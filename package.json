@@ -1,0 +1,26 @@
+{
+  "name": "ece458-group-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+   "start": "node index", 
+   "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+	  "express": "~4.15.3",
+	  "mongoose": "~4.11.0",
+	  "cors": "~2.8.3",
+	  "body-parser": "~1.17.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jap87/ECE458-Group-Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jap87/ECE458-Group-Project/issues"
+  },
+  "homepage": "https://github.com/jap87/ECE458-Group-Project#readme"
+}
