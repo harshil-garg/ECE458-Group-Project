@@ -6,12 +6,19 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const config = require('./config/database');
 const bucketlist = require('./controllers/bucketlist');
+const users = require('./controllers/user');
 
 //Connect mongoose to our database
-mongoose.connect(config.database);
+mongoose.connect(config.database, function(err){
+    if(err){
+        console.log("Not connected to database: "+err);
+    }else{
+        console.log("Successfully connected to MongoDB")
+    }
+});
 
 //Declaring Port
-const port = 3000;
+const port = process.env.Port || 3000;
 
 //Initialize our app variable
 const app = express();
@@ -38,6 +45,7 @@ app.get('/', (req,res) => {
 
 //Routing all HTTP requests to /bucketlist to bucketlist controller
 app.use('/bucketlist',bucketlist);
+app.use('/users', users);
 
 
 //Listen to port 3000
