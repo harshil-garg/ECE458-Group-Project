@@ -1,6 +1,8 @@
 // We’ll declare all our dependencies here
+const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
+const https = require('https');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -56,8 +58,13 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/users', users);
 
+//Create https server
+let httpsServer = https.createServer({
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert')
+  }, app);
 
 //Listen to port 3000
-app.listen(port, () => {
+httpsServer.listen(port, () => {
     console.log(`Starting the server at port ${port}`);
 });
