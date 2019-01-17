@@ -2,7 +2,7 @@
   "name": "ece458-group-project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,8 +12,11 @@
     "body-parser": "~1.17.2",
     "cors": "~2.8.3",
     "express": "~4.15.3",
+    "express-session": "^1.15.6",
     "joi": "^14.3.1",
-    "mongoose": "~4.11.0"
+    "mongoose": "~4.11.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0"
   },
   "repository": {
     "type": "git",

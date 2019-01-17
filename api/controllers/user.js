@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt-nodejs');
 
 router.post('/', (req,res) => {
     let newUser = new User({
-        username: req.body.username,
+        name: req.body.name,
         password: req.body.password,
         email: req.body.email
     });

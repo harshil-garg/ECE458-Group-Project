@@ -1,12 +1,16 @@
 // We’ll declare all our dependencies here
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const config = require('./config/database');
-const bucketlist = require('./controllers/bucketlist');
-const users = require('./controllers/user');
+const passport = require('passport');
+
+require('./api/config/passport');
+const config = require('./api/config/database');
+const users = require('./api/routes/users');
+const index = require('./api/routes/index');
 
 //Connect mongoose to our database
 mongoose.connect(config.database, function(err){
@@ -37,14 +41,19 @@ app.use(bodyParser.json());
 */
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Express session and passport setup
+app.use(
+    session({
+        secret: 'secret',
+        resave: true,
+        saveUninitialized: true
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get('/', (req,res) => {
-    res.send("Invalid page");
-})
-
-
-//Routing all HTTP requests to /bucketlist to bucketlist controller
-app.use('/bucketlist',bucketlist);
+//Routing HTTP requests 
+app.use('/', index);
 app.use('/users', users);
 
 
