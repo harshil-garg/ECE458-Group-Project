@@ -11,7 +11,7 @@ const passport = require('passport');
 
 require('./api/config/passport');
 const config = require('./api/config/database');
-const users = require('./api/routes/users');
+const users = require('./api/routes/authentication');
 const index = require('./api/routes/index');
 
 //Connect mongoose to our database

@@ -5,18 +5,15 @@ const User = require('../model/user');
 
 const router = express.Router();
 
-//Login page
-router.get('/login', (req,res) => {
-    res.send('login');
-});
-
 //Register page
 router.get('/register', (req,res) => {
     res.send('register');
 });
 
-//Login handle
-
+//Login page
+router.get('/login', (req,res) => {
+    res.send('login');
+});
 
 //Register handle
 router.post('/register', (req,res) => {
@@ -31,7 +28,7 @@ router.post('/register', (req,res) => {
     if(password !== password2){
         res.send('Passwords do not match');
     }
-
+    
     //validation passed
     let user = new User({
         name: name,
@@ -53,11 +50,19 @@ router.post('/register', (req,res) => {
             res.json({success:true, message: "Added successfully."});
 
     });
+    
+    
 })
 
 //Login handle
 router.post('/login',
-    passport.authenticate('local', { successRedirect: '/',
+    passport.authenticate('local', { successRedirect: '/dashboard',
                                  failureRedirect: '/login' }));
+
+//Logout Handle
+router.get('/logout', (req,res) => {
+    req.logOut();
+    res.redirect('/');
+});
 
 module.exports = router;
