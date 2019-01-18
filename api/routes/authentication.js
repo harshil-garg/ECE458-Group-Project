@@ -65,4 +65,25 @@ router.get('/logout', (req,res) => {
     res.redirect('/');
 });
 
+//Get all users
+let limit = 10;
+router.post('/all/', (req, res) => {
+    const { sortBy, pageNum } = req.body;
+
+    //check fields completed
+    if(!sortBy || !pageNum){
+        res.send('Please fill in all fields');
+    }
+
+    User.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, users) => {
+        if((pageNum-1)*limit >= users.length){
+            res.send('Page does not exist');
+        }else{
+            res.json({data: users});
+        }
+        
+    });
+        
+});
+
 module.exports = router;
