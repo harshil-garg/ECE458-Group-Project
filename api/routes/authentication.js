@@ -16,6 +16,7 @@ router.get('/login', (req,res) => {
 });
 
 //Register handle
+//request params: name, email, password, password2
 router.post('/register', (req,res) => {
     const {name, email, password, password2} = req.body;
 
@@ -23,7 +24,7 @@ router.post('/register', (req,res) => {
     if(!name || !email || !password || !password2){
         res.send('Please fill in all fields');
     }
-
+    
     //check passwords match
     if(password !== password2){
         res.send('Passwords do not match');
@@ -55,6 +56,7 @@ router.post('/register', (req,res) => {
 })
 
 //Login handle
+//request params: email, password
 router.post('/login',
     passport.authenticate('local', { successRedirect: '/dashboard',
                                  failureRedirect: '/login' }));
@@ -66,6 +68,7 @@ router.get('/logout', (req,res) => {
 });
 
 //Get all users
+//request params: sortBy, pageNum
 let limit = 10;
 router.post('/all/', (req, res) => {
     const { sortBy, pageNum } = req.body;
