@@ -22,11 +22,13 @@ router.post('/register', (req,res) => {
     //check fields completed
     if(!name || !email || !password || !password2){
         res.send('Please fill in all fields');
+        return;
     }
 
     //check passwords match
     if(password !== password2){
         res.send('Passwords do not match');
+        return;
     }
     
     //validation passed
@@ -62,28 +64,34 @@ router.post('/login',
 //Logout Handle
 router.get('/logout', (req,res) => {
     req.logOut();
-    res.redirect('/');
+    res.redirect('/login');
 });
 
 //Get all users
 let limit = 10;
 router.post('/all/', (req, res) => {
-    const { sortBy, pageNum } = req.body;
+    if (req.isAuthenticated()) {
+        const { sortBy, pageNum } = req.body;
 
-    //check fields completed
-    if(!sortBy || !pageNum){
-        res.send('Please fill in all fields');
-    }
+        //check fields completed
+        if(!sortBy || !pageNum){
+            res.send('Please fill in all fields');
 
-    User.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, users) => {
-        if((pageNum-1)*limit >= users.length){
-            res.send('Page does not exist');
-        }else{
-            res.json({data: users});
+            return;
         }
-        
-    });
-        
+
+        User.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, users) => {
+            if((pageNum-1)*limit >= users.length){
+                res.send('Page does not exist');
+            }else{
+                res.json({data: users});
+            }
+            
+        });
+    }
+    else {
+        res.send('not authed');
+    }   
 });
 
 module.exports = router;
