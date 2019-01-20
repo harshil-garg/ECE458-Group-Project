@@ -55,8 +55,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Routing HTTP requests 
-app.use('/', index);
 app.use('/users', users);
+app.get('/', (req, res) => {
+    console.log("received");
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
 
 //Create https server
 let httpsServer = https.createServer({
