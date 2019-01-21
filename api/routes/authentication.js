@@ -24,7 +24,7 @@ router.post('/register', (req,res) => {
     if(!name || !email || !password || !password2){
         res.send('Please fill in all fields');
     }
-    
+
     //check passwords match
     if(password !== password2){
         res.send('Passwords do not match');
@@ -88,5 +88,7 @@ router.post('/all/', (req, res) => {
     });
         
 });
+
+
 
 module.exports = router;
