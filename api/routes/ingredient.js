@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Ingredient = require('../model/ingredient');
+const Ingredient = require('../model/ingredient_model');
 
 let limit = 10;
 //Get initial documents
