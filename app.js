@@ -56,7 +56,7 @@ app.use(passport.session());
 
 //Routing HTTP requests 
 app.use('/users', users);
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
     console.log("received");
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });

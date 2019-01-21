@@ -90,7 +90,7 @@ router.post('/all/', (req, res) => {
         });
     }
     else {
-        res.send('not authed');
+        res.redirect('/users/login');
     }   
 });
 
