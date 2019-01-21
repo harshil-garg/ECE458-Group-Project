@@ -1,0 +1,18 @@
+<div>
+  <label>Email:
+    <input #email />
+  </label>
+    <br>
+  <label>Password:
+    <input type="password" #password />
+  </label>
+  <br>
+  <label>Re-enter Password:
+    <input type="password" #password2 />
+  </label>
+  <br>
+  <!-- (click) passes input value to add() and then clears the input -->
+  <button (click)="login(email.value, password.value, password2.value)">
+    Submit
+  </button>
+</div>

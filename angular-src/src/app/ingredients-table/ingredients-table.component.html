@@ -1,0 +1,32 @@
+<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
+
+<div class="card">
+  <h3 class="card-header text-center font-weight-bold text-uppercase py-4">Ingredients</h3>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <button class = "add" type="button" (click)="add()">+</button>
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center">Ingredient Name</th>
+          <th class="text-center">Ingredient Number</th>
+          <th class="text-center">Vendor Information</th>
+          <th class="text-center">Package Size</th>
+          <th class="text-center">Cost Per Package (USD)</th>
+          <th class="text-center">Comment</th>
+        </tr>
+        <tr *ngFor="let ingredient of ingredientList; let id = index">
+          <td contenteditable="true" (keyup)="changeValue(id, 'name', $event)" (blur)="updateList(id, 'name', $event)">{{ingredient.name}}</td>
+          <td onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57;"
+            contenteditable="true" (keyup)="changeValue(id, 'id', $event)" (blur)="updateList(id, 'id', $event)">{{ingredient.id}}</td>
+          <td contenteditable="true" (keyup)="changeValue(id, 'vendor_info', $event)" (blur)="updateList(id, 'vendor_info', $event)">{{ingredient.vendor_info}}</td>
+          <td contenteditable="true" (keyup)="changeValue(id, 'package_size', $event)" (blur)="updateList(id, 'package_size', $event)">{{ingredient.package_size}}</td>
+          <td contenteditable="true" (keyup)="changeValue(id, 'cost_per_package', $event)" (blur)="updateList(id, 'cost_per_package', $event)">{{ingredient.cost_per_package}}</td>
+          <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="updateList(id, 'comment', $event)">{{ingredient.comment}}</td>
+          <td>
+            <button class="remove" type="button" (click)="remove(id)">Remove</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

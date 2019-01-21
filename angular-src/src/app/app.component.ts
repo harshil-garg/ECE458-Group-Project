@@ -8,4 +8,3 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'angular-src';
 }
-// add code to route to / here
