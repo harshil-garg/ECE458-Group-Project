@@ -10,4 +10,3 @@ export class AppComponent {
   loginState = {loggedIn: false};
   title = 'angular-src';
 }
-// add code to route to / here
