@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoginState } from '../loginstate';
+
 
 @Component({
   selector: 'app-login',
@@ -8,11 +10,17 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
 
-
+  @Input() loginState: LoginState;
 	 constructor() { }
 
 	login(email: string, password: string) {
-		console.log(email);
+    if (!this.loginState.loggedIn) {
+        console.log(email);
+    }
+    else {
+      console.log("logged in");
+    }
+    this.loginState.loggedIn = true;
 	} 
 
 }

@@ -9,9 +9,12 @@ import { Router } from '@angular/router';
 export class AuthenticationService {
 
 	constructor(private http: HttpClient, private router: Router) { }
+  
+  login(username: string, password: string) {
+    this.request('post', 'login', {});
+  }
 
-
-	private request(method: 'post'|'get', type: 'login'|'register'|'profile') {
+	private request(method: 'post'|'get', type: 'login'|'register'|'profile', body) {
 	  let base;
 
 	  if (method === 'post') {
