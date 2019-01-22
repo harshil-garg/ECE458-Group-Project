@@ -9,4 +9,5 @@
   <button (click)="login(email.value, password.value)">
     Submit
   </button>
+  <div *ngIf="loginError">Email or password incorrect</div>
 </div>

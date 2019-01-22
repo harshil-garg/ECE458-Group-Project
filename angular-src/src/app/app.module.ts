@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { IngredientsTableComponent } from './ingredients-table/ingredients-table.component';
 import { TableEditableComponent } from './table-editable/table-editable.component';
+import { UiParentComponent } from './ui-parent/ui-parent.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { TableEditableComponent } from './table-editable/table-editable.componen
     RegisterComponent,
     IngredientsTableComponent,
     TableEditableComponent,
+    UiParentComponent,
   ],
   imports: [
     BrowserModule,
