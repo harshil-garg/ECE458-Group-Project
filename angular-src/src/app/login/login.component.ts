@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginState } from '../loginstate';
-
+import { AuthenticationService, LoginResponse } from '../authentication.service'
 
 @Component({
   selector: 'app-login',
@@ -11,16 +11,16 @@ import { LoginState } from '../loginstate';
 export class LoginComponent {
 
   @Input() loginState: LoginState;
-	 constructor() { }
+	 constructor(private authenticationService: AuthenticationService) { }
 
 	login(email: string, password: string) {
-    if (!this.loginState.loggedIn) {
-        console.log(email);
-    }
-    else {
-      console.log("logged in");
-    }
-    this.loginState.loggedIn = true;
+    this.authenticationService.login({email: email, password: password}).subscribe(response => this.handleResponse(response));
+    
 	} 
-
+  
+  private handleResponse(response: LoginResponse) {
+    if (response.success) {
+        this.loginState.loggedIn = true;
+    }
+  }
 }
