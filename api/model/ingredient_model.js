@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const ingredients = new Schema({
+const IngredientSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -25,11 +25,11 @@ const ingredients = new Schema({
         required: true
     },
     comment: {
-        type: String,
+        type: String
     }
 });
 
-var Ingredients = mongoose.model('Ingredients', ingredients);
+let Ingredients = mongoose.model('Ingredient', IngredientSchema);
 module.exports = Ingredients;
 
 //newUser.save is used to insert the document into MongoDB

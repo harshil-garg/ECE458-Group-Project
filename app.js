@@ -12,6 +12,7 @@ const passport = require('passport');
 require('./api/config/passport');
 const config = require('./api/config/database');
 const users = require('./api/routes/authentication');
+const ingredients = require('./api/routes/ingredient');
 const index = require('./api/routes/index');
 
 //Connect mongoose to our database
@@ -57,6 +58,7 @@ app.use(passport.session());
 //Routing HTTP requests 
 app.use('/', index);
 app.use('/users', users);
+app.use('/ingredients', ingredients);
 
 //Create https server
 let httpsServer = https.createServer({
