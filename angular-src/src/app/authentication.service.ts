@@ -25,6 +25,8 @@ const httpOptions = {
 })
 export class AuthenticationService {
 
+  loginState = {loggedIn: false};
+
 	constructor(private http: HttpClient) { }
   
   login(credentials: LoginCredentials):Observable<LoginResponse> {

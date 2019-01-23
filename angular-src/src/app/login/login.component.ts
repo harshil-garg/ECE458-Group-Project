@@ -10,10 +10,8 @@ import { AuthenticationService, LoginResponse } from '../authentication.service'
 })
 export class LoginComponent implements OnInit {
 	loginError = false;
-
-	@Input() loginState: LoginState;
 	 
-	constructor(private authenticationService: AuthenticationService) { }
+	constructor(private authenticationService: AuthenticationService, private router: Router) { }
 
 	ngOnInit() { }
 
@@ -30,8 +28,9 @@ export class LoginComponent implements OnInit {
   
 	private handleResponse(response: LoginResponse) {
 	    if (response.success) {
-	        this.loginState.loggedIn = true;
-	        this.loginError = false;
+	        this.authenticationService.loginState.loggedIn = true;
+			this.loginError = false;
+			this.router.navigate(['/dashboard'])
 	    }
   	}
 }

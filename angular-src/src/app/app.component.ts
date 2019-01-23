@@ -7,6 +7,5 @@ import { LoginState } from './loginstate';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  loginState = {loggedIn: false};
-  title = 'angular-src';
+  title = 'Hypo Meals';
 }
