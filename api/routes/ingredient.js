@@ -4,47 +4,16 @@ const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
 
 let limit = 10;
-//Get initial documents
-//request params: sortBy, pageNum
-router.post('/all', (req, res) => {
-    const { sortBy, pageNum } = req.body;
-
-    //check fields completed
-    if(!sortBy || !pageNum){
-        res.send('Please fill in all fields');
-    }
-
-    Ingredient.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
-        if((pageNum-1)*limit >= ingredients.length){
-            res.send('Page does not exist');
-        }else{
-            res.json({data: ingredients});
-        }
-        
-    });
-        
-});
-
-//Sort ingredients
-router.post('/sort', (req, res) => {
-    const { sortBy, pageNum, direction } = req.body;
-
-    //check fields completed
-    if(!sortBy || !pageNum || !direction){
-        res.send('Please fill in all fields');
-    }
-
-    //find from already filtered results
-});
 
 //Filter ingredients
-//request params: sortBy, pageNum, keywords, skus
+//request params: sortBy, direction, pageNum, keywords, skus
 router.post('/filter', (req, res) => {
-    const { pageNum, keywords, skus } = req.body;
+    const { sortBy, pageNum, keywords, skus } = req.body;
 
     //check fields completed
-    if(!pageNum || !keywords || !skus){
+    if(!sortBy || !pageNum || !keywords || !skus){
         res.send('Please fill in all fields');
+
         return;
     }
 
@@ -52,46 +21,43 @@ router.post('/filter', (req, res) => {
         return new RegExp(keyword, 'i');
     });
 
-    //find all ingredients containing any of the keywords
-
-    let union = [];
-    // for(let exp of key_exps) {
-        Ingredient.find({$or:[
-            {name: exp},
-            {number: exp},
-            {vendor_info: exp},
-            {package_size: exp},
-            {cost: exp},
-            {comment: /good/i}
-        ]}, (err, ingredients) => {
-            union.concat(ingredients);
-            console.log(ingredients);
+    //No filter, return all
+    if(keywords.length == 0 && skus.length == 0){
+        Ingredient.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+            if((pageNum-1)*limit >= ingredients.length){
+                res.send('Page does not exist');
+            }else{
+                res.json({data: ingredients});
+            }
+            
         });
-    // }
-    //res.json({data: union});
+    }
+    //Keywords no SKUs
+    else if(skus.length == 0){
+        //find all ingredients containing any of the keywords
+        Ingredient.find({$or:[
+            {name: {$in: key_exps}}, 
+            {number: {$in: key_exps}},
+            {vendor_info: {$in: key_exps}},
+            {package_size: {$in: key_exps}},
+            {cost: {$in: key_exps}},
+            {comment: {$in: key_exps}}]
+        }, (err, ingredients) => {
+            res.json({data: ingredients});
+        });
+    }
+    //SKUs no keywords
+    else if(keywords.length == 0){
+        //get all ingredients with given SKUs
+        // SKU.find({name: {$in: skus}}, ingredients, (err, ingredients) => {
+        //     res.json({data: ingredients});
+        // });
+    }
+    //Keywords and SKUs
+    else{
 
-    // Ingredient.find({$or:[
-    //     {name: {$in: key_exps}}, 
-    //     {number: {$in: key_exps}},
-    //     {vendor_info: {$in: key_exps}},
-    //     {package_size: {$in: key_exps}},
-    //     {cost: {$in: key_exps}},
-    //     {comment: {$in: key_exps}}]
-    // }, (err, ingredients) => {
-    //     res.json({data: ingredients});
-    // });
+    }
 
-    // Ingredient.find({comment: {$in: key_exps}}, (err, ingredients) => {
-    //     res.json({data: ingredients});
-    // })
-
-    //get all ingredients with given SKUs
-    // SKU.find({name: {$in: skus}}, ingredients, (err, ingredients) => {
-    //     res.json({data: ingredients});
-    // });
-
-    //intersection of results
-    
 });
 
 //Add ingredient
@@ -100,7 +66,10 @@ router.post('/add', (req, res) => {
     //check fields completed
     if(!name || !number || !package_size || !cost){
         res.send('Please fill in all fields');
+        return;
     }
+
+    //check inputs, number and cost need to be numeric
 
     let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
     Ingredient.addIngredient(ingredient, (err) => {
