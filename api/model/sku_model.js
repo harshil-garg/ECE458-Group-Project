@@ -1,10 +1,9 @@
 //Require mongoose package
 const mongoose = require('mongoose');
-const Ingredient = require('../model/ingredient_model');
 
 const Schema = mongoose.Schema;
 const Tuple = new Schema({
-    ingredient: [Ingredient.schema],
+    ingredient: String,
     quantity: Number
 });
 const SKUSchema = new Schema({
@@ -14,17 +13,17 @@ const SKUSchema = new Schema({
         unique: true
     },
     number: {
-        type: Number,
+        type: String,
         required: true,
         unique: true
     },
     case_upc: {
-        type: Number,
+        type: String,
         required: true,
         unique: true
     },
     unit_upc: {
-        type: Number,
+        type: String,
         required: true
     }, 
     size: {
@@ -32,7 +31,7 @@ const SKUSchema = new Schema({
         required: true
     },
     count: {
-        type: Number,
+        type: String,
         required: true
     },
     product_line: {

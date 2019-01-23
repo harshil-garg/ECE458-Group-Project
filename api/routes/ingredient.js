@@ -13,7 +13,6 @@ router.post('/filter', (req, res) => {
     //check fields completed
     if(!sortBy || !pageNum || !keywords || !skus){
         res.send('Please fill in all fields');
-
         return;
     }
 
@@ -42,8 +41,12 @@ router.post('/filter', (req, res) => {
             {package_size: {$in: key_exps}},
             {cost: {$in: key_exps}},
             {comment: {$in: key_exps}}]
-        }, (err, ingredients) => {
-            res.json({data: ingredients});
+        }, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+            if((pageNum-1)*limit >= ingredients.length){
+                res.send('Page does not exist');
+            }else{
+                res.json({data: ingredients});
+            }
         });
     }
     //SKUs no keywords
