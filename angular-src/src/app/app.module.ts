@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { IngredientsTableComponent } from './ingredients-table/ingredients-table.component';
 import { TableEditableComponent } from './table-editable/table-editable.component';
+import { UploadModule } from './upload/upload.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { TableEditableComponent } from './table-editable/table-editable.componen
     TableEditableComponent,
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    UploadModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
