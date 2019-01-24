@@ -17,7 +17,7 @@ export class IngredientsTableComponent {
     ];
 
     blankIngredient: Ingredient =
-      { name: '', id:0 , vendor_info: '', package_size: '', cost_per_package: 0, comment: '' };
+      { name: '', id:'0' , vendor_info: '', package_size: '', cost_per_package: '0', comment: '' };
 
     skuShown: Array<any> = [
       {id:1, shown:true},
@@ -75,13 +75,7 @@ export class IngredientsTableComponent {
     }
 
     getNumSkus(ingredient: Ingredient){
-      if(ingredient.id == 1)
-      {
-        return 3;
-      }
-      else{
-        return 4;
-      }
+      return 3;
     }
 
     toggleSkus(id: number){
