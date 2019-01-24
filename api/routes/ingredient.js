@@ -58,13 +58,71 @@ router.post('/filter', (req, res) => {
     //SKUs no keywords
     else if(keywords.length == 0){
         //get all ingredients with given SKUs
-        // SKU.find({name: {$in: skus}}, ingredients, (err, ingredients) => {
-        //     res.json({data: ingredients});
-        // });
+        SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name', (err, skus) => {
+            if(err){
+                res.json({success: false, message: err});
+            }else{
+                let ingredient_names = new Set();
+                for(let sku of skus){
+                    for(let ingredient of sku.ingredients){
+                        ingredient_names.add(ingredient.ingredient_name);
+                    }
+                }
+                let names = Array.from(ingredient_names);
+
+                //find ingredients with given names
+                Ingredient.find({name: {$in: names}}, null, 
+                    {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+                    if(err){
+                        res.json({success: false, message: err});
+                    }else{
+                        let pages = Math.ceil(ingredients.length/limit);
+                        res.json({success: true,
+                            data: ingredients,
+                            pages: pages});
+                    }
+                })
+            }
+            
+        });
     }
     //Keywords and SKUs
     else{
+        SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name', (err, skus) => {
+            if(err){
+                res.json({success: false, message: err});
+            }else{
+                let ingredient_names = new Set();
+                for(let sku of skus){
+                    for(let ingredient of sku.ingredients){
+                        ingredient_names.add(ingredient.ingredient_name);
+                    }
+                }
+                let names = Array.from(ingredient_names);
 
+                //find ingredients with given names
+                Ingredient.find({name: {$in: names},
+                    $or:[
+                        {name: {$in: key_exps}}, 
+                        {number: {$in: key_exps}},
+                        {vendor_info: {$in: key_exps}},
+                        {package_size: {$in: key_exps}},
+                        {cost: {$in: key_exps}},
+                        {comment: {$in: key_exps}}]
+                }, null, 
+                    {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+                    if(err){
+                        res.json({success: false, message: err});
+                    }else{
+                        let pages = Math.ceil(ingredients.length/limit);
+                        res.json({success: true,
+                            data: ingredients,
+                            pages: pages});
+                    }
+                })
+            }
+            
+        });
     }
 
 });

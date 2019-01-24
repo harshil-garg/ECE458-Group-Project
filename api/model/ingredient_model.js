@@ -32,7 +32,6 @@ const IngredientSchema = new Schema({
 let Ingredients = mongoose.model('Ingredient', IngredientSchema);
 module.exports = Ingredients;
 
-//newUser.save is used to insert the document into MongoDB
 module.exports.addIngredient = (ingredient, callback) => {
     Ingredients.create(ingredient, callback);
 }
