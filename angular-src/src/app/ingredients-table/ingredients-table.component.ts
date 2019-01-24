@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Ingredient } from '../ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../sku'
+import { CrudIngredientsService, Response } from './crud-ingredients.service';
 
 @Component({
   selector: 'ingredients-table',
@@ -26,7 +27,7 @@ export class IngredientsTableComponent {
 
     editable: boolean = true;
 
-    constructor(private authenticationService: AuthenticationService){}
+    constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService){}
     /*awaitingPersonList: Array<any> = [
       { id: 6, name: 'George Vega', age: 28, companyName: 'Classical', country: 'Russia', city: 'Moscow' },
       { id: 7, name: 'Mike Low', age: 22, companyName: 'Lou', country: 'USA', city: 'Los Angeles' },
@@ -46,9 +47,61 @@ export class IngredientsTableComponent {
       }
     }
 
-    remove(id: any) {
-      //this.awaitingPersonList.push(this.personList[id]);
-      this.ingredientList.splice(id, 1);
+    remove(deleted_name: any) {
+      this.crudIngredientsService.remove({
+          name : deleted_name
+        }).subscribe(
+        response => this.handleResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    edit(name:any, property:string, event:any) {
+      var editedIngredient : Ingredient = new Ingredient();
+      editedIngredient.name = name;
+      switch(property){
+        case 'name':{
+          editedIngredient.name = event.target.textContent;
+        }
+        case 'id':{
+          editedIngredient.id = event.target.textContent;
+        }
+        case 'vendor_info':{
+          editedIngredient.vendor_info = event.target.textContent;
+        }
+        case 'package_size':{
+          editedIngredient.package_size = event.target.textContent;
+        }
+        case 'cost_per_package':{
+          editedIngredient.cost_per_package = event.target.textContent;
+        }
+        case 'comment':{
+          editedIngredient.comment = event.target.textContent;
+        }
+      }
+      this.crudIngredientsService.edit({
+          name : editedIngredient.name,
+          number : editedIngredient.id,
+          vendor_info : editedIngredient.vendor_info,
+          package_size: editedIngredient.package_size,
+          cost : editedIngredient.cost_per_package,
+          comment : editedIngredient.comment
+        }).subscribe(
+        response => this.handleResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    private handleResponse(response: Response) {
+      console.log(response);
     }
 
     add() {

@@ -22,16 +22,16 @@
          <!-- TABLE VIEWED BY ADMIN -->
          <ng-container *ngIf="isAdmin()==true">
             <tr>
-              <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="updateList(id, 'name', $event)">{{ingredient.name}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="edit(ingredient.name, 'name', $event)">{{ingredient.name}}</td>
               <td onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57;"
-                contenteditable="true" (keyup)="changeValue(id, 'id', $event)" (blur)="updateList(id, 'id', $event)">{{ingredient.id}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'vendor_info', $event)" (blur)="updateList(id, 'vendor_info', $event)">{{ingredient.vendor_info}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'package_size', $event)" (blur)="updateList(id, 'package_size', $event)">{{ingredient.package_size}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'cost_per_package', $event)" (blur)="updateList(id, 'cost_per_package', $event)">{{ingredient.cost_per_package}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="updateList(id, 'comment', $event)">{{ingredient.comment}}</td>
+                contenteditable="true" (keyup)="changeValue(id, 'id', $event)" (blur)="edit(ingredient.name, 'id', $event)">{{ingredient.id}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'vendor_info', $event)" (blur)="edit(ingredient.name, 'vendor_info', $event)">{{ingredient.vendor_info}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'package_size', $event)" (blur)="edit(ingredient.name, 'package_size', $event)">{{ingredient.package_size}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'cost_per_package', $event)" (blur)="edit(ingredient.name, 'cost_per_package', $event)">{{ingredient.cost_per_package}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="edit(ingredient.name, 'comment', $event)">{{ingredient.comment}}</td>
               <td contenteditable="false" (click) = "toggleSkus(id)">{{getNumSkus(ingredient)}} <i class="fa fa-sort-desc"></i></td>
               <td>
-                <button class="remove" type="button" (click)="remove(id)">Remove</button>
+                <button class="remove" type="button" (click)="remove(ingredient.name)">Remove</button>
               </td>
             </tr>
           </ng-container>

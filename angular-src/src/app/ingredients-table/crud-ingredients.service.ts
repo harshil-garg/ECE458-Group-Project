@@ -13,7 +13,20 @@ export class CreateMessage {
   comment : string;
 }
 
-export class CreateResponse {
+export class RemoveMessage {
+  name: string;
+}
+
+export class EditMessage {
+  name : string;
+  number : string;
+  vendor_info : string;
+  package_size: string;
+  cost : string;
+  comment : string;
+}
+
+export class Response {
   success: boolean;
   message: string;
 }
@@ -31,7 +44,15 @@ export class CrudIngredientsService {
 
 	constructor(private http: HttpClient) { }
 
-  add(requestedIngredient: CreateMessage): Observable<CreateResponse>{
-    return this.http.post<CreateResponse>('api/ingredients/add', requestedIngredient, httpOptions);
+  add(requestedIngredient: CreateMessage): Observable<Response>{
+    return this.http.post<Response>('api/ingredients/add', requestedIngredient, httpOptions);
+  }
+
+  remove(requestedIngredient: RemoveMessage): Observable<Response>{
+    return this.http.post<Response>('api/ingredients/remove', requestedIngredient, httpOptions);
+  }
+
+  edit(requestedIngredient: EditMessage): Observable<Response>{
+    return this.http.post<Response>('api/ingredients/edit', requestedIngredient, httpOptions);
   }
 }

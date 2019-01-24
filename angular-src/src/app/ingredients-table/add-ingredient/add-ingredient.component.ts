@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { AddIngredientDialogComponent } from './add-ingredient-dialog/add-ingredient-dialog.component';
-import { CrudIngredientsService, CreateResponse } from '../crud-ingredients.service';
+import { CrudIngredientsService, Response } from '../crud-ingredients.service';
 
 import { Ingredient } from '../../ingredient';
 
@@ -47,7 +47,7 @@ export class AddIngredientComponent {
       );
     }
 
-    private handleResponse(response: CreateResponse) {
+    private handleResponse(response: Response) {
       console.log(response);
     }
 
