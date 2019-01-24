@@ -22,7 +22,7 @@ router.post('/add', (req, res) => {
 
     //check ingredients and product lines exist
 
-    let sku = new SKU(name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment);
+    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment});
     SKU.addSKU(sku, (err) => {
         if(err){
             res.json({success: false, message: `Failed to add SKU. Error: ${err}`});
@@ -34,7 +34,16 @@ router.post('/add', (req, res) => {
 
 //Remove
 router.post('/remove', (req, res) => {
+    const name = req.body.name;
 
+    SKU.removeSKU(name, (err) => {
+        if(err) {
+            res.json({success: false, message: `Failed to remove SKU. Error: ${err}`});
+
+        }else{
+            res.json({success: true, message: "Removed successfully."});
+        }
+    })
 });
 
 module.exports = router;
