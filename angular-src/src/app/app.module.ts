@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { IngredientsTableComponent } from './ingredients-table/ingredients-table.component';
 import { TableEditableComponent } from './table-editable/table-editable.component';
+import { UploadModule } from './upload/upload.module';
 import { UiParentComponent } from './ui-parent/ui-parent.component';
 import { RouterModule, Routes } from '@angular/router';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
@@ -16,16 +17,11 @@ import { AuthGuard } from './auth-guard';
 const routes: Routes = [
   {
     path: 'dashboard',
-    component: UiParentComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
-      {
-        path: '',
-        canActivateChild: [AuthGuard],
-        children: [
-          { path: 'ingredients', component: TableEditableComponent },
-        ]
-      }
+        	{ path: '', component: DashboardComponent },
+        	{ path: 'ingredients', component: IngredientsTableComponent }
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -46,6 +42,7 @@ const routes: Routes = [
   ],
   imports: [
     BrowserModule,
+    UploadModule,
     HttpClientModule,
     RouterModule.forRoot(routes)
   ],

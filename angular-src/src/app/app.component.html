@@ -3,5 +3,17 @@
   <h1>
     Welcome to {{ title }}!
   </h1>
+  <div *ngIf="this.authService.loginState.loggedIn">
+	  	<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+		    <div class="container">
+		        <a class="navbar-brand">Angular Router</a>
+		        <ul class="nav navbar-nav" routerLinkActive="active">
+		            <li class="nav-item"><a class="nav-link" routerLink="dashboard">Home</a></li>
+		            <li class="nav-item"><a class="nav-link" routerLink="dashboard/ingredients">Ingredients</a></li>
+		        </ul>
+		    </div>
+		</nav>
+ 	</div>
+
   <router-outlet></router-outlet>
 </div>

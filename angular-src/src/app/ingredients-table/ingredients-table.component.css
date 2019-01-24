@@ -6,8 +6,8 @@ table {
 
 td, th {
   border: 1px solid #dddddd;
-  text-align: left;
   padding: 8px;
+  text-align: center;
 }
 
 tr:nth-child(even) {
@@ -44,4 +44,23 @@ tr:nth-child(even) {
 
 .remove:hover {
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+tr.blankcell:nth-child(odd) {
+  background-color: #ffffff00;
+  text-align: left;
+}
+
+tr.blankcell:nth-child(even) {
+  background-color: #ffffff00;
+  text-align: left;
+}
+
+td.blankcell {
+  border: none;
+  text-align: left;
+}
+
+.fa:hover {
+  cursor:pointer;
 }
