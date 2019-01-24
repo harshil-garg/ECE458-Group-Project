@@ -11,7 +11,7 @@ router.post('/filter', (req, res) => {
 //Add
 router.post('/add', (req, res) => {
     const { name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-
+    console.log(req.body)
     //check required fields
     if(!name || !number, !case_upc || !unit_upc || !size || !count || !product_line || !ingredients){
         res.json({success: false, message: 'Please fill in all fields'});
