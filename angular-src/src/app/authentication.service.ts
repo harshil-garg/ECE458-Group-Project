@@ -12,6 +12,7 @@ export class LoginCredentials {
 export class LoginResponse {
   success: boolean; 
   message: string;
+  admin: boolean;
 }
 
 const httpOptions = {
@@ -32,14 +33,4 @@ export class AuthenticationService {
   login(credentials: LoginCredentials):Observable<LoginResponse> {
     return this.http.post<LoginResponse>('api/users/login', credentials, httpOptions);
   }
-
-	private request(method: 'post'|'get', type: 'login'|'register'|'profile', body) {
-	  let base;
-
-	  if (method === 'post') {
-	    base = this.http.post(`/api/${type}`, {});
-	  } else {
-	    base = this.http.get(`/api/${type}`);
-	  }
-	}
 }

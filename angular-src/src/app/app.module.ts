@@ -16,16 +16,11 @@ import { AuthGuard } from './auth-guard';
 const routes: Routes = [
   {
     path: 'dashboard',
-    component: UiParentComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
-      {
-        path: '',
-        canActivateChild: [AuthGuard],
-        children: [
-          { path: 'ingredients', component: TableEditableComponent },
-        ]
-      }
+        	{ path: '', component: DashboardComponent },
+        	{ path: 'ingredients', component: TableEditableComponent }
     ]
   },
   {path: 'login', component: LoginComponent },

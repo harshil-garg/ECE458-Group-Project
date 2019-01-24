@@ -1,3 +1,4 @@
 export class LoginState {
-  loggedIn: boolean;
+  loggedIn: boolean = false;
+  isAdmin: boolean = false;
 }

@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
 	private handleResponse(response: LoginResponse) {
 	    if (response.success) {
 	        this.authenticationService.loginState.loggedIn = true;
+	        this.authenticationService.loginState.loggedIn = response.admin;
 			this.loginError = false;
 			this.router.navigate(['/dashboard'])
 	    }
