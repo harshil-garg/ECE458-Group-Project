@@ -49,3 +49,18 @@ const SKUSchema = new Schema({
 
 let SKU = mongoose.model('SKU', SKUSchema);
 module.exports = SKU;
+
+
+module.exports.addSKU = (sku, callback) => {
+    SKU.create(sku, callback);
+}
+
+module.exports.removeSKU = (sku_name, callback) => {
+    var query = {name: sku_name};
+    SKU.deleteOne(query, callback);
+}
+
+module.exports.updateSKU = (sku_name, sku_update, cb) => {
+    var query = {name: sku_name};
+    SKU.findOneAndUpdate(query, sku_update, cb);
+}

@@ -12,7 +12,7 @@ router.post('/filter', (req, res) => {
 
     //check fields completed
     if(!sortBy || !pageNum || !keywords || !skus){
-        res.send('Please fill in all fields');
+        res.json({success: false, message: "Please fill in all fields"});
         return;
     }
 
@@ -23,10 +23,13 @@ router.post('/filter', (req, res) => {
     //No filter, return all
     if(keywords.length == 0 && skus.length == 0){
         Ingredient.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
-            if((pageNum-1)*limit >= ingredients.length){
-                res.send('Page does not exist');
+            if(err){
+                res.json({success: false, message: err});
             }else{
-                res.json({data: ingredients});
+                let pages = Math.ceil(ingredients.length/limit);
+                res.json({success: true,
+                    data: ingredients,
+                    pages: pages});
             }
             
         });
@@ -42,10 +45,13 @@ router.post('/filter', (req, res) => {
             {cost: {$in: key_exps}},
             {comment: {$in: key_exps}}]
         }, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
-            if((pageNum-1)*limit >= ingredients.length){
-                res.send('Page does not exist');
+            if(err){
+                res.json({success: false, message: err});
             }else{
-                res.json({data: ingredients});
+                let pages = Math.ceil(ingredients.length/limit);
+                res.json({success: true,
+                    data: ingredients,
+                    pages: pages});
             }
         });
     }
@@ -68,20 +74,20 @@ router.post('/add', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
     //check fields completed
     if(!name || !number || !package_size || !cost){
-        res.send('Please fill in all fields');
+        res.json({success: false, message: "Please fill in all fields"});
         return;
     }
 
-    //check inputs, number and cost need to be numeric
+    //TODO: check inputs, number and cost need to be numeric
 
     let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
     Ingredient.addIngredient(ingredient, (err) => {
         if(err) {
             res.json({success: false, message: `Failed to create a new ingredient. Error: ${err}`});
 
-        }else
+        }else{
             res.json({success:true, message: "Added successfully."});
-
+        }
     });
 
 });
@@ -94,9 +100,9 @@ router.post('/remove', (req, res) => {
         if(err) {
             res.json({success: false, message: `Failed to remove ingredient. Error: ${err}`});
 
-        }else
-            res.json({success:true, message: "Removed successfully."});
-
+        }else{
+            res.json({success: true, message: "Removed successfully."});
+        }
     });
 });
 
@@ -115,9 +121,9 @@ router.post('/edit', (req, res) => {
         if(err) {
             res.json({success: false, message: `Failed to update ingredient. Error: ${err}`});
 
-        }else
+        }else{
             res.json({success:true, message: "Updated successfully."});
-
+        }
     });
 });
 

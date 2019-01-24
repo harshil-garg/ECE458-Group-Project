@@ -9,7 +9,6 @@ passport.use(new LocalStrategy({usernameField: 'email'}, (email, password, done)
     User.findOne({email: email})
         .then((user) => {
             if(!user){
-                console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
                 return done(null, false, {message: 'Email not registered'});
             }
 
