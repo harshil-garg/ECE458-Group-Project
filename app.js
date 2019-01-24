@@ -1,9 +1,6 @@
 // We’ll declare all our dependencies here
 const fs = require('fs');
 const express = require('express');
-const multer = require('multer');
-const upload = multer({ dest: 'tmp/csv/' });
-const csv = require('fast-csv');
 const session = require('express-session');
 const https = require('https');
 const path = require('path');
@@ -12,16 +9,15 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const uploadroute = require('./api/routes/upload');
 require('./api/config/passport');
-const config = require('./api/config/database');
-const users = require('./api/routes/authentication');
+const mongoCreds = require('./api/config/database');
+const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
-const index = require('./api/routes/index');
-
-const router = express.Router();
+const authguard = require('./api/config/auth.js');
 
 //Connect mongoose to our database
-mongoose.connect(config.database, function(err){
+mongoose.connect(mongoCreds.database, function(err){
     if(err){
         console.log("Not connected to database: "+err);
     }else{
@@ -58,23 +54,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Uploading csv files
 //app.post('/upload', upload);
 
-router.post('/', upload.single('file'), function (req, res) {
-  const fileRows = [];
-
-  // open uploaded file
-  csv.fromPath(req.file.path)
-    .on("data", function (data) {
-      fileRows.push(data); // push each row
-    })
-    .on("end", function () {
-      console.log(fileRows);
-      console.log('HELLO WORLD');
-      fs.unlinkSync(req.file.path);   // remove temp file
-      //process "fileRows" and respond
-    })
-});
-
-app.use('/upload', router);
+app.use('/api/upload', uploadroute);
+app.use('/api/*', authguard);
 
 //Express session and passport setup
 app.use(

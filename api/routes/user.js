@@ -10,11 +10,6 @@ router.get('/register', (req,res) => {
     res.send('register');
 });
 
-//Login page
-router.get('/login', (req,res) => {
-    res.send('login');
-});
-
 //Register handle
 //request params: name, email, password, password2
 router.post('/register', (req,res) => {
@@ -61,6 +56,7 @@ router.post('/register', (req,res) => {
 //request params: email, password
 router.post('/login',
     passport.authenticate('local'), (req, res) => {
+        console.log('login succeeded');
         let admin = false;
         User.findOne({email: req.body.email}, (err, user) => {
             if(err){
@@ -84,28 +80,24 @@ router.get('/logout', (req,res) => {
 //request params: sortBy, pageNum
 let limit = 10;
 router.post('/all/', (req, res) => {
-    if (req.isAuthenticated()) {
-        const { sortBy, pageNum } = req.body;
+    const { sortBy, pageNum } = req.body;
 
-        //check fields completed
-        if(!sortBy || !pageNum){
-            res.send('Please fill in all fields');
+    //check fields completed
+    if(!sortBy || !pageNum){
+        res.send('Please fill in all fields');
 
-            return;
-        }
-
-        User.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, users) => {
-            if((pageNum-1)*limit >= users.length){
-                res.send('Page does not exist');
-            }else{
-                res.json({data: users});
-            }
-            
-        });
+        return;
     }
-    else {
-        res.redirect('/users/login');
-    }   
+
+    User.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, users) => {
+        if((pageNum-1)*limit >= users.length){
+            res.send('Page does not exist');
+        }else{
+            res.json({data: users});
+        }
+        
+    });
+    
 });
 
 
