@@ -18,7 +18,7 @@ router.post('/add', (req, res) => {
         return;
     }
 
-    //TODO: check that inputs are valid
+    //TODO: check that inputs are valid (upca standard, numbers are numeric)
 
     //check ingredients and product lines exist
 

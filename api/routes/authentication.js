@@ -61,11 +61,17 @@ router.post('/register', (req,res) => {
 //request params: email, password
 router.post('/login',
     passport.authenticate('local'), (req, res) => {
-        let admin;
+        let admin = false;
         User.findOne({email: req.body.email}, (err, user) => {
-            admin = user.admin;
+            if(err){
+                res.json({success: false, message: err});
+            }else{
+                admin = user.admin;
+                res.json({success: true, message: "worked", admin: admin});
+            }
+            
         });
-		res.json({success: true, message: "worked", admin: admin});
+		
 	});
 
 //Logout Handle
