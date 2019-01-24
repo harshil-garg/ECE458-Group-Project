@@ -26,7 +26,7 @@ const httpOptions = {
 })
 export class AuthenticationService {
 
-  loginState = {loggedIn: false};
+  loginState = {loggedIn: false, admin: false};
 
 	constructor(private http: HttpClient) { }
   
