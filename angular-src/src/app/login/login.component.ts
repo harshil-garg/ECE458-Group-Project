@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoginState } from '../loginstate';
+import { LoginState } from '../model/loginstate';
 import { AuthenticationService, LoginResponse } from '../authentication.service'
 
 @Component({

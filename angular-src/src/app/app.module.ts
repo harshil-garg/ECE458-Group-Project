@@ -7,7 +7,6 @@ import { RegisterComponent } from './register/register.component';
 import { IngredientsTableComponent } from './ingredients-table/ingredients-table.component';
 import { TableEditableComponent } from './table-editable/table-editable.component';
 import { UploadModule } from './upload/upload.module';
-import { UiParentComponent } from './ui-parent/ui-parent.component';
 import { RouterModule, Routes } from '@angular/router';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -36,7 +35,6 @@ const routes: Routes = [
     RegisterComponent,
     IngredientsTableComponent,
     TableEditableComponent,
-    UiParentComponent,
     PagenotfoundComponent,
     DashboardComponent
   ],

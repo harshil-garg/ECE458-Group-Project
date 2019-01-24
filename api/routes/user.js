@@ -56,7 +56,6 @@ router.post('/register', (req,res) => {
 //request params: email, password
 router.post('/login',
     passport.authenticate('local'), (req, res) => {
-        console.log('login succeeded');
         let admin = false;
         User.findOne({email: req.body.email}, (err, user) => {
             if(err){

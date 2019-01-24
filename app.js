@@ -53,10 +53,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Uploading csv files
 //app.post('/upload', upload);
-
-app.use('/api/upload', uploadroute);
 app.use('/api/*', authguard);
-
+app.use('/api/upload', uploadroute);
 //Express session and passport setup
 app.use(
     session({

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 
-import { Ingredient } from '../ingredient'
+import { Ingredient } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
-import { Sku } from '../sku'
+import { Sku } from '../model/sku'
 
 @Component({
   selector: 'ingredients-table',
