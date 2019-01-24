@@ -18,7 +18,7 @@ router.get('/login', (req,res) => {
 //Register handle
 //request params: name, email, password, password2
 router.post('/register', (req,res) => {
-    const {name, email, password, password2} = req.body;
+    const {name, email, password, password2, admin} = req.body;
 
     //check fields completed
     if(!name || !email || !password || !password2){
@@ -36,7 +36,8 @@ router.post('/register', (req,res) => {
     let user = new User({
         name: name,
         email: email,
-        password: password
+        password: password,
+        admin : admin
     });
 
     bcrypt.genSalt(10, (err, salt) => {
@@ -53,8 +54,7 @@ router.post('/register', (req,res) => {
             res.json({success:true, message: "Added successfully."});
 
     });
-    
-    
+
 })
 
 //Login handle
@@ -62,7 +62,7 @@ router.post('/register', (req,res) => {
 router.post('/login',
     passport.authenticate('local'), (req, res) => {
         let admin;
-        Users.findOne({email: req.body.email}, (err, user) => {
+        User.findOne({email: req.body.email}, (err, user) => {
             admin = user.admin;
         });
 		res.json({success: true, message: "worked", admin: admin});
