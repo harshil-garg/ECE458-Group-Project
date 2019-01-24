@@ -128,34 +128,31 @@ router.post('/filter', (req, res) => {
 
 });
 
-//Add ingredient
-router.post('/add', (req, res) => {
+//CREATE
+router.post('/create', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
     
-    var validation = Validator.add(name, number, package_size, cost);
+    var validation = Validator.create(name, number, package_size, cost);
     if (!validation.success) {
         res.json(validation);
     }
 
     if (number) {
-        add_ingredient(res, name, number, vendor_info, package_size, cost, comment);
+        create_ingredient(res, name, number, vendor_info, package_size, cost, comment);
     } else {
         create_ingredient_number(function(id) {
-            return add_ingredient(res, name, id, vendor_info, package_size, cost, comment);
+            return create_ingredient(res, name, id, vendor_info, package_size, cost, comment);
         });
     }
 });
 
-function add_ingredient(res, name, number, vendor_info, package_size, cost, comment) {
+function create_ingredient(res, name, number, vendor_info, package_size, cost, comment) {
     let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
-    console.log(ingredient);
-    Ingredient.addIngredient(ingredient, (error) => {
+    Ingredient.createIngredient(ingredient, (error) => {
         if (error) {
-            console.log(error);
             res.json({success: false, message: "Failed to create a new ingredient. Error: ${err}"});
-
         } else{
-            res.json({success:true, message: "Added successfully."});
+            res.json({success: true, message: "Added successfully."});
         }
     });
 }
@@ -172,44 +169,62 @@ function smallest_missing_number(ingredients, lo, hi) {
         return lo+1;
     let mid =  Math.floor(lo + (hi - lo) / 2);
 
-    if (ingredients[mid] == mid+1) {
+    if (ingredients[mid].number == mid+1) {
         return smallest_missing_number(ingredients, mid + 1, hi);
     } else {
         return smallest_missing_number(ingredients, lo, mid - 1);
     }
 }
 
-//Remove ingredient
-//request params: name
-router.post('/remove', (req, res) => {
-    const name = req.body.name;
-    Ingredient.removeIngredient(name, (err) => {
-        if(err) {
-            res.json({success: false, message: `Failed to remove ingredient. Error: ${err}`});
+// TODO: READ (SEARCH)
 
-        }else{
-            res.json({success: true, message: "Removed successfully."});
+// UPDATE
+router.post('/update', (req, res) => {
+    const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
+    
+    var validation = Validator.update(number, cost);
+    if (!validation.success) {
+        res.json(validation);
+    }
+
+    var json = {};
+
+    if (newname) {
+        json["name"] = newname;
+    }
+    if (number) {
+        json["number"] = number;
+    }
+    if (vendor_info) {
+        json["vendor_info"] = vendor_info;
+    }
+    if (package_size) {
+        json["package_size"] = package_size;
+    }
+    if (cost) {
+        json["cost"] = cost;
+    }
+    if (comment) {
+        json["comment"] = comment;
+    }
+    
+    Ingredient.updateIngredient(name, json, (error) => {
+        if (error) {
+            res.json({success: false, message: `Failed to update ingredient. Error: ${error}`});
+        } else {
+            res.json({success: true, message: "Updated successfully."});
         }
     });
 });
 
-//Edit ingredient
-router.post('/edit', (req, res) => {
-    const { name, number, vendor_info, package_size, cost, comment } = req.body;
-
-    Ingredient.updateIngredient(name, {
-        name: name,
-        number: number, 
-        vendor_info: vendor_info,
-        package_size: package_size,
-        cost: cost, 
-        comment: comment
-    }, (err) => {
-        if(err) {
-            res.json({success: false, message: `Failed to update ingredient. Error: ${err}`});
-
-        }else{
-            res.json({success:true, message: "Updated successfully."});
+// DELETE
+router.post('/delete', (req, res) => {
+    const name = req.body.name; 
+    Ingredient.deleteIngredient(name, (error) => {
+        if (error) {
+            res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
+        } else {
+            res.json({success: true, message: "Removed successfully."});
         }
     });
 });

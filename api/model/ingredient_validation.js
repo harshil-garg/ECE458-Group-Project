@@ -1,26 +1,38 @@
-function add(name, number, package_size, cost) {
-
-    var json = get_error_response();
-    console.log(name + " 1 " + number + " 2 " + package_size + " 3 " + cost);
+function create(name, number, package_size, cost) {
     if (!name || !package_size || !cost) {
-        return json;
+        return get_error_response();
     }
 
-    console.log("why");
-    if (isNumeric(cost)) {
-        return json;
+    if (isNotNumeric(cost)) {
+        return get_error_response();
     }
 
     if (number) {
-        if (isNumeric(number) || number % 1 != 0) {
-            return json;
+        if (isNotNumeric(number) || number % 1 != 0) {
+            return get_error_response();
         }
     }
 
     return get_success_response();
 }
 
-function isNumeric(value) {
+function update(number, cost) {
+    if (number) {
+        if (isNotNumeric(number) || number % 1 != 0) {
+            return get_error_response();
+        }
+    }
+
+    if (cost) {
+        if (isNotNumeric(cost)) {
+            return get_error_response();
+        }
+    }
+
+    return get_success_response();
+}
+
+function isNotNumeric(value) {
     return isNaN(value) || value.trim() == "" || value < 0;
 }
 
@@ -39,5 +51,6 @@ function get_success_response() {
 }
 
 module.exports = {
-    add: add
+    create: create,
+    update: update
 }
