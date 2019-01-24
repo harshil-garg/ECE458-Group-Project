@@ -2,14 +2,13 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
-const User = require('../model/user')
+const User = require('../model/user_model')
 
 passport.use(new LocalStrategy({usernameField: 'email'}, (email, password, done) => {
     //Match user
     User.findOne({email: email})
         .then((user) => {
             if(!user){
-                console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
                 return done(null, false, {message: 'Email not registered'});
             }
 
