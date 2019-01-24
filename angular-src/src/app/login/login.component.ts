@@ -29,12 +29,10 @@ export class LoginComponent implements OnInit {
 	private handleResponse(response: LoginResponse) {
 	    if (response.success) {
 	        this.authenticationService.loginState.loggedIn = true;
-	        this.authenticationService.loginState.loggedIn = response.admin;
-	        if (response.admin) {
-	        console.log('youre an admin!');
-	        }
+	        this.authenticationService.loginState.isAdmin = true;
+	        
 			this.loginError = false;
-			this.router.navigate(['/dashboard']);
+			this.router.navigate(['dashboard']);
 	    }
   	}
 }
