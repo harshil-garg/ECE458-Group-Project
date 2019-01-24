@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
+const Validator = require('../model/ingredient_validation');
 
 let limit = 10;
 
@@ -72,25 +73,53 @@ router.post('/filter', (req, res) => {
 //Add ingredient
 router.post('/add', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
-    //check fields completed
-    if(!name || !number || !package_size || !cost){
-        res.json({success: false, message: "Please fill in all fields"});
-        return;
+    
+    var validation = Validator.add(name, number, package_size, cost);
+    if (!validation.success) {
+        res.json(validation);
     }
 
-    //TODO: check inputs, number and cost need to be numeric
+    if (number) {
+        add_ingredient(res, name, number, vendor_info, package_size, cost, comment);
+    } else {
+        create_ingredient_number(function(id) {
+            return add_ingredient(res, name, id, vendor_info, package_size, cost, comment);
+        });
+    }
+});
 
+function add_ingredient(res, name, number, vendor_info, package_size, cost, comment) {
     let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
-    Ingredient.addIngredient(ingredient, (err) => {
-        if(err) {
-            res.json({success: false, message: `Failed to create a new ingredient. Error: ${err}`});
+    console.log(ingredient);
+    Ingredient.addIngredient(ingredient, (error) => {
+        if (error) {
+            console.log(error);
+            res.json({success: false, message: "Failed to create a new ingredient. Error: ${err}"});
 
-        }else{
+        } else{
             res.json({success:true, message: "Added successfully."});
         }
     });
+}
 
-});
+function create_ingredient_number(callback) {
+    Ingredient.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec(function(error, ingredients) {
+        if (error) return error;
+        return callback(smallest_missing_number(ingredients, 0, ingredients.length));
+    })
+}
+
+function smallest_missing_number(ingredients, lo, hi) {
+    if (lo > hi)
+        return lo+1;
+    let mid =  Math.floor(lo + (hi - lo) / 2);
+
+    if (ingredients[mid] == mid+1) {
+        return smallest_missing_number(ingredients, mid + 1, hi);
+    } else {
+        return smallest_missing_number(ingredients, lo, mid - 1);
+    }
+}
 
 //Remove ingredient
 //request params: name
