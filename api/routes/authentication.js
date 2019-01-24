@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
-const User = require('../model/user');
+const User = require('../model/user_model');
 
 const router = express.Router();
 
@@ -16,8 +16,9 @@ router.get('/login', (req,res) => {
 });
 
 //Register handle
+//request params: name, email, password, password2
 router.post('/register', (req,res) => {
-    const {name, email, password, password2} = req.body;
+    const {name, email, password, password2, admin} = req.body;
 
     //check fields completed
     if(!name || !email || !password || !password2){
@@ -35,7 +36,8 @@ router.post('/register', (req,res) => {
     let user = new User({
         name: name,
         email: email,
-        password: password
+        password: password,
+        admin : admin
     });
 
     bcrypt.genSalt(10, (err, salt) => {
@@ -52,14 +54,25 @@ router.post('/register', (req,res) => {
             res.json({success:true, message: "Added successfully."});
 
     });
-    
-    
+
 })
 
 //Login handle
+//request params: email, password
 router.post('/login',
-    passport.authenticate('local', { successRedirect: '/dashboard',
-                                 failureRedirect: '/login' }));
+    passport.authenticate('local'), (req, res) => {
+        let admin = false;
+        User.findOne({email: req.body.email}, (err, user) => {
+            if(err){
+                res.json({success: false, message: err});
+            }else{
+                admin = user.admin;
+                res.json({success: true, message: "worked", admin: admin});
+            }
+            
+        });
+		
+	});
 
 //Logout Handle
 router.get('/logout', (req,res) => {
@@ -68,6 +81,7 @@ router.get('/logout', (req,res) => {
 });
 
 //Get all users
+//request params: sortBy, pageNum
 let limit = 10;
 router.post('/all/', (req, res) => {
     if (req.isAuthenticated()) {
@@ -93,5 +107,7 @@ router.post('/all/', (req, res) => {
         res.redirect('/users/login');
     }   
 });
+
+
 
 module.exports = router;

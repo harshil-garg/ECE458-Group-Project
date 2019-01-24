@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { LoginState } from './loginstate';
+import { AuthenticationService } from './authentication.service'
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-src';
+	constructor (private authService: AuthenticationService) { }
+	title = 'Hypo Meals';
 }

@@ -15,6 +15,7 @@ const passport = require('passport');
 require('./api/config/passport');
 const config = require('./api/config/database');
 const users = require('./api/routes/authentication');
+const ingredients = require('./api/routes/ingredient');
 const index = require('./api/routes/index');
 
 const router = express.Router();
@@ -87,9 +88,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Routing HTTP requests
+app.use('/api/ingredients', ingredients);
 app.use('/api/users', users);
 app.get('*', (req, res) => {
-    console.log("received");
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 

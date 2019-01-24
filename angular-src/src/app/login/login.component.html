@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="!this.authenticationService.loginState.loggedIn">
   <label>Email:
     <input #email />
   </label>
@@ -9,4 +9,6 @@
   <button (click)="login(email.value, password.value)">
     Submit
   </button>
+  <div *ngIf="loginError">Email or password incorrect</div>
 </div>
+<div *ngIf="this.authenticationService.loginState.loggedIn">Already logged in!</div>

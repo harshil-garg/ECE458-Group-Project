@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { Ingredient } from '../ingredient'
+import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../sku'
 
 @Component({
@@ -22,6 +23,10 @@ export class IngredientsTableComponent {
       {id:1, shown:true},
       {id:2, shown:false}
     ]
+
+    editable: boolean = true;
+
+    constructor(private authenticationService: AuthenticationService){}
     /*awaitingPersonList: Array<any> = [
       { id: 6, name: 'George Vega', age: 28, companyName: 'Classical', country: 'Russia', city: 'Moscow' },
       { id: 7, name: 'Mike Low', age: 22, companyName: 'Lou', country: 'USA', city: 'Los Angeles' },
@@ -65,14 +70,8 @@ export class IngredientsTableComponent {
       this.editField = event.target.textContent;
     }
 
-    isAdmin(property: string) {
-      if(property === 'cost_per_package')
-      {
-        return true;
-      }
-      else{
-        return false;
-      }
+    isAdmin() {
+      return this.authenticationService.loginState.isAdmin;
     }
 
     getNumSkus(ingredient: Ingredient){
