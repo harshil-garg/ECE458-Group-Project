@@ -12,6 +12,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './auth-guard';
+import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 
 
 const routes: Routes = [
@@ -43,6 +44,7 @@ const routes: Routes = [
   imports: [
     BrowserModule,
     UploadModule,
+    AddIngredientModule,
     HttpClientModule,
     RouterModule.forRoot(routes)
   ],
