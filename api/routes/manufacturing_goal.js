@@ -12,8 +12,14 @@ router.post('/create', (req, res) => {
     }
 
     // Need to have a sanity check validation (SKUs must exist!)
+    // TODO (will need a mongo query)
     for (i = 0; i < skus.length; i++) {
         console.log(skus[i]);
+    }
+
+    if (skus.length != case_quantity.length) {
+        res.send("You messed up");
+        return;
     }
 
     let goal = new ManufacturingGoal({name, skus, case_quantity});
