@@ -12,7 +12,7 @@
   <div class="card-body">
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
-      <app-add-ingredient></app-add-ingredient>
+      <app-add-ingredient *ngIf="isAdmin()"></app-add-ingredient>
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
           <th class="text-center" (click)="setSortBy('name')">Ingredient Name <i *ngIf="sortBy=='name'" class="fa fa-sort-desc"></i></th>
