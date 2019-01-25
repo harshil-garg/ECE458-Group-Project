@@ -14,6 +14,9 @@ require('./api/config/passport');
 const mongoCreds = require('./api/config/database');
 const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
+const manufacturing_goals = require('./api/routes/manufacturing_goal');
+
+
 
 //Connect mongoose to our database
 mongoose.connect(mongoCreds.database, function(err){
@@ -62,6 +65,7 @@ app.use('/api/*', ensureAuthenticated);
 app.use('/api/upload', uploadroute);
 app.use('/api/ingredients', ingredients);
 app.use('/api/users', users);
+app.use('/api/manufacturing_goal', manufacturing_goals);
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
