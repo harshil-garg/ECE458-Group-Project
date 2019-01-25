@@ -49,7 +49,8 @@
             </tr>
           </ng-container>
 
-          <ng-container *ngIf="(skuShown[id].shown == true)">
+          <!--<ng-container *ngIf="(skuShown[id].shown == true)">-->
+          <ng-container *ngIf="(false)">
             <tr class="blankcell" *ngFor = "let ingredient2 of ingredientList; let id2=index">
               <td class="blankcell"></td>
               <td colspan = "6" contenteditable="false">{{ingredient2.name}}</td>

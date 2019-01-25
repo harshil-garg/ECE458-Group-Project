@@ -1,40 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Ingredient } from '../ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../sku'
 import { CrudIngredientsService, Response } from './crud-ingredients.service';
+import { FilterIngredientsService, FilterResponse } from './filter-ingredients.service'
 
 @Component({
   selector: 'ingredients-table',
   templateUrl: './ingredients-table.component.html',
   styleUrls: ['./ingredients-table.component.css'],
 })
-export class IngredientsTableComponent {
+export class IngredientsTableComponent implements OnInit{
     editField: string;
-    ingredientList: Array<any> = [
-      { name: 'Oranges', id: 1, vendor_info: 'Florida', package_size: '1 lb', cost_per_package: 4, comment: 'Hello world' },
-      { name: 'Apples', id:2, vendor_info: 'Applebees', package_size: '3 lb', cost_per_package: 15, comment: 'Hello world 2' },
-    ];
-
-    blankIngredient: Ingredient =
-      { name: '', id:'0' , vendor_info: '', package_size: '', cost_per_package: '0', comment: '' };
+    ingredientList: Array<any> = [];
 
     skuShown: Array<any> = [
       {id:1, shown:true},
       {id:2, shown:false}
     ]
 
-    editable: boolean = true;
+    ngOnInit() {
+      this.refresh();
+    }
 
-    constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService){}
-    /*awaitingPersonList: Array<any> = [
-      { id: 6, name: 'George Vega', age: 28, companyName: 'Classical', country: 'Russia', city: 'Moscow' },
-      { id: 7, name: 'Mike Low', age: 22, companyName: 'Lou', country: 'USA', city: 'Los Angeles' },
-      { id: 8, name: 'John Derp', age: 36, companyName: 'Derping', country: 'USA', city: 'Chicago' },
-      { id: 9, name: 'Anastasia John', age: 21, companyName: 'Ajo', country: 'Brazil', city: 'Rio' },
-      { id: 10, name: 'John Maklowicz', age: 36, companyName: 'Mako', country: 'Poland', city: 'Bialystok' },
-    ];*/
+    constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService,
+      public filterIngredientsService: FilterIngredientsService){}
 
     updateList(id: number, property: string, event: any) {
       const editField = event.target.textContent;
@@ -99,23 +90,12 @@ export class IngredientsTableComponent {
           if (err.status === 401) {
             console.log("401 Error")
           }
-        }
-      );
+        });
     }
 
     private handleResponse(response: Response) {
       console.log(response);
-    }
-
-    add() {
-      // if (this.awaitingPersonList.length > 0) {
-      //   const person = this.awaitingPersonList[0];
-      //   this.personList.push(person);
-      //   this.awaitingPersonList.splice(0, 1);
-      // }
-      var addedIngredient = new Ingredient();
-      addedIngredient.id = nextId(this.ingredientList);
-      this.ingredientList.push(addedIngredient);
+      this.refresh();
     }
 
     changeValue(id: number, property: string, event: any) {
@@ -136,6 +116,38 @@ export class IngredientsTableComponent {
 
     toggleSkus(id: number){
       this.skuShown[id].shown = !this.skuShown[id].shown;
+    }
+
+    refresh(){
+      this.filterIngredientsService.filter({
+          sortBy : "name",
+          pageNum: "1",
+          keywords: [],
+          skus : []
+        }).subscribe(
+        response => this.handleRefreshResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleRefreshResponse(response: FilterResponse){
+      if(response.success){
+        this.ingredientList = [];
+        for(let ingredient of response.data){
+          this.ingredientList.push({
+              id: ingredient.number,
+              name: ingredient.name,
+              vendor_info: ingredient.vendor_info,
+              package_size: ingredient.package_size,
+              cost_per_package: ingredient.cost,
+              comment: ingredient.comment
+          });
+        }
+      }
     }
 
 }

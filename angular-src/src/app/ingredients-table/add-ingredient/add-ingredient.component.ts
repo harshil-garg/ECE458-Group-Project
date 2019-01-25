@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { AddIngredientDialogComponent } from './add-ingredient-dialog/add-ingredient-dialog.component';
 import { CrudIngredientsService, Response } from '../crud-ingredients.service';
+import { IngredientsTableComponent } from '../ingredients-table.component';
 
 import { Ingredient } from '../../ingredient';
 
@@ -14,7 +15,8 @@ export class AddIngredientComponent {
 
     ingredient: Ingredient = new Ingredient();
 
-    constructor(public dialog: MatDialog, public crudIngredientsService: CrudIngredientsService) {}
+    constructor(public dialog: MatDialog, public crudIngredientsService: CrudIngredientsService,
+      public ingredientsTableComponent: IngredientsTableComponent) {}
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddIngredientDialogComponent, {
@@ -49,6 +51,7 @@ export class AddIngredientComponent {
 
     private handleResponse(response: Response) {
       console.log(response);
+      this.ingredientsTableComponent.refresh();
     }
 
 }
