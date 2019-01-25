@@ -13,6 +13,7 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './auth-guard';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { AccountsComponent } from './accounts/accounts.component';
 
 const routes: Routes = [
   {
@@ -21,7 +22,8 @@ const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
         	{ path: '', component: DashboardComponent },
-        	{ path: 'ingredients', component: IngredientsTableComponent }
+        	{ path: 'ingredients', component: IngredientsTableComponent },
+        	{ path: 'accounts', component: AccountsComponent }
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -38,7 +40,8 @@ const routes: Routes = [
     TableEditableComponent,
     UiParentComponent,
     PagenotfoundComponent,
-    DashboardComponent
+    DashboardComponent,
+    AccountsComponent
   ],
   imports: [
     BrowserModule,
