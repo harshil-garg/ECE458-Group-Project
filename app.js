@@ -14,7 +14,6 @@ require('./api/config/passport');
 const mongoCreds = require('./api/config/database');
 const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
-const authguard = require('./api/config/auth.js');
 
 //Connect mongoose to our database
 mongoose.connect(mongoCreds.database, function(err){
@@ -44,18 +43,6 @@ app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-
-/*express.static is a built in middleware function to serve static files.
- We are telling express server public folder is the place to look for the static files
-
-*/
-app.use(express.static(path.join(__dirname, 'public')));
-
-//Uploading csv files
-//app.post('/upload', upload);
-app.use('/api/*', authguard);
-app.use('/api/upload', uploadroute);
-//Express session and passport setup
 app.use(
     session({
         secret: 'secret',
@@ -63,10 +50,16 @@ app.use(
         saveUninitialized: true
     })
 );
+/*express.static is a built in middleware function to serve static files.
+ We are telling express server public folder is the place to look for the static files
+
+*/
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
-
-//Routing HTTP requests
+// Routes
+app.use('/api/*', ensureAuthenticated);
+app.use('/api/upload', uploadroute);
 app.use('/api/ingredients', ingredients);
 app.use('/api/users', users);
 app.get('*', (req, res) => {
@@ -83,3 +76,11 @@ let httpsServer = https.createServer({
 httpsServer.listen(port, () => {
     console.log(`Starting the server at port ${port}`);
 });
+
+
+function ensureAuthenticated(req, res, next) {
+    if(req.isAuthenticated() || req.originalUrl === '/api/users/login'){
+         return next();
+    }
+    res.redirect('/login');
+}
