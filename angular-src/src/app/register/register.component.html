@@ -1,8 +1,9 @@
-<h1>Add a new user</h1>
+<h3>Add a new user</h3>
 <div class="register">
   <label>Name:
     <input #name />
   </label>
+  <br>
   <label>Email:
     <input #email />
   </label>
@@ -15,7 +16,7 @@
     <input type="password" #password2 />
   </label>
   <br>
-  <button (click)="login(email.value, email.value, password.value, password2.value)">
+  <button (click)="register(name.value, email.value, password.value, password2.value)">
     Submit
   </button>
 </div>
