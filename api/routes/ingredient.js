@@ -32,14 +32,14 @@ router.post('/filter', (req, res) => {
                     data: ingredients,
                     pages: pages});
             }
-            
+
         });
     }
     //Keywords no SKUs
     else if(skus.length == 0){
         //find all ingredients containing any of the keywords
         Ingredient.find({$or:[
-            {name: {$in: key_exps}}, 
+            {name: {$in: key_exps}},
             {number: {$in: key_exps}},
             {vendor_info: {$in: key_exps}},
             {package_size: {$in: key_exps}},
@@ -72,7 +72,7 @@ router.post('/filter', (req, res) => {
                 let names = Array.from(ingredient_names);
 
                 //find ingredients with given names
-                Ingredient.find({name: {$in: names}}, null, 
+                Ingredient.find({name: {$in: names}}, null,
                     {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
                     if(err){
                         res.json({success: false, message: err});
@@ -84,7 +84,7 @@ router.post('/filter', (req, res) => {
                     }
                 })
             }
-            
+
         });
     }
     //Keywords and SKUs
@@ -104,13 +104,13 @@ router.post('/filter', (req, res) => {
                 //find ingredients with given names
                 Ingredient.find({name: {$in: names},
                     $or:[
-                        {name: {$in: key_exps}}, 
+                        {name: {$in: key_exps}},
                         {number: {$in: key_exps}},
                         {vendor_info: {$in: key_exps}},
                         {package_size: {$in: key_exps}},
                         {cost: {$in: key_exps}},
                         {comment: {$in: key_exps}}]
-                }, null, 
+                }, null,
                     {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
                     if(err){
                         res.json({success: false, message: err});
@@ -122,7 +122,7 @@ router.post('/filter', (req, res) => {
                     }
                 })
             }
-            
+
         });
     }
 
@@ -131,7 +131,7 @@ router.post('/filter', (req, res) => {
 //CREATE
 router.post('/create', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
-    
+
     var validation = Validator.create(name, number, package_size, cost);
     if (!validation.success) {
         res.json(validation);
@@ -181,7 +181,7 @@ function smallest_missing_number(ingredients, lo, hi) {
 // UPDATE
 router.post('/update', (req, res) => {
     const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
-    
+
     var validation = Validator.update(number, cost);
     if (!validation.success) {
         res.json(validation);
@@ -207,7 +207,7 @@ router.post('/update', (req, res) => {
     if (comment) {
         json["comment"] = comment;
     }
-    
+
     Ingredient.updateIngredient(name, json, (error) => {
         if (error) {
             res.json({success: false, message: `Failed to update ingredient. Error: ${error}`});
@@ -219,7 +219,7 @@ router.post('/update', (req, res) => {
 
 // DELETE
 router.post('/delete', (req, res) => {
-    const name = req.body.name; 
+    const name = req.body.name;
     Ingredient.deleteIngredient(name, (error) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});

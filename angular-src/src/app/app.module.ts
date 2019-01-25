@@ -7,13 +7,13 @@ import { RegisterComponent } from './register/register.component';
 import { IngredientsTableComponent } from './ingredients-table/ingredients-table.component';
 import { TableEditableComponent } from './table-editable/table-editable.component';
 import { UploadModule } from './upload/upload.module';
-import { UiParentComponent } from './ui-parent/ui-parent.component';
 import { RouterModule, Routes } from '@angular/router';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './auth-guard';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './accounts/accounts.component';
+import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 
 const routes: Routes = [
   {
@@ -38,7 +38,6 @@ const routes: Routes = [
     RegisterComponent,
     IngredientsTableComponent,
     TableEditableComponent,
-    UiParentComponent,
     PagenotfoundComponent,
     DashboardComponent,
     AccountsComponent
@@ -46,6 +45,7 @@ const routes: Routes = [
   imports: [
     BrowserModule,
     UploadModule,
+    AddIngredientModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
     NgbModule

@@ -1,4 +1,8 @@
-<div>
+<h1>Add a new user</h1>
+<div class="register">
+  <label>Name:
+    <input #name />
+  </label>
   <label>Email:
     <input #email />
   </label>
@@ -11,8 +15,7 @@
     <input type="password" #password2 />
   </label>
   <br>
-  <!-- (click) passes input value to add() and then clears the input -->
-  <button (click)="login(email.value, password.value, password2.value)">
+  <button (click)="login(email.value, email.value, password.value, password2.value)">
     Submit
   </button>
 </div>
