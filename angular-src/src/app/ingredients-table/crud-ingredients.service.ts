@@ -19,6 +19,7 @@ export class RemoveMessage {
 
 export class EditMessage {
   name : string;
+  newname: string;
   number : string;
   vendor_info : string;
   package_size: string;
@@ -45,14 +46,14 @@ export class CrudIngredientsService {
 	constructor(private http: HttpClient) { }
 
   add(requestedIngredient: CreateMessage): Observable<Response>{
-    return this.http.post<Response>('api/ingredients/add', requestedIngredient, httpOptions);
+    return this.http.post<Response>('api/ingredients/create', requestedIngredient, httpOptions);
   }
 
   remove(requestedIngredient: RemoveMessage): Observable<Response>{
-    return this.http.post<Response>('api/ingredients/remove', requestedIngredient, httpOptions);
+    return this.http.post<Response>('api/ingredients/delete', requestedIngredient, httpOptions);
   }
 
   edit(requestedIngredient: EditMessage): Observable<Response>{
-    return this.http.post<Response>('api/ingredients/edit', requestedIngredient, httpOptions);
+    return this.http.post<Response>('api/ingredients/update', requestedIngredient, httpOptions);
   }
 }

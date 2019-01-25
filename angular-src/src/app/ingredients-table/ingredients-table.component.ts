@@ -62,10 +62,12 @@ export class IngredientsTableComponent {
 
     edit(name:any, property:string, event:any) {
       var editedIngredient : Ingredient = new Ingredient();
+      var newName : string;
       editedIngredient.name = name;
       switch(property){
         case 'name':{
-          editedIngredient.name = event.target.textContent;
+          newName = event.target.textContent; //new name
+          editedIngredient.name = event.target.textContent;//old name
         }
         case 'id':{
           editedIngredient.id = event.target.textContent;
@@ -85,6 +87,7 @@ export class IngredientsTableComponent {
       }
       this.crudIngredientsService.edit({
           name : editedIngredient.name,
+          newname: newName,
           number : editedIngredient.id,
           vendor_info : editedIngredient.vendor_info,
           package_size: editedIngredient.package_size,
