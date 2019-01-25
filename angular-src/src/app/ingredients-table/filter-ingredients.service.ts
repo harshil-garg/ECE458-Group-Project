@@ -25,6 +25,7 @@ export class ResponseData {
 export class FilterResponse {
   success: boolean;
   data: Array<ResponseData>;
+	pages: number;
 }
 
 const httpOptions = {

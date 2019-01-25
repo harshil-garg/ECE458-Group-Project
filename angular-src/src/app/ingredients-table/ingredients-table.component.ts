@@ -14,6 +14,9 @@ import { FilterIngredientsService, FilterResponse } from './filter-ingredients.s
 export class IngredientsTableComponent implements OnInit{
     editField: string;
     ingredientList: Array<any> = [];
+    currentPage: number;
+    maxPages: number;
+    sortBy: string = "name";
 
     skuShown: Array<any> = [
       {id:1, shown:true},
@@ -21,6 +24,7 @@ export class IngredientsTableComponent implements OnInit{
     ]
 
     ngOnInit() {
+      this.currentPage = 1;
       this.refresh();
     }
 
@@ -120,8 +124,8 @@ export class IngredientsTableComponent implements OnInit{
 
     refresh(){
       this.filterIngredientsService.filter({
-          sortBy : "name",
-          pageNum: "1",
+          sortBy : this.sortBy,
+          pageNum: this.currentPage.toString(),
           keywords: [],
           skus : []
         }).subscribe(
@@ -147,6 +151,49 @@ export class IngredientsTableComponent implements OnInit{
               comment: ingredient.comment
           });
         }
+        this.maxPages = response.pages;
+      }
+    }
+
+    setSortBy(property: string){
+      this.sortBy = property;
+      this.refresh();
+    }
+
+    nextPage(){
+      if(this.currentPage<this.maxPages){
+        this.currentPage++;
+        this.refresh();
+      }
+    }
+
+    prevPage(){
+      if(this.currentPage>1){
+        this.currentPage--;
+        this.refresh();
+      }
+    }
+
+    setPage(i){
+      this.currentPage = i;
+      this.refresh();
+    }
+
+    shownPages(){
+      var numbers : Array<number> = [];
+      if(this.maxPages>5)
+      {
+        for (var i = 1; i < 5; i++) {
+          numbers.push(i);
+        }
+        numbers.push(this.maxPages)
+        return numbers;
+      }
+      else{
+        for (var i = 1; i <= this.maxPages; i++) {
+          numbers.push(i);
+        }
+        return numbers;
       }
     }
 
