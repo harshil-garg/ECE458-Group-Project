@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UiParentComponent } from './ui-parent.component';
+import { AddIngredientComponent } from './add-ingredient.component';
 
-describe('UiParentComponent', () => {
-  let component: UiParentComponent;
-  let fixture: ComponentFixture<UiParentComponent>;
+describe('AddIngredientComponent', () => {
+  let component: AddIngredientComponent;
+  let fixture: ComponentFixture<AddIngredientComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UiParentComponent ]
+      declarations: [ AddIngredientComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UiParentComponent);
+    fixture = TestBed.createComponent(AddIngredientComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
