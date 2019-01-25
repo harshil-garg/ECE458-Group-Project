@@ -13,6 +13,7 @@ require('./api/config/passport');
 const config = require('./api/config/database');
 const users = require('./api/routes/authentication');
 const ingredients = require('./api/routes/ingredient');
+const manufacturing_goals = require('./api/routes/manufacturing_goal');
 const index = require('./api/routes/index');
 
 //Connect mongoose to our database
@@ -58,6 +59,7 @@ app.use(passport.session());
 //Routing HTTP requests 
 app.use('/api/ingredients', ingredients);
 app.use('/api/users', users);
+app.use('/api/manufacturing_goal', manufacturing_goals);
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });

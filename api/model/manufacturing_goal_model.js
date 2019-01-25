@@ -14,7 +14,7 @@ const ManufacturingGoalSchema = new Schema({
         required: true
     },
     case_quantity: {
-        type: Number,
+        type: [Number],
         required: true
     }
 });
@@ -24,15 +24,15 @@ module.exports = ManufacturingGoal;
 
 
 module.exports.addManufacturingGoal = (manufacturing_goal, callback) => {
-    SKU.create(manufacturing_goal, callback);
+    ManufacturingGoal.create(manufacturing_goal, callback);
 }
 
-module.exports.removeSKU = (manufacturing_goal_name, callback) => {
+module.exports.removeManufacturingGoal = (manufacturing_goal_name, callback) => {
     var query = {name: manufacturing_goal_name};
-    SKU.deleteOne(query, callback);
+    ManufacturingGoal.deleteOne(query, callback);
 }
 
-module.exports.updateSKU = (manufacturing_goal_name, manufacturing_goal_update, cb) => {
+module.exports.updateManufacturingGoal = (manufacturing_goal_name, manufacturing_goal_update, cb) => {
     var query = {name: manufacturing_goal_name};
-    SKU.findOneAndUpdate(query, manufacturing_goal_update, cb);
+    ManufacturingGoal.findOneAndUpdate(query, manufacturing_goal_update, cb);
 }
