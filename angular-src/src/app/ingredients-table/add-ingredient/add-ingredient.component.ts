@@ -4,7 +4,7 @@ import { AddIngredientDialogComponent } from './add-ingredient-dialog/add-ingred
 import { CrudIngredientsService, Response } from '../crud-ingredients.service';
 import { IngredientsTableComponent } from '../ingredients-table.component';
 
-import { Ingredient } from '../../ingredient';
+import { Ingredient } from '../../model/ingredient';
 
 @Component({
   selector: 'app-add-ingredient',
