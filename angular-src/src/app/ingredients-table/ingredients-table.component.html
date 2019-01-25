@@ -2,18 +2,26 @@
 
 <div class="card">
   <h3 class="card-header text-center font-weight-bold py-4">Ingredients</h3>
+<div class="pagination">
+  <a (click) = "prevPage()">&laquo;</a>
+  <li *ngFor="let i of shownPages()" [ngClass]="{active: i == currentPage}" (click)="setPage(i)">
+      <a>{{i}}</a>
+  </li>
+  <a (click) = "nextPage()">&raquo;</a>
+</div>
   <div class="card-body">
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
+      <app-add-ingredient *ngIf="isAdmin()"></app-add-ingredient>
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
-          <th class="text-center">Ingredient Name <i class="fa fa-sort"></i></th>
-          <th class="text-center">Ingredient Number <i class="fa fa-sort"></i></th>
-          <th class="text-center">Vendor Information <i class="fa fa-sort"></i></th>
-          <th class="text-center">Package Size <i class="fa fa-sort"></i></th>
-          <th class="text-center">Cost Per Package (USD) <i class="fa fa-sort"></i></th>
-          <th class="text-center">Comment <i class="fa fa-sort"></i></th>
-          <th class="text-center">SKUs <i class="fa fa-sort"></i></th>
+          <th class="text-center" (click)="setSortBy('name')">Ingredient Name <i *ngIf="sortBy=='name'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('number')">Ingredient Number <i *ngIf="sortBy=='number'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('vendor_info')">Vendor Information <i *ngIf="sortBy=='vendor_info'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('package_size')">Package Size <i *ngIf="sortBy=='package_size'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('cost')">Cost Per Package (USD) <i *ngIf="sortBy=='cost'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('comment')">Comment <i *ngIf="sortBy=='comment'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center">SKUs</th>
 
         </tr>
 
@@ -21,16 +29,16 @@
          <!-- TABLE VIEWED BY ADMIN -->
          <ng-container *ngIf="isAdmin()==true">
             <tr>
-              <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="updateList(id, 'name', $event)">{{ingredient.name}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="edit(ingredient.name, 'name', $event)">{{ingredient.name}}</td>
               <td onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57;"
-                contenteditable="true" (keyup)="changeValue(id, 'id', $event)" (blur)="updateList(id, 'id', $event)">{{ingredient.id}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'vendor_info', $event)" (blur)="updateList(id, 'vendor_info', $event)">{{ingredient.vendor_info}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'package_size', $event)" (blur)="updateList(id, 'package_size', $event)">{{ingredient.package_size}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'cost_per_package', $event)" (blur)="updateList(id, 'cost_per_package', $event)">{{ingredient.cost_per_package}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="updateList(id, 'comment', $event)">{{ingredient.comment}}</td>
+                contenteditable="true" (keyup)="changeValue(id, 'id', $event)" (blur)="edit(ingredient.name, 'id', $event)">{{ingredient.id}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'vendor_info', $event)" (blur)="edit(ingredient.name, 'vendor_info', $event)">{{ingredient.vendor_info}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'package_size', $event)" (blur)="edit(ingredient.name, 'package_size', $event)">{{ingredient.package_size}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'cost_per_package', $event)" (blur)="edit(ingredient.name, 'cost_per_package', $event)">{{ingredient.cost_per_package}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="edit(ingredient.name, 'comment', $event)">{{ingredient.comment}}</td>
               <td contenteditable="false" (click) = "toggleSkus(id)">{{getNumSkus(ingredient)}} <i class="fa fa-sort-desc"></i></td>
               <td>
-                <button class="remove" type="button" (click)="remove(id)">Remove</button>
+                <button class="remove" type="button" (click)="remove(ingredient.name)">Remove</button>
               </td>
             </tr>
           </ng-container>
@@ -48,7 +56,8 @@
             </tr>
           </ng-container>
 
-          <ng-container *ngIf="(skuShown[id].shown == true)">
+          <!--<ng-container *ngIf="(skuShown[id].shown == true)">-->
+          <ng-container *ngIf="(false)">
             <tr class="blankcell" *ngFor = "let ingredient2 of ingredientList; let id2=index">
               <td class="blankcell"></td>
               <td colspan = "6" contenteditable="false">{{ingredient2.name}}</td>

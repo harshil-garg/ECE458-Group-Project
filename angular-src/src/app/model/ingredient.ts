@@ -1,8 +1,8 @@
 export class Ingredient {
-  id: number;
+  id: string;
   name: string;
   vendor_info: string;
   package_size: string;
-  cost_per_package: number;
+  cost_per_package: string;
   comment: string;
 }
