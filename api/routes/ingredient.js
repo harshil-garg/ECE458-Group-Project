@@ -150,7 +150,7 @@ function create_ingredient(res, name, number, vendor_info, package_size, cost, c
     let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
     Ingredient.createIngredient(ingredient, (error) => {
         if (error) {
-            res.json({success: false, message: "Failed to create a new ingredient. Error: ${err}"});
+            res.json({success: false, message: `Failed to create a new ingredient. Error: ${err}`});
         } else{
             res.json({success: true, message: "Added successfully."});
         }
