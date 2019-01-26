@@ -9,7 +9,7 @@ const IngredientSchema = new Schema({
         unique: true
     },
     number: {
-        type: String,
+        type: Number,
         required: true,
         unique: true
     },
@@ -21,7 +21,7 @@ const IngredientSchema = new Schema({
         required: true
     }, 
     cost: {
-        type: String,
+        type: Number,
         required: true
     },
     comment: {

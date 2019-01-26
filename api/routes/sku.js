@@ -8,10 +8,9 @@ router.post('/filter', (req, res) => {
 
 });
 
-//Add
-router.post('/add', (req, res) => {
+//Create
+router.post('/create', (req, res) => {
     const { name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-    console.log(req.body)
     //check required fields
     if(!name || !number, !case_upc || !unit_upc || !size || !count || !product_line || !ingredients){
         res.json({success: false, message: 'Please fill in all fields'});
@@ -23,27 +22,70 @@ router.post('/add', (req, res) => {
     //check ingredients and product lines exist
 
     let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment});
-    SKU.addSKU(sku, (err) => {
+    SKU.createSKU(sku, (err) => {
         if(err){
-            res.json({success: false, message: `Failed to add SKU. Error: ${err}`});
+            res.json({success: false, message: `Failed to create SKU. Error: ${err}`});
         }else{
-            res.json({success: true, message: "Added successfully"});
+            res.json({success: true, message: "Created successfully"});
         }
     });
 });
 
-//Remove
-router.post('/remove', (req, res) => {
+//Delete
+router.post('/delete', (req, res) => {
     const name = req.body.name;
 
-    SKU.removeSKU(name, (err) => {
+    SKU.deleteSKU(name, (err) => {
         if(err) {
-            res.json({success: false, message: `Failed to remove SKU. Error: ${err}`});
+            res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
 
         }else{
-            res.json({success: true, message: "Removed successfully."});
+            res.json({success: true, message: "Deleted successfully."});
         }
     })
 });
+
+//Update
+router.post('/update', (req, res) => {
+    const { name, newname, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
+
+    var json = {};
+
+    if (newname) {
+        json["name"] = newname;
+    }
+    if (number) {
+        json["number"] = number;
+    }
+    if (case_upc) {
+        json["case_upc"] = case_upc;
+    }
+    if (unit_upc) {
+        json["unit_upc"] = unit_upc;
+    }
+    if (size) {
+        json["size"] = size;
+    }
+    if (count) {
+        json["count"] = count;
+    }
+    if (product_line) {
+        json["product_line"] = product_line;
+    }
+    if (ingredients) {
+        json["ingredients"] = ingredients;
+    }
+    if (comment) {
+        json["comment"] = comment;
+    }
+
+    SKU.updateSKU(name, json, (err) => {
+        if (err) {
+            res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
+        } else {
+            res.json({success: true, message: "Updated successfully."});
+        }
+    })
+})
 
 module.exports = router;
