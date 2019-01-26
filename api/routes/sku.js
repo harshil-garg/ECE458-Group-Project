@@ -31,31 +31,17 @@ router.post('/create', (req, res) => {
     });
 });
 
-//Delete
-router.post('/delete', (req, res) => {
-    const name = req.body.name;
-
-    SKU.deleteSKU(name, (err) => {
-        if(err) {
-            res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
-
-        }else{
-            res.json({success: true, message: "Deleted successfully."});
-        }
-    })
-});
-
 //Update
 router.post('/update', (req, res) => {
-    const { name, newname, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
+    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
 
     var json = {};
 
-    if (newname) {
-        json["name"] = newname;
+    if (name) {
+        json["name"] = name;
     }
-    if (number) {
-        json["number"] = number;
+    if (newnumber) {
+        json["number"] = newnumber;
     }
     if (case_upc) {
         json["case_upc"] = case_upc;
@@ -79,7 +65,7 @@ router.post('/update', (req, res) => {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(name, json, (err) => {
+    SKU.updateSKU(number, json, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else {
@@ -88,4 +74,17 @@ router.post('/update', (req, res) => {
     })
 })
 
+//Delete
+router.post('/delete', (req, res) => {
+    const number = req.body.number;
+
+    SKU.deleteSKU(number, (err) => {
+        if(err) {
+            res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
+
+        }else{
+            res.json({success: true, message: "Deleted successfully."});
+        }
+    })
+});
 module.exports = router;

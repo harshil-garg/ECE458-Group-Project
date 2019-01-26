@@ -54,12 +54,12 @@ module.exports.createSKU = (sku, callback) => {
     SKU.create(sku, callback);
 }
 
-module.exports.deleteSKU = (sku_name, callback) => {
-    var query = {name: sku_name};
+module.exports.deleteSKU = (sku_number, callback) => {
+    var query = {number: sku_number};
     SKU.deleteOne(query, callback);
 }
 
-module.exports.updateSKU = (sku_name, sku_update, cb) => {
-    var query = {name: sku_name};
+module.exports.updateSKU = (sku_number, sku_update, cb) => {
+    var query = {number: sku_number};
     SKU.findOneAndUpdate(query, sku_update, cb);
 }

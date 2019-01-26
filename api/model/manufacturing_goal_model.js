@@ -28,11 +28,11 @@ let ManufacturingGoal = mongoose.model('ManufacturingGoal', ManufacturingGoalSch
 module.exports = ManufacturingGoal;
 
 
-module.exports.addManufacturingGoal = (manufacturing_goal, callback) => {
+module.exports.createManufacturingGoal = (manufacturing_goal, callback) => {
     ManufacturingGoal.create(manufacturing_goal, callback);
 }
 
-module.exports.removeManufacturingGoal = (manufacturing_goal_name, callback) => {
+module.exports.deleteManufacturingGoal = (manufacturing_goal_name, callback) => {
     var query = {name: manufacturing_goal_name};
     ManufacturingGoal.deleteOne(query, callback);
 }
