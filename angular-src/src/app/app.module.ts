@@ -15,6 +15,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 import { UploadComponent } from './upload/upload.component';
+import { SearchIngredientComponent } from './ingredients-table/search-ingredient/search-ingredient.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
@@ -42,7 +44,8 @@ const routes: Routes = [
     TableEditableComponent,
     PagenotfoundComponent,
     DashboardComponent,
-    AccountsComponent
+    AccountsComponent,
+    SearchIngredientComponent
   ],
   imports: [
     BrowserModule,
@@ -50,6 +53,7 @@ const routes: Routes = [
     AddIngredientModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
+    ReactiveFormsModule,
     NgbModule
   ],
   providers: [],
