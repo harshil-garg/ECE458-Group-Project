@@ -14,6 +14,8 @@ require('./api/config/passport');
 const mongoCreds = require('./api/config/database');
 const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
+const skus = require('./api/routes/sku');
+const product_lines = require('./api/routes/product_line');
 const manufacturing_goals = require('./api/routes/manufacturing_goal');
 
 
@@ -64,8 +66,11 @@ app.use(passport.session());
 app.use('/api/*', ensureAuthenticated);
 app.use('/api/upload', uploadroute);
 app.use('/api/ingredients', ingredients);
+app.use('/api/skus', skus)
+app.use('/api/product_line', product_lines);
 app.use('/api/users', users);
 app.use('/api/manufacturing_goal', manufacturing_goals);
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });

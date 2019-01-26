@@ -16,6 +16,11 @@ const ManufacturingGoalSchema = new Schema({
     case_quantity: {
         type: [Number],
         required: true
+    },
+    user: {
+        type: String,
+        required: true,
+        unique: true
     }
 });
 
