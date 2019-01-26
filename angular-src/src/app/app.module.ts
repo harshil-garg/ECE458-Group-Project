@@ -14,6 +14,7 @@ import { AuthGuard } from './auth-guard';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
+import { UploadComponent } from './upload/upload.component';
 
 const routes: Routes = [
   {
@@ -23,7 +24,8 @@ const routes: Routes = [
     children: [
         	{ path: '', component: DashboardComponent },
         	{ path: 'ingredients', component: IngredientsTableComponent },
-        	{ path: 'accounts', component: AccountsComponent }
+          { path: 'accounts', component: AccountsComponent },
+          { path: 'upload', component: UploadComponent}
     ]
   },
   {path: 'login', component: LoginComponent },

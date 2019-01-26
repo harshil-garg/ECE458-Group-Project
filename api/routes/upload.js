@@ -6,8 +6,14 @@ const Validator = require('../model/ingredient_validation');
 const multer = require('multer');
 const upload = multer({ dest: 'tmp/csv/' });
 const csv = require('fast-csv');
+const fs = require('fs');
+
+let uploadSession = {
+  started: false
+}
 
 router.post('/', upload.single('file'), function (req, res) {
+    uploadSession.started = true;
     const fileRows = [];
   
     // open uploaded file
@@ -21,6 +27,9 @@ router.post('/', upload.single('file'), function (req, res) {
         fs.unlinkSync(req.file.path);   // remove temp file
         //process "fileRows" and respond
       })
+
+      uploadSession.started = false;
+      res.json({success: true, errorList: []});
   });
 
   module.exports = router;
