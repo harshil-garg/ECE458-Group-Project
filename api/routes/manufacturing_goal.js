@@ -21,11 +21,11 @@ router.post('/create', (req, res) => {
         res.send("You messed up");
         return;
     }
-
-    let goal = new ManufacturingGoal({name, skus, case_quantity});
+    let user = req.user.email;
+    let goal = new ManufacturingGoal({name, skus, case_quantity, user});
     ManufacturingGoal.create(goal, (error) => {
         if (error) {
-            res.json({success: false, message: "Failed to create a new manufacturing goal. Error: ${err}"});
+            res.json({success: false, message: `Failed to create a new manufacturing goal. Error: ${error}`});
         } else{
             res.json({success: true, message: "Added successfully."});
         }

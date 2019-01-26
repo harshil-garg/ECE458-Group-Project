@@ -23,13 +23,14 @@ router.post('/filter', (req, res) => {
 
     //No filter, return all
     if(keywords.length == 0 && skus.length == 0){
-        Ingredient.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+        Ingredient.find({}, null, {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
-                let pages = Math.ceil(ingredients.length/limit);
+                let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
+                let slice = Math.min(limit, ingredients.length);
                 res.json({success: true,
-                    data: ingredients,
+                    data: ingredients.slice(0,slice),
                     pages: pages});
             }
 
@@ -49,9 +50,10 @@ router.post('/filter', (req, res) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
-                let pages = Math.ceil(ingredients.length/limit);
+                let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
+                let slice = Math.min(limit, ingredients.length);
                 res.json({success: true,
-                    data: ingredients,
+                    data: ingredients.slice(0,slice),
                     pages: pages});
             }
         });
@@ -77,9 +79,10 @@ router.post('/filter', (req, res) => {
                     if(err){
                         res.json({success: false, message: err});
                     }else{
-                        let pages = Math.ceil(ingredients.length/limit);
+                        let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
+                        let slice = Math.min(limit, ingredients.length);
                         res.json({success: true,
-                            data: ingredients,
+                            data: ingredients.slice(0,slice),
                             pages: pages});
                     }
                 })
@@ -89,7 +92,7 @@ router.post('/filter', (req, res) => {
     }
     //Keywords and SKUs
     else{
-        SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name', (err, skus) => {
+        SKU.find({name: {$in: skus}}, 'ingredients', (err, skus) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
@@ -115,9 +118,10 @@ router.post('/filter', (req, res) => {
                     if(err){
                         res.json({success: false, message: err});
                     }else{
-                        let pages = Math.ceil(ingredients.length/limit);
+                        let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
+                        let slice = Math.min(limit, ingredients.length);
                         res.json({success: true,
-                            data: ingredients,
+                            data: ingredients.slice(0,slice),
                             pages: pages});
                     }
                 })
