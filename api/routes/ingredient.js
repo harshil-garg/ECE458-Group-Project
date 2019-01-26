@@ -6,6 +6,24 @@ const Validator = require('../model/ingredient_validation');
 
 let limit = 10;
 
+function paginate(ingredients, pageNum, res){
+    let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
+    let slice = Math.min(limit, ingredients.length);
+    res.json({success: true,
+        data: ingredients.slice(0,slice),
+        pages: pages});
+}
+
+function getNames(skus) {
+    let ingredient_names = new Set();
+    for(let sku of skus){
+        for(let ingredient of sku.ingredients){
+            ingredient_names.add(ingredient.ingredient_name);
+        }
+    }
+    return Array.from(ingredient_names);
+}
+
 //Filter ingredients
 //request params: sortBy, direction, pageNum, keywords, skus
 router.post('/filter', (req, res) => {
@@ -27,11 +45,7 @@ router.post('/filter', (req, res) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
-                let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
-                let slice = Math.min(limit, ingredients.length);
-                res.json({success: true,
-                    data: ingredients.slice(0,slice),
-                    pages: pages});
+                paginate(ingredients, pageNum, res);
             }
 
         });
@@ -44,48 +58,33 @@ router.post('/filter', (req, res) => {
             {vendor_info: {$all: key_exps}},
             {package_size: {$all: key_exps}},
             {comment: {$all: key_exps}}]
-        }, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+        }, null, {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
-                let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
-                let slice = Math.min(limit, ingredients.length);
-                res.json({success: true,
-                    data: ingredients.slice(0,slice),
-                    pages: pages});
+                paginate(ingredients, pageNum, res);
             }
         });
     }
     //SKUs no keywords
     else if(keywords.length == 0){
         //get all ingredients with given SKUs
-        SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name', (err, skus) => {
+        SKU.find({name: {$in: skus}}, 'ingredients', (err, skus) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
-                let ingredient_names = new Set();
-                for(let sku of skus){
-                    for(let ingredient of sku.ingredients){
-                        ingredient_names.add(ingredient.ingredient_name);
-                    }
-                }
-                let names = Array.from(ingredient_names);
+                let names = getNames(skus);
 
                 //find ingredients with given names
                 Ingredient.find({name: {$in: names}}, null,
-                    {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+                    {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
                     if(err){
                         res.json({success: false, message: err});
                     }else{
-                        let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
-                        let slice = Math.min(limit, ingredients.length);
-                        res.json({success: true,
-                            data: ingredients.slice(0,slice),
-                            pages: pages});
+                        paginate(ingredients, pageNum, res);
                     }
                 })
             }
-
         });
     }
     //Keywords and SKUs
@@ -94,13 +93,7 @@ router.post('/filter', (req, res) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
-                let ingredient_names = new Set();
-                for(let sku of skus){
-                    for(let ingredient of sku.ingredients){
-                        ingredient_names.add(ingredient.ingredient_name);
-                    }
-                }
-                let names = Array.from(ingredient_names);
+                let names = getNames(skus);
 
                 //find ingredients with given names
                 Ingredient.find({name: {$in: names},
@@ -110,22 +103,16 @@ router.post('/filter', (req, res) => {
                         {package_size: {$all: key_exps}},
                         {comment: {$all: key_exps}}]
                 }, null,
-                    {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
+                    {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
                     if(err){
                         res.json({success: false, message: err});
                     }else{
-                        let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
-                        let slice = Math.min(limit, ingredients.length);
-                        res.json({success: true,
-                            data: ingredients.slice(0,slice),
-                            pages: pages});
+                        paginate(ingredients, pageNum, res);
                     }
                 })
             }
-
         });
     }
-
 });
 
 //CREATE
