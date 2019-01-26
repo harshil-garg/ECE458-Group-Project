@@ -40,12 +40,10 @@ router.post('/filter', (req, res) => {
     else if(skus.length == 0){
         //find all ingredients containing any of the keywords
         Ingredient.find({$or:[
-            {name: {$in: key_exps}},
-            {number: {$in: key_exps}},
-            {vendor_info: {$in: key_exps}},
-            {package_size: {$in: key_exps}},
-            {cost: {$in: key_exps}},
-            {comment: {$in: key_exps}}]
+            {name: {$all: key_exps}},
+            {vendor_info: {$all: key_exps}},
+            {package_size: {$all: key_exps}},
+            {comment: {$all: key_exps}}]
         }, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
             if(err){
                 res.json({success: false, message: err});
@@ -107,12 +105,10 @@ router.post('/filter', (req, res) => {
                 //find ingredients with given names
                 Ingredient.find({name: {$in: names},
                     $or:[
-                        {name: {$in: key_exps}},
-                        {number: {$in: key_exps}},
-                        {vendor_info: {$in: key_exps}},
-                        {package_size: {$in: key_exps}},
-                        {cost: {$in: key_exps}},
-                        {comment: {$in: key_exps}}]
+                        {name: {$all: key_exps}},
+                        {vendor_info: {$all: key_exps}},
+                        {package_size: {$all: key_exps}},
+                        {comment: {$all: key_exps}}]
                 }, null,
                     {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, ingredients) => {
                     if(err){
