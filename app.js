@@ -1,9 +1,6 @@
 // We’ll declare all our dependencies here
 const fs = require('fs');
 const express = require('express');
-const multer = require('multer');
-const upload = multer({ dest: 'tmp/csv/' });
-const csv = require('fast-csv');
 const session = require('express-session');
 const https = require('https');
 const path = require('path');
@@ -12,16 +9,17 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const uploadroute = require('./api/routes/upload');
 require('./api/config/passport');
-const config = require('./api/config/database');
-const users = require('./api/routes/authentication');
+const mongoCreds = require('./api/config/database');
+const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
-const index = require('./api/routes/index');
+const manufacturing_goals = require('./api/routes/manufacturing_goal');
 
-const router = express.Router();
+
 
 //Connect mongoose to our database
-mongoose.connect(config.database, function(err){
+mongoose.connect(mongoCreds.database, function(err){
     if(err){
         console.log("Not connected to database: "+err);
     }else{
@@ -48,35 +46,6 @@ app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-
-/*express.static is a built in middleware function to serve static files.
- We are telling express server public folder is the place to look for the static files
-
-*/
-app.use(express.static(path.join(__dirname, 'public')));
-
-//Uploading csv files
-//app.post('/upload', upload);
-
-router.post('/', upload.single('file'), function (req, res) {
-  const fileRows = [];
-
-  // open uploaded file
-  csv.fromPath(req.file.path)
-    .on("data", function (data) {
-      fileRows.push(data); // push each row
-    })
-    .on("end", function () {
-      console.log(fileRows);
-      console.log('HELLO WORLD');
-      fs.unlinkSync(req.file.path);   // remove temp file
-      //process "fileRows" and respond
-    })
-});
-
-app.use('/upload', router);
-
-//Express session and passport setup
 app.use(
     session({
         secret: 'secret',
@@ -84,12 +53,19 @@ app.use(
         saveUninitialized: true
     })
 );
+/*express.static is a built in middleware function to serve static files.
+ We are telling express server public folder is the place to look for the static files
+
+*/
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
-
-//Routing HTTP requests
+// Routes
+app.use('/api/*', ensureAuthenticated);
+app.use('/api/upload', uploadroute);
 app.use('/api/ingredients', ingredients);
 app.use('/api/users', users);
+app.use('/api/manufacturing_goal', manufacturing_goals);
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
@@ -104,3 +80,11 @@ let httpsServer = https.createServer({
 httpsServer.listen(port, () => {
     console.log(`Starting the server at port ${port}`);
 });
+
+
+function ensureAuthenticated(req, res, next) {
+    if(req.isAuthenticated() || req.originalUrl === '/api/users/login'){
+         return next();
+    }
+    res.redirect('/login');
+}

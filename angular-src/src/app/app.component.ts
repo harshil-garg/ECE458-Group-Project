@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { LoginState } from './loginstate';
-import { AuthenticationService } from './authentication.service'
+import { LoginState } from './model/loginstate';
+import { AuthenticationService } from './authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,6 @@ import { AuthenticationService } from './authentication.service'
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-	constructor (private authService: AuthenticationService) { }
+	constructor (private authService: AuthenticationService, private router: Router) { }
 	title = 'Hypo Meals';
 }
