@@ -27,6 +27,6 @@ const UserSchema = new Schema({
 module.exports = mongoose.model('User', UserSchema);
 
 //newUser.save is used to insert the document into MongoDB
-module.exports.addUser = (newUser, callback) => {
+module.exports.createUser = (newUser, callback) => {
     newUser.save(callback);
 }
