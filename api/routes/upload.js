@@ -29,7 +29,7 @@ router.post('/', upload.single('file'), function (req, res) {
       })
 
       uploadSession.started = false;
-      res.json({success: true, errorList: []});
+      res.json({success: true, errorList: [], updateList: []});
   });
 
   module.exports = router;
