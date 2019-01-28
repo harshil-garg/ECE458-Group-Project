@@ -10,15 +10,13 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const uploadroute = require('./api/routes/upload');
-require('./api/config/passport');
+const passport_config = require('./api/config/passport');
 const mongoCreds = require('./api/config/database');
 const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
 const skus = require('./api/routes/sku');
 const product_lines = require('./api/routes/product_line');
 const manufacturing_goals = require('./api/routes/manufacturing_goal');
-
-
 
 //Connect mongoose to our database
 mongoose.connect(mongoCreds.database, function(err){
@@ -63,7 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 // Routes
-app.use('/api/*', ensureAuthenticated);
+//app.use('/api/*', ensureAuthenticated);
 app.use('/api/upload', uploadroute);
 app.use('/api/ingredients', ingredients);
 app.use('/api/skus', skus)

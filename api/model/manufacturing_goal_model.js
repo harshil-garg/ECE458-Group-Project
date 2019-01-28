@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+const Tuple = new Schema({
+    sku_name: String,
+    case_quantity: Number
+});
+
 const ManufacturingGoalSchema = new Schema({
     name: {
         type: String,
@@ -10,11 +15,7 @@ const ManufacturingGoalSchema = new Schema({
         unique: true
     },
     skus: {
-        type: [String],
-        required: true
-    },
-    case_quantity: {
-        type: [Number],
+        type: [Tuple],
         required: true
     },
     user: {

@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Tuple = new Schema({
     ingredient_name: String,
-    quantity: String
+    quantity: Number
 });
 const SKUSchema = new Schema({
     name: {

@@ -137,7 +137,7 @@ function create_ingredient(res, name, number, vendor_info, package_size, cost, c
     let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
     Ingredient.createIngredient(ingredient, (error) => {
         if (error) {
-            res.json({success: false, message: `Failed to create a new ingredient. Error: ${err}`});
+            res.json({success: false, message: `Failed to create a new ingredient. Error: ${error}`});
         } else{
             res.json({success: true, message: "Added successfully."});
         }
@@ -147,13 +147,13 @@ function create_ingredient(res, name, number, vendor_info, package_size, cost, c
 function create_ingredient_number(callback) {
     Ingredient.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec(function(error, ingredients) {
         if (error) return error;
-        return callback(smallest_missing_number(ingredients, 0, ingredients.length));
+        return callback(smallest_missing_number(ingredients, 0, ingredients.length - 1));
     })
 }
 
 function smallest_missing_number(ingredients, lo, hi) {
     if (lo > hi)
-        return lo+1;
+        return lo + 1;
     let mid =  Math.floor(lo + (hi - lo) / 2);
 
     if (ingredients[mid].number == mid+1) {
