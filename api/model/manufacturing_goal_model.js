@@ -20,7 +20,6 @@ const ManufacturingGoalSchema = new Schema({
     user: {
         type: String,
         required: true,
-        unique: true
     }
 });
 

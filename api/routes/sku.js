@@ -1,11 +1,91 @@
 const express = require('express');
 const router = express.Router();
-const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
+const sku_filter = require('../controllers/sku_filter');
+const pagination = require('../controllers/paginate');
 
+function intersection(a, b=0) {
+    if(b==0){
+        return a;
+    }
+    if(!b){
+        return a;
+    }
+    if(!a){
+        return b;
+    }
+    if(!b && !a){
+        return null;
+    }
+    let intersection = [];
+    for (let obja of a){
+        for(let objb of b){
+            if(_.isEqual(obja, objb)){
+                intersection.push(obja);
+            }
+        }
+    }
+    return intersection;
+}
+
+let limit=10
 //Filter
 router.post('/filter', (req, res) => {
+    const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
 
+    //check fields completed
+    if(!sortBy || !pageNum || !keywords || !ingredients || !product_lines){
+        res.json({success: false, message: "Please fill in all fields"});
+        return;
+    }
+
+    let key_exps = keywords.map((keyword) => {
+        return new RegExp(keyword, 'i');
+    });
+    
+    let intersect = [];
+    if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
+        sku_filter.none(pageNum, sortBy, res);
+    }else if(ingredients.length == 0 && product_lines.length == 0){
+        sku_filter.keywords(pageNum, sortBy, key_exps, res);
+    }else if(keywords.length == 0 && product_lines.length == 0){
+        sku_filter.ingredients(pageNum, sortBy, ingredients, res);
+    }else if(keywords.length == 0 && ingredients.length == 0){
+        sku_filter.productLines(pageNum, sortBy, product_lines, res);
+    }else if(product_lines.length == 0){
+        sku_filter.keywordsandIngredients(pageNum, sortBy, keywords, ingredients, res)
+    }else if(keywords.length == 0){
+        sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines, res)
+    }else if(ingredients.length == 0){
+        sku_filter.keywordsandLines(pageNum, sortBy, keywords, product_lines, res)
+    }else{
+        sku_filter.filter(pageNum, sortBy, keywords, ingredients, product_lines, res)
+    }
+
+    // let keywordsList
+    // if(keywords.length != 0){
+    //     sku_filter.keywords(pageNum, limit, sortBy, key_exps, res, (results) => {
+    //         keywordsList = results;
+    //     });
+        
+    // }
+    // let ingredientsList
+    // if(ingredients.length != 0){
+    //     sku_filter.ingredients(pageNum, limit, sortBy, ingredients, res, (results) => {
+    //         ingredientsList = results;
+    //     });
+    // }
+    // let productsList
+    // if(product_lines.length != 0){
+    //     sku_filter.keywords(pageNum, limit, sortBy, product_lines, res, (results) => {
+    //         productsList = results;
+    //     });
+    // }
+    
+    // intersect = intersection(keywordsList, ingredientsList);
+    // intersect = intersection(intersect, productsList)
+
+    // res.json(intersect)
 });
 
 //Create
