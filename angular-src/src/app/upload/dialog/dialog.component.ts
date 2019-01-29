@@ -47,20 +47,23 @@ export class DialogComponent implements OnInit {
 
     // set the component state to "uploading"
     this.uploading = true;
+    let responseData = [];
 
     // start the upload and save the progress map
     this.response = this.uploadService.upload(this.files);
-    console.log(this.response);
     for (const key in this.response) {
       this.response[key].progress.subscribe(val => console.log(val));
-      console.log('waiting for finish message');
-      this.response[key].validation.subscribe(val => console.log(val));
+      this.response[key].validation.subscribe((val) => {
+        responseData.push(val);
+        console.log('val');
+        console.log(val);
+      });
     }
 
     // convert the progress map into an array
     let allProgressObservables = [];
     for (let key in this.response) {
-      allProgressObservables.push(this.response[key].progress);
+      allProgressObservables.push(this.response[key].validation);
     }
 
     // Adjust the state variables
