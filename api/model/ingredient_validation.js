@@ -3,15 +3,15 @@ function create(name, number, package_size, cost) {
         return get_error_response();
     }
 
-    if (isNotNumeric(cost)) {
-        return get_error_response();
-    }
+    // if (isNotNumeric(cost)) {
+    //     return get_error_response();
+    // }
 
-    if (number) {
-        if (isNotNumeric(number) || number % 1 != 0) {
-            return get_error_response();
-        }
-    }
+    // if (number) {
+    //     if (isNotNumeric(number) || number % 1 != 0) {
+    //         return get_error_response();
+    //     }
+    // }
 
     return get_success_response();
 }

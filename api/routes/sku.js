@@ -85,13 +85,13 @@ router.post('/filter', (req, res) => {
     }else if(keywords.length == 0 && ingredients.length == 0){
         sku_filter.productLines(pageNum, sortBy, product_lines, res);
     }else if(product_lines.length == 0){
-        sku_filter.keywordsandIngredients(pageNum, sortBy, keywords, ingredients, res)
+        sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients, res)
     }else if(keywords.length == 0){
         sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines, res)
     }else if(ingredients.length == 0){
-        sku_filter.keywordsandLines(pageNum, sortBy, keywords, product_lines, res)
+        sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines, res)
     }else{
-        sku_filter.filter(pageNum, sortBy, keywords, ingredients, product_lines, res)
+        sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines, res)
     }
 
     // let keywordsList

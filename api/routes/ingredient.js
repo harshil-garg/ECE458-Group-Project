@@ -26,9 +26,18 @@ function getNames(skus) {
 }
 
 async function getSKUS(ingredient, callback){
-    SKU.find({name: ingredient.name}, (err, results) => {
-        ingredient.num_skus = results.length;
-        return results;
+    let result = await SKU.where({"ingredients.ingredient_name": ingredient.name}).count().exec((err, count) => {
+        // console.log(count)
+        return count;
+    });
+    let json = {};
+    json["num_skus"] = result;
+    Ingredient.updateIngredient(ingredient.name, json, (err, result) => {
+        if(err){
+            console.log(err)
+        }
+        console.log(result)
+        callback(result)
     });
 }
 
@@ -66,7 +75,9 @@ router.post('/filter', (req, res) => {
                 res.json({success: false, message: err});
             }else{
                 for(let ingredient of ingredients){
-                    getSKUS(ingredient)
+                    getSKUS(ingredient, (result) => {
+                        ingredient = result;
+                    })
                 }
                 paginate(ingredients, pageNum, res);
             }
@@ -142,11 +153,13 @@ router.post('/filter', (req, res) => {
 router.post('/create', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
 
-    var validation = Validator.create(name, number, package_size, cost);
-    if (!validation.success) {
-        res.json(validation);
-    }
+    // var validation = Validator.create(name, number, package_size, cost);
+    // if (!validation.success) {
+    //     res.json(validation);
+    // }
 
+
+    //Autogen number logic
     if (number) {
         create_ingredient(res, name, number, vendor_info, package_size, cost, comment);
     } else {
