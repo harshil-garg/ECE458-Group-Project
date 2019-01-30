@@ -3,6 +3,7 @@ const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
 const Validator = require('../model/ingredient_validation');
+const autocomplete = require('../controllers/autocomplete');
 
 let limit = 10;
 
@@ -23,6 +24,25 @@ function getNames(skus) {
     }
     return Array.from(ingredient_names);
 }
+
+async function getSKUS(ingredient, callback){
+    SKU.find({name: ingredient.name}, (err, results) => {
+        ingredient.num_skus = results.length;
+        return results;
+    });
+}
+
+//Autocomplete
+router.post('/autocomplete', (req, res) => {
+    const input = req.body.input;
+    autocomplete.autocomplete(SKU, input, (err, results) => {
+        if(err){
+            res.json({success: "false"});
+        }else{
+            paginate(results, 1, res);
+        }
+    });
+});
 
 //Filter ingredients
 //request params: sortBy, direction, pageNum, keywords, skus
@@ -45,6 +65,9 @@ router.post('/filter', (req, res) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
+                for(let ingredient of ingredients){
+                    getSKUS(ingredient)
+                }
                 paginate(ingredients, pageNum, res);
             }
 
