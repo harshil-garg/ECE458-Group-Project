@@ -25,20 +25,18 @@ function getNames(skus) {
     return Array.from(ingredient_names);
 }
 
-async function getSKUS(ingredient, callback){
+async function getSKUS(ingredient){
     let result = await SKU.where({"ingredients.ingredient_name": ingredient.name}).count().exec((err, count) => {
         // console.log(count)
         return count;
     });
     let json = {};
     json["num_skus"] = result;
-    Ingredient.updateIngredient(ingredient.name, json, (err, result) => {
-        if(err){
-            console.log(err)
-        }
-        console.log(result)
-        callback(result)
+    let newIngredient = await Ingredient.updateIngredient(ingredient.name, json).exec((err, result) => {
+        return result;
     });
+
+    return newIngredient
 }
 
 //Autocomplete
@@ -75,9 +73,7 @@ router.post('/filter', (req, res) => {
                 res.json({success: false, message: err});
             }else{
                 for(let ingredient of ingredients){
-                    getSKUS(ingredient, (result) => {
-                        ingredient = result;
-                    })
+                    ingredient = getSKUS(ingredient);
                 }
                 paginate(ingredients, pageNum, res);
             }
@@ -205,10 +201,10 @@ function smallest_missing_number(ingredients, lo, hi) {
 router.post('/update', (req, res) => {
     const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
 
-    var validation = Validator.update(number, cost);
-    if (!validation.success) {
-        res.json(validation);
-    }
+    // var validation = Validator.update(number, cost);
+    // if (!validation.success) {
+    //     res.json(validation);
+    // }
 
     var json = {};
 

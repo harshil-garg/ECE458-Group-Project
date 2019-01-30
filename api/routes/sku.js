@@ -9,29 +9,6 @@ const autocomplete = require('../controllers/autocomplete');
 
 
 let limit=10
-function intersection(a, b=0) {
-    if(b==0){
-        return a;
-    }
-    if(!b){
-        return a;
-    }
-    if(!a){
-        return b;
-    }
-    if(!b && !a){
-        return null;
-    }
-    let intersection = [];
-    for (let obja of a){
-        for(let objb of b){
-            if(_.isEqual(obja, objb)){
-                intersection.push(obja);
-            }
-        }
-    }
-    return intersection;
-}
 
 //Autocomplete ingredients
 router.post('/autocomplete_ingredients', (req, res) => {
@@ -75,7 +52,6 @@ router.post('/filter', (req, res) => {
         return new RegExp(keyword, 'i');
     });
     
-    let intersect = [];
     if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
         sku_filter.none(pageNum, sortBy, res);
     }else if(ingredients.length == 0 && product_lines.length == 0){
@@ -93,31 +69,6 @@ router.post('/filter', (req, res) => {
     }else{
         sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines, res)
     }
-
-    // let keywordsList
-    // if(keywords.length != 0){
-    //     sku_filter.keywords(pageNum, limit, sortBy, key_exps, res, (results) => {
-    //         keywordsList = results;
-    //     });
-        
-    // }
-    // let ingredientsList
-    // if(ingredients.length != 0){
-    //     sku_filter.ingredients(pageNum, limit, sortBy, ingredients, res, (results) => {
-    //         ingredientsList = results;
-    //     });
-    // }
-    // let productsList
-    // if(product_lines.length != 0){
-    //     sku_filter.keywords(pageNum, limit, sortBy, product_lines, res, (results) => {
-    //         productsList = results;
-    //     });
-    // }
-    
-    // intersect = intersection(keywordsList, ingredientsList);
-    // intersect = intersection(intersect, productsList)
-
-    // res.json(intersect)
 });
 
 //Create
