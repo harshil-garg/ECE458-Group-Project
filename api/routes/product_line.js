@@ -26,15 +26,9 @@ router.post('/create', (req, res) => {
 router.post('/read', (req, res) => {
     const pageNum  = req.body.pageNum;
 
-    ProductLine.find({}, null, {sortBy: 'name'}, (err, results) => {
-        if(err){
-            res.json({success: false, message: err})
-        }else{
-            pagination.paginate(results, pageNum, res);
-        }
-    });
-
-})
+    let filter = ProductLine.find({});
+    pagination.paginate(filter, ProductLine, pageNum, 'name', res);
+});
 
 //Update
 router.post('/update', (req, res) => {

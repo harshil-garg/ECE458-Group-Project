@@ -2,58 +2,19 @@ const express = require('express');
 const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
-const Validator = require('../model/ingredient_validation');
+const ingredient_filter = require('../controllers/ingredient_filter');
+const Validator = require('../controllers/ingredient_validation');
 const autocomplete = require('../controllers/autocomplete');
-
-let limit = 10;
-
-function paginate(ingredients, pageNum, res){
-    let pages = Math.ceil(ingredients.length/limit) + (pageNum-1);
-    let slice = Math.min(limit, ingredients.length);
-    res.json({success: true,
-        data: ingredients.slice(0,slice),
-        pages: pages});
-}
-
-function getNames(skus) {
-    let ingredient_names = new Set();
-    for(let sku of skus){
-        for(let ingredient of sku.ingredients){
-            ingredient_names.add(ingredient.ingredient_name);
-        }
-    }
-    return Array.from(ingredient_names);
-}
-
-async function getSKUS(ingredient){
-    let result = await SKU.where({"ingredients.ingredient_name": ingredient.name}).count().exec((err, count) => {
-        // console.log(count)
-        return count;
-    });
-    let json = {};
-    json["num_skus"] = result;
-    let newIngredient = await Ingredient.updateIngredient(ingredient.name, json).exec((err, result) => {
-        return result;
-    });
-
-    return newIngredient
-}
 
 //Autocomplete
 router.post('/autocomplete', (req, res) => {
     const input = req.body.input;
-    autocomplete.autocomplete(SKU, input, (err, results) => {
-        if(err){
-            res.json({success: "false"});
-        }else{
-            paginate(results, 1, res);
-        }
-    });
+    autocomplete.skus(SKU, input, res);
 });
 
 //Filter ingredients
 //request params: sortBy, direction, pageNum, keywords, skus
-router.post('/filter', (req, res) => {
+router.post('/filter', async (req, res) => {
     const { sortBy, pageNum, keywords, skus } = req.body;
 
     //check fields completed
@@ -68,80 +29,28 @@ router.post('/filter', (req, res) => {
 
     //No filter, return all
     if(keywords.length == 0 && skus.length == 0){
-        Ingredient.find({}, null, {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                for(let ingredient of ingredients){
-                    ingredient = getSKUS(ingredient);
-                }
-                paginate(ingredients, pageNum, res);
-            }
-
-        });
+        ingredient_filter.none(pageNum, sortBy, res);
     }
     //Keywords no SKUs
     else if(skus.length == 0){
-        //find all ingredients containing any of the keywords
-        Ingredient.find({$or:[
-            {name: {$all: key_exps}},
-            {vendor_info: {$all: key_exps}},
-            {package_size: {$all: key_exps}},
-            {comment: {$all: key_exps}}]
-        }, null, {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                paginate(ingredients, pageNum, res);
-            }
-        });
+        ingredient_filter.keywords(pageNum, sortBy, key_exps, res);
     }
     //SKUs no keywords
     else if(keywords.length == 0){
         //get all ingredients with given SKUs
-        SKU.find({name: {$in: skus}}, 'ingredients', (err, skus) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                let names = getNames(skus);
-
-                //find ingredients with given names
-                Ingredient.find({name: {$in: names}}, null,
-                    {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
-                    if(err){
-                        res.json({success: false, message: err});
-                    }else{
-                        paginate(ingredients, pageNum, res);
-                    }
-                })
-            }
+        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec((err, results) => {
+            return results;
         });
+
+        ingredient_filter.skus(pageNum, sortBy, skuList, res);
     }
     //Keywords and SKUs
     else{
-        SKU.find({name: {$in: skus}}, 'ingredients', (err, skus) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                let names = getNames(skus);
-
-                //find ingredients with given names
-                Ingredient.find({name: {$in: names},
-                    $or:[
-                        {name: {$all: key_exps}},
-                        {vendor_info: {$all: key_exps}},
-                        {package_size: {$all: key_exps}},
-                        {comment: {$all: key_exps}}]
-                }, null,
-                    {skip: (pageNum-1)*limit, sort: sortBy}, (err, ingredients) => {
-                    if(err){
-                        res.json({success: false, message: err});
-                    }else{
-                        paginate(ingredients, pageNum, res);
-                    }
-                })
-            }
+        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec((err, results) => {
+            return results;
         });
+        
+        ingredient_filter.keywordsAndSkus(pageNum, sortBy, key_exps, skuList, res);
     }
 });
 

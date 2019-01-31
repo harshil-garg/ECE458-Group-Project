@@ -4,39 +4,22 @@ const SKU = require('../model/sku_model');
 const Ingredient = require('../model/ingredient_model');
 const ProductLine = require('../model/product_line_model');
 const sku_filter = require('../controllers/sku_filter');
-const pagination = require('../controllers/paginate');
 const autocomplete = require('../controllers/autocomplete');
 
-
-let limit=10
 
 //Autocomplete ingredients
 router.post('/autocomplete_ingredients', (req, res) => {
     const input = req.body.input;
 
-    autocomplete.autocomplete(Ingredient, input, (err, results) => {
-        if(err){
-            res.json({success: "false"});
-        }else{
-            pagination.paginate(results, 1, limit, res);
-        }
-    });
+    autocomplete.ingredients(Ingredient, input, res);
 });
 
 //Autocomplete product lines
 router.post('/autocomplete_product_lines', (req, res) => {
     const input = req.body.input;
 
-    autocomplete.autocomplete(ProductLine, input, (err, results) => {
-        if(err){
-            res.json({success: "false"});
-        }else{
-            pagination.paginate(results, 1, limit, res);
-        }
-    });
+    autocomplete.productLines(ProductLine, input, res);
 });
-
-
 
 //Filter
 router.post('/filter', (req, res) => {
@@ -67,7 +50,7 @@ router.post('/filter', (req, res) => {
     }else if(ingredients.length == 0){
         sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines, res)
     }else{
-        sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines, res)
+        sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines, res)
     }
 });
 

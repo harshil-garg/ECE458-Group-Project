@@ -26,9 +26,6 @@ const IngredientSchema = new Schema({
     },
     comment: {
         type: String
-    },
-    num_skus: {
-        type: Number
     }
 });
 

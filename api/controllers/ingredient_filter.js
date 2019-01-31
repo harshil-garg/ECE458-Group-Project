@@ -1,33 +1,44 @@
-const mongoose = require('mongoose');
 const Ingredient = require('../model/ingredient_model');
-const pagination = require('/paginate');
+const pagination = require('./paginate');
 
-module.exports.noFilter = function (pageNum, limit, sortBy){
-    Ingredient.find({}, null, {skip: (pageNum-1)*limit, sort: sortBy}, (err, results) => {
-        if(err){
-            res.json({success: false, message: err});
-        }else{
-            pagination.paginate(results, pageNum, res);
-        }
-
-    });
+module.exports.none = function (pageNum, sortBy, res){
+    let filter = Ingredient.find({});
+    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
 };
 
-module.exports.keywordsFilter = function (pageNum, limit, sortBy, keywords){
-    Ingredient.find({$or:[
+module.exports.keywords = function (pageNum, sortBy, keywords, res){
+    let filter = Ingredient.find({$or:[
         {name: {$all: keywords}},
         {vendor_info: {$all: keywords}},
         {package_size: {$all: keywords}},
         {comment: {$all: keywords}}]
-    }, null, {skip: (pageNum-1)*limit, sort: sortBy}, (err, results) => {
-        if(err){
-            res.json({success: false, message: err});
-        }else{
-            pagination.paginate(results, pageNum, res);
-        }
     });
+    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
 };
 
-module.exports.skuFilter = function (model, pageNum, limit, sortBy, skus){
-
+module.exports.skus = function (pageNum, sortBy, skus, res){
+    let filter = Ingredient.find({name: {$in: getNames(skus)}});
+    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
 }
+
+module.exports.keywordsAndSkus = function(pageNum, sortBy, keywords, skus, res){
+    let filter = Ingredient.find({name: {$in: getNames(skus)},
+        $or:[
+            {name: {$all: keywords}},
+            {vendor_info: {$all: keywords}},
+            {package_size: {$all: keywords}},
+            {comment: {$all: keywords}}]
+    });
+    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
+}
+
+function getNames(skus) {
+    let ingredient_names = new Set();
+    for(let sku of skus){
+        for(let ingredient of sku.ingredients){
+            ingredient_names.add(ingredient.ingredient_name);
+        }
+    }
+    return Array.from(ingredient_names);
+}
+
