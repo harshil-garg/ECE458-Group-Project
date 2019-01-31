@@ -65,9 +65,9 @@ app.use(passport.session());
 app.use('/api/upload', uploadroute);
 app.use('/api/ingredients', ingredients);
 app.use('/api/skus', skus)
-app.use('/api/product_line', product_lines);
+app.use('/api/product_lines', product_lines);
 app.use('/api/users', users);
-app.use('/api/manufacturing_goal', manufacturing_goals);
+app.use('/api/manufacturing_goals', manufacturing_goals);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
