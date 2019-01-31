@@ -2,48 +2,37 @@ import { Component, OnInit } from '@angular/core';
 import { Ingredient } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
-import { CrudIngredientsService, Response } from './crud-ingredients.service';
-import { FilterIngredientsService, FilterResponse } from './filter-ingredients.service'
+import { CrudSkuService, Response } from './crud-sku.service';
+import { FilterSkuService, FilterResponse } from './filter-sku.service'
 
 @Component({
-  selector: 'ingredients-table',
-  templateUrl: './ingredients-table.component.html',
-  styleUrls: ['./ingredients-table.component.css'],
+  selector: 'sku-table',
+  templateUrl: './sku-table.component.html',
+  styleUrls: ['./sku-table.component.css'],
 })
-export class IngredientsTableComponent implements OnInit{
+export class SkuTableComponent implements OnInit{
     editField: string;
-    ingredientList: Array<any> = [];
+    skuList: Array<any> = [];
     currentPage: number;
     maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
-
-    skuShown: Array<any> = [
-      {id:1, shown:true},
-      {id:2, shown:false}
-    ]
 
     ngOnInit() {
       this.currentPage = 1;
       this.refresh();
     }
 
-    constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService,
-      public filterIngredientsService: FilterIngredientsService){}
+    constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService,
+      public filterSkuService: FilterSkuService){}
 
     updateList(id: number, property: string, event: any) {
       const editField = event.target.textContent;
-      if(property === 'cost_per_package')
-      {
-        this.ingredientList[id][property] = parseFloat(editField).toFixed(2);
-      }
-      else{
-        this.ingredientList[id][property] = editField;
-      }
+      this.skuList[id][property] = editField;
     }
 
     remove(deleted_name: any) {
-      this.crudIngredientsService.remove({
+      this.crudSkuService.remove({
           name : deleted_name
         }).subscribe(
         response => this.handleResponse(response),
@@ -56,38 +45,50 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, event:any) {
-      var editedIngredient : Ingredient = new Ingredient();
+      var editedSku : Sku = new Sku();
       var newName : string;
-      editedIngredient.name = name;
+      editedSku.name = name;
       switch(property){
         case 'name':{
           newName = event.target.textContent; //new name
-          editedIngredient.name = event.target.textContent;//old name
+          editedSku.name = event.target.textContent;//old name
         }
         case 'id':{
-          editedIngredient.id = event.target.textContent;
+          editedSku.id = event.target.textContent;
         }
-        case 'vendor_info':{
-          editedIngredient.vendor_info = event.target.textContent;
+        case 'case_upc':{
+          editedSku.case_upc = event.target.textContent;
         }
-        case 'package_size':{
-          editedIngredient.package_size = event.target.textContent;
+        case 'unit_upc':{
+          editedSku.unit_upc = event.target.textContent;
         }
-        case 'cost_per_package':{
-          editedIngredient.cost_per_package = event.target.textContent;
+        case 'unit_size':{
+          editedSku.unit_size = event.target.textContent;
+        }
+        case 'count_per_case':{
+          editedSku.count_per_case = event.target.textContent;
+        }
+        case 'product_line':{
+          editedSku.product_line = event.target.textContent;
+        }
+        case 'ingredient_quantity':{
+          editedSku.ingredient_quantity = event.target.textContent;
         }
         case 'comment':{
-          editedIngredient.comment = event.target.textContent;
+          editedSku.comment = event.target.textContent;
         }
       }
-      this.crudIngredientsService.edit({
-          name : editedIngredient.name,
+      this.crudSkuService.edit({
+          name : editedSku.name,
           newname: newName,
-          number : editedIngredient.id,
-          vendor_info : editedIngredient.vendor_info,
-          package_size: editedIngredient.package_size,
-          cost : editedIngredient.cost_per_package,
-          comment : editedIngredient.comment
+          number : editedSku.id,
+          case_upc : editedSku.case_upc,
+          unit_upc: editedSku.unit_upc,
+          size : editedSku.unit_size,
+          count: editedSku.count_per_case,
+          product_line : editedSku.product_line,
+          ingredients: editedSku.ingredient_quantity,
+          comment: editedSku.comment
         }).subscribe(
         response => this.handleResponse(response),
         err => {
@@ -103,10 +104,6 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     changeValue(id: number, property: string, event: any) {
-      if(property === 'cost_per_package')
-      {
-        this.editField = parseFloat(event.target.textContent).toFixed(2);
-      }
       this.editField = event.target.textContent;
     }
 
@@ -114,16 +111,8 @@ export class IngredientsTableComponent implements OnInit{
       return this.authenticationService.loginState.isAdmin;
     }
 
-    getNumSkus(ingredient: Ingredient){
-      return 3;
-    }
-
-    toggleSkus(id: number){
-      this.skuShown[id].shown = !this.skuShown[id].shown;
-    }
-
     refresh(){
-      this.filterIngredientsService.filter({
+      this.filterSkuService.filter({
           sortBy : this.sortBy,
           pageNum: this.currentPage.toString(),
           keywords: this.keywords,
@@ -140,15 +129,18 @@ export class IngredientsTableComponent implements OnInit{
 
     handleRefreshResponse(response: FilterResponse){
       if(response.success){
-        this.ingredientList = [];
-        for(let ingredient of response.data){
-          this.ingredientList.push({
-              id: ingredient.number,
-              name: ingredient.name,
-              vendor_info: ingredient.vendor_info,
-              package_size: ingredient.package_size,
-              cost_per_package: ingredient.cost,
-              comment: ingredient.comment
+        this.skuList = [];
+        for(let sku of response.data){
+          this.skuList.push({
+              id: sku.number,
+              name: sku.name,
+              case_upc: sku.case_upc,
+              unit_upc: sku.unit_upc,
+              unit_size: sku.size,
+              count_per_case: sku.count,
+              product_line: sku.product_line,
+              ingredient_quantity: sku.ingredients,
+              comment: sku.comment
           });
         }
         this.maxPages = response.pages;
@@ -206,10 +198,6 @@ export class IngredientsTableComponent implements OnInit{
       this.refresh();
     }
 
-}
-
-function nextId(ingredientList: Array<any>){
-  return ingredientList[ingredientList.length - 1].id + 1;
 }
 //
 // function skuList(ingredient: Ingredient)

@@ -14,9 +14,13 @@ import { AuthGuard } from './auth-guard';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
+import { AddProductLineModule } from './product-line-table/add-product-line/add-product-line.module';
+import { AddSkuModule } from './sku-table/add-sku/add-sku.module';
 import { UploadComponent } from './upload/upload.component';
 import { SearchIngredientComponent } from './ingredients-table/search-ingredient/search-ingredient.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ProductLineTableComponent } from './product-line-table/product-line-table.component';
+import { SkuTableComponent } from './sku-table/sku-table.component';
 
 const routes: Routes = [
   {
@@ -26,6 +30,8 @@ const routes: Routes = [
     children: [
         	{ path: '', component: DashboardComponent },
         	{ path: 'ingredients', component: IngredientsTableComponent },
+          { path: 'product-lines', component: ProductLineTableComponent },
+          { path: 'skus', component: SkuTableComponent },
           { path: 'accounts', component: AccountsComponent },
           { path: 'upload', component: UploadComponent}
     ]
@@ -45,12 +51,16 @@ const routes: Routes = [
     PagenotfoundComponent,
     DashboardComponent,
     AccountsComponent,
-    SearchIngredientComponent
+    SearchIngredientComponent,
+    ProductLineTableComponent,
+    SkuTableComponent
   ],
   imports: [
     BrowserModule,
     UploadModule,
     AddIngredientModule,
+    AddProductLineModule,
+    AddSkuModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
     ReactiveFormsModule,

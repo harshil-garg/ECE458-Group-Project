@@ -1,0 +1,69 @@
+<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
+<!-- <app-search-ingredient></app-search-ingredient> -->
+<div class="card">
+  <h3 class="card-header text-center font-weight-bold py-4">SKUs</h3>
+<div class="pagination">
+  <a (click) = "prevPage()">&laquo;</a>
+  <li *ngFor="let i of shownPages()" [ngClass]="{active: i == currentPage}" (click)="setPage(i)">
+      <a>{{i}}</a>
+  </li>
+  <a (click) = "nextPage()">&raquo;</a>
+</div>
+<a (click) = "showAll()">Show all</a>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
+      <app-add-sku *ngIf="isAdmin()"></app-add-sku>
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center" (click)="setSortBy('name')">SKU Name <i *ngIf="sortBy=='name'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('number')">SKU Number <i *ngIf="sortBy=='number'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('case_upc')">Case UPC Number <i *ngIf="sortBy=='vendor_info'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('unit_upc')">Unit UPC Number <i *ngIf="sortBy=='package_size'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('size')">Unit Size <i *ngIf="sortBy=='cost'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('count')">Count Per Case <i *ngIf="sortBy=='comment'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('ingredients')">Ingredients <i *ngIf="sortBy=='comment'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center" (click)="setSortBy('comment')">Comment <i *ngIf="sortBy=='comment'" class="fa fa-sort-desc"></i></th>
+        </tr>
+
+       <ng-container *ngFor="let sku of skuList; let id=index">
+         <!-- TABLE VIEWED BY ADMIN -->
+         <ng-container *ngIf="isAdmin()==true">
+            <tr>
+              <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="edit(sku.name, 'name', $event)">{{sku.name}}</td>
+              <td onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57;"
+                contenteditable="true" (keyup)="changeValue(id, 'id', $event)" (blur)="edit(sku.name, 'id', $event)">{{sku.id}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'case_upc', $event)" (blur)="edit(sku.name, 'case_upc', $event)">{{sku.case_upc}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'unit_upc', $event)" (blur)="edit(sku.name, 'unit_upc', $event)">{{sku.unit_upc}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'unit_size', $event)" (blur)="edit(sku.name, 'unit_size', $event)">{{sku.unit_size}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'count_per_case', $event)" (blur)="edit(sku.name, 'count_per_case', $event)">{{sku.count_per_case}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'product_line', $event)" (blur)="edit(sku.name, 'product_line', $event)">{{sku.product_line}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'ingredient_quantity', $event)" (blur)="edit(sku.name, 'ingredient_quantity', $event)">{{sku.ingredient_quantity}}</td>
+              <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="edit(sku.name, 'comment', $event)">{{sku.comment}}</td>
+              <td>
+                <button class="remove" type="button" (click)="remove(sku.name)">Remove</button>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- TABLE VIEWED BY NON-ADMIN -->
+          <ng-container *ngIf="isAdmin()==false">
+            <tr>
+              <td contenteditable="false">{{sku.name}}</td>
+              <td contenteditable="false">{{sku.id}}</td>
+              <td contenteditable="false">{{sku.case_upc}}</td>
+              <td contenteditable="false">{{sku.unit_upc}}</td>
+              <td contenteditable="false">{{sku.unit_size}}</td>
+              <td contenteditable="false">{{sku.count_per_case}}</td>
+              <td contenteditable="false">{{sku.product_line}}</td>
+              <td contenteditable="false">{{sku.ingredient_quantity}}</td>
+              <td contenteditable="false">{{sku.comment}}</td>
+            </tr>
+          </ng-container>
+
+        </ng-container>
+
+      </table>
+    </div>
+  </div>
+</div>
