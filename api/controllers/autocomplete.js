@@ -12,18 +12,32 @@ module.exports.ingredients = (model, input, res) => {
     });
 }
 
-module.exports.skus = (model, input, res) => {
-    let regex;
+module.exports.skus = async (model, input, res) => {
+    let regex = new RegExp('^'+input, 'i');
     if(isNaN(input)){
-        regex = new RegExp('^'+input, 'i');
         model.find({name: regex}, 'name size count').limit(10).sort('name').lean().exec((err, results) => {
-            res.json({
-                success: true,
-                data: results
-            });
+            if(err){
+                res.json({success: false, message: err});
+            }else{
+                res.json({
+                    success: true,
+                    data: results
+                });
+            }
         })
     }else{
-        res.json('he')
+        //tolower converts number to string, 1 means to include
+        let skus = [];
+        // let cursor = model.aggregate({$match: {}}).cursor({}).exec();
+        let cursor = model.aggregate({$project: {num2str: {'$toLower' : '$number'}, name: 1, size: 1, count: 1}}).match({num2str: regex}).cursor({}).exec();
+        await cursor.eachAsync((sku) => {
+            skus.push(sku);
+        });
+
+        res.json({
+            success: true,
+            data: skus
+        });
     }
 }
 
