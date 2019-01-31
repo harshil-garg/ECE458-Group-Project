@@ -19,13 +19,13 @@ export class CreateMessage {
 }
 
 export class RemoveMessage {
-  name: string;
+  number: number;
 }
 
 export class EditMessage {
   name: string;
-  newname: string;
   number: number;
+  newnumber: number;
   case_upc: number;
   unit_upc: number;
   size: string;
@@ -62,6 +62,7 @@ export class CrudSkuService {
   }
 
   edit(requestedSku: EditMessage): Observable<Response>{
+    console.log(requestedSku);
     return this.http.post<Response>('api/skus/update', requestedSku, httpOptions);
   }
 }

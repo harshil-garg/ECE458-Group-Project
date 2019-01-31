@@ -31,9 +31,9 @@ export class SkuTableComponent implements OnInit{
       this.skuList[id][property] = editField;
     }
 
-    remove(deleted_name: any) {
+    remove(deleted_number: any) {
       this.crudSkuService.remove({
-          name : deleted_name
+          number : deleted_number
         }).subscribe(
         response => this.handleResponse(response),
         err => {
@@ -44,44 +44,52 @@ export class SkuTableComponent implements OnInit{
       );
     }
 
-    edit(name:any, property:string, event:any) {
+    edit(num:any, property:string, event:any) {
       var editedSku : Sku = new Sku();
-      var newName : string;
-      editedSku.name = name;
+      var newNumber : number;
+      editedSku.id = num*1;
       switch(property){
         case 'name':{
-          newName = event.target.textContent; //new name
-          editedSku.name = event.target.textContent;//old name
+          editedSku.name = event.target.textContent;
+          break;
         }
         case 'id':{
-          editedSku.id = event.target.textContent;
+          newNumber = event.target.textContent;
+          break;
         }
         case 'case_upc':{
           editedSku.case_upc = event.target.textContent;
+          break;
         }
         case 'unit_upc':{
           editedSku.unit_upc = event.target.textContent;
+          break;
         }
         case 'unit_size':{
           editedSku.unit_size = event.target.textContent;
+          break;
         }
         case 'count_per_case':{
-          editedSku.count_per_case = event.target.textContent;
+          editedSku.count_per_case = event.target.textContent*1;
+          break;
         }
         case 'product_line':{
           editedSku.product_line = event.target.textContent;
+          break;
         }
         case 'ingredient_quantity':{
           editedSku.ingredient_quantity = event.target.textContent;
+          break;
         }
         case 'comment':{
           editedSku.comment = event.target.textContent;
+          break;
         }
       }
       this.crudSkuService.edit({
           name : editedSku.name,
-          newname: newName,
           number : editedSku.id,
+          newnumber: newNumber,
           case_upc : editedSku.case_upc,
           unit_upc: editedSku.unit_upc,
           size : editedSku.unit_size,
@@ -116,7 +124,8 @@ export class SkuTableComponent implements OnInit{
           sortBy : this.sortBy,
           pageNum: this.currentPage.toString(),
           keywords: this.keywords,
-          skus : []
+          ingredients: [],
+          product_lines: []
         }).subscribe(
         response => this.handleRefreshResponse(response),
         err => {
@@ -128,6 +137,8 @@ export class SkuTableComponent implements OnInit{
     }
 
     handleRefreshResponse(response: FilterResponse){
+      console.log(response.success);
+      console.log(response);
       if(response.success){
         this.skuList = [];
         for(let sku of response.data){
@@ -204,7 +215,7 @@ export class SkuTableComponent implements OnInit{
 // {
 //   const skuList = [
 //     { name: 'Fruit Cocktail', id: 1, case_upc: 618273945710, unit_upc: 618273945712, unit_size: 4, count_per_case:36, product_line: "Dole", ingredient_quantity: {}, comment: 'Hello world' },
-//     { name: 'Fruit Kebob', id:2, case_upc: 120394876276, unit_upc: 618273945714, unit_size: 15, count_per_caes:12, product_line: "Dole", ingredient_quantity: {}, comment: 'Hello world 2' },
+//     { name: 'Fruit Kebob', id:2, case_upc: 120394876276, unit_upc: 618273945714, unit_size: 15, count_per_case:12, product_line: "Dole", ingredient_quantity: {}, comment: 'Hello world 2' },
 //   ];
 //   return this.skuList;
 // }

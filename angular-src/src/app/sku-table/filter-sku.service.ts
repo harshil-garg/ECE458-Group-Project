@@ -10,7 +10,8 @@ export class FilterMessage {
 	sortBy : string;
 	pageNum: string;
 	keywords: Array<string>;
-	skus : Array<string>;
+	ingredients: Array<[Ingredient, number]>;
+	product_lines: Array<string>;
 }
 
 export class ResponseData {

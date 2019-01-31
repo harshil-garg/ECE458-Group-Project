@@ -5,7 +5,7 @@ export class Sku {
   name: string;
   case_upc: number;
   unit_upc: number;
-  unit_size: number;
+  unit_size: string;
   count_per_case: number;
   product_line: string;
   ingredient_quantity: Array<[Ingredient, number]>;

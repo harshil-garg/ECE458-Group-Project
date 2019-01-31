@@ -62,22 +62,27 @@ export class IngredientsTableComponent implements OnInit{
       switch(property){
         case 'name':{
           newName = event.target.textContent; //new name
-          editedIngredient.name = event.target.textContent;//old name
+          break;
         }
         case 'id':{
           editedIngredient.id = event.target.textContent;
+          break;
         }
         case 'vendor_info':{
           editedIngredient.vendor_info = event.target.textContent;
+          break;
         }
         case 'package_size':{
           editedIngredient.package_size = event.target.textContent;
+          break;
         }
         case 'cost_per_package':{
           editedIngredient.cost_per_package = event.target.textContent;
+          break;
         }
         case 'comment':{
           editedIngredient.comment = event.target.textContent;
+          break;
         }
       }
       this.crudIngredientsService.edit({

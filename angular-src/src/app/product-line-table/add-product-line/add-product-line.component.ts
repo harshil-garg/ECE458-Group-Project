@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ProductLineTableComponent } from '../product-line-table.component';
 import { AddProductLineDialogComponent } from './add-product-line-dialog/add-product-line-dialog.component';
+import { CrudProductLineService, Response } from '../crud-product-line.service';
 
 import { ProductLine } from '../../model/product-line';
 
@@ -14,7 +15,8 @@ export class AddProductLineComponent {
 
     productLine: ProductLine = new ProductLine();
 
-    constructor(public dialog: MatDialog, public ProductLineTableComponent: ProductLineTableComponent) {}
+    constructor(public dialog: MatDialog, public productLineTableComponent: ProductLineTableComponent,
+      public crudProductLineService: CrudProductLineService) {}
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddProductLineDialogComponent, {
@@ -30,26 +32,21 @@ export class AddProductLineComponent {
     }
 
     add(productLine: ProductLine) {
-      // this.crudIngredientsService.add({
-      //     name : ingredient.name,
-      //     number : ingredient.id,
-      //     vendor_info : ingredient.vendor_info,
-      //     package_size: ingredient.package_size,
-      //     cost : ingredient.cost_per_package,
-      //     comment : ingredient.comment
-      //   }).subscribe(
-      //   response => this.handleResponse(response),
-      //   err => {
-      //     if (err.status === 401) {
-      //       console.log("401 Error")
-      //     }
-      //   }
-      // );
+      this.crudProductLineService.add({
+          name : productLine.name
+        }).subscribe(
+        response => this.handleResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
     }
 
-    // private handleResponse(response: Response) {
-    //   console.log(response);
-    //   this.ingredientsTableComponent.refresh();
-    // }
+    private handleResponse(response: Response) {
+      console.log(response);
+      this.productLineTableComponent.refresh();
+    }
 
 }

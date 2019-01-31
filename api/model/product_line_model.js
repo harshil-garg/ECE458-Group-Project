@@ -14,11 +14,11 @@ const ProductLineSchema = new Schema({
 let ProductLine = mongoose.model('ProductLine', ProductLineSchema);
 module.exports = ProductLine;
 
-module.exports.addProductLine = (product_line, callback) => {
+module.exports.createProductLine = (product_line, callback) => {
     ProductLine.create(product_line, callback);
 }
 
-module.exports.removeProductLine = (product_line_name, callback) => {
+module.exports.deleteProductLine = (product_line_name, callback) => {
     var query = {name: product_line_name};
     ProductLine.deleteOne(query, callback);
 }

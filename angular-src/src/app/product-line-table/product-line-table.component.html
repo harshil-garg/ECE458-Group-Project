@@ -8,14 +8,13 @@
   </li>
   <a (click) = "nextPage()">&raquo;</a>
 </div>
-<a (click) = "showAll()">Show all</a>
   <div class="card-body">
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
       <app-add-product-line *ngIf="isAdmin()"></app-add-product-line>
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
-          <th class="text-center" (click)="setSortBy('name')">Product Line Name<i *ngIf="sortBy=='name'" class="fa fa-sort-desc"></i></th>
+          <th class="text-center">Product Line Name</th>
         </tr>
 
        <ng-container *ngFor="let productLine of productLineList; let id=index">

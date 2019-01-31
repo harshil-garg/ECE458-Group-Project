@@ -5,6 +5,7 @@ import { CrudSkuService, Response } from '../crud-sku.service';
 import { SkuTableComponent } from '../sku-table.component';
 
 import { Sku } from '../../model/sku';
+import { Ingredient } from '../../model/ingredient';
 
 @Component({
   selector: 'app-add-sku',
@@ -32,6 +33,8 @@ export class AddSkuComponent {
   }
 
   add(sku: Sku) {
+    console.log(sku);
+    var ingredient : Ingredient = new Ingredient();
     this.crudSkuService.add({
         name: sku.name,
         number: sku.id,
@@ -39,8 +42,8 @@ export class AddSkuComponent {
         unit_upc: sku.unit_upc,
         size: sku.unit_size,
         count: sku.count_per_case,
-        product_line: sku.product_line,
-        ingredients: sku.ingredient_quantity,
+        product_line: 'sku.product_line',
+        ingredients: [[ingredient,12]],
         comment: sku.comment
       }).subscribe(
       response => this.handleResponse(response),
