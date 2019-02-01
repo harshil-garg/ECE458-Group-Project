@@ -11,6 +11,10 @@ export class FilterMessage {
 	skus : Array<string>;
 }
 
+export class AutocompleteMessage {
+	input : string;
+}
+
 export class ResponseData {
   _id: string;
   name: string;
@@ -26,6 +30,10 @@ export class FilterResponse {
   success: boolean;
   data: Array<ResponseData>;
 	pages: number;
+}
+
+export class AutocompleteResponse {
+	data : string[];
 }
 
 const httpOptions = {
@@ -44,4 +52,8 @@ export class FilterIngredientsService {
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
     return this.http.post<FilterResponse>('api/ingredients/filter', filterMessage, httpOptions);
   }
+
+	autocomplete(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
+		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
+	}
 }

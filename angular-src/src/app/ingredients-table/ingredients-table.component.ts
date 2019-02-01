@@ -17,6 +17,7 @@ export class IngredientsTableComponent implements OnInit{
     maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
+    skus: Array<any> = [];
 
     skuShown: Array<any> = [
       {id:1, shown:true},
@@ -132,7 +133,7 @@ export class IngredientsTableComponent implements OnInit{
           sortBy : this.sortBy,
           pageNum: this.currentPage.toString(),
           keywords: this.keywords,
-          skus : []
+          skus : this.skus
         }).subscribe(
         response => this.handleRefreshResponse(response),
         err => {
@@ -208,6 +209,11 @@ export class IngredientsTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.refresh();
+    }
+
+    setSearchedSkus(newSkus : Array<any>){
+      this.skus = newSkus;
       this.refresh();
     }
 
