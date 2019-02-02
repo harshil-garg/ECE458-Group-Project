@@ -19,10 +19,7 @@ export class IngredientsTableComponent implements OnInit{
     keywords: Array<any> = [];
     skus: Array<any> = [];
 
-    skuShown: Array<any> = [
-      {id:1, shown:true},
-      {id:2, shown:false}
-    ]
+    skuShown: Array<boolean> = [false];
 
     ngOnInit() {
       this.currentPage = 1;
@@ -121,11 +118,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     getNumSkus(ingredient: Ingredient){
-      return 3;
-    }
-
-    toggleSkus(id: number){
-      this.skuShown[id].shown = !this.skuShown[id].shown;
+      return ingredient.skus.length;
     }
 
     refresh(){
@@ -154,6 +147,7 @@ export class IngredientsTableComponent implements OnInit{
               vendor_info: ingredient.vendor_info,
               package_size: ingredient.package_size,
               cost_per_package: ingredient.cost,
+              skus: ingredient.skus,
               comment: ingredient.comment
           });
         }

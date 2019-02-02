@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Ingredient } from '../model/ingredient'
+import { Ingredient, Tuple } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { CrudSkuService, Response } from './crud-sku.service';
@@ -17,6 +17,9 @@ export class SkuTableComponent implements OnInit{
     maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
+
+    ingredientInputs: Array<any> = [];
+    quantityInputs: Array<any> = [];
 
     ngOnInit() {
       this.currentPage = 1;
@@ -104,6 +107,45 @@ export class SkuTableComponent implements OnInit{
             console.log("401 Error")
           }
         });
+    }
+
+    updateIngredientQuantity(editedSku : Sku){
+      this.crudSkuService.edit({
+        name : editedSku.name,
+        number : editedSku.id,
+        newnumber: editedSku.id,
+        case_upc : editedSku.case_upc,
+        unit_upc: editedSku.unit_upc,
+        size : editedSku.unit_size,
+        count: editedSku.count_per_case,
+        product_line : editedSku.product_line,
+        ingredients: editedSku.ingredient_quantity,
+        comment: editedSku.comment
+      }).subscribe(
+        response => this.handleResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        });
+    }
+
+    addIngredientQuantity(num:any, id:number, ingr_quant: Tuple){
+      var editedSku : Sku = new Sku();
+      var ingr_quant_list: Array<any> = this.skuList[id].ingredient_quantity;
+      editedSku.id = num*1;
+      ingr_quant_list.push(ingr_quant);
+      editedSku.ingredient_quantity = ingr_quant_list;
+      this.updateIngredientQuantity(editedSku);
+    }
+
+    removeIngrQuant(ingr_id:number, id:number, sku_id:number){
+      var editedSku : Sku = new Sku();
+      var ingr_quant_list: Array<any> = this.skuList[id].ingredient_quantity;
+      editedSku.id = sku_id*1;
+      ingr_quant_list.splice(ingr_id, 1);
+      editedSku.ingredient_quantity = ingr_quant_list;
+      this.updateIngredientQuantity(editedSku);
     }
 
     private handleResponse(response: Response) {
@@ -207,6 +249,21 @@ export class SkuTableComponent implements OnInit{
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
       this.refresh();
+    }
+
+    keyPressed(sku_num, id, event){
+      if(event.keyCode == 13){ //enter pressed
+        if(this.ingredientInputs[id]!=null && this.ingredientInputs[id].length>0 && this.quantityInputs[id]!=null && this.quantityInputs[id].length>0){
+          var added_ingr_quant: Tuple = {
+            ingredient_name: this.ingredientInputs[id],
+            quantity: this.quantityInputs[id]
+          }
+          this.addIngredientQuantity(sku_num, id, added_ingr_quant);
+          this.refresh();
+          this.ingredientInputs[id] = '';
+          this.quantityInputs[id] = '';
+        }
+      }
     }
 
 }

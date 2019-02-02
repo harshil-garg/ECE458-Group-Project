@@ -33,8 +33,6 @@ export class AddSkuComponent {
   }
 
   add(sku: Sku) {
-    console.log(sku);
-    var ingredient : Ingredient = new Ingredient();
     this.crudSkuService.add({
         name: sku.name,
         number: sku.id,
@@ -42,8 +40,8 @@ export class AddSkuComponent {
         unit_upc: sku.unit_upc,
         size: sku.unit_size,
         count: sku.count_per_case,
-        product_line: 'sku.product_line',
-        ingredients: [[ingredient,12]],
+        product_line: sku.product_line,
+        ingredients: sku.ingredient_quantity,
         comment: sku.comment
       }).subscribe(
       response => this.handleResponse(response),

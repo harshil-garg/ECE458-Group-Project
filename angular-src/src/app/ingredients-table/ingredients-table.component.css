@@ -70,7 +70,10 @@ th:hover {
 }
 
 .pagination {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .pagination a {

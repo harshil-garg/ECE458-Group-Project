@@ -8,7 +8,8 @@
       <th class="text-center">Unit UPC Number</th>
       <th class="text-center">Unit Size</th>
       <th class="text-center">Count Per Case</th>
-      <th class="text-center">SKUs</th>
+      <th class="text-center">Product Line</th>
+      <th class="text-center">Ingredient-Quantity</th>
       <th class="text-center">Comment</th>
     </tr>
 
@@ -20,8 +21,16 @@
       <td> <input class = "input" [(ngModel)]="sku.unit_upc"></td>
       <td> <input class = "input" [(ngModel)]="sku.unit_size"></td>
       <td> <input class = "input" [(ngModel)]="sku.count_per_case"></td>
-      <!-- Need way of inputing {product line, quantity} tuples -->
       <td> <input class = "input" [(ngModel)]="sku.product_line"></td>
+      <!-- Need way of inputing {product line, quantity} tuples -->
+      <td contenteditable="false">
+        <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
+          <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
+            <i (click)="removeIngrQuant(ingr_id)" class="fa fa-remove"> </i><br></a>
+        </ng-container>
+        <input [(ngModel)]="ingredientInput" (keydown) = "keyPressed($event)" type="text"placeholder="Ingredient Name"/><br>
+        <input [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
+      </td>
       <td> <input class = "input" [(ngModel)]="sku.comment"></td>
 
     <tr>

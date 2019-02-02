@@ -3,6 +3,7 @@ import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Tuple } from '../model/ingredient';
 
 export class FilterMessage {
 	sortBy : string;
@@ -24,6 +25,7 @@ export class ResponseData {
   cost: string;
   comment: string;
   __v: number;
+	skus: [Tuple];
 }
 
 export class FilterResponse {

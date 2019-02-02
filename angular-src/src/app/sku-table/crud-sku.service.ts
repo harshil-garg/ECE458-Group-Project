@@ -4,7 +4,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Ingredient } from '../model/ingredient'
+import { Tuple } from '../model/ingredient'
 
 export class CreateMessage {
   name: string;
@@ -14,7 +14,7 @@ export class CreateMessage {
   size: string;
   count: number;
   product_line: string;
-  ingredients: Array<[Ingredient, number]>;
+  ingredients: Tuple[];
   comment: string;
 }
 
@@ -31,7 +31,7 @@ export class EditMessage {
   size: string;
   count: number;
   product_line: string;
-  ingredients: Array<[Ingredient, number]>;
+  ingredients: Tuple[];
   comment: string;
 }
 
@@ -54,6 +54,8 @@ export class CrudSkuService {
 	constructor(private http: HttpClient) { }
 
   add(requestedSku: CreateMessage): Observable<Response>{
+    console.log("REQUESTED:");
+    console.log(requestedSku);
     return this.http.post<Response>('api/skus/create', requestedSku, httpOptions);
   }
 

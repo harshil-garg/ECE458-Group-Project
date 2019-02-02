@@ -38,7 +38,14 @@
               <td contenteditable="true" (keyup)="changeValue(id, 'unit_size', $event)" (blur)="edit(sku.id, 'unit_size', $event)">{{sku.unit_size}}</td>
               <td contenteditable="true" (keyup)="changeValue(id, 'count_per_case', $event)" (blur)="edit(sku.id, 'count_per_case', $event)">{{sku.count_per_case}}</td>
               <td contenteditable="true" (keyup)="changeValue(id, 'product_line', $event)" (blur)="edit(sku.id, 'product_line', $event)">{{sku.product_line}}</td>
-              <td contenteditable="true" (keyup)="changeValue(id, 'ingredient_quantity', $event)" (blur)="edit(sku.id, 'ingredient_quantity', $event)">{{sku.ingredient_quantity}}</td>
+              <td contenteditable="false">
+                <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
+                  <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
+                    <i (click)="removeIngrQuant(ingr_id,id,sku.id)" class="fa fa-remove"> </i><br></a>
+                </ng-container>
+                <input [(ngModel)]="ingredientInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text"placeholder="Ingredient Name"/><br>
+                <input [(ngModel)]="quantityInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text" placeholder="Quantity"/><br>
+              </td>
               <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="edit(sku.id, 'comment', $event)">{{sku.comment}}</td>
               <td>
                 <button class="remove" type="button" (click)="remove(sku.id)">Remove</button>
