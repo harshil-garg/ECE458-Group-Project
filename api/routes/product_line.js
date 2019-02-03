@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ProductLine = require('../model/product_line_model');
-
+const pagination = require('../controllers/paginate');
 
 //Create
 router.post('/create', (req, res) => {
@@ -20,6 +20,14 @@ router.post('/create', (req, res) => {
             res.json({success: true, message: "Created successfully"});
         }
     });
+});
+
+//Read
+router.post('/read', (req, res) => {
+    const pageNum  = req.body.pageNum;
+
+    let filter = ProductLine.find({});
+    pagination.paginate(filter, ProductLine, pageNum, 'name', res);
 });
 
 //Update

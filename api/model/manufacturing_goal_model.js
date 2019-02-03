@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+const Tuple = new Schema({
+    sku_name: String,
+    case_quantity: Number
+});
+
 const ManufacturingGoalSchema = new Schema({
     name: {
         type: String,
@@ -10,17 +15,12 @@ const ManufacturingGoalSchema = new Schema({
         unique: true
     },
     skus: {
-        type: [String],
-        required: true
-    },
-    case_quantity: {
-        type: [Number],
+        type: [Tuple],
         required: true
     },
     user: {
         type: String,
         required: true,
-        unique: true
     }
 });
 
@@ -28,11 +28,11 @@ let ManufacturingGoal = mongoose.model('ManufacturingGoal', ManufacturingGoalSch
 module.exports = ManufacturingGoal;
 
 
-module.exports.addManufacturingGoal = (manufacturing_goal, callback) => {
+module.exports.createManufacturingGoal = (manufacturing_goal, callback) => {
     ManufacturingGoal.create(manufacturing_goal, callback);
 }
 
-module.exports.removeManufacturingGoal = (manufacturing_goal_name, callback) => {
+module.exports.deleteManufacturingGoal = (manufacturing_goal_name, callback) => {
     var query = {name: manufacturing_goal_name};
     ManufacturingGoal.deleteOne(query, callback);
 }

@@ -1,16 +1,90 @@
+
 <ng-container *ngFor="let keyword of keywords; let id=index">
-  <label>{{keyword}} <i (click)="remove(id)" class="fa fa-remove"> </i></label>
-  <!--
-  <div class="keyword-box">
-    <div class="box">keyword</div>
-  </div> -->
-  </ng-container>
+  <label class="keyword">{{keyword}} <i (click)="remove(id)" class="fa fa-remove"> </i></label>
+</ng-container>
+<ng-container *ngFor="let sku of skus; let id=index">
+  <label class="sku">{{sku}} <i (click)="removeSku(id)" class="fa fa-remove"> </i></label>
+</ng-container>
 <section class="filter-wrapper">
- <div class="keyword-wrapper">
+ <div class="dropdown">
+   <span>
 <input [formControl]="inputField" type="text" id="keyword" placeholder="Search for ingredients/skus"
   (keydown)="keyPressed($event)" autofocus/>
-  </div>
-<ul class="filter-select">
-  <li class="filter-select-list"><p class="artist-name"></p>
-</ul>
+  </span>
+
+    <div class="dropdown-content" *ngIf="inputField.value?.length > 0">
+      <ul>
+        <li *ngFor="let sku of suggestedSkus" class="sku-list">
+          <p class="sku-name" (click) = "addSku(sku.name)">{{sku.name}}</p>
+        </li>
+      </ul>
+    </div>
+    </div>
 </section>
+
+<!-- <div class="dropdown">
+  <span>Mouse over me</span>
+  <div class="dropdown-content">
+    <p>Hello World!</p>
+  </div>
+</div> -->
+
+  <!-- <div class="container h-100">
+    <div class="d-flex justify-content-center h-100">
+      <div class="searchbar">
+        <input class="search_input" type="text" name="" placeholder="Search...">
+        <a class="search_icon"><i class="fa fa-search"></i></a>
+
+      </div>
+    </div>
+  </div> -->
+
+<!--
+  <nav class="navbar navbar-inverse bg-inverse">
+      <div class="container navbar-container">
+          <a class="navbar-brand" href="#">
+          </a>
+          <form class="form-inline d-flex dropdown">
+              <input class="form-control form-control-sm" type="text" placeholder="Search" id="menu1" data-toggle="dropdown">
+              <button class="btn btn-outline-success btn-sm" type="submit">Go</button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">HTML</a></li>
+                  <div class="dropdown-divider"></div>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">CSS</a></li>
+                  <div class="dropdown-divider"></div>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">JavaScript</a></li>
+              </ul>
+          </form>
+      </div>
+  </nav> -->
+
+  <!-- <label class="col-sm-4 col-md-8 text-right control-label vertical-label" for="inputPassword3"> Select Client Name</label>
+  <div class="col-sm-8 col-md-4 text-right">
+      <div class="form-group">
+          <div class="input-group">
+              <input class="form-control" *ngIf="flag" type="text" [(ngModel)]="ClientName" (keyup)="searchClient(ClientName)" />
+              <input class="form-control" [(ngModel)]="ClientName" disabled *ngIf="!flag" type="text" />
+
+          </div>
+      </div>
+      <div class="search-result" *ngIf="flag">
+          <ul>
+              <li *ngFor="let client of clients | async">
+                  <a (click)="onselectClient(client)">{{client.ClientName}}</a>
+              </li>
+          </ul>
+      </div>
+
+
+  </div> -->
+
+
+
+
+
+
+<!--https://bootsnipp.com/snippets/GaeQR -->
+
+<!-- <div class="btn-group" dropdown  container="body">
+  <input id="typeahead-basic" type="text" class="form-control" [ngbTypeahead]="search"/>
+</div> -->

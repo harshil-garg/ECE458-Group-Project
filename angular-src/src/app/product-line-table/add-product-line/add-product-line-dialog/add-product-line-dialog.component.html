@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Add Product Line</h1>
+<div mat-dialog-content>
+  <table class="table table-bordered table-responsive-md table-striped text-center">
+    <tr>
+      <th class="text-center">Product Line Name</th>
+    </tr>
+
+    <tr>
+
+      <td> <input class = "input" [(ngModel)]="productLine.name"></td>
+
+    <tr>
+  </table>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="productLine" cdkFocusInitial>Ok</button>
+</div>
