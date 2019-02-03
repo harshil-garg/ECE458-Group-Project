@@ -1,0 +1,42 @@
+<h1 mat-dialog-title>Add SKU</h1>
+<div mat-dialog-content>
+  <table class="table table-bordered table-responsive-md table-striped text-center">
+    <tr>
+      <th class="text-center">SKU Name</th>
+      <th class="text-center">SKU Number</th>
+      <th class="text-center">Case UPC Number</th>
+      <th class="text-center">Unit UPC Number</th>
+      <th class="text-center">Unit Size</th>
+      <th class="text-center">Count Per Case</th>
+      <th class="text-center">Product Line</th>
+      <th class="text-center">Ingredient-Quantity</th>
+      <th class="text-center">Comment</th>
+    </tr>
+
+    <tr>
+
+      <td> <input class = "input" [(ngModel)]="sku.name"></td>
+      <td> <input class = "input" [(ngModel)]="sku.id"></td>
+      <td> <input class = "input" [(ngModel)]="sku.case_upc"></td>
+      <td> <input class = "input" [(ngModel)]="sku.unit_upc"></td>
+      <td> <input class = "input" [(ngModel)]="sku.unit_size"></td>
+      <td> <input class = "input" [(ngModel)]="sku.count_per_case"></td>
+      <td> <input class = "input" [(ngModel)]="sku.product_line"></td>
+      <!-- Need way of inputing {product line, quantity} tuples -->
+      <td contenteditable="false">
+        <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
+          <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
+            <i (click)="removeIngrQuant(ingr_id)" class="fa fa-remove"> </i><br></a>
+        </ng-container>
+        <input [(ngModel)]="ingredientInput" (keydown) = "keyPressed($event)" type="text"placeholder="Ingredient Name"/><br>
+        <input [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
+      </td>
+      <td> <input class = "input" [(ngModel)]="sku.comment"></td>
+
+    <tr>
+  </table>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="sku" cdkFocusInitial>Ok</button>
+</div>

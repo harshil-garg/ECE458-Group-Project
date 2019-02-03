@@ -1,13 +1,13 @@
-import { Ingredient } from './ingredient'
+import { Tuple } from './ingredient'
 
 export class Sku {
   id: number;
   name: string;
   case_upc: number;
   unit_upc: number;
-  unit_size: number;
+  unit_size: string;
   count_per_case: number;
   product_line: string;
-  ingredient_quantity: Array<[Ingredient, number]>;
+  ingredient_quantity: Tuple[];
   comment: string;
 }

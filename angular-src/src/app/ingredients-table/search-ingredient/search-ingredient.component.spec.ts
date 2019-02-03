@@ -1,3 +1,4 @@
+//based on https://medium.com/@nacimidjakirene/angular-search-autosuggest-with-observables-6f42987f80e6
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SearchIngredientComponent } from './search-ingredient.component';

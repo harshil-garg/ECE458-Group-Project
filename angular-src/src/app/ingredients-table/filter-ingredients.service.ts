@@ -3,12 +3,17 @@ import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Tuple } from '../model/ingredient';
 
 export class FilterMessage {
 	sortBy : string;
 	pageNum: string;
 	keywords: Array<string>;
 	skus : Array<string>;
+}
+
+export class AutocompleteMessage {
+	input : string;
 }
 
 export class ResponseData {
@@ -20,12 +25,17 @@ export class ResponseData {
   cost: string;
   comment: string;
   __v: number;
+	skus: [Tuple];
 }
 
 export class FilterResponse {
   success: boolean;
   data: Array<ResponseData>;
 	pages: number;
+}
+
+export class AutocompleteResponse {
+	data : string[];
 }
 
 const httpOptions = {
@@ -44,4 +54,8 @@ export class FilterIngredientsService {
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
     return this.http.post<FilterResponse>('api/ingredients/filter', filterMessage, httpOptions);
   }
+
+	autocomplete(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
+		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
+	}
 }

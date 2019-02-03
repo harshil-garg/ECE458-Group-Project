@@ -41,7 +41,7 @@ router.post('/register', (req,res) => {
         });
     }); 
 
-    User.addUser(user, (err) => {
+    User.createUser(user, (err) => {
         if(err) {
             res.json({success: false, message: `Failed to create a new user. Error: ${err}`});
 

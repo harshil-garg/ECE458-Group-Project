@@ -17,11 +17,9 @@ export class IngredientsTableComponent implements OnInit{
     maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
+    skus: Array<any> = [];
 
-    skuShown: Array<any> = [
-      {id:1, shown:true},
-      {id:2, shown:false}
-    ]
+    skuShown: Array<boolean> = [false];
 
     ngOnInit() {
       this.currentPage = 1;
@@ -62,22 +60,27 @@ export class IngredientsTableComponent implements OnInit{
       switch(property){
         case 'name':{
           newName = event.target.textContent; //new name
-          editedIngredient.name = event.target.textContent;//old name
+          break;
         }
         case 'id':{
           editedIngredient.id = event.target.textContent;
+          break;
         }
         case 'vendor_info':{
           editedIngredient.vendor_info = event.target.textContent;
+          break;
         }
         case 'package_size':{
           editedIngredient.package_size = event.target.textContent;
+          break;
         }
         case 'cost_per_package':{
           editedIngredient.cost_per_package = event.target.textContent;
+          break;
         }
         case 'comment':{
           editedIngredient.comment = event.target.textContent;
+          break;
         }
       }
       this.crudIngredientsService.edit({
@@ -115,11 +118,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     getNumSkus(ingredient: Ingredient){
-      return 3;
-    }
-
-    toggleSkus(id: number){
-      this.skuShown[id].shown = !this.skuShown[id].shown;
+      return ingredient.skus.length;
     }
 
     refresh(){
@@ -127,7 +126,7 @@ export class IngredientsTableComponent implements OnInit{
           sortBy : this.sortBy,
           pageNum: this.currentPage.toString(),
           keywords: this.keywords,
-          skus : []
+          skus : this.skus
         }).subscribe(
         response => this.handleRefreshResponse(response),
         err => {
@@ -148,6 +147,7 @@ export class IngredientsTableComponent implements OnInit{
               vendor_info: ingredient.vendor_info,
               package_size: ingredient.package_size,
               cost_per_package: ingredient.cost,
+              skus: ingredient.skus,
               comment: ingredient.comment
           });
         }
@@ -179,6 +179,10 @@ export class IngredientsTableComponent implements OnInit{
       this.refresh();
     }
 
+    showAll(){
+      this.currentPage = -1;
+    }
+
     shownPages(){
       var numbers : Array<number> = [];
       if(this.maxPages>5)
@@ -199,6 +203,11 @@ export class IngredientsTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.refresh();
+    }
+
+    setSearchedSkus(newSkus : Array<any>){
+      this.skus = newSkus;
       this.refresh();
     }
 

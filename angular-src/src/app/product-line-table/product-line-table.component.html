@@ -1,0 +1,43 @@
+<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
+<div class="card">
+  <h3 class="card-header text-center font-weight-bold py-4">Product Lines</h3>
+<div class="pagination">
+  <a (click) = "prevPage()">&laquo;</a>
+  <li *ngFor="let i of shownPages()" [ngClass]="{active: i == currentPage}" (click)="setPage(i)">
+      <a>{{i}}</a>
+  </li>
+  <a (click) = "nextPage()">&raquo;</a>
+</div>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
+      <app-add-product-line *ngIf="isAdmin()"></app-add-product-line>
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center">Product Line Name</th>
+        </tr>
+
+       <ng-container *ngFor="let productLine of productLineList; let id=index">
+         <!-- TABLE VIEWED BY ADMIN -->
+         <ng-container *ngIf="isAdmin()==true">
+            <tr>
+                <td contenteditable="true" (blur)="edit(productLine.name, 'name', $event)">{{productLine.name}}</td>
+              <td>
+                <button class="remove" type="button" (click)="remove(productLine.name)">Remove</button>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- TABLE VIEWED BY NON-ADMIN -->
+          <ng-container *ngIf="isAdmin()==false">
+            <tr>
+              <td contenteditable="false">{{productLine.name}}</td>
+            </tr>
+          </ng-container>
+
+        </ng-container>
+
+      </table>
+    </div>
+  </div>
+</div>

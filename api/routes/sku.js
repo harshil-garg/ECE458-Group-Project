@@ -1,11 +1,57 @@
 const express = require('express');
 const router = express.Router();
-const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
+const Ingredient = require('../model/ingredient_model');
+const ProductLine = require('../model/product_line_model');
+const sku_filter = require('../controllers/sku_filter');
+const autocomplete = require('../controllers/autocomplete');
+
+
+//Autocomplete ingredients
+router.post('/autocomplete_ingredients', (req, res) => {
+    const input = req.body.input;
+
+    autocomplete.ingredients(Ingredient, input, res);
+});
+
+//Autocomplete product lines
+router.post('/autocomplete_product_lines', (req, res) => {
+    const input = req.body.input;
+
+    autocomplete.productLines(ProductLine, input, res);
+});
 
 //Filter
 router.post('/filter', (req, res) => {
+    const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
 
+    //check fields completed
+    if(!sortBy || !pageNum || !keywords || !ingredients || !product_lines){
+        res.json({success: false, message: "Please fill in all fields"});
+        return;
+    }
+
+    let key_exps = keywords.map((keyword) => {
+        return new RegExp(keyword, 'i');
+    });
+    
+    if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
+        sku_filter.none(pageNum, sortBy, res);
+    }else if(ingredients.length == 0 && product_lines.length == 0){
+        sku_filter.keywords(pageNum, sortBy, key_exps, res);
+    }else if(keywords.length == 0 && product_lines.length == 0){
+        sku_filter.ingredients(pageNum, sortBy, ingredients, res);
+    }else if(keywords.length == 0 && ingredients.length == 0){
+        sku_filter.productLines(pageNum, sortBy, product_lines, res);
+    }else if(product_lines.length == 0){
+        sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients, res)
+    }else if(keywords.length == 0){
+        sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines, res)
+    }else if(ingredients.length == 0){
+        sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines, res)
+    }else{
+        sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines, res)
+    }
 });
 
 //Create
@@ -31,31 +77,17 @@ router.post('/create', (req, res) => {
     });
 });
 
-//Delete
-router.post('/delete', (req, res) => {
-    const name = req.body.name;
-
-    SKU.deleteSKU(name, (err) => {
-        if(err) {
-            res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
-
-        }else{
-            res.json({success: true, message: "Deleted successfully."});
-        }
-    })
-});
-
 //Update
 router.post('/update', (req, res) => {
-    const { name, newname, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
+    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
 
     var json = {};
 
-    if (newname) {
-        json["name"] = newname;
+    if (name) {
+        json["name"] = name;
     }
-    if (number) {
-        json["number"] = number;
+    if (newnumber) {
+        json["number"] = newnumber;
     }
     if (case_upc) {
         json["case_upc"] = case_upc;
@@ -79,7 +111,7 @@ router.post('/update', (req, res) => {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(name, json, (err) => {
+    SKU.updateSKU(number, json, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else {
@@ -88,4 +120,17 @@ router.post('/update', (req, res) => {
     })
 })
 
+//Delete
+router.post('/delete', (req, res) => {
+    const number = req.body.number;
+
+    SKU.deleteSKU(number, (err) => {
+        if(err) {
+            res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
+
+        }else{
+            res.json({success: true, message: "Deleted successfully."});
+        }
+    })
+});
 module.exports = router;

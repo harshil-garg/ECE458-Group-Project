@@ -2,20 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
-const Validator = require('../model/ingredient_validation');
+const Validator = require('../controllers/ingredient_validation');
 const multer = require('multer');
 const upload = multer({ dest: 'tmp/csv/' });
 const csv = require('fast-csv');
 const fs = require('fs');
 
-let uploadSession = {
-  started: false
-}
 
 router.post('/', upload.array('file[]', 4), function (req, res) {
-    uploadSession.started = true;
-    
-  
     // open uploaded file
     req.files.forEach(file => {
       const fileRows = [];
@@ -29,7 +23,7 @@ router.post('/', upload.array('file[]', 4), function (req, res) {
       })
     })
 
-      res.json({success: true, errorList: []});
+      res.json({success: true, errorList: [], updateList: []});
   });
   //This will be called when we have an array of files.
   function handleFiles() {
