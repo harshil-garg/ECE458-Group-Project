@@ -39,7 +39,6 @@ const SKUSchema = new Schema({
     },
     ingredients: {
         type: [Tuple],
-        required: true
     },
     comment: {
         type: String

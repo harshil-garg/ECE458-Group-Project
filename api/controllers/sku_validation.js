@@ -4,7 +4,7 @@ module.exports.itemExists = async function(model, itemName) {
     await model.findOne({name: itemName}).exec((err, result) => {       
         ans = !result;     
     })
-
+    console.log('item null')
     return ans;
 }
 
@@ -13,16 +13,19 @@ const first_digit = new Set(['0', '1', '6', '7', '8', '9'])
 module.exports.isUPCStandard = function(upc_num) {
     if(upc_num.length != 12){
         //incorrect length
+        console.log('upc length')
         return false;
     }
     let num = Number(upc_num);
     if(isNaN(num)){
         //not a number
+        console.log('upc nan')
         return false;
     }
 
     if(!first_digit.has(upc_num[0])){
         //invalid first digit
+        console.log('upc first digit')
         return false;
     }
 
@@ -38,6 +41,7 @@ module.exports.isUPCStandard = function(upc_num) {
 
     if(sum % 10 != 0){
         //invalid sum
+        console.log('upc sum')
         return false
     }
 

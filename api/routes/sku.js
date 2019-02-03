@@ -68,6 +68,7 @@ router.post('/create', (req, res) => {
         let bool = validator.itemExists(Ingredient, ingredient.ingredient_name);
         ingredient_passed = bool && ingredient_passed;
     }
+    console.log(ingredient_passed)
     
     let product_passed = validator.itemExists(ProductLine, product_line);
     let case_passed = validator.isUPCStandard(case_upc);
