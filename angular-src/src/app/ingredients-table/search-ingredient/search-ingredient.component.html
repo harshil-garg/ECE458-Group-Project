@@ -1,0 +1,16 @@
+<ng-container *ngFor="let keyword of keywords; let id=index">
+  <label>{{keyword}} <i (click)="remove(id)" class="fa fa-remove"> </i></label>
+  <!--
+  <div class="keyword-box">
+    <div class="box">keyword</div>
+  </div> -->
+  </ng-container>
+<section class="filter-wrapper">
+ <div class="keyword-wrapper">
+<input [formControl]="inputField" type="text" id="keyword" placeholder="Search for ingredients/skus"
+  (keydown)="keyPressed($event)" autofocus/>
+  </div>
+<ul class="filter-select">
+  <li class="filter-select-list"><p class="artist-name"></p>
+</ul>
+</section>

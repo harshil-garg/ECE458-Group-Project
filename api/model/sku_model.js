@@ -9,21 +9,20 @@ const Tuple = new Schema({
 const SKUSchema = new Schema({
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     number: {
-        type: String,
+        type: Number,
         required: true,
         unique: true
     },
     case_upc: {
-        type: String,
+        type: Number,
         required: true,
         unique: true
     },
     unit_upc: {
-        type: String,
+        type: Number,
         required: true
     }, 
     size: {
@@ -31,7 +30,7 @@ const SKUSchema = new Schema({
         required: true
     },
     count: {
-        type: String,
+        type: Number,
         required: true
     },
     product_line: {
@@ -51,11 +50,11 @@ let SKU = mongoose.model('SKU', SKUSchema);
 module.exports = SKU;
 
 
-module.exports.addSKU = (sku, callback) => {
+module.exports.createSKU = (sku, callback) => {
     SKU.create(sku, callback);
 }
 
-module.exports.removeSKU = (sku_name, callback) => {
+module.exports.deleteSKU = (sku_name, callback) => {
     var query = {name: sku_name};
     SKU.deleteOne(query, callback);
 }
