@@ -16,7 +16,7 @@ module.exports.append = async function(ingredients, pages, res){
 }
 
 async function getSKUS(ingredient){
-    let result = await SKU.find({"ingredients.ingredient_name": ingredient.name}, 'name').exec((err, results) => {
+    let result = await SKU.find({"ingredients.ingredient_name": ingredient.name}, 'name size count').exec((err, results) => {
         return results;
     });
     ingredient.skus = result;
