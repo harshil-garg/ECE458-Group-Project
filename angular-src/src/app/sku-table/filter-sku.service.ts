@@ -28,10 +28,18 @@ export class ResponseData {
   __v: number;
 }
 
+export class AutocompleteMessage {
+	input: string;
+}
+
 export class FilterResponse {
   success: boolean;
   data: Array<ResponseData>;
 	pages: number;
+}
+
+export class AutocompleteResponse {
+	data : string[];
 }
 
 const httpOptions = {
@@ -50,4 +58,14 @@ export class FilterSkuService {
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
     return this.http.post<FilterResponse>('api/skus/filter', filterMessage, httpOptions);
   }
+
+	autocompleteIngredients(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
+		console.log(autocompleteMessage);
+    return this.http.post<AutocompleteResponse>('api/skus/autocomplete_ingredients', autocompleteMessage, httpOptions);
+  }
+
+	autocompleteProductLines(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
+		console.log(autocompleteMessage);
+		return this.http.post<AutocompleteResponse>('api/skus/autocomplete_product_lines', autocompleteMessage, httpOptions);
+	}
 }

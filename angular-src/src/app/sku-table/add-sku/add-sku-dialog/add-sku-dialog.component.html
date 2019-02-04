@@ -28,6 +28,7 @@
           <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
             <i (click)="removeIngrQuant(ingr_id)" class="fa fa-remove"> </i><br></a>
         </ng-container>
+        <!--<app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>-->
         <input [(ngModel)]="ingredientInput" (keydown) = "keyPressed($event)" type="text"placeholder="Ingredient Name"/><br>
         <input [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
       </td>

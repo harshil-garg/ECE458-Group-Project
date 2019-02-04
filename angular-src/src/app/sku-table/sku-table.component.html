@@ -2,6 +2,7 @@
 <!-- <app-search-ingredient></app-search-ingredient> -->
 <div class="card">
   <h3 class="card-header text-center font-weight-bold py-4">SKUs</h3>
+  <app-search-sku></app-search-sku>
 <div class="pagination">
   <a (click) = "prevPage()">&laquo;</a>
   <li *ngFor="let i of shownPages()" [ngClass]="{active: i == currentPage}" (click)="setPage(i)">
@@ -43,7 +44,8 @@
                   <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
                     <i (click)="removeIngrQuant(ingr_id,id,sku.id)" class="fa fa-remove"> </i><br></a>
                 </ng-container>
-                <input [(ngModel)]="ingredientInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text"placeholder="Ingredient Name"/><br>
+                <app-ingredient-autocomplete (messageEvent)="setIngredientInput(id, $event)"></app-ingredient-autocomplete>
+                <!--<input [(ngModel)]="ingredientInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text"placeholder="Ingredient Name"/><br>-->
                 <input [(ngModel)]="quantityInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text" placeholder="Quantity"/><br>
               </td>
               <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="edit(sku.id, 'comment', $event)">{{sku.comment}}</td>

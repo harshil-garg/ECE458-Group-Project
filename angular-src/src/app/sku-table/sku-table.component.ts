@@ -17,6 +17,8 @@ export class SkuTableComponent implements OnInit{
     maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
+    ingredients: Array<any> = [];
+    productLines: Array<any> = [];
 
     ingredientInputs: Array<any> = [];
     quantityInputs: Array<any> = [];
@@ -166,8 +168,8 @@ export class SkuTableComponent implements OnInit{
           sortBy : this.sortBy,
           pageNum: this.currentPage.toString(),
           keywords: this.keywords,
-          ingredients: [],
-          product_lines: []
+          ingredients: this.ingredients,
+          product_lines: this.productLines
         }).subscribe(
         response => this.handleRefreshResponse(response),
         err => {
@@ -246,11 +248,6 @@ export class SkuTableComponent implements OnInit{
       }
     }
 
-    setKeywords(newKeywords : Array<any>){
-      this.keywords = newKeywords;
-      this.refresh();
-    }
-
     keyPressed(sku_num, id, event){
       if(event.keyCode == 13){ //enter pressed
         if(this.ingredientInputs[id]!=null && this.ingredientInputs[id].length>0 && this.quantityInputs[id]!=null && this.quantityInputs[id].length>0){
@@ -264,6 +261,25 @@ export class SkuTableComponent implements OnInit{
           this.quantityInputs[id] = '';
         }
       }
+    }
+
+    setIngredientInput(id, event){
+      this.ingredientInputs[id] = event;
+    }
+
+    setKeywords(newKeywords : Array<any>){
+      this.keywords = newKeywords;
+      this.refresh();
+    }
+
+    setSearchedIngredients(newIngredients : Array<any>){
+      this.ingredients = newIngredients;
+      this.refresh();
+    }
+
+    setSearchedProductLines(newProductLines : Array<any>){
+      this.productLines = newProductLines;
+      this.refresh();
     }
 
 }
