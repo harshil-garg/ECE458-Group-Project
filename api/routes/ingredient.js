@@ -63,7 +63,7 @@ router.post('/create', (req, res) => {
     //     res.json(validation);
     // }
 
-
+    cost = cost.toFixed(2);
     //Autogen number logic
     if (number) {
         create_ingredient(res, name, number, vendor_info, package_size, cost, comment);
