@@ -11,7 +11,7 @@ import { Tuple } from '../../../model/ingredient';
 })
 export class AddSkuDialogComponent{
 
-  ingredientInput: any;
+  ingredientInput: string;
   quantityInput: any;
 
   constructor(
@@ -34,6 +34,10 @@ export class AddSkuDialogComponent{
           this.quantityInput = '';
         }
       }
+    }
+
+    setIngredientInput(event){
+      this.ingredientInput = event;
     }
 
     removeIngrQuant(ingr_id){

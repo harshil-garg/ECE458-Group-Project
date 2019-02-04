@@ -22,6 +22,8 @@ import { SearchIngredientComponent } from './ingredients-table/search-ingredient
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductLineTableComponent } from './product-line-table/product-line-table.component';
 import { SkuTableComponent } from './sku-table/sku-table.component';
+import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.component';
+import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 
 const routes: Routes = [
   {
@@ -54,7 +56,9 @@ const routes: Routes = [
     AccountsComponent,
     SearchIngredientComponent,
     ProductLineTableComponent,
-    SkuTableComponent
+    SkuTableComponent,
+    IngredientAutocompleteComponent,
+    SearchSkuComponent
   ],
   imports: [
     BrowserModule,
