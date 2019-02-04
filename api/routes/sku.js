@@ -5,6 +5,7 @@ const Ingredient = require('../model/ingredient_model');
 const ProductLine = require('../model/product_line_model');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
+const validator = require('../controllers/sku_validation');
 
 
 //Autocomplete ingredients
@@ -62,8 +63,21 @@ router.post('/create', (req, res) => {
         res.json({success: false, message: 'Please fill in all fields'});
         return;
     }
-
-    //TODO: check that inputs are valid (upca standard, numbers are numeric)
+    let ingredient_passed = true;
+    for(let ingredient of ingredients) {
+        let bool = validator.itemExists(Ingredient, ingredient.ingredient_name);
+        ingredient_passed = bool && ingredient_passed;
+    }
+    console.log(ingredient_passed)
+    
+    let product_passed = validator.itemExists(ProductLine, product_line);
+    let case_passed = validator.isUPCStandard(case_upc);
+    let unit_passed = validator.isUPCStandard(unit_upc);
+    
+    if(!ingredient_passed || !product_passed || !case_passed || !unit_passed){
+        res.json({success: false, message: 'Input invalid'});
+        return;
+    }
 
     //check ingredients and product lines exist
 
