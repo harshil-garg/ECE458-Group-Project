@@ -6,12 +6,13 @@ const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const Ingredient = require('../model/ingredient_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/sku_validation');
+const input_validator = require('../controllers/input_validation');
 
 router.post('/calculator', (req, res) => {
     const { name } = req.body;
+    const required_params = { name };
 
-    if (!name) {
-        res.send("Name not specified");
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -99,8 +100,10 @@ function runIngredientDBQuery(result, res) {
 router.post('/all', (req, res) => {
     const { pageNum, sortBy, user } = req.body;
 
-    if(!pageNum || !sortBy || !user){
-        res.send('Please fill in all fields');
+    const required_params = { pageNum, sortBy, user };
+
+    if(!input_validator.passed(required_params, res)){
+        return;
     }
     pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy, res);
     
@@ -109,9 +112,9 @@ router.post('/all', (req, res) => {
 // CREATE
 router.post('/create', async (req, res) => {
     const { name, skus } = req.body;
+    const required_params = { name, skus };
 
-    if (!name || !skus) {
-        res.send("You messed up");
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -125,9 +128,16 @@ router.post('/create', async (req, res) => {
 
     if(!sku_exists){
         res.json({success: false, message: 'One or more SKU does not exist'});
+        return;
+    }
+    let user;
+    if(!req.user){
+        res.json({success: false, message: 'No user logged in'});
+        return;
+    }else{
+        user = req.user.email;
     }
 
-    let user = req.user.email;
     let goal = new ManufacturingGoal({name, skus, user});
     
     ManufacturingGoal.create(goal, (error) => {
@@ -142,9 +152,9 @@ router.post('/create', async (req, res) => {
 
 router.post('/read', (req, res) => {
     const { name, user } = req.body;
+    const required_params = { name, user };
 
-    if (!name || !user) {
-        res.send("Please specify the manufacturing goal name and user.");
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 

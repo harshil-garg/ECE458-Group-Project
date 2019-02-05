@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
-const Validator = require('../controllers/ingredient_validation');
 const multer = require('multer');
 const upload = multer({ dest: 'tmp/csv/' });
 const csv = require('fast-csv');
