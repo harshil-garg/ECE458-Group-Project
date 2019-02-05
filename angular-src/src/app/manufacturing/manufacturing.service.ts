@@ -7,7 +7,6 @@ import { catchError } from 'rxjs/operators';
 
 export class CreateMessage {
   name : string;
-  user: string;
   skus : SkuNameQuantity[];
 }
 
