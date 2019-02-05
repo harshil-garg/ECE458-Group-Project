@@ -134,7 +134,8 @@ router.post('/update', (req, res) => {
         json["package_size"] = package_size;
     }
     if (cost) {
-        json["cost"] = cost;
+        let rounded_cost = (isNaN(cost)) ? cost : Number(cost).toFixed(2);
+        json["cost"] = rounded_cost;
     }
     if (comment) {
         json["comment"] = comment;

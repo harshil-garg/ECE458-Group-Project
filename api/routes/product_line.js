@@ -26,7 +26,7 @@ router.post('/create', (req, res) => {
 //Read
 router.post('/read', (req, res) => {
     const {pageNum}  = req.body;
-    const required_params = { name };
+    const required_params = { pageNum };
 
     if(!input_validator.passed(required_params, res)){
         return;
