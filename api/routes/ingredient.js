@@ -63,13 +63,13 @@ router.post('/create', (req, res) => {
     //     res.json(validation);
     // }
 
-    cost = cost.toFixed(2);
+    let rounded_cost = cost.toFixed(2);
     //Autogen number logic
     if (number) {
-        create_ingredient(res, name, number, vendor_info, package_size, cost, comment);
+        create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
     } else {
         create_ingredient_number(function(id) {
-            return create_ingredient(res, name, id, vendor_info, package_size, cost, comment);
+            return create_ingredient(res, name, id, vendor_info, package_size, rounded_cost, comment);
         });
     }
 });

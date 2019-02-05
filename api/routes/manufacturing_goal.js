@@ -97,12 +97,12 @@ function runIngredientDBQuery(result, res) {
 
 // Get all
 router.post('/all', (req, res) => {
-    const { pageNum, sortBy } = req.body;
+    const { pageNum, sortBy, user } = req.body;
 
-    if(!pageNum || ! sortBy){
+    if(!pageNum || !sortBy || !user){
         res.send('Please fill in all fields');
     }
-    pagination.paginate(ManufacturingGoal.find({}), ManufacturingGoal, pageNum, sortBy, res);
+    pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy, res);
     
 });
 

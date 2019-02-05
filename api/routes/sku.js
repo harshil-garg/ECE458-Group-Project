@@ -79,7 +79,6 @@ router.post('/create', (req, res) => {
         return;
     }
 
-    //check ingredients and product lines exist
 
     let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment});
     SKU.createSKU(sku, (err) => {
