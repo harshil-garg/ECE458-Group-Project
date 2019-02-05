@@ -16,6 +16,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 import { AddProductLineModule } from './product-line-table/add-product-line/add-product-line.module';
+import { CalculatorModule } from './manufacturing/calculator/calculator.module';
 import { AddSkuModule } from './sku-table/add-sku/add-sku.module';
 import { UploadComponent } from './upload/upload.component';
 import { SearchIngredientComponent } from './ingredients-table/search-ingredient/search-ingredient.component';
@@ -68,6 +69,7 @@ const routes: Routes = [
     UploadModule,
     AddIngredientModule,
     AddProductLineModule,
+    CalculatorModule,
     AddSkuModule,
     HttpClientModule,
     RouterModule.forRoot(routes),

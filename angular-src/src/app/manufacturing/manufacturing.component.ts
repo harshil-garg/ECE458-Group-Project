@@ -36,6 +36,7 @@ export class ManufacturingComponent implements OnInit {
   }
 
   handleRefreshResponse(response: RefreshResponse){
+    console.log(response);
     if(response.success){
       this.manufGoalList = [];
       for(let manufGoal of response.data){

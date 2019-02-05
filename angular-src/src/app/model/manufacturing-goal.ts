@@ -1,6 +1,6 @@
 export class SkuNameQuantity {
   sku_name: string;
-  sku_quantity: number;
+  case_quantity: number;
 }
 
 export class ManufacturingGoal {

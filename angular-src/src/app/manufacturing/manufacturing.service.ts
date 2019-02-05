@@ -33,6 +33,15 @@ export class RefreshResponse {
   pages: number;
 }
 
+export class CalculateMessage {
+  name: string;
+}
+
+export class CalculateData {
+  name: string;
+	calculated_quantity: string;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -52,5 +61,9 @@ export class ManufacturingService {
 
   refresh(requestedRefresh: RefreshMessage): Observable<RefreshResponse>{
     return this.http.post<RefreshResponse>('/api/manufacturing_goals/all', requestedRefresh, httpOptions);
+  }
+
+  calculate(requestedCalculate: CalculateMessage): Observable<CalculateData[]>{
+    return this.http.post<CalculateData[]>('/api/manufacturing_goals/calculator', requestedCalculate, httpOptions);
   }
 }

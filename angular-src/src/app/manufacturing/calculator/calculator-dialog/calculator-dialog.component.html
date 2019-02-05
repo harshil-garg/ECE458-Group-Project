@@ -1,0 +1,13 @@
+<table class="table table-bordered table-responsive-md table-striped text-center">
+  <tr>
+    <th>Ingredient</th>
+    <th>Quantity</th>
+  </tr>
+
+ <ng-container *ngFor="let calculatedVal of calculateList; let id=index">
+    <tr>
+      <td>{{calculatedVal.name}}</td>
+      <td>{{calculatedVal.calculated_quantity}}</td>
+    </tr>
+ </ng-container>
+</table>
