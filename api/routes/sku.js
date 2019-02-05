@@ -6,44 +6,41 @@ const ProductLine = require('../model/product_line_model');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
 const validator = require('../controllers/sku_validation');
+const input_validator = require('../controllers/input_validation');
 
 
 //Autocomplete ingredients
 router.post('/autocomplete_ingredients', (req, res) => {
-    const input = req.body.input;
+    const {input} = req.body;
+    const required_params = {input};
+    
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     autocomplete.ingredients(Ingredient, input, res);
 });
 
 //Autocomplete product lines
 router.post('/autocomplete_product_lines', (req, res) => {
-    const input = req.body.input;
+    const {input} = req.body;
+    const required_params = {input};
+    
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     autocomplete.productLines(ProductLine, input, res);
 });
 
-function createBoolMap() {
-    let map = {};
-    for(let arg of arguments) {
-        map[arg.name] = arg;
-    }
-
-    return bool;
-}
 
 //Filter
 router.post('/filter', (req, res) => {
+
     const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
+    const required_params = { sortBy, pageNum, keywords, ingredients, product_lines };
 
-    let boolArray = createBoolArray(!sortBy, !pageNum, !keywords, !ingredients);
-
-    // for(let bool of boolArray) {
-    //     if()
-    // }
-
-    //check fields completed
-    if(!sortBy || !pageNum || !keywords || !ingredients || !product_lines){
-        res.json({success: false, message: "Please fill in all fields"});
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -73,11 +70,12 @@ router.post('/filter', (req, res) => {
 //Create
 router.post('/create', async (req, res) => {
     const { name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-    //check required fields
-    if(!name || !number, !case_upc || !unit_upc || !size || !count || !product_line || !ingredients){
-        res.json({success: false, message: 'Please fill in all fields'});
+    const required_params = { name, number, case_upc, unit_upc, size, count, product_line, ingredients };
+
+    if(!input_validator.passed(required_params, res)){
         return;
     }
+
     let ingredient_passed = true;
     for(let ingredient of ingredients) {
         let bool = await validator.itemExists(Ingredient, ingredient.ingredient_name);
@@ -108,6 +106,11 @@ router.post('/create', async (req, res) => {
 //Update
 router.post('/update', (req, res) => {
     const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
+    const required_params = { name, number, case_upc, unit_upc, size, count, product_line, ingredients };
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     var json = {};
 
@@ -150,7 +153,13 @@ router.post('/update', (req, res) => {
 
 //Delete
 router.post('/delete', (req, res) => {
-    const number = req.body.number;
+    const { number } = req.body;
+
+    const required_params = { number};
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     SKU.deleteSKU(number, (err, result) => {
         if(err) {

@@ -3,12 +3,18 @@ const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
 const ingredient_filter = require('../controllers/ingredient_filter');
-const Validator = require('../controllers/ingredient_validation');
 const autocomplete = require('../controllers/autocomplete');
+const input_validator = require('../controllers/input_validation');
+
 
 //Autocomplete
 router.post('/autocomplete', (req, res) => {
-    const input = req.body.input;
+    const {input} = req.body;
+    const required_params = { input };
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
     autocomplete.skus(SKU, input, res);
 });
 
@@ -16,10 +22,9 @@ router.post('/autocomplete', (req, res) => {
 //request params: sortBy, direction, pageNum, keywords, skus
 router.post('/filter', async (req, res) => {
     const { sortBy, pageNum, keywords, skus } = req.body;
+    const required_params = { sortBy, pageNum, keywords, skus };
 
-    //check fields completed
-    if(!sortBy || !pageNum || !keywords || !skus){
-        res.json({success: false, message: "Please fill in all fields"});
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -57,11 +62,11 @@ router.post('/filter', async (req, res) => {
 //CREATE
 router.post('/create', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
+    const required_params = { name, number, package_size, cost };
 
-    // var validation = Validator.create(name, number, package_size, cost);
-    // if (!validation.success) {
-    //     res.json(validation);
-    // }
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     let rounded_cost = cost.toFixed(2);
     //Autogen number logic
@@ -109,11 +114,11 @@ function smallest_missing_number(ingredients, lo, hi) {
 // UPDATE
 router.post('/update', (req, res) => {
     const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
+    const required_params = { name, newname, number, package_size, cost };
 
-    // var validation = Validator.update(number, cost);
-    // if (!validation.success) {
-    //     res.json(validation);
-    // }
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     var json = {};
 
@@ -147,7 +152,13 @@ router.post('/update', (req, res) => {
 
 // DELETE
 router.post('/delete', (req, res) => {
-    const name = req.body.name;
+    const {name} = req.body;
+    const required_params = { name };
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
+    
     Ingredient.deleteIngredient(name, (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
