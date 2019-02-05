@@ -26,21 +26,25 @@ export class SearchSkuComponent implements OnInit {
    .distinctUntilChanged()
    .switchMap((query) =>  this.filterSkuService.autocompleteIngredients({input: query}))
    .subscribe( result => {
+     if(result!=null && result.data!=null){
           this.suggestedIngredients = [];
           for(let ingredient of result.data){
             this.suggestedIngredients.push(ingredient)
          }
          this.suggestedIngredients.slice(0,10)
+      }
     });
     this.inputField.valueChanges.debounceTime(200)
    .distinctUntilChanged()
    .switchMap((query) =>  this.filterSkuService.autocompleteProductLines({input: query}))
    .subscribe( result => {
+     if(result!=null && result.data!=null){
           this.suggestedProductLines = [];
           for(let productLine of result.data){
             this.suggestedProductLines.push(productLine)
          }
          this.suggestedProductLines.slice(0,10)
+       }
     });
 
   }
@@ -78,6 +82,16 @@ export class SearchSkuComponent implements OnInit {
   removeProductLine(index: number){
     this.productLines.splice(index, 1);
     this.skuTableComponent.setSearchedProductLines(this.productLines);
+  }
+
+  onSelectionChanged(event){
+    console.log("SELECTED:");
+    if(this.suggestedIngredients.findIndex(x => x===event.option.value)>=0){ //selected element was an ingredient
+      this.addIngredient(event.option.value.name);
+    }
+    else if(this.suggestedProductLines.findIndex(x => x===event.option.value)>=0){ //selected element was a product line
+      this.addProductLine(event.option.value.name);
+    }
   }
 
 

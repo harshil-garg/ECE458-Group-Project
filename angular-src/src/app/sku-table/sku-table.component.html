@@ -45,8 +45,11 @@
                     <i (click)="removeIngrQuant(ingr_id,id,sku.id)" class="fa fa-remove"> </i><br></a>
                 </ng-container>
                 <app-ingredient-autocomplete (messageEvent)="setIngredientInput(id, $event)"></app-ingredient-autocomplete>
+                <br>
                 <!--<input [(ngModel)]="ingredientInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text"placeholder="Ingredient Name"/><br>-->
-                <input [(ngModel)]="quantityInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text" placeholder="Quantity"/><br>
+                <mat-form-field style="width: 200px;">
+                  <input matInput [(ngModel)]="quantityInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text" placeholder="Quantity"/><br>
+                </mat-form-field>
               </td>
               <td contenteditable="true" (keyup)="changeValue(id, 'comment', $event)" (blur)="edit(sku.id, 'comment', $event)">{{sku.comment}}</td>
               <td>

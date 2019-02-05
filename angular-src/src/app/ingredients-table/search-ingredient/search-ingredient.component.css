@@ -43,3 +43,7 @@ i:hover {
 .sku-list {
   list-style: none;
 }
+
+.suggested-type {
+  color: gray;
+}
