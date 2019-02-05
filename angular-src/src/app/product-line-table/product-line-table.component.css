@@ -70,7 +70,10 @@ th:hover {
 }
 
 .pagination {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .pagination a {
@@ -81,7 +84,7 @@ th:hover {
 }
 
 .pagination a.active {
-  background-color: #4CAF50;
+  background-color: #f44336;
   color: white;
 }
 
