@@ -25,6 +25,7 @@ import { ProductLineTableComponent } from './product-line-table/product-line-tab
 import { SkuTableComponent } from './sku-table/sku-table.component';
 import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.component';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
+import { ManufacturingComponent } from './manufacturing/manufacturing.component';
 
 const routes: Routes = [
   {
@@ -37,7 +38,8 @@ const routes: Routes = [
           { path: 'product-lines', component: ProductLineTableComponent },
           { path: 'skus', component: SkuTableComponent },
           { path: 'accounts', component: AccountsComponent },
-          { path: 'upload', component: UploadComponent}
+          { path: 'upload', component: UploadComponent},
+          { path: 'manufacturing', component: ManufacturingComponent}
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -59,7 +61,8 @@ const routes: Routes = [
     ProductLineTableComponent,
     SkuTableComponent,
     IngredientAutocompleteComponent,
-    SearchSkuComponent
+    SearchSkuComponent,
+    ManufacturingComponent
   ],
   imports: [
     BrowserModule,
