@@ -344,7 +344,120 @@ router.post('/commit', function (req, res) {
   }
 
   async function handleSkus(skus, results) {
+    //check for duplicates within the input csv
+    var nameSet = new Set();
+    var numberSet = new Set();
 
+    skus.forEach((row) => {
+      if (numberSet.has(row['SKU#'])) {
+        if (!results.skus.errorlist) {
+          results.skus.errorlist = [];
+        }
+        results.skus.errorlist.push({
+          message: 'Duplicate row in SKUs',
+          data: row
+        });
+        return;
+      }
+      else {
+        numberSet.add(row['SKU#']);
+      }
+      if (nameSet.has(row['Case UPC'])) {
+        if (!results.skus.errorlist) {
+          results.skus.errorlist = [];
+        }
+        results.skus.errorlist.push({
+          message: 'Duplicate row in SKUs',
+          data: row
+        });
+      }
+      else {
+        nameSet.add(row['Name']);
+      }
+    });
+
+    await asyncForEach(skus, async (row) => {
+      var searchPromise = new Promise((resolve, reject) => {
+        SKU.findOne({number: row['SKU#']}).exec(async (err, result) => {
+          // if we find an existing entry, we check to ignore, change, or error
+          if (result) {
+            //if a SKU is identical, add it to the ignore list
+            if (result.name == row['Name'] && result.case_upc == row['Case UPC'] && result.unit_upc == row['Unit UPC'] && result.result.count == row['Count per case'] && result.product_line == row['Product Line Name'] && result.comment == row['Comment']) {
+              if (!results.skus.ignorelist) {
+                results.skus.ignorelist = [];
+              }
+              results.skus.ignorelist.push(row);
+            }
+            // if matches on the primary key AND the unique key, validate and update
+            else if (result.name == row['Case UPC']) {
+              if (await validateSKU(sku, results)) {
+                if (!results.skus.changelist) {
+                  results.skus.changelist = [];
+                }
+                results.skus.changelist.push(row);
+              }
+            }
+            // if it matches on the primary key AND another row's unique key, it should fail
+            else {
+              var validatePromise = new Promise ((resolve2, reject2) => {
+                SKU.findOne({case_upc: row['Case UPC']}).exec(async (err, result) => {
+                  if (result) {
+                    if (!results.skus.errorlist) {
+                      results.skus.errorlist = [];
+                    }
+                    results.skus.errorlist.push({
+                      message: 'Ambiguous record',
+                      data: row
+                    });
+                  }
+                  // other wise validate and update
+                  else {
+                    if (await validateSKU(row, results)) {
+                      if (!results.skus.changelist) {
+                        results.skus.changelist = [];
+                      }
+                      results.skus.changelist.push(row);
+                    }
+                  }
+                  resolve2();
+                }); 
+              });
+              await validatePromise;
+            }
+          }
+          // if it is not a match on the primary key, validate it
+          else {
+            //if its a match on a unique key, it should fail
+            var validatePromise = new Promise ((resolve2, reject2) => {
+              SKU.findOne({case_upc: row['Case UPC']}).exec(async (err, result) => {
+                if (result) {
+                  if (!results.skus.errorlist) {
+                    results.skus.errorlist = [];
+                  }
+                  results.skus.errorlist.push({
+                    message: 'Ambiguous record',
+                    data: row
+                  });
+                }
+                // other wise validate and add
+                else {
+                  if (await validateSKU(row, results)) {
+                    if (!results.skus.createlist) {
+                      results.skus.createlist = [];
+                    }
+                    results.skus.createlist.push(row);
+                  }
+                }
+                resolve2();
+              });
+            });
+            await validatePromise;
+          }
+          resolve();
+        });
+      });
+      await searchPromise;
+    });
   }
 
   async function handleIngredients(ingredients, results) {
@@ -502,6 +615,10 @@ router.post('/commit', function (req, res) {
 
   async function handleFormulas(formulas, results) {
 
+  }
+
+  async function validateSKU(sku, results) {
+    return true;
   }
 
   async function commitImport(res) {
