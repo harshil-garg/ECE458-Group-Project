@@ -306,7 +306,6 @@ router.post('/commit', function (req, res) {
   }
 
   async function handleProductLines(product_lines, results) {
-    // check that headers are correct and
     //check for duplicates within the input csv
     var nameSet = new Set();
     product_lines.forEach((row) => {
@@ -354,7 +353,37 @@ router.post('/commit', function (req, res) {
   }
 
   async function handleIngredients(ingredients, results) {
+    //check for duplicates within the input csv
+    var nameSet = new Set();
+    var numberSet = new Set();
 
+    ingredients.forEach((row) => {
+      if (nameSet.has(row['Name'])) {
+        if (!results.ingredients.errorlist) {
+          results.ingredients.errorlist = [];
+        }
+        results.ingredients.errorlist.push({
+          message: 'Duplicate row in ingredients',
+          data: row
+        });
+        return;
+      }
+      else {
+        nameSet.add(row.Name);
+      }
+      if (numberSet.has(row['Ingr#'])) {
+        if (!results.ingredients.errorlist) {
+          results.ingredients.errorlist = [];
+        }
+        results.ingredients.errorlist.push({
+          message: 'Duplicate row in ingredients',
+          data: row
+        });
+      }
+      else {
+        numberSet.add(row['Ingr#']);
+      }
+    });
   }
 
   async function handleFormulas(formulas, results) {
