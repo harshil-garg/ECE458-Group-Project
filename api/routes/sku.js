@@ -22,9 +22,24 @@ router.post('/autocomplete_product_lines', (req, res) => {
     autocomplete.productLines(ProductLine, input, res);
 });
 
+function createBoolMap() {
+    let map = {};
+    for(let arg of arguments) {
+        map[arg.name] = arg;
+    }
+
+    return bool;
+}
+
 //Filter
 router.post('/filter', (req, res) => {
     const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
+
+    let boolArray = createBoolArray(!sortBy, !pageNum, !keywords, !ingredients);
+
+    // for(let bool of boolArray) {
+    //     if()
+    // }
 
     //check fields completed
     if(!sortBy || !pageNum || !keywords || !ingredients || !product_lines){
@@ -56,7 +71,7 @@ router.post('/filter', (req, res) => {
 });
 
 //Create
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
     const { name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
     //check required fields
     if(!name || !number, !case_upc || !unit_upc || !size || !count || !product_line || !ingredients){
@@ -65,12 +80,12 @@ router.post('/create', (req, res) => {
     }
     let ingredient_passed = true;
     for(let ingredient of ingredients) {
-        let bool = validator.itemExists(Ingredient, ingredient.ingredient_name);
+        let bool = await validator.itemExists(Ingredient, ingredient.ingredient_name);
         ingredient_passed = bool && ingredient_passed;
     }
-    console.log(ingredient_passed)
     
-    let product_passed = validator.itemExists(ProductLine, product_line);
+    
+    let product_passed = await validator.itemExists(ProductLine, product_line);
     let case_passed = validator.isUPCStandard(case_upc);
     let unit_passed = validator.isUPCStandard(unit_upc);
     
@@ -79,7 +94,6 @@ router.post('/create', (req, res) => {
         return;
     }
 
-    //check ingredients and product lines exist
 
     let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment});
     SKU.createSKU(sku, (err) => {
@@ -138,10 +152,12 @@ router.post('/update', (req, res) => {
 router.post('/delete', (req, res) => {
     const number = req.body.number;
 
-    SKU.deleteSKU(number, (err) => {
+    SKU.deleteSKU(number, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
 
+        }else if(result.deletedCount == 0){
+            res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
             res.json({success: true, message: "Deleted successfully."});
         }

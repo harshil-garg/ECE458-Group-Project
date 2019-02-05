@@ -53,10 +53,12 @@ router.post('/update', (req, res) => {
 router.post('/delete', (req, res) => {
     const name = req.body.name;
 
-    ProductLine.deleteProductLine(name, (err) => {
+    ProductLine.deleteProductLine(name, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete product line. Error: ${err}`});
 
+        }else if(result.deletedCount == 0){
+            res.json({success: false, message: 'Product Line does not exist to delete'});
         }else{
             res.json({success: true, message: "Deleted successfully."});
         }

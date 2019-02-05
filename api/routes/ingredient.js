@@ -63,13 +63,13 @@ router.post('/create', (req, res) => {
     //     res.json(validation);
     // }
 
-
+    let rounded_cost = cost.toFixed(2);
     //Autogen number logic
     if (number) {
-        create_ingredient(res, name, number, vendor_info, package_size, cost, comment);
+        create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
     } else {
         create_ingredient_number(function(id) {
-            return create_ingredient(res, name, id, vendor_info, package_size, cost, comment);
+            return create_ingredient(res, name, id, vendor_info, package_size, rounded_cost, comment);
         });
     }
 });
@@ -148,9 +148,11 @@ router.post('/update', (req, res) => {
 // DELETE
 router.post('/delete', (req, res) => {
     const name = req.body.name;
-    Ingredient.deleteIngredient(name, (error) => {
+    Ingredient.deleteIngredient(name, (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
+        } else if(result.deletedCount == 0){
+            res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
             res.json({success: true, message: "Removed successfully."});
         }
