@@ -67,8 +67,7 @@ router.post('/create', (req, res) => {
     if(!input_validator.passed(required_params, res)){
         return;
     }
-
-    let rounded_cost = cost.toFixed(2);
+    let rounded_cost = (isNaN(cost)) ? cost : Number(cost).toFixed(2); //makes sure that toFixed is not called on strings
     //Autogen number logic
     if (number) {
         create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
@@ -114,7 +113,7 @@ function smallest_missing_number(ingredients, lo, hi) {
 // UPDATE
 router.post('/update', (req, res) => {
     const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
-    const required_params = { name, newname, number, package_size, cost };
+    const required_params = { name };
 
     if(!input_validator.passed(required_params, res)){
         return;
@@ -158,7 +157,7 @@ router.post('/delete', (req, res) => {
     if(!input_validator.passed(required_params, res)){
         return;
     }
-    
+
     Ingredient.deleteIngredient(name, (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
