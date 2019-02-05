@@ -346,7 +346,7 @@ router.post('/commit', function (req, res) {
   async function handleSkus(skus, results) {
     //check for duplicates within the input csv
     var nameSet = new Set();
-    var numberSet = new Set();
+    var caseUPCSet = new Set();
 
     skus.forEach((row) => {
       if (numberSet.has(row['SKU#'])) {
@@ -362,7 +362,7 @@ router.post('/commit', function (req, res) {
       else {
         numberSet.add(row['SKU#']);
       }
-      if (nameSet.has(row['Case UPC'])) {
+      if (caseUPCSet.has(row['Case UPC'])) {
         if (!results.skus.errorlist) {
           results.skus.errorlist = [];
         }
@@ -372,7 +372,7 @@ router.post('/commit', function (req, res) {
         });
       }
       else {
-        nameSet.add(row['Name']);
+        caseUPCSet.add(row['Case UPC']);
       }
     });
 
@@ -616,7 +616,8 @@ router.post('/commit', function (req, res) {
   async function handleFormulas(formulas, results) {
 
   }
-
+  // returns true if the row is valid syntactically and referentially
+  // otherwise returns false and adds the row to the errorlist with the correct explanation message
   async function validateSKU(sku, results) {
     return true;
   }
