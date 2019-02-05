@@ -32,7 +32,6 @@ var toBeCommitted = {
     createlist: null,
   },
   product_lines: {
-    changelist: null,
     createlist: null,
   },
   skus: {
@@ -40,7 +39,6 @@ var toBeCommitted = {
     createlist: null,
   },
   formulas: {
-    changelist: null,
     createlist: null,
   }
 };
@@ -101,7 +99,6 @@ router.post('/commit', function (req, res) {
       },
       product_lines: {
         errorlist: null,
-        changelist: null,
         createlist: null,
         ignorelist: null
       },
@@ -113,7 +110,6 @@ router.post('/commit', function (req, res) {
       },
       formulas: {
         errorlist: null,
-        changelist: null,
         createlist: null,
         ignorelist: null
       }
@@ -256,6 +252,7 @@ router.post('/commit', function (req, res) {
       }
       // if theres errors, end the session
       if (results.ingredients.errorlist || results.skus.errorlist || results.product_lines.errorlist || results.formulas.errorlist) {
+        results.success = false;
         uploadSessionStarted = false;
       }
       else {
@@ -264,12 +261,10 @@ router.post('/commit', function (req, res) {
         toBeCommitted.skus.createlist = results.skus.createlist;
         toBeCommitted.skus.changelist = results.skus.changelist;
         toBeCommitted.formulas.createlist = results.formulas.createlist;
-        toBeCommitted.formulas.changelist = results.formulas.changelist;
         toBeCommitted.product_lines.createlist = results.product_lines.createlist;
-        toBeCommitted.product_lines.changelist = results.product_lines.changelist;
 
         //if there's no errors and no potential changes, end the session and commit the changes
-        if (!(results.ingredients.changelist || results.skus.changelist || results.product_lines.changelist || results.formulas.changelist)) {
+        if (!(results.ingredients.changelist || results.skus.changelist || results.formulas.changelist)) {
           commitImport(res);
           results.success = true;
           uploadSessionStarted = false;
@@ -384,6 +379,125 @@ router.post('/commit', function (req, res) {
         numberSet.add(row['Ingr#']);
       }
     });
+
+    await asyncForEach(ingredients, async (row) => {
+      var searchPromise = new Promise((resolve, reject) => {
+        Ingredient.findOne({number: row['Ingr#']}).exec(async (err, result) => {
+          // if we find an existing entry, we check to ignore, change, or error
+          if (result) {
+            //if an ingredient is identical, add it to the ignore list
+            if (result.name == row['Name'] && result.vendor_info == row['Vendor Info'] && result.package_size == row['Size'] && result.cost == row['Cost'] && result.comment == row['Comment']) {
+              if (!results.ingredients.ignorelist) {
+                results.ingredients.ignorelist = [];
+              }
+              results.ingredients.ignorelist.push(row);
+            }
+            // if matches on the primary key AND the unique key, validate and update
+            else if (result.name == row['Name']) {
+              // validate that cost is a number
+              if (isNaN(row['Cost'])) {
+                if (!results.ingredients.errorlist) {
+                  results.ingredients.errorlist = [];
+                }
+                results.ingredients.errorlist.push({
+                  message: 'Cost not a number',
+                  data: row
+                });
+              }
+              // if it's a number, round it
+              else {
+                row['Cost'] = Number(row['Cost']).toFixed(2);
+                if (!results.ingredients.changelist) {
+                  results.ingredients.changelist = [];
+                }
+                results.ingredients.changelist.push(row);
+              }
+            }
+            // if it matches on the primary key AND another row's unique key, it should fail
+            else {
+              var validatePromise = new Promise ((resolve2, reject2) => {
+                Ingredient.findOne({name: row['Name']}).exec((err, result) => {
+                  if (result) {
+                    if (!results.ingredients.errorlist) {
+                      results.ingredients.errorlist = [];
+                    }
+                    results.ingredients.errorlist.push({
+                      message: 'Ambiguous record',
+                      data: row
+                    });
+                  }
+                  // other wise validate and update
+                  else {
+                    // validate that cost is a number
+                    if (isNaN(row['Cost'])) {
+                      if (!results.ingredients.errorlist) {
+                        results.ingredients.errorlist = [];
+                      }
+                      results.ingredients.errorlist.push({
+                        message: 'Cost not a number',
+                        data: row
+                      });
+                    }
+                    // if it's a number, round it
+                    else {
+                      row['Cost'] = Number(row['Cost']).toFixed(2);
+                      if (!results.ingredients.changelist) {
+                        results.ingredients.changelist = [];
+                      }
+                      results.ingredients.changelist.push(row);
+                    }
+                  }
+                  resolve2();
+                }); 
+              });
+              await validatePromise;
+            }
+          }
+          // if it is not a match on the primary key, validate it
+          else {
+            //if its a match on a unique key, it should fail
+            var validatePromise = new Promise ((resolve2, reject2) => {
+              Ingredient.findOne({name: row['Name']}).exec((err, result) => {
+                if (result) {
+                  if (!results.ingredients.errorlist) {
+                    results.ingredients.errorlist = [];
+                  }
+                  results.ingredients.errorlist.push({
+                    message: 'Ambiguous record',
+                    data: row
+                  });
+                }
+                // other wise validate and add
+                else {
+                  // validate that cost is a number
+                  if (isNaN(row['Cost'])) {
+                    if (!results.ingredients.errorlist) {
+                      results.ingredients.errorlist = [];
+                    }
+                    results.ingredients.errorlist.push({
+                      message: 'Cost not a number',
+                      data: row
+                    });
+                  }
+                  // if it's a number, round it
+                  else {
+                    row['Cost'] = Number(row['Cost']).toFixed(2);
+                    if (!results.ingredients.createlist) {
+                      results.ingredients.createlist = [];
+                    }
+                    results.ingredients.createlist.push(row);
+                  }
+                }
+                resolve2();
+              });
+            });
+            await validatePromise;
+          }
+          resolve();
+        });
+      });
+      await searchPromise;
+    });
   }
 
   async function handleFormulas(formulas, results) {
@@ -400,7 +514,6 @@ router.post('/commit', function (req, res) {
               errorOn = true;
               res.json({success: false, message: "Product line create failed"});
             }
-            console.log('made it to create: ' + row.Name);
             resolve();
           });
         });
@@ -410,7 +523,7 @@ router.post('/commit', function (req, res) {
     if (toBeCommitted.ingredients.createlist && !errorOn) {
       await asyncForEach(toBeCommitted.ingredients.createlist, async (row) => {
         var importPromise = new Promise((resolve, reject) => {
-          var newngredient = {
+          var newIngredient = {
             name: row.Name,
             number: row['Ingr#'],
             vendor_info: row['Vendor Info'],
@@ -547,7 +660,6 @@ router.post('/commit', function (req, res) {
         createlist: null,
       },
       product_lines: {
-        changelist: null,
         createlist: null,
       },
       skus: {
@@ -555,7 +667,6 @@ router.post('/commit', function (req, res) {
         createlist: null,
       },
       formulas: {
-        changelist: null,
         createlist: null,
       }
     };
