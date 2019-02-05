@@ -28,7 +28,8 @@ const IngredientSchema = new Schema({
         type: String
     },
     num_skus: {
-        type: Number
+        type: Number,
+        default: 0
     }
 });
 
