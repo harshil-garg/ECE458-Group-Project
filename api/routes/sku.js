@@ -106,7 +106,7 @@ router.post('/create', async (req, res) => {
 //Update
 router.post('/update', (req, res) => {
     const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-    const required_params = { name, number, case_upc, unit_upc, size, count, product_line, ingredients };
+    const required_params = { number };
 
     if(!input_validator.passed(required_params, res)){
         return;

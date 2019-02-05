@@ -113,7 +113,7 @@ function smallest_missing_number(ingredients, lo, hi) {
 // UPDATE
 router.post('/update', (req, res) => {
     const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
-    const required_params = { name, newname, number, package_size, cost };
+    const required_params = { name };
 
     if(!input_validator.passed(required_params, res)){
         return;
