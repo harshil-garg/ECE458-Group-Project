@@ -1,5 +1,6 @@
 //Require mongoose package
 const mongoose = require('mongoose');
+const Ingredient = require('./ingredient_model');
 
 const Schema = mongoose.Schema;
 const Tuple = new Schema({
@@ -61,4 +62,53 @@ module.exports.deleteSKU = (sku_number, callback) => {
 module.exports.updateSKU = (sku_number, sku_update, cb) => {
     var query = {number: sku_number};
     SKU.findOneAndUpdate(query, sku_update, cb);
+}
+
+module.exports.addFormulaRow = (row, cb) => {
+    var query = {number: row['SKU#']};
+    SKU.findOne(query, (err, sku) => {
+        if (err) {
+            cb(err);
+        }
+        else {
+            Ingredient.findOne({number: row['Ingr#']}, (err, ingredient) => {
+                if (err) {
+                    cb(err);
+                }
+                else {
+                    var ingredients = sku.ingredients.slice();
+                    ingredients.push({ingredient_name: ingredient.name, quantity: row['Quantity']});
+                    SKU.findOneAndUpdate(query, {ingredients: ingredients}, cb);
+                }
+            })
+            
+        }
+    })
+}
+
+module.exports.updateFormulaRow = (row, cb) => {
+    var query = {number: row['SKU#']};
+    SKU.findOne(query, (err, sku) => {
+        if (err) {
+            cb(err);
+        }
+        else {
+            Ingredient.findOne({number: row['Ingr#']}, (err, ingredient) => {
+                if (err) {
+                    cb(err);
+                }
+                else {
+                    var ingredients = sku.ingredients.slice();
+                    for (var i = 0; i < ingredients.length; i++) {
+                        if (ingredients[i].ingredient_name == ingredient.name) {
+                            ingredients[i] = {ingredient_name: ingredient.name, quantity: row['Quantity']};
+                            break;
+                        }
+                    }
+                    SKU.findOneAndUpdate(query, {ingredients: ingredients}, cb);
+                }
+            })
+            
+        }
+    })
 }
