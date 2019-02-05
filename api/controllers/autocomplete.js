@@ -28,7 +28,6 @@ module.exports.skus = async (model, input, res) => {
     }else{
         //tolower converts number to string, 1 means to include
         let skus = [];
-        // let cursor = model.aggregate({$match: {}}).cursor({}).exec();
         let cursor = model.aggregate({$project: {num2str: {'$toLower' : '$number'}, name: 1, size: 1, count: 1}}).match({num2str: regex}).cursor({}).exec();
         await cursor.eachAsync((sku) => {
             skus.push(sku);

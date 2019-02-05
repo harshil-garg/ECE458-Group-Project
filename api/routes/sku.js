@@ -6,29 +6,41 @@ const ProductLine = require('../model/product_line_model');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
 const validator = require('../controllers/sku_validation');
+const input_validator = require('../controllers/input_validation');
 
 
 //Autocomplete ingredients
 router.post('/autocomplete_ingredients', (req, res) => {
-    const input = req.body.input;
+    const {input} = req.body;
+    const required_params = {input};
+    
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     autocomplete.ingredients(Ingredient, input, res);
 });
 
 //Autocomplete product lines
 router.post('/autocomplete_product_lines', (req, res) => {
-    const input = req.body.input;
+    const {input} = req.body;
+    const required_params = {input};
+    
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     autocomplete.productLines(ProductLine, input, res);
 });
 
+
 //Filter
 router.post('/filter', (req, res) => {
-    const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
 
-    //check fields completed
-    if(!sortBy || !pageNum || !keywords || !ingredients || !product_lines){
-        res.json({success: false, message: "Please fill in all fields"});
+    const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
+    const required_params = { sortBy, pageNum, keywords, ingredients, product_lines };
+
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -56,21 +68,22 @@ router.post('/filter', (req, res) => {
 });
 
 //Create
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
     const { name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-    //check required fields
-    if(!name || !number, !case_upc || !unit_upc || !size || !count || !product_line || !ingredients){
-        res.json({success: false, message: 'Please fill in all fields'});
+    const required_params = { name, number, case_upc, unit_upc, size, count, product_line, ingredients };
+
+    if(!input_validator.passed(required_params, res)){
         return;
     }
+
     let ingredient_passed = true;
     for(let ingredient of ingredients) {
-        let bool = validator.itemExists(Ingredient, ingredient.ingredient_name);
+        let bool = await validator.itemExists(Ingredient, ingredient.ingredient_name);
         ingredient_passed = bool && ingredient_passed;
     }
-    console.log(ingredient_passed)
     
-    let product_passed = validator.itemExists(ProductLine, product_line);
+    
+    let product_passed = await validator.itemExists(ProductLine, product_line);
     let case_passed = validator.isUPCStandard(case_upc);
     let unit_passed = validator.isUPCStandard(unit_upc);
     
@@ -79,7 +92,6 @@ router.post('/create', (req, res) => {
         return;
     }
 
-    //check ingredients and product lines exist
 
     let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment});
     SKU.createSKU(sku, (err) => {
@@ -94,6 +106,11 @@ router.post('/create', (req, res) => {
 //Update
 router.post('/update', (req, res) => {
     const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
+    const required_params = { number };
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
 
     var json = {};
 
@@ -136,12 +153,20 @@ router.post('/update', (req, res) => {
 
 //Delete
 router.post('/delete', (req, res) => {
-    const number = req.body.number;
+    const { number } = req.body;
 
-    SKU.deleteSKU(number, (err) => {
+    const required_params = { number};
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
+
+    SKU.deleteSKU(number, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
 
+        }else if(result.deletedCount == 0){
+            res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
             res.json({success: true, message: "Deleted successfully."});
         }

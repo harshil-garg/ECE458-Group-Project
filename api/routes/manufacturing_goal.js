@@ -4,12 +4,15 @@ const router = express.Router();
 const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const Ingredient = require('../model/ingredient_model');
+const pagination = require('../controllers/paginate');
+const validator = require('../controllers/sku_validation');
+const input_validator = require('../controllers/input_validation');
 
 router.post('/calculator', (req, res) => {
     const { name } = req.body;
+    const required_params = { name };
 
-    if (!name) {
-        res.send("Name not specified");
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -93,22 +96,48 @@ function runIngredientDBQuery(result, res) {
     }
 }
 
-// CREATE
-router.post('/create', (req, res) => {
-    const { name, skus } = req.body;
+// Get all
+router.post('/all', (req, res) => {
+    const { pageNum, sortBy, user } = req.body;
 
-    if (!name || !skus) {
-        res.send("You messed up");
+    const required_params = { pageNum, sortBy, user };
+
+    if(!input_validator.passed(required_params, res)){
+        return;
+    }
+    pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy, res);
+    
+});
+
+// CREATE
+router.post('/create', async (req, res) => {
+    const { name, skus } = req.body;
+    const required_params = { name, skus };
+
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
     // Need to have a sanity check validation (SKUs must exist!)
     // TODO (will need a mongo query)
-    for (i = 0; i < skus.length; i++) {
-        console.log(skus[i]);
+    let sku_exists = true;
+    for (let sku of skus) {
+        let bool = await validator.itemExists(SKU, sku.sku_name)
+        sku_exists = sku_exists && bool;
     }
 
-    let user = req.user.email;
+    if(!sku_exists){
+        res.json({success: false, message: 'One or more SKU does not exist'});
+        return;
+    }
+    let user;
+    if(!req.user){
+        res.json({success: false, message: 'No user logged in'});
+        return;
+    }else{
+        user = req.user.email;
+    }
+
     let goal = new ManufacturingGoal({name, skus, user});
     
     ManufacturingGoal.create(goal, (error) => {
@@ -122,14 +151,14 @@ router.post('/create', (req, res) => {
 });
 
 router.post('/read', (req, res) => {
-    const { name } = req.body;
+    const { name, user } = req.body;
+    const required_params = { name, user };
 
-    if (!name) {
-        res.send("Please specify the manufacturing goal name.");
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
-    ManufacturingGoal.findOne({name: name}, (error, goal) => {
+    ManufacturingGoal.findOne({name: name, user: user}, (error, goal) => {
         if (error) {
             res.send("Manufacturing goal not found " + error);
         }

@@ -30,6 +30,7 @@ module.exports.keywordsAndSkus = function(pageNum, sortBy, keywords, skus, res){
             {comment: {$all: keywords}}]
     });
     pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
+
 }
 
 function getNames(skus) {
