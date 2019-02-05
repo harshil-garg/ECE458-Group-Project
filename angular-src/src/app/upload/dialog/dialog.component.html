@@ -14,7 +14,7 @@
 
         <h4 mat-line>{{file.name}}</h4>
 
-        <mat-progress-bar *ngIf="response" mode="determinate" [value]="response[file.name].progress | async"></mat-progress-bar>
+        <mat-progress-bar *ngIf="response" mode="determinate" [value]="response.progress | async"></mat-progress-bar>
 
       </mat-list-item>
     </mat-list>
