@@ -17,6 +17,7 @@ export class SearchIngredientComponent implements OnInit {
   skus : Array<any> = [];
   suggestedSkus : Array<any> = [];
   inputField : FormControl = new FormControl();
+  auto: any;
   constructor(public ingredientsTableComponent: IngredientsTableComponent, public filterIngredientsService: FilterIngredientsService) { }
 
   ngOnInit() {
@@ -24,9 +25,11 @@ export class SearchIngredientComponent implements OnInit {
    .distinctUntilChanged()
    .switchMap((query) =>  this.filterIngredientsService.autocomplete({input: query}))
    .subscribe( result => {
-          this.suggestedSkus = [];
-          for(let sku of result.data){
-            this.suggestedSkus.push(sku)
+          if(result!=null && result.data!=null){
+            this.suggestedSkus = [];
+            for(let sku of result.data){
+              this.suggestedSkus.push(sku)
+          }
          }
          this.suggestedSkus.slice(0,10)
     });
@@ -42,6 +45,8 @@ export class SearchIngredientComponent implements OnInit {
   }
 
   addSku(skuName : any){
+    console.log("NAME:");
+    console.log(skuName);
     this.skus.push(skuName);
     this.ingredientsTableComponent.setSearchedSkus(this.skus);
     this.inputField.setValue('');
@@ -55,6 +60,10 @@ export class SearchIngredientComponent implements OnInit {
   removeSku(index: number){
     this.skus.splice(index, 1);
     this.ingredientsTableComponent.setSearchedSkus(this.skus);
+  }
+
+  onSelectionChanged(event){
+    this.addSku(event.option.value);
   }
 
 }

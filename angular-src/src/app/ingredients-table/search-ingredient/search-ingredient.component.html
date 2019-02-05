@@ -5,9 +5,13 @@
 <ng-container *ngFor="let sku of skus; let id=index">
   <label class="sku">{{sku}} <i (click)="removeSku(id)" class="fa fa-remove"> </i></label>
 </ng-container>
-<section class="filter-wrapper">
+
+<br>
+
+<!-- <section class="filter-wrapper">
  <div class="dropdown">
    <span>
+
 <input [formControl]="inputField" type="text" id="keyword" placeholder="Search for ingredients/skus"
   (keydown)="keyPressed($event)" autofocus/>
   </span>
@@ -20,7 +24,15 @@
       </ul>
     </div>
     </div>
-</section>
+</section> -->
+
+  <mat-form-field>
+    <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Search for ingredients/skus" (keydown)="keyPressed($event)">
+  </mat-form-field>
+
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+    <mat-option *ngFor="let sku of suggestedSkus" [value]="sku.name">{{sku.name}}</mat-option>
+  </mat-autocomplete>
 
 <!-- <div class="dropdown">
   <span>Mouse over me</span>
