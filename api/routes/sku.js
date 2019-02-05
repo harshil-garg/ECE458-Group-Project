@@ -35,7 +35,7 @@ function createBoolMap() {
 router.post('/filter', (req, res) => {
     const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
 
-    let boolArray = createBoolArray(!sortBy, !pageNum, !keywords, !ingredients);
+    // let boolArray = createBoolArray(!sortBy, !pageNum, !keywords, !ingredients);
 
     // for(let bool of boolArray) {
     //     if()
