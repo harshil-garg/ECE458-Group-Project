@@ -2,9 +2,9 @@
 module.exports.itemExists = async function(model, itemName) {
     let ans = false;
     await model.findOne({name: itemName}).exec((err, result) => {       
-        ans = !result;     
+        ans = !(!result);     
     })
-    console.log('item null')
+    console.log(`${model.modelName} exists: ${ans}`);
     return ans;
 }
 

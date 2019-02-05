@@ -107,7 +107,7 @@ router.post('/all', (req, res) => {
 });
 
 // CREATE
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
     const { name, skus } = req.body;
 
     if (!name || !skus) {
@@ -119,7 +119,7 @@ router.post('/create', (req, res) => {
     // TODO (will need a mongo query)
     let sku_exists = true;
     for (let sku of skus) {
-        let bool = validator.itemExists(SKU, sku.sku_name)
+        let bool = await validator.itemExists(SKU, sku.sku_name)
         sku_exists = sku_exists && bool;
     }
 

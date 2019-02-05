@@ -148,9 +148,11 @@ router.post('/update', (req, res) => {
 // DELETE
 router.post('/delete', (req, res) => {
     const name = req.body.name;
-    Ingredient.deleteIngredient(name, (error) => {
+    Ingredient.deleteIngredient(name, (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
+        } else if(result.deletedCount == 0){
+            res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
             res.json({success: true, message: "Removed successfully."});
         }
