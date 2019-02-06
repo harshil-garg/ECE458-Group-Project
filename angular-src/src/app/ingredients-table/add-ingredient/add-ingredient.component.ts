@@ -26,8 +26,10 @@ export class AddIngredientComponent {
       });
 
       dialogRef.afterClosed().subscribe(result =>{
-        this.ingredient = result;
-        this.add(this.ingredient);
+        if(result!=null){
+          this.ingredient = result;
+          this.add(this.ingredient);
+        }
       });
     }
 
