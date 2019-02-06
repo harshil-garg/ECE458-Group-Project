@@ -31,6 +31,10 @@
                 <app-calculator [manufGoal]="manufGoal.name"></app-calculator>
               </td>
               <td>
+                <button class="remove" type="button" (click)="exportcsv(id)">Export to CSV</button>
+                <!--<button class="remove" type="button" (click)="remove(manufGoal.name)">Remove</button>-->
+              </td>
+              <td>
                 <button class="remove" type="button">Remove</button>
                 <!--<button class="remove" type="button" (click)="remove(manufGoal.name)">Remove</button>-->
               </td>

@@ -35,6 +35,19 @@ export class ManufacturingComponent implements OnInit {
       );
   }
 
+  exportcsv(id) {
+    var csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += ["sku_name", "case_quantity"].join(",") + "\r\n";
+    this.manufGoalList[id].skus.forEach(function(item) {
+      //let row = item.number+","+item.name+","+item.package_size+","+item.cost+","+item.calculated_quantity;
+      //csvContent += row + "\r\n";
+      console.log(item);
+      csvContent += item.sku_name+","+item.case_quantity+"\r\n";
+    });
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
+  }
+
   handleRefreshResponse(response: RefreshResponse){
     console.log(response);
     if(response.success){
