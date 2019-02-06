@@ -12,7 +12,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 
 ### SKUS
 #### Filter SKUs
-* Allows the user to filter SKUs by keyword and with assisted selection on ingredients and product lines
+* Allows the user to filter SKUs by keyword and with assisted selection on ingredients and product lines.  
 **URL**: ```POST /api/skus/filter```
 
 **Parameters**:
@@ -26,7 +26,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | product_lines | **Required**. List of product lines to filter by. | List |    
 
 #### Create SKU
-* Allows the user to create a new SKU
+* Allows the user to create a new SKU.  
 **URL**: ```POST / api/skus/create```
 
 **Parameters**
@@ -44,7 +44,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | comment | **Optional**. Comment about the SKU. | String |    
 
 #### Update SKU
-* Allows the user to update an existing SKU. When updating a SKU that exists in a manufacturing goal, the changes will propagate to that goal
+* Allows the user to update an existing SKU. When updating a SKU that exists in a manufacturing goal, the changes will propagate to that goal.  
 **URL**: ```POST / api/skus/update```
 
 **Parameters**
@@ -63,7 +63,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | comment | **Optional**. The new comment about the SKU. | String |  
 
 #### Delete SKU
-* Allows the user to delete an existing SKU. When deleting a SKU that exists in a manufacturing goal, the SKU will be removed from that goal
+* Allows the user to delete an existing SKU. When deleting a SKU that exists in a manufacturing goal, the SKU will be removed from that goal.  
 **URL**: ```POST / api/skus/delete```
 
 **Parameters**
@@ -74,7 +74,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 
 ### Ingredients
 #### Filter Ingredients
-* Allows the user to filter ingredients by keyword and with assisted selection on SKUs
+* Allows the user to filter ingredients by keyword and with assisted selection on SKUs.  
 **URL**: ```POST /api/ingredients/filter```
 
 **Parameters**:
@@ -87,7 +87,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | skus | **Required**. List of skus to filter by. | List |      
 
 #### Create Ingredient
-* Allows the user to create a new ingredient
+* Allows the user to create a new ingredient.  
 **URL**: ```POST / api/ingredients/create```
 
 **Parameters**
@@ -102,7 +102,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | comment | **Optional**. Comment about the ingredient. | String |    
 
 #### Update Ingredient
-* Allows the user to update an existing ingredient. When updating an ingredient that exists in a SKU, the changes will be propagated to that SKU
+* Allows the user to update an existing ingredient. When updating an ingredient that exists in a SKU, the changes will be propagated to that SKU.  
 **URL**: ```POST / api/ingredients/update```
 
 **Parameters**
@@ -118,7 +118,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | comment | **Optional**. The new comment about the ingredient. | String |   
 
 #### Delete Ingredient
-* Allows the user to delete an existing ingredient. When deleting an ingredient that exists in a SKU, the ingredient will be removed from that SKU
+* Allows the user to delete an existing ingredient. When deleting an ingredient that exists in a SKU, the ingredient will be removed from that SKU.  
 **URL**: ```POST / api/ingredients/delete```
 
 **Parameters**
@@ -128,4 +128,43 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | name | **Required**. The name used to find the right ingredient to delete. | String |    
 
 ### Product Line
-   
+#### Create Product Line
+* Allows the user to create a new product line.  
+**URL**: ```POST / api/product_lines/create```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the product line. | String |    
+  
+#### Read Product Lines
+* Allows the user to view all product lines in the database.  
+**URL**: ```POST /api/product_lines/read```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| pageNum | **Required**. The page of the results you want to view. | Number |    
+
+#### Update Product Lines
+* Allows the user to update an existing product line. When updating a product line that exists in a SKU, the change will be propagated to the SKU.  
+**URL**: ```POST /api/product_lines/update```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the product line used to find the product line to update. | String |  
+| newname | **Required**. The new name of the product line. | String |  
+
+#### Delete Product Lines
+* Allows the user to delete an existing product line. Users will not be able to delete a product line if a SKU is a part of that line.  
+**URL**: ```POST /api/product_lines/delete```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the product line used to find the product line to delete. | String |  
