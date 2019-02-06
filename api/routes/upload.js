@@ -28,18 +28,18 @@ var uploadSessionStarted = false;
 var uploadHalfComplete = false;
 var toBeCommitted = {
   ingredients: {
-    changelist: null,
-    createlist: null,
+    changelist: [],
+    createlist: [],
   },
   product_lines: {
-    createlist: null,
+    createlist: [],
   },
   skus: {
-    changelist: null,
-    createlist: null,
+    changelist: [],
+    createlist: [],
   },
   formulas: {
-    createlist: null,
+    createlist: [],
   }
 };
 
@@ -64,7 +64,7 @@ router.post('/', upload.array('file[]', 4), function (req, res) {
 router.post('/commit', function (req, res) {
   if (uploadSessionStarted && uploadHalfComplete) {
     if (req.body.commit = true) {
-      commitChanges();
+      commitImport();
     }
     else {
       resetSession();
@@ -92,26 +92,26 @@ router.post('/commit', function (req, res) {
       success: null,
       uploadErrorType: null,
       ingredients: {
-        errorlist: null,
-        changelist: null,
-        createlist: null,
-        ignorelist: null
+        errorlist: [],
+        changelist: [],
+        createlist: [],
+        ignorelist: []
       },
       product_lines: {
-        errorlist: null,
-        createlist: null,
-        ignorelist: null
+        errorlist: [],
+        createlist: [],
+        ignorelist: []
       },
       skus: {
-        errorlist: null,
-        changelist: null,
-        createlist: null,
-        ignorelist: null
+        errorlist: [],
+        changelist: [],
+        createlist: [],
+        ignorelist: []
       },
       formulas: {
-        errorlist: null,
-        createlist: null,
-        ignorelist: null
+        errorlist: [],
+        createlist: [],
+        ignorelist: []
       }
     };
 
@@ -251,7 +251,7 @@ router.post('/commit', function (req, res) {
         await handleFormulas(csvFormulas, results);
       }
       // if theres errors, end the session
-      if (results.ingredients.errorlist || results.skus.errorlist || results.product_lines.errorlist || results.formulas.errorlist) {
+      if (results.ingredients.errorlist.length || results.skus.errorlist.length || results.product_lines.errorlist.length || results.formulas.errorlist.length) {
         results.success = false;
         uploadSessionStarted = false;
       }
@@ -264,7 +264,7 @@ router.post('/commit', function (req, res) {
         toBeCommitted.product_lines.createlist = results.product_lines.createlist;
 
         //if there's no errors and no potential changes, end the session and commit the changes
-        if (!(results.ingredients.changelist || results.skus.changelist || results.formulas.changelist)) {
+        if (!(results.ingredients.changelist.length || results.skus.changelist.length || results.formulas.changelist.length)) {
           commitImport(res);
           results.success = true;
           uploadSessionStarted = false;
@@ -305,9 +305,6 @@ router.post('/commit', function (req, res) {
     var nameSet = new Set();
     product_lines.forEach((row) => {
       if (nameSet.has(row.Name)) {
-        if (!results.product_lines.errorlist) {
-          results.product_lines.errorlist = [];
-        }
         results.product_lines.errorlist.push({
           message: 'Duplicate row in product lines',
           data: row
@@ -323,16 +320,10 @@ router.post('/commit', function (req, res) {
       var searchPromise = new Promise((resolve, reject) => {
         ProductLine.findOne({name: row.Name}).exec((err, result) => {
           if (result) {
-            if (!results.product_lines.ignorelist) {
-              results.product_lines.ignorelist = [];
-            }
             results.product_lines.ignorelist.push(row);
           }
           // if it is not identical, add it to the create list
           else {
-            if (!results.product_lines.createlist) {
-              results.product_lines.createlist = [];
-            }
             results.product_lines.createlist.push(row);
           }
           resolve();
@@ -350,9 +341,6 @@ router.post('/commit', function (req, res) {
 
     skus.forEach((row) => {
       if (numberSet.has(row['SKU#'])) {
-        if (!results.skus.errorlist) {
-          results.skus.errorlist = [];
-        }
         results.skus.errorlist.push({
           message: 'Duplicate row in SKUs',
           data: row
@@ -363,9 +351,6 @@ router.post('/commit', function (req, res) {
         numberSet.add(row['SKU#']);
       }
       if (caseUPCSet.has(row['Case UPC'])) {
-        if (!results.skus.errorlist) {
-          results.skus.errorlist = [];
-        }
         results.skus.errorlist.push({
           message: 'Duplicate row in SKUs',
           data: row
@@ -383,17 +368,11 @@ router.post('/commit', function (req, res) {
           if (result) {
             //if a SKU is identical, add it to the ignore list
             if (result.name == row['Name'] && result.case_upc == row['Case UPC'] && result.unit_upc == row['Unit UPC'] && result.result.count == row['Count per case'] && result.product_line == row['Product Line Name'] && result.comment == row['Comment']) {
-              if (!results.skus.ignorelist) {
-                results.skus.ignorelist = [];
-              }
               results.skus.ignorelist.push(row);
             }
             // if matches on the primary key AND the unique key, validate and update
             else if (result.name == row['Case UPC']) {
               if (await validateSKU(sku, results)) {
-                if (!results.skus.changelist) {
-                  results.skus.changelist = [];
-                }
                 results.skus.changelist.push(row);
               }
             }
@@ -402,9 +381,6 @@ router.post('/commit', function (req, res) {
               var validatePromise = new Promise ((resolve2, reject2) => {
                 SKU.findOne({case_upc: row['Case UPC']}).exec(async (err, result) => {
                   if (result) {
-                    if (!results.skus.errorlist) {
-                      results.skus.errorlist = [];
-                    }
                     results.skus.errorlist.push({
                       message: 'Ambiguous record',
                       data: row
@@ -413,9 +389,6 @@ router.post('/commit', function (req, res) {
                   // other wise validate and update
                   else {
                     if (await validateSKU(row, results)) {
-                      if (!results.skus.changelist) {
-                        results.skus.changelist = [];
-                      }
                       results.skus.changelist.push(row);
                     }
                   }
@@ -431,9 +404,6 @@ router.post('/commit', function (req, res) {
             var validatePromise = new Promise ((resolve2, reject2) => {
               SKU.findOne({case_upc: row['Case UPC']}).exec(async (err, result) => {
                 if (result) {
-                  if (!results.skus.errorlist) {
-                    results.skus.errorlist = [];
-                  }
                   results.skus.errorlist.push({
                     message: 'Ambiguous record',
                     data: row
@@ -442,9 +412,6 @@ router.post('/commit', function (req, res) {
                 // other wise validate and add
                 else {
                   if (await validateSKU(row, results)) {
-                    if (!results.skus.createlist) {
-                      results.skus.createlist = [];
-                    }
                     results.skus.createlist.push(row);
                   }
                 }
@@ -467,9 +434,6 @@ router.post('/commit', function (req, res) {
 
     ingredients.forEach((row) => {
       if (nameSet.has(row['Name'])) {
-        if (!results.ingredients.errorlist) {
-          results.ingredients.errorlist = [];
-        }
         results.ingredients.errorlist.push({
           message: 'Duplicate row in ingredients',
           data: row
@@ -480,9 +444,6 @@ router.post('/commit', function (req, res) {
         nameSet.add(row.Name);
       }
       if (numberSet.has(row['Ingr#'])) {
-        if (!results.ingredients.errorlist) {
-          results.ingredients.errorlist = [];
-        }
         results.ingredients.errorlist.push({
           message: 'Duplicate row in ingredients',
           data: row
@@ -500,40 +461,19 @@ router.post('/commit', function (req, res) {
           if (result) {
             //if an ingredient is identical, add it to the ignore list
             if (result.name == row['Name'] && result.vendor_info == row['Vendor Info'] && result.package_size == row['Size'] && result.cost == row['Cost'] && result.comment == row['Comment']) {
-              if (!results.ingredients.ignorelist) {
-                results.ingredients.ignorelist = [];
-              }
               results.ingredients.ignorelist.push(row);
             }
             // if matches on the primary key AND the unique key, validate and update
             else if (result.name == row['Name']) {
-              // validate that cost is a number
-              if (isNaN(row['Cost'])) {
-                if (!results.ingredients.errorlist) {
-                  results.ingredients.errorlist = [];
-                }
-                results.ingredients.errorlist.push({
-                  message: 'Cost not a number',
-                  data: row
-                });
-              }
-              // if it's a number, round it
-              else {
-                row['Cost'] = Number(row['Cost']).toFixed(2);
-                if (!results.ingredients.changelist) {
-                  results.ingredients.changelist = [];
-                }
+              if (await validateIngredient(row, results)) {
                 results.ingredients.changelist.push(row);
               }
             }
             // if it matches on the primary key AND another row's unique key, it should fail
             else {
               var validatePromise = new Promise ((resolve2, reject2) => {
-                Ingredient.findOne({name: row['Name']}).exec((err, result) => {
+                Ingredient.findOne({name: row['Name']}).exec( async (err, result) => {
                   if (result) {
-                    if (!results.ingredients.errorlist) {
-                      results.ingredients.errorlist = [];
-                    }
                     results.ingredients.errorlist.push({
                       message: 'Ambiguous record',
                       data: row
@@ -541,22 +481,8 @@ router.post('/commit', function (req, res) {
                   }
                   // other wise validate and update
                   else {
-                    // validate that cost is a number
-                    if (isNaN(row['Cost'])) {
-                      if (!results.ingredients.errorlist) {
-                        results.ingredients.errorlist = [];
-                      }
-                      results.ingredients.errorlist.push({
-                        message: 'Cost not a number',
-                        data: row
-                      });
-                    }
-                    // if it's a number, round it
-                    else {
-                      row['Cost'] = Number(row['Cost']).toFixed(2);
-                      if (!results.ingredients.changelist) {
-                        results.ingredients.changelist = [];
-                      }
+                    var result = await validateIngredient(row, results);
+                    if (result) {
                       results.ingredients.changelist.push(row);
                     }
                   }
@@ -570,11 +496,8 @@ router.post('/commit', function (req, res) {
           else {
             //if its a match on a unique key, it should fail
             var validatePromise = new Promise ((resolve2, reject2) => {
-              Ingredient.findOne({name: row['Name']}).exec((err, result) => {
+              Ingredient.findOne({name: row['Name']}).exec(async (err, result) => {
                 if (result) {
-                  if (!results.ingredients.errorlist) {
-                    results.ingredients.errorlist = [];
-                  }
                   results.ingredients.errorlist.push({
                     message: 'Ambiguous record',
                     data: row
@@ -582,22 +505,8 @@ router.post('/commit', function (req, res) {
                 }
                 // other wise validate and add
                 else {
-                  // validate that cost is a number
-                  if (isNaN(row['Cost'])) {
-                    if (!results.ingredients.errorlist) {
-                      results.ingredients.errorlist = [];
-                    }
-                    results.ingredients.errorlist.push({
-                      message: 'Cost not a number',
-                      data: row
-                    });
-                  }
-                  // if it's a number, round it
-                  else {
-                    row['Cost'] = Number(row['Cost']).toFixed(2);
-                    if (!results.ingredients.createlist) {
-                      results.ingredients.createlist = [];
-                    }
+                  var validated = await validateIngredient(row, results);
+                  if (validated) {
                     results.ingredients.createlist.push(row);
                   }
                 }
@@ -619,6 +528,71 @@ router.post('/commit', function (req, res) {
   // returns true if the row is valid syntactically and referentially
   // otherwise returns false and adds the row to the errorlist with the correct explanation message
   async function validateSKU(sku, results) {
+    if (!skuValidator.isUPCStandard(sku['Case UPC'] || !skuValidator.isUPCStandard(sku['Unit UPC']))) {
+      results.skus.errorlist.push({
+        message: 'UPC numbers are not up to standard',
+        data: sku
+      });
+      return false;
+    }
+    if (isNaN(sku['SKU#'] || isNaN(sku['Count per case']))) {
+      results.ingredients.errorlist.push({
+        message: 'A value that must be a number is not a number',
+        data: sku
+      });
+      return false;
+    }
+    // check whether there is a product line in product lines
+    // if not, check whether there is a product line in the document
+    var found = false;
+    for (row in results.product_lines.createlist) {
+      if (row['Name'] == sku['Product Line Name']) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      var searchPromise = new Promise((resolve, reject) => {
+        ProductLine.findOne({name: sku['Product Line Name']}, (err, result) => {
+          if (!result) {
+            results.ingredients.errorlist.push({
+              message: 'This SKU is referring to a product line that does not exist',
+              data: sku
+            });
+            resolve(false);
+          }
+          else {
+            resolve(true);
+          }
+        });
+      });
+      if (!(await searchPromise)) {
+        return false;
+      }
+    }
+
+    //if we are creating a new SKU and no number is supplied we create a number
+    if (sku['SKU#'] == '') {
+      sku['SKU#'] = await create_SKU_number();
+    }
+    return true;
+  }
+
+  // returns true if the row is valid syntactically
+  // otherwise returns false and adds the row to the errorlist with the correct explanation message
+  async function validateIngredient(ingredient, results) {
+    if (isNaN(ingredient['Ingr#']) || isNaN(ingredient['Cost'])) {
+      results.ingredients.errorlist.push({
+        message: 'A value that must be a number is not a number',
+        data: row
+      });
+      return false;
+    }
+    // if we are creating a new ingredient and no number is supplied, 
+    if (ingredient['Ingr#'] == '') {
+      ingredient['Ingr#'] == await create_ingredient_number();
+    }
+    ingredient['Cost'] = Number(ingredient['Cost']).toFixed(2);
     return true;
   }
 
@@ -774,18 +748,18 @@ router.post('/commit', function (req, res) {
     //reset our commit store
     toBeCommitted = {
       ingredients: {
-        changelist: null,
-        createlist: null,
+        changelist: [],
+        createlist: [],
       },
       product_lines: {
-        createlist: null,
+        createlist: [],
       },
       skus: {
-        changelist: null,
-        createlist: null,
+        changelist: [],
+        createlist: [],
       },
       formulas: {
-        createlist: null,
+        createlist: [],
       }
     };
     //end session
@@ -798,5 +772,43 @@ router.post('/commit', function (req, res) {
       await callback(array[index], index, array);
     }
   }
+
+  async function create_ingredient_number() {
+    var searchPromise = new Promise((resolve, reject) => {
+      Ingredient.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec(function(error, ingredients) {
+        if (error) reject();
+        if (!ingredients) {
+          resolve(0);
+        }
+        resolve(smallest_missing_number(ingredients, 0, ingredients.length - 1));
+      });
+    });
+    return await searchPromise;
+  }
+
+  async function create_SKU_number() {
+    var searchPromise = new Promise((resolve, reject) => {
+      SKU.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec(function(error, results) {
+        if (error) reject();
+        if (!results) {
+          resolve(0);
+        }
+         resolve(smallest_missing_number(results, 0, results.length - 1));
+      });
+    });
+    return await searchPromise;
+  }
+
+  function smallest_missing_number(list, lo, hi) {
+    if (lo > hi)
+        return lo + 1;
+    let mid =  Math.floor(lo + (hi - lo) / 2);
+
+    if (list[mid].number == mid+1) {
+        return smallest_missing_number(ingredients, mid + 1, hi);
+    } else {
+        return smallest_missing_number(ingredients, lo, mid - 1);
+  }
+}
 
   module.exports = router;
