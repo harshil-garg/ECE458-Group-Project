@@ -264,7 +264,7 @@ router.post('/commit', function (req, res) {
         toBeCommitted.product_lines.createlist = results.product_lines.createlist;
 
         //if there's no errors and no potential changes, end the session and commit the changes
-        if (!(results.ingredients.changelist.length || results.skus.changelist.length || results.formulas.changelist.length)) {
+        if (!(results.ingredients.changelist.length || results.skus.changelist.length)) {
           commitImport(res);
           results.success = true;
           uploadSessionStarted = false;
@@ -336,7 +336,7 @@ router.post('/commit', function (req, res) {
 
   async function handleSkus(skus, results) {
     //check for duplicates within the input csv
-    var nameSet = new Set();
+    var numberSet = new Set();
     var caseUPCSet = new Set();
 
     skus.forEach((row) => {
