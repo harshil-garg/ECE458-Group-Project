@@ -37,7 +37,10 @@ export class CalculateMessage {
 }
 
 export class CalculateData {
+  number: number;
   name: string;
+  package_size: string;
+  cost: number;
 	calculated_quantity: string;
 }
 
