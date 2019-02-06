@@ -97,7 +97,7 @@ function runIngredientDBQuery(result, res) {
 }
 
 // Get all
-router.post('/all', (req, res) => {
+router.post('/all', async (req, res) => {
     const { pageNum, sortBy, user } = req.body;
 
     const required_params = { pageNum, sortBy, user };
@@ -105,8 +105,8 @@ router.post('/all', (req, res) => {
     if(!input_validator.passed(required_params, res)){
         return;
     }
-    pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy, res);
-    
+    let results = pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy, res);
+    res.json(results);
 });
 
 // CREATE

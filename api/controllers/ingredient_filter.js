@@ -1,27 +1,27 @@
 const Ingredient = require('../model/ingredient_model');
 const pagination = require('./paginate');
 
-module.exports.none = function (pageNum, sortBy, res){
+module.exports.none = async function (pageNum, sortBy){
     let filter = Ingredient.find({});
-    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
+    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
 };
 
-module.exports.keywords = function (pageNum, sortBy, keywords, res){
+module.exports.keywords = async function (pageNum, sortBy, keywords){
     let filter = Ingredient.find({$or:[
         {name: {$all: keywords}},
         {vendor_info: {$all: keywords}},
         {package_size: {$all: keywords}},
         {comment: {$all: keywords}}]
     });
-    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
+    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
 };
 
-module.exports.skus = function (pageNum, sortBy, skus, res){
+module.exports.skus = async function (pageNum, sortBy, skus){
     let filter = Ingredient.find({name: {$in: getNames(skus)}});
-    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
+    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
 }
 
-module.exports.keywordsAndSkus = function(pageNum, sortBy, keywords, skus, res){
+module.exports.keywordsAndSkus = async function(pageNum, sortBy, keywords, skus){
     let filter = Ingredient.find({name: {$in: getNames(skus)},
         $or:[
             {name: {$all: keywords}},
@@ -29,7 +29,7 @@ module.exports.keywordsAndSkus = function(pageNum, sortBy, keywords, skus, res){
             {package_size: {$all: keywords}},
             {comment: {$all: keywords}}]
     });
-    pagination.paginate(filter, Ingredient, pageNum, sortBy, res);
+    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
 
 }
 

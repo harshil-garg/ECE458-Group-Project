@@ -3,6 +3,7 @@ const router = express.Router();
 const ProductLine = require('../model/product_line_model');
 const pagination = require('../controllers/paginate');
 const input_validator = require('../controllers/input_validation');
+const validator = require('../controllers/product_line_validation');
 
 //Create
 router.post('/create', (req, res) => {
@@ -25,7 +26,7 @@ router.post('/create', (req, res) => {
 });
 
 //Read
-router.post('/read', (req, res) => {
+router.post('/read', async (req, res) => {
     const {pageNum}  = req.body;
     const required_params = { pageNum };
 
@@ -34,7 +35,8 @@ router.post('/read', (req, res) => {
     }
 
     let filter = ProductLine.find({});
-    pagination.paginate(filter, ProductLine, pageNum, 'name', res);
+    let results = await pagination.paginate(filter, ProductLine, pageNum, 'name');
+    res.json(results);
 });
 
 //Update
@@ -62,11 +64,18 @@ router.post('/update', (req, res) => {
 });
 
 //Delete
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const {name} = req.body;
     const required_params = { name };
 
     if(!input_validator.passed(required_params, res)){
+        return;
+    }
+
+    let bool = await validator.in_use(name);
+
+    if(bool){
+        res.json({success: false, message: 'Cannot delete, SKUs dependent on this line'});
         return;
     }
 
