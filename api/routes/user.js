@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../model/user_model');
+const input_validator = require('../controllers/input_validation');
 
 const router = express.Router();
 
@@ -14,10 +15,9 @@ router.get('/register', (req,res) => {
 //request params: name, email, password, password2
 router.post('/register', (req,res) => {
     const {name, email, password, password2, admin} = req.body;
-
+    const required_params = { name, email, password, password2 };
     //check fields completed
-    if(!name || !email || !password || !password2){
-        res.send('Please fill in all fields');
+    if(!input_validator.passed(required_params, res)){
         return;
     }
 
@@ -74,31 +74,6 @@ router.get('/logout', (req,res) => {
     req.logOut();
     res.redirect('/login');
 });
-
-//Get all users
-//request params: sortBy, pageNum
-let limit = 10;
-router.post('/all/', (req, res) => {
-    const { sortBy, pageNum } = req.body;
-
-    //check fields completed
-    if(!sortBy || !pageNum){
-        res.send('Please fill in all fields');
-
-        return;
-    }
-
-    User.find({}, null, {skip: (pageNum-1)*limit, limit: limit, sort: sortBy}, (err, users) => {
-        if((pageNum-1)*limit >= users.length){
-            res.send('Page does not exist');
-        }else{
-            res.json({data: users});
-        }
-        
-    });
-    
-});
-
 
 
 module.exports = router;
