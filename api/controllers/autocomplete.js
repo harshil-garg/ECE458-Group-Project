@@ -1,6 +1,6 @@
 module.exports.ingredients = (model, input, res) => {
     let regex = new RegExp('^'+input, 'i'); //only checks from beginning of string
-    model.find({name: regex}, 'name').limit(10).sort('name').lean().exec((err, results) => {
+    model.find({name: regex}, 'name').limit(10).collation({locale: 'en'}).sort('name').lean().exec((err, results) => {
         if(err){
             res.json({success: false, message: err});
         }else{
@@ -15,7 +15,7 @@ module.exports.ingredients = (model, input, res) => {
 module.exports.skus = async (model, input, res) => {
     let regex = new RegExp('^'+input, 'i');
     if(isNaN(input)){
-        model.find({name: regex}, 'name size count').limit(10).sort('name').lean().exec((err, results) => {
+        model.find({name: regex}, 'name size count').limit(10).collation({locale: 'en'}).sort('name').lean().exec((err, results) => {
             if(err){
                 res.json({success: false, message: err});
             }else{
@@ -42,7 +42,7 @@ module.exports.skus = async (model, input, res) => {
 
 module.exports.productLines = (model, input, res) => {
     let regex = new RegExp('^'+input, 'i'); //only checks from beginning of string
-    model.find({name: regex}, 'name').limit(10).sort('name').lean().exec((err, results) => {
+    model.find({name: regex}, 'name').limit(10).collation({locale: 'en'}).sort('name').lean().exec((err, results) => {
         if(err){
             res.json({success: false, message: err});
         }else{

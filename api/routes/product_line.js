@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ProductLine = require('../model/product_line_model');
 const pagination = require('../controllers/paginate');
+const input_validator = require('../controllers/input_validation');
 
 //Create
 router.post('/create', (req, res) => {
