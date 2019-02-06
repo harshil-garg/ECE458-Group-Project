@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>Add Manufacturing Goal</h1>
+<div mat-dialog-content>
+  <table class="table table-bordered table-responsive-md table-striped text-center">
+    <tr>
+      <th class="text-center">Manufacturing Goal</th>
+      <th class="text-center">SKUs and Quantity</th>
+    </tr>
+
+    <tr>
+
+      <td> <input class = "input" [(ngModel)]="manufGoal.name"></td>
+      <td>
+        <ng-container *ngFor="let sku_quant of manufGoal.skus; let id=index">
+          <a *ngIf="sku_quant.sku_name!=null">{{sku_quant.sku_name}} : {{sku_quant.case_quantity}}
+            <i (click)="removeSku(id)" class="fa fa-remove"> </i><br></a>
+        </ng-container>
+        <app-search-sku></app-search-sku>
+        <!--<app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>-->
+        <!--
+        <input [(ngModel)]="skuInput" (keydown) = "keyPressed($event)" type="text"placeholder="Sku Name"/><br>-->
+        <input [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
+      </td>
+
+    </tr>
+  </table>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="manufGoal" cdkFocusInitial>Ok</button>
+</div>

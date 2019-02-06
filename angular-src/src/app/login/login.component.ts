@@ -10,14 +10,14 @@ import { AuthenticationService, LoginResponse } from '../authentication.service'
 })
 export class LoginComponent implements OnInit {
 	loginError = false;
-	 
+
 	constructor(private authenticationService: AuthenticationService, private router: Router) { }
 
 	ngOnInit() { }
 
 	login(email: string, password: string) {
 		this.authenticationService.login({email: email, password: password}).subscribe(
-			response => this.handleResponse(response),
+			response => this.handleResponse(response, email),
 			err => {
 				if (err.status === 401) {
 					this.loginError = true;
@@ -25,12 +25,13 @@ export class LoginComponent implements OnInit {
 			}
 		);
 	}
-  
-	private handleResponse(response: LoginResponse) {
+
+	private handleResponse(response: LoginResponse, email: string) {
 	    if (response.success) {
 	        this.authenticationService.loginState.loggedIn = true;
 	        this.authenticationService.loginState.isAdmin = response.admin;
-	        
+          this.authenticationService.loginState.user = email;
+
 			this.loginError = false;
 			this.router.navigate(['dashboard']);
 	    }

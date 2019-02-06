@@ -15,7 +15,6 @@ export class IngredientAutocompleteComponent implements OnInit {
 
     suggestedIngredients : Array<any> = [];
     inputField : FormControl = new FormControl();
-    focus: boolean = false;
 
     @Output() messageEvent = new EventEmitter<string>();
 
@@ -26,11 +25,13 @@ export class IngredientAutocompleteComponent implements OnInit {
      .distinctUntilChanged()
      .switchMap((query) =>  this.filterSkuService.autocompleteIngredients({input: query}))
      .subscribe( result => {
+          if(result!=null && result.data!=null){
             this.suggestedIngredients = [];
             for(let ingredient of result.data){
               this.suggestedIngredients.push(ingredient)
            }
            this.suggestedIngredients.slice(0,10)
+         }
       });
 
     }
@@ -39,18 +40,16 @@ export class IngredientAutocompleteComponent implements OnInit {
       if(event.keyCode == 13){ //enter pressed
         this.inputField.setValue(this.suggestedIngredients[0].name);
         this.messageEvent.emit(this.inputField.value);
-        this.focus = false;
       }
     }
 
     selectIngredient(ingr_name){
       this.inputField.setValue(ingr_name);
       this.messageEvent.emit(this.inputField.value);
-      this.focus = false;
     }
 
-    setFocus(new_focus: boolean){
-      this.focus = new_focus;
+    onSelectionChanged(event){
+      this.selectIngredient(event.option.value);
     }
 
 

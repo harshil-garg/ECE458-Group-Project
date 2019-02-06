@@ -89,7 +89,7 @@ export class IngredientsTableComponent implements OnInit{
           number : editedIngredient.id,
           vendor_info : editedIngredient.vendor_info,
           package_size: editedIngredient.package_size,
-          cost : editedIngredient.cost_per_package,
+          cost : editedIngredient.cost_per_package*1,
           comment : editedIngredient.comment
         }).subscribe(
         response => this.handleResponse(response),
@@ -150,6 +150,7 @@ export class IngredientsTableComponent implements OnInit{
               skus: ingredient.skus,
               comment: ingredient.comment
           });
+          console.log(ingredient.skus);
         }
         this.maxPages = response.pages;
       }

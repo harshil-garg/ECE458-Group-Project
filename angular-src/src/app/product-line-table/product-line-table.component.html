@@ -3,8 +3,8 @@
   <h3 class="card-header text-center font-weight-bold py-4">Product Lines</h3>
 <div class="pagination">
   <a (click) = "prevPage()">&laquo;</a>
-  <li *ngFor="let i of shownPages()" [ngClass]="{active: i == currentPage}" (click)="setPage(i)">
-      <a>{{i}}</a>
+  <li *ngFor="let i of shownPages()" (click)="setPage(i)">
+      <a [ngClass]="{active: i == currentPage}">{{i}}</a>
   </li>
   <a (click) = "nextPage()">&raquo;</a>
 </div>

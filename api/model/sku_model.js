@@ -5,9 +5,16 @@ const Ingredient = require('./ingredient_model');
 const utils = require( '../../utils/utils');
 
 const Schema = mongoose.Schema;
-const Tuple = new Schema({
-    ingredient_name: String,
-    quantity: Number
+const Formula = new Schema({
+    ingredient_name: {
+        type: String,
+        required: true
+    },
+    ingredient_number: Number,
+    quantity: {
+        type: Number,
+        required: true
+    }
 });
 const SKUSchema = new Schema({
     name: {
@@ -41,7 +48,7 @@ const SKUSchema = new Schema({
         required: true
     },
     ingredients: {
-        type: [Tuple],
+        type: [Formula],
     },
     comment: {
         type: String

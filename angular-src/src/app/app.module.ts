@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import {CommonModule} from "@angular/common";
 import { HttpClientModule } from '@angular/common/http';
@@ -16,6 +17,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 import { AddProductLineModule } from './product-line-table/add-product-line/add-product-line.module';
+import { AddManufacturingGoalModule } from './manufacturing/add-manufacturing-goal/add-manufacturing-goal.module';
+import { CalculatorModule } from './manufacturing/calculator/calculator.module';
 import { AddSkuModule } from './sku-table/add-sku/add-sku.module';
 import { UploadComponent } from './upload/upload.component';
 import { SearchIngredientComponent } from './ingredients-table/search-ingredient/search-ingredient.component';
@@ -24,6 +27,8 @@ import { ProductLineTableComponent } from './product-line-table/product-line-tab
 import { SkuTableComponent } from './sku-table/sku-table.component';
 import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.component';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
+import { ManufacturingComponent } from './manufacturing/manufacturing.component';
+import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule } from '@angular/material';
 
 const routes: Routes = [
   {
@@ -36,7 +41,8 @@ const routes: Routes = [
           { path: 'product-lines', component: ProductLineTableComponent },
           { path: 'skus', component: SkuTableComponent },
           { path: 'accounts', component: AccountsComponent },
-          { path: 'upload', component: UploadComponent}
+          { path: 'upload', component: UploadComponent},
+          { path: 'manufacturing', component: ManufacturingComponent}
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -58,20 +64,29 @@ const routes: Routes = [
     ProductLineTableComponent,
     SkuTableComponent,
     IngredientAutocompleteComponent,
-    SearchSkuComponent
+    SearchSkuComponent,
+    ManufacturingComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     UploadModule,
     AddIngredientModule,
     AddProductLineModule,
+    AddManufacturingGoalModule,
+    CalculatorModule,
     AddSkuModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
     FormsModule,
     ReactiveFormsModule,
     NgbModule.forRoot(),
-    CommonModule
+    CommonModule,
+    MatAutocompleteModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatRippleModule
   ],
   providers: [],
   bootstrap: [AppComponent]
