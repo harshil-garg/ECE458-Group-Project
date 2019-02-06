@@ -56,7 +56,7 @@ export class SkuCsvData {
   "Unit UPC": string;
 	"Unit size": string;
 	"Count per case": string;
-	"ProductLine Name": string;
+	"Product Line Name": string;
 	"Comment": string;
 }
 

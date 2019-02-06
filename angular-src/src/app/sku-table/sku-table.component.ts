@@ -281,6 +281,7 @@ export class SkuTableComponent implements OnInit{
 
     handleExportSkusResponse(response){
       var csvResponseData : Array<any>;
+      console.log(response);
       if(response.success){
         csvResponseData = [];
         for(let csv_data of response.data){
@@ -291,7 +292,7 @@ export class SkuTableComponent implements OnInit{
             "Unit UPC": csv_data["Unit UPC"],
             "Unit size": csv_data["Unit size"],
             "Count per case": csv_data["Count per case"],
-            "ProductLine Name": csv_data["ProductLine Name"],
+            "Product Line Name": csv_data["Product Line Name"],
             "Comment": csv_data["Comment"],
           });
         }
