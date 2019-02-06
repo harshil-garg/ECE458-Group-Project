@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const ProductLine = require('../model/product_line_model');
+const SKU = require('../model/sku_model');
 const pagination = require('../controllers/paginate');
 const input_validator = require('../controllers/input_validation');
 const validator = require('../controllers/product_line_validation');
+
 
 //Create
 router.post('/create', (req, res) => {
@@ -54,10 +56,20 @@ router.post('/update', (req, res) => {
         json["name"] = newname;
     }
 
-    ProductLine.updateProductLine(name, json, (error) => {
+    ProductLine.updateProductLine(name, json, async (error) => {
         if (error) {
             res.json({success: false, message: `Failed to update product line. Error: ${error}`});
         } else {
+            let results = await SKU.find({product_line: name}).exec();
+
+            for(let result of results){
+                await SKU.findOneAndUpdate({number: result.number}, {product_line: newname}).exec((err) => {
+                    if(err){
+                        res.json({success: false, message: err});
+                        return;
+                    }                  
+                });
+            }
             res.json({success: true, message: "Updated successfully."});
         }
     });
