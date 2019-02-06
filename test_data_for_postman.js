@@ -6,7 +6,7 @@
 		{
 			"sku_name": "cookies",
 			"case_quantity": 3
-		}, 
+		},
 		{
 			"sku_name": "shawarma",
 			"case_quantity": 7
@@ -21,7 +21,7 @@
 // SKUS
 
 /*{
-	"name": "cookies", 
+	"name": "cookies",
 	"number": "1",
 	"case_upc": "000000000000",
 	"unit_upc": "000000000000",
@@ -32,7 +32,7 @@
 		{
 			"ingredient_name": "brown sugar",
 			"quantity": "4.2"
-		}, 
+		},
 		{
 			"ingredient_name": "flour",
 			"quantity": "2.1"
@@ -47,10 +47,10 @@
 
 /*
 {
-	"name": "shawarma", 
+	"name": "shawarma",
 	"number": "2",
-	"case_upc": "000000000001",
-	"unit_upc": "000000000001",
+	"case_upc": "000000000093",
+	"unit_upc": "000000000093",
 	"size": "16oz",
 	"count": "20",
 	"product_line": "entrees",
@@ -58,7 +58,7 @@
 		{
 			"ingredient_name": "chicken",
 			"quantity": "3"
-		}, 
+		},
 		{
 			"ingredient_name": "flour",
 			"quantity": "2.4"
@@ -72,7 +72,7 @@
 }*/
 /*
 {
-	"name": "pina colada", 
+	"name": "pina colada",
 	"number": "3",
 	"case_upc": "000000000002",
 	"unit_upc": "000000000000",
@@ -83,7 +83,7 @@
 		{
 			"ingredient_name": "brown sugar",
 			"quantity": "2"
-		}, 
+		},
 		{
 			"ingredient_name": "coconut",
 			"quantity": "8"
