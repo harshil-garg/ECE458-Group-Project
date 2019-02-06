@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const Tuple = new Schema({
+const Formula = new Schema({
     ingredient_name: {
         type: String,
         required: true
@@ -45,7 +45,7 @@ const SKUSchema = new Schema({
         required: true
     },
     ingredients: {
-        type: [Tuple],
+        type: [Formula],
     },
     comment: {
         type: String
