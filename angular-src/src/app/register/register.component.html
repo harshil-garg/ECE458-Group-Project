@@ -1,24 +1,26 @@
-<h3>Add a new user</h3>
-<div class="register">
-  <label>Name:
-    <input #name />
-  </label>
-  <br>
-  <label>Email:
-    <input #email />
-  </label>
+<ng-container *ngIf="isAdmin()">
+  <h3>Add a new user</h3>
+  <div class="register">
+    <label>Name:
+      <input #name />
+    </label>
     <br>
-  <label>Password:
-    <input type="password" #password />
-  </label>
-  <br>
-  <label>Re-enter Password:
-    <input type="password" #password2 />
-  </label>
-  <br>
-  <button (click)="register(name.value, email.value, password.value, password2.value)">
-    Submit
-  </button>
-</div>
-<div *ngIf="successfulRegistration">Registered a user succesfully!</div>
-<div *ngIf="registerError">Something wrong happened</div>
+    <label>Email:
+      <input #email />
+    </label>
+      <br>
+    <label>Password:
+      <input type="password" #password />
+    </label>
+    <br>
+    <label>Re-enter Password:
+      <input type="password" #password2 />
+    </label>
+    <br>
+    <button (click)="register(name.value, email.value, password.value, password2.value)">
+      Submit
+    </button>
+  </div>
+  <div *ngIf="successfulRegistration">Registered a user succesfully!</div>
+  <div *ngIf="registerError">Something wrong happened</div>
+</ng-container>

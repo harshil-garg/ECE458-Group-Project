@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../accounts.service';
+import { AuthenticationService } from '../authentication.service';
 
 @Component({
   selector: 'app-register',
@@ -10,7 +11,7 @@ export class RegisterComponent implements OnInit {
 	registerError = false;
 	successfulRegistration = false;
 
-	constructor(private accountsService: AccountsService) { }
+	constructor(private authenticationService: AuthenticationService, private accountsService: AccountsService) { }
 
 	ngOnInit() { }
 
@@ -24,5 +25,9 @@ export class RegisterComponent implements OnInit {
 			this.registerError = true;
 		});
 	}
+
+  isAdmin(){
+    return this.authenticationService.loginState.isAdmin;
+  }
 
 }
