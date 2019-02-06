@@ -713,33 +713,16 @@ router.post('/commit', function (req, res) {
     }
     
     if (toBeCommitted.formulas.createlist && !errorOn) {
-      await asyncForEach(toBeCommitted.formulas.createlist, async (row) => {
-        var importPromise = new Promise((resolve, reject) => {
-          SKU.addFormulaRow(row, (error) => {
-            if (error) {
-              errorOn = true;
-              console.log(error);
-              res.json({success: false, message: "Formula create failed"});
-            }
-            resolve();
-          });
+      var importPromise = new Promise((resolve, reject) => {
+        SKU.importFormulas(toBeCommitted.formulas.createlist, (error) => {
+          if (error) {
+            console.log(error);
+            res.json({success: false, message: "Formula create failed"});
+          }
+          resolve();
         });
-        await importPromise;
       });
-    }
-    if (toBeCommitted.formulas.changelist && !errorOn) {
-      await asyncForEach(toBeCommitted.formulas.changelist, async (row) => {
-        var importPromise = new Promise((resolve, reject) => {
-          SKU.updateFormulaRow(row, (error) => {
-            if (error) {
-              console.log(error);
-              res.json({success: false, message: "Formula update failed"});
-            }
-            resolve();
-          });
-        });
-        await importPromise;
-      });
+      await importPromise;
     }
 
     resetSession();

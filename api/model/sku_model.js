@@ -2,6 +2,8 @@
 const mongoose = require('mongoose');
 const Ingredient = require('./ingredient_model');
 
+const utils = require( '../../utils/utils');
+
 const Schema = mongoose.Schema;
 const Tuple = new Schema({
     ingredient_name: String,
@@ -64,51 +66,28 @@ module.exports.updateSKU = (sku_number, sku_update, cb) => {
     SKU.findOneAndUpdate(query, sku_update, cb);
 }
 
-module.exports.addFormulaRow = (row, cb) => {
-    var query = {number: row['SKU#']};
-    SKU.findOne(query, (err, sku) => {
-        if (err) {
-            cb(err);
+module.exports.importFormulas = async (formulas) => {
+    var skuMap = new Map();
+    formulas.forEach((formula) => {
+        if (!skuMap.has(formula['SKU#'])) {
+            skuMap.set(formula['SKU#'], [formula]);
         }
         else {
-            Ingredient.findOne({number: row['Ingr#']}, (err, ingredient) => {
-                if (err) {
-                    cb(err);
-                }
-                else {
-                    var ingredients = sku.ingredients.slice();
-                    ingredients.push({ingredient_name: ingredient.name, quantity: row['Quantity']});
-                    SKU.findOneAndUpdate(query, {ingredients: ingredients}, cb);
-                }
-            })
-            
+            skuMap.get(formula['SKU#']).push(formula);
         }
-    })
-}
-
-module.exports.updateFormulaRow = (row, cb) => {
-    var query = {number: row['SKU#']};
-    SKU.findOne(query, (err, sku) => {
-        if (err) {
-            cb(err);
-        }
-        else {
-            Ingredient.findOne({number: row['Ingr#']}, (err, ingredient) => {
-                if (err) {
-                    cb(err);
-                }
-                else {
-                    var ingredients = sku.ingredients.slice();
-                    for (var i = 0; i < ingredients.length; i++) {
-                        if (ingredients[i].ingredient_name == ingredient.name) {
-                            ingredients[i] = {ingredient_name: ingredient.name, quantity: row['Quantity']};
-                            break;
-                        }
-                    }
-                    SKU.findOneAndUpdate(query, {ingredients: ingredients}, cb);
-                }
-            })
-            
-        }
-    })
+    });
+    // in order to import a tuple, we need SKU#, we need ingr#, we need ingrname, and we need quantity
+    await utils.asyncForEach(skuMap.keys, async (key) => {
+        var newArray = [];
+        // for each set of formulas for a sku, generate the ingredient names
+        await utils.asyncForEach(skuMap.get(key), async (formula) => {
+            var ingredient = await Ingredient.findOne({number: formula['Ingr#']}).exec();
+            newArray.push({
+                ingredient_name: ingredient.name,
+                ingredient_number: formula['Ingr#'],
+                quantity: formula['Quantity']
+            });
+        });
+        await SKU.findOneAndUpdate({number: key}, {ingredients: newArray}).exec();
+    });
 }
