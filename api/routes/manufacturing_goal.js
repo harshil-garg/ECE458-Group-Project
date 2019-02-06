@@ -122,8 +122,9 @@ router.post('/create', async (req, res) => {
     // TODO (will need a mongo query)
     let sku_exists = true;
     for (let sku of skus) {
-        let bool = await validator.itemExists(SKU, sku.sku_name)
-        sku_exists = sku_exists && bool;
+        let ans = await validator.itemExists(SKU, sku.sku_name)
+        sku['sku_number'] = ans.number;
+        sku_exists = sku_exists && ans.bool;
     }
 
     if(!sku_exists){

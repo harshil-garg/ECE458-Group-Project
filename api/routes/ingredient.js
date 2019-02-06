@@ -62,13 +62,12 @@ router.post('/filter', async (req, res) => {
 //CREATE
 router.post('/create', (req, res) => {
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
-    const required_params = { name, number, package_size, cost };
+    const required_params = { name, package_size, cost };
 
     if(!input_validator.passed(required_params, res)){
         return;
     }
     let rounded_cost = (isNaN(cost)) ? cost : Number(cost).toFixed(2); //makes sure that toFixed is not called on strings
-    console.log(rounded_cost)
     //Autogen number logic
     if (number) {
         create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
@@ -149,20 +148,9 @@ router.post('/update', (req, res) => {
             res.json({success: false, message: `Failed to update ingredient. Error: ${error}`});
         } else {
             if(propagate){
-                let results = await SKU.find({'ingredients.ingredient_name': name}).exec();
-                for(let result of results){
-                    await SKU.findOneAndUpdate({number: result.number, 'ingredients.ingredient_name': name},
-                    {'ingredients.$.ingredient_name' : newname}).exec((err) => {
-                        if(err){
-                            res.json({success: false, message: err});
-                            return;
-                        }
-                    });              
-                }
-                res.json({success: true, message: "Updated successfully."});
-            }else{
-                res.json({success: true, message: "Updated successfully."});
-            }  
+                await SKU.update({'ingredients.ingredient_name': name}, {'ingredients.$.ingredient_name' : newname}, {multi: true}).exec();               
+            }
+            res.json({success: true, message: "Updated successfully."});
         }
     });
 });
@@ -182,16 +170,7 @@ router.post('/delete', (req, res) => {
         } else if(result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
-            let skus = await SKU.find({'ingredients.ingredient_name': name}).exec();
-                for(let sku of skus){
-                    await SKU.findOneAndUpdate({number: sku.number, 'ingredients.ingredient_name': name},
-                    {$unset: {'ingredients.$.ingredient_name': 1}}).exec((err) => {
-                        if(err){
-                            res.json({success: false, message: err});
-                            return;
-                        }
-                    });              
-                }
+            await SKU.update({'ingredients.ingredient_name': name}, {$pull: {ingredients : {ingredient_name : name}}}, {multi: true}).exec();
             res.json({success: true, message: "Removed successfully."});
         }
     });

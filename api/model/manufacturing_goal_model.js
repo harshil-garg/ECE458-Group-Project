@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 
 const Tuple = new Schema({
     sku_name: String,
+    sku_number: Number,
     case_quantity: Number
 });
 
