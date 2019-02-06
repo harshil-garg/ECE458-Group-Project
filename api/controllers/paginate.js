@@ -5,9 +5,9 @@ let limit = 10;
 module.exports.paginate = function (filter, model, pageNum, sortBy, res){
     let newFilter
     if(pageNum == -1){
-        newFilter = filter.sort(sortBy).lean();
+        newFilter = filter.collation({locale: 'en'}).sort(sortBy).lean();
     }else{
-        newFilter = filter.skip((pageNum-1)*limit).sort(sortBy).lean();
+        newFilter = filter.skip((pageNum-1)*limit).collation({locale: 'en'}).sort(sortBy).lean();
     }
     newFilter.exec(async (err, results) => {
         if(err){
