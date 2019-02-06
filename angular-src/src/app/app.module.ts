@@ -26,9 +26,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductLineTableComponent } from './product-line-table/product-line-table.component';
 import { SkuTableComponent } from './sku-table/sku-table.component';
 import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.component';
+import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 import { ManufacturingComponent } from './manufacturing/manufacturing.component';
-import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule } from '@angular/material';
+import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule } from '@angular/material';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
 
@@ -65,7 +66,6 @@ const routes: Routes = [
     SearchIngredientComponent,
     ProductLineTableComponent,
     SkuTableComponent,
-    IngredientAutocompleteComponent,
     SearchSkuComponent,
     ManufacturingComponent,
     CreateDependencyReportComponent,
@@ -86,11 +86,14 @@ const routes: Routes = [
     ReactiveFormsModule,
     NgbModule.forRoot(),
     CommonModule,
+    IngredientAutocompleteModule,
     MatAutocompleteModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatRippleModule
+    MatRippleModule,
+    MatDialogModule,
+    MatListModule
   ],
   providers: [],
   bootstrap: [AppComponent],
