@@ -60,14 +60,14 @@ export class CalculatorDialogComponent implements OnInit {
 
     public export() {
       pdfMake.vfs = pdfFonts.pdfMake.vfs;
-      pdfMake.fonts = {
-        din: {
-          normal: 'NeueHaasGroteskRegular.ttf',
-          bold: 'NeueHaasGroteskMedium.ttf',
-          italics: 'FF_DIN_Regular.otf',
-          bolditalics: 'FF_DIN_Regular.otf'
-        }
-      }
+      //pdfMake.fonts = {
+        //din: {
+          //normal: 'NeueHaasGroteskRegular.ttf',
+          //bold: 'NeueHaasGroteskMedium.ttf',
+          //italics: 'FF_DIN_Regular.otf',
+          //bolditalics: 'FF_DIN_Regular.otf'
+        //}
+    //  }
 
       var tabular_data = [[]];
       tabular_data.push([
@@ -130,10 +130,10 @@ export class CalculatorDialogComponent implements OnInit {
             fontSize: 18,
             bold: true
           }
-        },
-        defaultStyle: {
-          font: 'din'
-        }
+        }//,
+        //defaultStyle: {
+          //font: 'din'
+        //}
       };
 
       pdfMake.createPdf(dd).download();

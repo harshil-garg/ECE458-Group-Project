@@ -26,8 +26,10 @@ export class AddManufacturingGoalComponent {
       });
 
       dialogRef.afterClosed().subscribe(result =>{
-        this.manufGoal = result;
-        this.add(this.manufGoal);
+        if(result!=null){
+          this.manufGoal = result;
+          this.add(this.manufGoal);
+        }
       });
     }
 

@@ -35,6 +35,19 @@ export class ManufacturingComponent implements OnInit {
       );
   }
 
+  delete(name) {
+    this.manufacturingService.delete({
+        name : name
+      }).subscribe(
+      response => this.refresh(),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
+  }
+
   exportcsv(id) {
     var csvContent = "data:text/csv;charset=utf-8,";
     csvContent += ["sku_name", "case_quantity"].join(",") + "\r\n";

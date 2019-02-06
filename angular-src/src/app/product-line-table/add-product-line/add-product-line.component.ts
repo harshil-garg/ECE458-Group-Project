@@ -26,8 +26,10 @@ export class AddProductLineComponent {
       });
 
       dialogRef.afterClosed().subscribe(result =>{
-        this.productLine = result;
-        this.add(this.productLine);
+        if(result!=null){
+          this.productLine = result;
+          this.add(this.productLine);
+        }
       });
     }
 
