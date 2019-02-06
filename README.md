@@ -10,6 +10,101 @@ To set up a development environment, run ```npm start``` in the main directory a
 ## API
 Our API consists of 7 main routes: users, upload, export, skus, ingredients, product_lines, and manufacturing_goals.
 
+### Users
+#### Register a user
+* Allows the admin to create a new user.  
+**URL**: ```POST / api/users/register```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the user. | String |    
+| email | **Required**. The email for the user. | String |    
+| password | **Required**. The password of the user. | String |      
+| password2 | **Required**. The password verification for the user. | String |      
+| admin | **Optional**. First time registration will set as admin. | Boolean |    
+
+#### Login a user
+* Allows a user to login.  
+**URL**: ```POST / api/users/login```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------      
+| email | **Required**. The email for the user. | String |    
+| password | **Required**. The password of the user. | String |     
+
+### Upload
+#### Create an upload sessions
+* Allows a user to import a file. If errors or no collisions, will finish. Otherwise need to use commit.  
+**URL**: ```POST / api/upload/```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------      
+| files | **Required**. List of files to import. | List |    
+
+#### Commit changes
+* Allows a user to commit changes.  
+**URL**: ```POST / api/upload/commit```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------      
+| commit | **Required**. Boolean that determines whether to commit. | Boolean |   
+
+### Export
+#### Export ingredients
+* Allows the user to export ingredients after filtering by keyword and with assisted selection on SKUs.  
+**URL**: ```POST /api/export/ingredients```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| sortBy | **Required**. The field to sort by. | String |       
+| keywords | **Required**. List of keywords to filter by. | List |      
+| skus | **Required**. List of skus to filter by. | List |     
+
+#### Export SKUs
+* Allows the user to export SKUs after filtering by keyword and with assisted selection on ingredients and product lines.  
+**URL**: ```POST /api/export/skus```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| sortBy | **Required**. The field to sort by. | String |     
+| keywords | **Required**. List of keywords to filter by. | List |      
+| ingredients | **Required**. List of ingredients to filter by. | List |      
+| product_lines | **Required**. List of product lines to filter by. | List |  
+
+#### Export Product Lines
+* Allows the user to export product linese.  
+**URL**: ```POST /api/export/product_lines```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+
+#### Export Formulas
+* Allows the user to export formulas after filtering SKUs by keyword and with assisted selection on ingredients and product lines.  
+**URL**: ```POST /api/export/formulas```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| sortBy | **Required**. The field to sort by. | String |     
+| keywords | **Required**. List of keywords to filter by. | List |      
+| ingredients | **Required**. List of ingredients to filter by. | List |      
+| product_lines | **Required**. List of product lines to filter by. | List |  
+
 ### SKUS
 #### Filter SKUs
 * Allows the user to filter SKUs by keyword and with assisted selection on ingredients and product lines.  
@@ -212,3 +307,5 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | Parameter | Description | Type |    
 | ----------- | ----------- |---------    
 | name | **Required**. The name of the manufacturing goal to calculate. | String |  
+
+
