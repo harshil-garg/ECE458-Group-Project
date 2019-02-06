@@ -5,7 +5,7 @@ module.exports.itemExists = async function(model, itemName) {
     ans = !(!result);     
     
     console.log(`${model.modelName} exists: ${ans}`);
-    if(model.modelName == 'Ingredient'){
+    if(model.modelName == 'Ingredient' || model.modelName == 'SKU'){
         return {
             bool : ans,
             number : result.number

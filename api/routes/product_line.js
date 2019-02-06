@@ -60,16 +60,7 @@ router.post('/update', (req, res) => {
         if (error) {
             res.json({success: false, message: `Failed to update product line. Error: ${error}`});
         } else {
-            let results = await SKU.find({product_line: name}).exec();
-
-            for(let result of results){
-                await SKU.findOneAndUpdate({number: result.number}, {product_line: newname}).exec((err) => {
-                    if(err){
-                        res.json({success: false, message: err});
-                        return;
-                    }                  
-                });
-            }
+            await SKU.update({product_line: name}, {product_line: newname}, {multi: true}).exec();
             res.json({success: true, message: "Updated successfully."});
         }
     });
