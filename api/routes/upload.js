@@ -63,7 +63,7 @@ router.post('/', upload.array('file[]', 4), function (req, res) {
 
 router.post('/commit', function (req, res) {
   if (uploadSessionStarted && uploadHalfComplete) {
-    if (req.body.commit = true) {
+    if (req.body.commit) {
       commitImport(res);
     }
     else {
@@ -653,7 +653,7 @@ router.post('/commit', function (req, res) {
     if (isNaN(ingredient['Ingr#']) || isNaN(ingredient['Cost'])) {
       results.ingredients.errorlist.push({
         message: 'A value that must be a number is not a number',
-        data: row
+        data: ingredient
       });
       return false;
     }
