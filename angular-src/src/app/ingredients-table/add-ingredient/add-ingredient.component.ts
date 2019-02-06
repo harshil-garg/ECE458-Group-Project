@@ -26,8 +26,10 @@ export class AddIngredientComponent {
       });
 
       dialogRef.afterClosed().subscribe(result =>{
-        this.ingredient = result;
-        this.add(this.ingredient);
+        if(result!=null){
+          this.ingredient = result;
+          this.add(this.ingredient);
+        }
       });
     }
 
@@ -37,7 +39,7 @@ export class AddIngredientComponent {
           number : ingredient.id,
           vendor_info : ingredient.vendor_info,
           package_size: ingredient.package_size,
-          cost : ingredient.cost_per_package,
+          cost : ingredient.cost_per_package*1,
           comment : ingredient.comment
         }).subscribe(
         response => this.handleResponse(response),

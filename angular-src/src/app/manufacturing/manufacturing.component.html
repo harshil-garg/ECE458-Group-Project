@@ -1,0 +1,46 @@
+<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
+<div class="card">
+  <h3 class="card-header text-center font-weight-bold py-4">Manufacturing Goals</h3>
+  <!--<app-search-ingredient></app-search-ingredient>-->
+<div class="pagination">
+  <a (click) = "prevPage()">&laquo;</a>
+  <li *ngFor="let i of shownPages()" (click)="setPage(i)">
+      <a [ngClass]="{active: i == currentPage}">{{i}}</a>
+  </li>
+  <a (click) = "nextPage()">&raquo;</a>
+</div>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <!--<app-add-ingredient></app-add-ingredient>-->
+      <app-add-manufacturing-goal></app-add-manufacturing-goal>
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center">Manufacturing Goal Name</th>
+          <th class="text-center">SKUs</th>
+        </tr>
+
+       <ng-container *ngFor="let manufGoal of manufGoalList; let id=index">
+            <tr>
+              <td contenteditable="false">{{manufGoal.name}}</td>
+              <td>
+                <ng-container *ngFor="let sku of manufGoal.skus; let sku_id=index">
+                  <a *ngIf="sku.sku_name!=null">{{sku.sku_name}} : {{sku.case_quantity}}<br></a>
+                </ng-container>
+              </td>
+              <td>
+                <app-calculator [manufGoal]="manufGoal.name"></app-calculator>
+              </td>
+              <td>
+                <button class="remove" type="button" (click)="exportcsv(id)">Export to CSV</button>
+                <!--<button class="remove" type="button" (click)="remove(manufGoal.name)">Remove</button>-->
+              </td>
+              <td>
+                <button class="remove" type="button" (click)="delete(manufGoal.name)">Remove</button>
+                <!--<button class="remove" type="button" (click)="remove(manufGoal.name)">Remove</button>-->
+              </td>
+            </tr>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+</div>

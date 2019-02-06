@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 import { UploadService } from '../upload.service';
 import { forkJoin } from 'rxjs/observable/forkJoin';
+import {ValidationData } from '../../model/validation-data';
 
 @Component({
   selector: 'app-dialog',
@@ -17,12 +18,13 @@ export class DialogComponent implements OnInit {
 
   ngOnInit() {}
 
-  progress;
+  response;
   canBeClosed = true;
   primaryButtonText = 'Upload';
   showCancelButton = true;
   uploading = false;
   uploadSuccessful = false;
+  uploadComplete = false;
 
   onFilesAdded() {
     const files: { [key: string]: File } = this.file.nativeElement.files;
@@ -45,18 +47,23 @@ export class DialogComponent implements OnInit {
 
     // set the component state to "uploading"
     this.uploading = true;
+    let responseData = [];
 
     // start the upload and save the progress map
-    this.progress = this.uploadService.upload(this.files);
-    console.log(this.progress);
-    for (const key in this.progress) {
-      this.progress[key].progress.subscribe(val => console.log(val));
+    this.response = this.uploadService.upload(this.files);
+    for (const key in this.response) {
+      this.response[key].progress.subscribe(val => console.log(val));
+      this.response[key].validation.subscribe((val) => {
+        responseData.push(val);
+        console.log('val');
+        console.log(val);
+      });
     }
 
     // convert the progress map into an array
     let allProgressObservables = [];
-    for (let key in this.progress) {
-      allProgressObservables.push(this.progress[key].progress);
+    for (let key in this.response) {
+      allProgressObservables.push(this.response[key].validation);
     }
 
     // Adjust the state variables
@@ -73,6 +80,8 @@ export class DialogComponent implements OnInit {
 
     // When all progress-observables are completed...
     forkJoin(allProgressObservables).subscribe(end => {
+      this.uploadComplete = true;
+      
       // ... the dialog can be closed again...
       this.canBeClosed = true;
       this.dialogRef.disableClose = false;

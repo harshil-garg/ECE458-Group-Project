@@ -2,9 +2,19 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const Tuple = new Schema({
-    ingredient_name: String,
-    quantity: String
+const Formula = new Schema({
+    ingredient_name: {
+        type: String,
+        required: true
+    },
+    ingredient_number: {
+        type: Number,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true
+    }
 });
 const SKUSchema = new Schema({
     name: {
@@ -17,12 +27,12 @@ const SKUSchema = new Schema({
         unique: true
     },
     case_upc: {
-        type: Number,
+        type: String,
         required: true,
         unique: true
     },
     unit_upc: {
-        type: Number,
+        type: String,
         required: true
     }, 
     size: {
@@ -38,8 +48,7 @@ const SKUSchema = new Schema({
         required: true
     },
     ingredients: {
-        type: [Tuple],
-        required: true
+        type: [Formula],
     },
     comment: {
         type: String

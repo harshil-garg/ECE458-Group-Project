@@ -1,0 +1,41 @@
+<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
+<h1 mat-dialog-title>Dependency Report</h1>
+<div mat-dialog-content>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center">Ingredient Name</th>
+          <th class="text-center">Ingredient Number</th>
+          <th class="text-center">Vendor Information</th>
+          <th class="text-center">Package Size</th>
+          <th class="text-center">Cost Per Package (USD)</th>
+          <th class="text-center">Comment</th>
+        </tr>
+
+       <ng-container *ngFor="let ingredient of ingredientList; let id=index">
+            <tr>
+              <td contenteditable="false">{{ingredient.name}}</td>
+              <td contenteditable="false">{{ingredient.id}}</td>
+              <td contenteditable="false">{{ingredient.vendor_info}}</td>
+              <td contenteditable="false">{{ingredient.package_size}}</td>
+              <td contenteditable="false">{{ingredient.cost_per_package}}</td>
+              <td contenteditable="false">{{ingredient.comment}}</td>
+            </tr>
+
+            <tr class="blankcell" *ngFor = "let sku of ingredient.skus; let id2=index">
+              <td class="blankcell"></td>
+              <td colspan = "6" contenteditable="false">{{sku.name}} : {{sku.size}} * {{sku.count}}</td>
+            </tr>
+        </ng-container>
+
+      </table>
+    </div>
+  </div>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button cdkFocusInitial>Ok</button>
+  <button mat-button (click)="exportCSV()">Export CSV</button>
+</div>
