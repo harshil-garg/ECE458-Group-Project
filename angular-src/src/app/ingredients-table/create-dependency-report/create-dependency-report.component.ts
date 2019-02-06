@@ -8,7 +8,7 @@ import { FilterIngredientsService } from '../filter-ingredients.service'
   templateUrl: './create-dependency-report.component.html',
   styleUrls: ['./create-dependency-report.component.css']
 })
-export class CreateDependencyReportComponent implements OnInit{
+export class CreateDependencyReportComponent{
 
   constructor(public dialog: MatDialog, public filterIngredientsService: FilterIngredientsService) {}
 
@@ -18,7 +18,7 @@ export class CreateDependencyReportComponent implements OnInit{
 
   ingredients: Array<any>;
 
-  ngOnInit() {
+  onclick(){
     this.filterIngredientsService.filter({
         sortBy : this.sortBy,
         pageNum: '-1',
@@ -50,14 +50,12 @@ export class CreateDependencyReportComponent implements OnInit{
             comment: ingredient.comment
         });
       }
+      let dialogRef = this.dialog.open(DependencyReportDialogComponent, {
+        height: '1000px',
+        width: '1400px',
+        data: this.ingredients
+      });
     }
   }
 
-  public openDialog() {
-    let dialogRef = this.dialog.open(DependencyReportDialogComponent, {
-      height: '1000px',
-      width: '1400px',
-      data: this.ingredients
-    });
-  }
 }

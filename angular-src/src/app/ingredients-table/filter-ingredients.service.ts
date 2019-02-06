@@ -52,6 +52,8 @@ export class FilterIngredientsService {
 	constructor(private http: HttpClient) { }
 
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
+		console.log("FILTER:");
+		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/ingredients/filter', filterMessage, httpOptions);
   }
 
