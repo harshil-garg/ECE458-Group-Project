@@ -367,12 +367,12 @@ router.post('/commit', function (req, res) {
           // if we find an existing entry, we check to ignore, change, or error
           if (result) {
             //if a SKU is identical, add it to the ignore list
-            if (result.name == row['Name'] && result.case_upc == row['Case UPC'] && result.unit_upc == row['Unit UPC'] && result.result.count == row['Count per case'] && result.product_line == row['Product Line Name'] && result.comment == row['Comment']) {
+            if (result.name == row['Name'] && result.case_upc == row['Case UPC'] && result.unit_upc == row['Unit UPC'] && result.count == row['Count per case'] && result.product_line == row['Product Line Name'] && result.comment == row['Comment']) {
               results.skus.ignorelist.push(row);
             }
             // if matches on the primary key AND the unique key, validate and update
-            else if (result.name == row['Case UPC']) {
-              if (await validateSKU(sku, results)) {
+            else if (result.case_upc == row['Case UPC']) {
+              if (await validateSKU(row, results)) {
                 results.skus.changelist.push(row);
               }
             }
@@ -381,6 +381,7 @@ router.post('/commit', function (req, res) {
               var validatePromise = new Promise ((resolve2, reject2) => {
                 SKU.findOne({case_upc: row['Case UPC']}).exec(async (err, result) => {
                   if (result) {
+                    console.log('this is in fact what happneed');
                     results.skus.errorlist.push({
                       message: 'Ambiguous record',
                       data: row
@@ -668,7 +669,7 @@ router.post('/commit', function (req, res) {
             unit_upc: row['Unit UPC'],
             size: row['Unit size'],
             count: row['Count per case'],
-            commment: row['Comment'],
+            comment: row['Comment'],
             product_line: row['Product Line Name'],
             ingredients: []
           };
