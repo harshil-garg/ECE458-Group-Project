@@ -64,11 +64,12 @@ router.post('/', upload.array('file[]', 4), function (req, res) {
 router.post('/commit', function (req, res) {
   if (uploadSessionStarted && uploadHalfComplete) {
     if (req.body.commit = true) {
-      commitImport();
+      commitImport(res);
     }
     else {
       resetSession();
     }
+    res.json({success: true});
   }
   else {
     res.json({
@@ -263,11 +264,10 @@ router.post('/commit', function (req, res) {
         toBeCommitted.formulas.createlist = results.formulas.createlist;
         toBeCommitted.product_lines.createlist = results.product_lines.createlist;
 
-        //if there's no errors and no potential changes, end the session and commit the changes
+        //if there's no errors and no potential changes, commit the changes
         if (!(results.ingredients.changelist.length || results.skus.changelist.length)) {
           commitImport(res);
           results.success = true;
-          uploadSessionStarted = false;
         }
         //if theres no errors, but there are changes, continue the session
         else {
@@ -523,8 +523,76 @@ router.post('/commit', function (req, res) {
     });
   }
 
-  async function handleFormulas(formulas, results) {
+  function pairListHas(list, skuNum, ingrNum) {
+    list.forEach((entity) => {
+      if (entity.skuNum == skuNum && entity.ingrNum == ingrNum) {
+        return true;
+      }
+    });
+    return false;
+  }
 
+  async function handleFormulas(formulas, results) {
+    //check for duplicates within the input csv
+    var pairList = [];
+
+    formulas.forEach((row) => {
+      if (pairListHas(pairList, row['SKU#'], row['Ingr#'])) {
+        results.formulas.errorlist.push({
+          message: 'Duplicate row in formulas',
+          data: row
+        });
+      }
+      else {
+        pairList.push({ingrNum: row['Ingr#'], skuNum: row['SKU#']});
+      }
+    });
+    // for each row, check that sku exists, ingredient number exists, and quantity is a number
+    await asyncForEach(formulas, async (formula) => {
+      var error = false;
+      if (isNaN(formula['Quantity']) || formula['Quantity'] == '') {
+        results.formulas.errorlist.push({
+          message: 'A Quantity in formula is not a number',
+          data: formula
+        });
+        error = true;
+      }
+      var skuFound = false;
+      results.skus.createlist.forEach((sku) => {
+        if (sku['SKU#'] == formula['SKU#']) {
+          skuFound = true;
+        }
+      });
+      if (!skuFound) {
+        var searchResult = await SKU.findOne({number: formula['SKU#']}).exec();
+        if (!searchResult) {
+          results.formulas.errorlist.push({
+            message: 'SKU# doesnt exist outside of this formula',
+            data: formula
+          });
+          error = true;
+        }
+      }
+      var ingrFound = false;
+      results.ingredients.createlist.forEach((ingredient) => {
+        if (ingredient['Ingr#'] == formula['Ingr#']) {
+          ingrFound = true;
+        }
+      });
+      if (!ingrFound) {
+        var searchResult = await Ingredient.findOne({number: formula['Ingr#']}).exec();
+        if (!searchResult) {
+          results.formulas.errorlist.push({
+            message: 'Ingr# doesnt exist outside of this formula',
+            data: formula
+          });
+          error = true;
+        }
+      }
+      if (!error) {
+        results.formulas.createlist.push(formula);
+      }
+    });
   }
   // returns true if the row is valid syntactically and referentially
   // otherwise returns false and adds the row to the errorlist with the correct explanation message
@@ -713,16 +781,10 @@ router.post('/commit', function (req, res) {
     }
     
     if (toBeCommitted.formulas.createlist && !errorOn) {
-      var importPromise = new Promise((resolve, reject) => {
-        SKU.importFormulas(toBeCommitted.formulas.createlist, (error) => {
-          if (error) {
-            console.log(error);
-            res.json({success: false, message: "Formula create failed"});
-          }
-          resolve();
+        await SKU.importFormulas(toBeCommitted.formulas.createlist)
+        .catch((error) => {
+          res.json({success: false, message: "Formula create failed"});
         });
-      });
-      await importPromise;
     }
 
     resetSession();

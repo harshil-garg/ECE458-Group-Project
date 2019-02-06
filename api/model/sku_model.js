@@ -84,7 +84,8 @@ module.exports.importFormulas = async (formulas) => {
         }
     });
     // in order to import a tuple, we need SKU#, we need ingr#, we need ingrname, and we need quantity
-    await utils.asyncForEach(skuMap.keys, async (key) => {
+    await utils.asyncForEach(Array.from(skuMap.keys()), async (key) => {
+        console.log(key);
         var newArray = [];
         // for each set of formulas for a sku, generate the ingredient names
         await utils.asyncForEach(skuMap.get(key), async (formula) => {
@@ -95,6 +96,9 @@ module.exports.importFormulas = async (formulas) => {
                 quantity: formula['Quantity']
             });
         });
-        await SKU.findOneAndUpdate({number: key}, {ingredients: newArray}).exec();
+        await SKU.findOneAndUpdate({number: key}, {ingredients: newArray}).exec()
+        .catch((error) => {
+            console.log(error);
+        });
     });
 }
