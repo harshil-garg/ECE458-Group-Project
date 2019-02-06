@@ -74,7 +74,7 @@ function format_ingredients(ingredients) {
         delete ingredient.name;
         ingredient['Vendor Info'] = ingredient.vendor_info;
         delete ingredient.vendor_info;
-        ingredient['Size'] = ingredient.size;
+        ingredient['Size'] = ingredient.package_size;
         delete ingredient.size;
         ingredient['Cost'] = ingredient.cost;
         delete ingredient.cost;
