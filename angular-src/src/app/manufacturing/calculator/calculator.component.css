@@ -1,0 +1,10 @@
+.calculator {
+  background-color: #f44336;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  padding: 15px 25px;
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+}

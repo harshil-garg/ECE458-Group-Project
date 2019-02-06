@@ -1,0 +1,269 @@
+import { Component, OnInit } from '@angular/core';
+import { Ingredient } from '../model/ingredient'
+import { AuthenticationService } from '../authentication.service'
+import { Sku } from '../model/sku'
+import { CrudIngredientsService, Response } from './crud-ingredients.service';
+import { FilterIngredientsService, FilterResponse, IngredientCsvData } from './filter-ingredients.service'
+
+@Component({
+  selector: 'ingredients-table',
+  templateUrl: './ingredients-table.component.html',
+  styleUrls: ['./ingredients-table.component.css'],
+})
+export class IngredientsTableComponent implements OnInit{
+    editField: string;
+    ingredientList: Array<any> = [];
+    currentPage: number;
+    maxPages: number;
+    sortBy: string = "name";
+    keywords: Array<any> = [];
+    skus: Array<any> = [];
+
+    skuShown: Array<boolean> = [false];
+
+    ngOnInit() {
+      this.currentPage = 1;
+      this.refresh();
+    }
+
+    constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService,
+      public filterIngredientsService: FilterIngredientsService){}
+
+    updateList(id: number, property: string, event: any) {
+      const editField = event.target.textContent;
+      if(property === 'cost_per_package')
+      {
+        this.ingredientList[id][property] = parseFloat(editField).toFixed(2);
+      }
+      else{
+        this.ingredientList[id][property] = editField;
+      }
+    }
+
+    remove(deleted_name: any) {
+      this.crudIngredientsService.remove({
+          name : deleted_name
+        }).subscribe(
+        response => this.handleResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    edit(name:any, property:string, event:any) {
+      var editedIngredient : Ingredient = new Ingredient();
+      var newName : string;
+      editedIngredient.name = name;
+      switch(property){
+        case 'name':{
+          newName = event.target.textContent; //new name
+          break;
+        }
+        case 'id':{
+          editedIngredient.id = event.target.textContent;
+          break;
+        }
+        case 'vendor_info':{
+          editedIngredient.vendor_info = event.target.textContent;
+          break;
+        }
+        case 'package_size':{
+          editedIngredient.package_size = event.target.textContent;
+          break;
+        }
+        case 'cost_per_package':{
+          editedIngredient.cost_per_package = event.target.textContent;
+          break;
+        }
+        case 'comment':{
+          editedIngredient.comment = event.target.textContent;
+          break;
+        }
+      }
+      this.crudIngredientsService.edit({
+          name : editedIngredient.name,
+          newname: newName,
+          number : editedIngredient.id,
+          vendor_info : editedIngredient.vendor_info,
+          package_size: editedIngredient.package_size,
+          cost : editedIngredient.cost_per_package*1,
+          comment : editedIngredient.comment
+        }).subscribe(
+        response => this.handleResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        });
+    }
+
+    private handleResponse(response: Response) {
+      console.log(response);
+      this.refresh();
+    }
+
+    changeValue(id: number, property: string, event: any) {
+      if(property === 'cost_per_package')
+      {
+        this.editField = parseFloat(event.target.textContent).toFixed(2);
+      }
+      this.editField = event.target.textContent;
+    }
+
+    isAdmin() {
+      return this.authenticationService.loginState.isAdmin;
+    }
+
+    getNumSkus(ingredient: Ingredient){
+      return ingredient.skus.length;
+    }
+
+    refresh(){
+      this.filterIngredientsService.filter({
+          sortBy : this.sortBy,
+          pageNum: this.currentPage.toString(),
+          keywords: this.keywords,
+          skus : this.skus
+        }).subscribe(
+        response => this.handleRefreshResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleRefreshResponse(response: FilterResponse){
+      if(response.success){
+        this.ingredientList = [];
+        for(let ingredient of response.data){
+          this.ingredientList.push({
+              id: ingredient.number,
+              name: ingredient.name,
+              vendor_info: ingredient.vendor_info,
+              package_size: ingredient.package_size,
+              cost_per_package: ingredient.cost,
+              skus: ingredient.skus,
+              comment: ingredient.comment
+          });
+          console.log(ingredient.skus);
+        }
+        this.maxPages = response.pages;
+      }
+    }
+
+    setSortBy(property: string){
+      this.sortBy = property;
+      this.refresh();
+    }
+
+    nextPage(){
+      if(this.currentPage<this.maxPages){
+        this.currentPage++;
+        this.refresh();
+      }
+    }
+
+    prevPage(){
+      if(this.currentPage>1){
+        this.currentPage--;
+        this.refresh();
+      }
+    }
+
+    setPage(i){
+      this.currentPage = i;
+      this.refresh();
+    }
+
+    showAll(){
+      this.currentPage = -1;
+    }
+
+    shownPages(){
+      var numbers : Array<number> = [];
+      if(this.maxPages>5)
+      {
+        for (var i = 1; i < 5; i++) {
+          numbers.push(i);
+        }
+        numbers.push(this.maxPages)
+        return numbers;
+      }
+      else{
+        for (var i = 1; i <= this.maxPages; i++) {
+          numbers.push(i);
+        }
+        return numbers;
+      }
+    }
+
+    setKeywords(newKeywords : Array<any>){
+      this.keywords = newKeywords;
+      this.refresh();
+    }
+
+    setSearchedSkus(newSkus : Array<any>){
+      this.skus = newSkus;
+      this.refresh();
+    }
+
+    export(){
+      this.filterIngredientsService.export({
+        sortBy : this.sortBy,
+      	keywords: this.keywords,
+      	skus : this.skus
+      }).subscribe(
+      response => this.handleExportResponse(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExportResponse(response){
+      var csvResponseData : Array<any>;
+      if(response.success){
+        csvResponseData = [];
+        for(let csv_data of response.data){
+          csvResponseData.push({
+            "Ingr#": csv_data["Ingr#"]==undefined ? "" : csv_data["Ingr#"],
+            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"],
+            "Vendor Info": csv_data["Vendor Info"]==undefined ? "" : csv_data["Vendor Info"],
+            "Size": csv_data["Size"]==undefined ? "" : csv_data["Size"],
+            "Cost": csv_data["Cost"]==undefined ? "" : csv_data["Cost"],
+            "Comment": csv_data["Comment"]==undefined ? "" : csv_data["Comment"]
+          });
+          console.log(csv_data);
+        }
+        console.log(csvResponseData);
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += ["Ingr#", "Name", "Vendor Info", "Size", "Cost", "Comment"].join(",") + "\r\n";
+        csvResponseData.forEach(function(response) {
+          csvContent += response["Ingr#"]+","+response["Name"]+","+response["Vendor Info"]+","+response["Size"]+","+response["Cost"]+","+response["Comment"]+"\r\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        window.open(encodedUri);
+      }
+    }
+
+}
+
+function nextId(ingredientList: Array<any>){
+  return ingredientList[ingredientList.length - 1].id + 1;
+}
+//
+// function skuList(ingredient: Ingredient)
+// {
+//   const skuList = [
+//     { name: 'Fruit Cocktail', id: 1, case_upc: 618273945710, unit_upc: 618273945712, unit_size: 4, count_per_case:36, product_line: "Dole", ingredient_quantity: {}, comment: 'Hello world' },
+//     { name: 'Fruit Kebob', id:2, case_upc: 120394876276, unit_upc: 618273945714, unit_size: 15, count_per_caes:12, product_line: "Dole", ingredient_quantity: {}, comment: 'Hello world 2' },
+//   ];
+//   return this.skuList;
+// }

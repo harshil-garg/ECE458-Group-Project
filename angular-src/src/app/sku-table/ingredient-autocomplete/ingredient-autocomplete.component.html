@@ -1,0 +1,8 @@
+<mat-form-field style="width: 200px;">
+  <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Ingredient" (keydown)="keyPressed($event)">
+</mat-form-field>
+
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+  <mat-option *ngFor="let ingredient of suggestedIngredients" [value]="ingredient.name">{{ingredient.name}}
+     <font color="lightgray">Ingredient</font> </mat-option>
+</mat-autocomplete>

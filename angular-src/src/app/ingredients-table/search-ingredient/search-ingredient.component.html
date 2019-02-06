@@ -1,0 +1,18 @@
+
+<ng-container *ngFor="let keyword of keywords; let id=index">
+  <label class="keyword">{{keyword}} <i (click)="remove(id)" class="fa fa-remove"> </i></label>
+</ng-container>
+<ng-container *ngFor="let sku of skus; let id=index">
+  <label class="sku">{{sku}} <i (click)="removeSku(id)" class="fa fa-remove"> </i></label>
+</ng-container>
+
+<br>
+
+<mat-form-field style="width: 300px;">
+  <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Search for ingredients/skus" (keydown)="keyPressed($event)">
+</mat-form-field>
+
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+  <mat-option *ngFor="let sku of suggestedSkus" [value]="sku.name">{{sku.name}}
+     <font color="lightgray">SKU</font> </mat-option>
+</mat-autocomplete>
