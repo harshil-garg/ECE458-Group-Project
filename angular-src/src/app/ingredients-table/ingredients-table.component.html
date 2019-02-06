@@ -60,7 +60,7 @@
           <ng-container *ngIf="(skuShown[id]==true)">
             <tr class="blankcell" *ngFor = "let sku of ingredient.skus; let id2=index">
               <td class="blankcell"></td>
-              <td colspan = "6" contenteditable="false">{{sku.name}}</td>
+              <td colspan = "6" contenteditable="false">{{sku.name}} : {{sku.size}} * {{sku.count}}</td>
             </tr>
           </ng-container>
         </ng-container>
