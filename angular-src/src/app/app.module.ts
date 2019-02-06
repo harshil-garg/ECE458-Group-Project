@@ -29,6 +29,8 @@ import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomp
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 import { ManufacturingComponent } from './manufacturing/manufacturing.component';
 import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule } from '@angular/material';
+import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
+import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
 
 const routes: Routes = [
   {
@@ -65,7 +67,9 @@ const routes: Routes = [
     SkuTableComponent,
     IngredientAutocompleteComponent,
     SearchSkuComponent,
-    ManufacturingComponent
+    ManufacturingComponent,
+    CreateDependencyReportComponent,
+    DependencyReportDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -89,6 +93,7 @@ const routes: Routes = [
     MatRippleModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [DependencyReportDialogComponent]
 })
 export class AppModule { }

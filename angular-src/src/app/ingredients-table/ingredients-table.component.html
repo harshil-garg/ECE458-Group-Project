@@ -9,6 +9,7 @@
   </li>
   <a (click) = "nextPage()">&raquo;</a>
 </div>
+<app-create-dependency-report [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
   <div class="card-body">
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
