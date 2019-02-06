@@ -10,8 +10,10 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const uploadroute = require('./api/routes/upload');
+const exportroute = require('./api/routes/export');
 const passport_config = require('./api/config/passport');
 const mongoCreds = require('./api/config/database');
+const elastic = require('./api/config/elasticsearch');
 const users = require('./api/routes/user');
 const ingredients = require('./api/routes/ingredient');
 const skus = require('./api/routes/sku');
@@ -26,6 +28,10 @@ mongoose.connect(mongoCreds.database, function(err){
         console.log("Successfully connected to MongoDB")
     }
 });
+
+//index mongodb
+// elastic.bulkIndex();
+
 
 //Declaring Port
 const port = process.env.Port || 3000;
@@ -63,6 +69,7 @@ app.use(passport.session());
 // Routes
 //app.use('/api/*', ensureAuthenticated);
 app.use('/api/upload', uploadroute);
+app.use('/api/export', exportroute);
 app.use('/api/ingredients', ingredients);
 app.use('/api/skus', skus)
 app.use('/api/product_lines', product_lines);

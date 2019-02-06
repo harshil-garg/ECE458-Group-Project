@@ -27,8 +27,10 @@ export class AddSkuComponent {
     });
 
     dialogRef.afterClosed().subscribe(result =>{
-      this.sku = result;
-      this.add(this.sku);
+      if(result!=null){
+        this.sku = result;
+        this.add(this.sku);
+      }
     });
   }
 

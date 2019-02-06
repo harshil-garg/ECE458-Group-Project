@@ -10,7 +10,10 @@ const Formula = new Schema({
         type: String,
         required: true
     },
-    ingredient_number: Number,
+    ingredient_number: {
+        type: Number,
+        required: true
+    },
     quantity: {
         type: Number,
         required: true

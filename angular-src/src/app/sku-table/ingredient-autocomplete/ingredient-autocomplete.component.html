@@ -1,20 +1,3 @@
-<!-- <section class="filter-wrapper">
- <div class="dropdown">
-   <span>
-<input [formControl]="inputField" type="text" id="keyword" placeholder="Ingredient"
-  (keydown)="keyPressed($event)" (focus)= "setFocus(true)"/>
-  </span>
-
-    <div class="dropdown-content" *ngIf="inputField.value?.length > 0 && this.focus">
-      <ul>
-        <li *ngFor="let ingredient of suggestedIngredients" class="ingredient-list">
-          <p class="ingredient-name" (click) = "selectIngredient(ingredient.name)">{{ingredient.name}}</p>
-        </li>
-      </ul>
-    </div>
-    </div>
-</section> -->
-
 <mat-form-field style="width: 200px;">
   <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Ingredient" (keydown)="keyPressed($event)">
 </mat-form-field>
