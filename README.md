@@ -127,7 +127,7 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | ----------- | ----------- |---------    
 | name | **Required**. The name used to find the right ingredient to delete. | String |    
 
-### Product Line
+### Product Lines
 #### Create Product Line
 * Allows the user to create a new product line.  
 **URL**: ```POST / api/product_lines/create```
@@ -168,3 +168,47 @@ Our API consists of 7 main routes: users, upload, export, skus, ingredients, pro
 | Parameter | Description | Type |    
 | ----------- | ----------- |---------    
 | name | **Required**. The name of the product line used to find the product line to delete. | String |  
+
+### Manufacturing Goals
+#### Create Manufacturing Goal
+* Allows the user to create a new manufacturing goal.  
+**URL**: ```POST / api/manufacturing_goals/create```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the product line. | String |    
+| skus | **Required**. The list of SKUs and quantities to be added to the goal. | List |    
+
+#### Read Manufacturing Goals
+* Allows the user to view all manufacturing goals in the database.  
+**URL**: ```POST /api/manufacturing_goals/all```
+
+**Parameters**:
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| pageNum | **Required**. The page of the results you want to view. | String |    
+| sortBy | **Required**. The field of the results you want to sort by. | String |  
+| user | **Required**. The user for which goals you want to view. | String | 
+
+#### Delete Manufacturing Goal
+* Allows the user to delete an existing manufacturing goal.  
+**URL**: ```POST / api/manufacturing_goals/delete```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the manufacturing goal to delete. | String |    
+
+#### Calculate Manufacturing Goal
+* Allows the user to calculate an existing manufacturing goal.  
+**URL**: ```POST / api/manufacturing_goals/calculator```
+
+**Parameters**
+
+| Parameter | Description | Type |    
+| ----------- | ----------- |---------    
+| name | **Required**. The name of the manufacturing goal to calculate. | String |  
