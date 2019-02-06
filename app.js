@@ -67,7 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 // Routes
-//app.use('/api/*', ensureAuthenticated);
+app.use('/api/*', ensureAuthenticated);
 app.use('/api/upload', uploadroute);
 app.use('/api/export', exportroute);
 app.use('/api/ingredients', ingredients);
