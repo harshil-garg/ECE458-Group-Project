@@ -44,6 +44,14 @@ export class CalculateData {
 	calculated_quantity: string;
 }
 
+export class DeleteMessage {
+  name: string;
+}
+
+export class DeleteResponse {
+  success: boolean;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -67,5 +75,9 @@ export class ManufacturingService {
 
   calculate(requestedCalculate: CalculateMessage): Observable<CalculateData[]>{
     return this.http.post<CalculateData[]>('/api/manufacturing_goals/calculator', requestedCalculate, httpOptions);
+  }
+
+  delete(requestedDelete: DeleteMessage): Observable<DeleteResponse>{
+    return this.http.post<DeleteResponse>('/api/manufacturing_goals/delete', requestedDelete, httpOptions);
   }
 }

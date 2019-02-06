@@ -23,7 +23,7 @@ router.post('/calculator', (req, res) => {
 
         var queue = [];
         var data = [];
-    
+
         for (i = 0; i < goal.skus.length; i++) {
             queue.push(i);
             SKU.findOne({name: goal.skus[i].sku_name}, (error, sku) => {
@@ -139,7 +139,7 @@ router.post('/create', async (req, res) => {
     }
 
     let goal = new ManufacturingGoal({name, skus, user});
-    
+
     ManufacturingGoal.create(goal, (error) => {
         if (error) {
             res.json({success: false, message: `Failed to create a new manufacturing goal. Error: ${error}`});
@@ -165,5 +165,16 @@ router.post('/read', (req, res) => {
         res.send(goal);
     });
 });
+
+router.post('/delete', (req, res) => {
+  const { name } = req.body;
+  ManufacturingGoal.deleteOne({name: name}, (error, goal) => {
+    if (error) {
+      res.send("Deletion failed");
+    }
+    res.json({success: true});
+  });
+
+})
 
 module.exports = router;

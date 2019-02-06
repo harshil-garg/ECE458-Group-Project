@@ -14,6 +14,29 @@ export class DependencyReportDialogComponent {
     onNoClick(): void {
       this.dialogRef.close();
     }
-
+    //exportcsv() {
+      //var csvContent = "data:text/csv;charset=utf-8,";
+      //csvContent += ["#", "Name", "Package Size", "Cost", "Quantity"].join(",") + "\r\n";
+      //this.calculateList.forEach(function(item) {
+        //let row = item.number+","+item.name+","+item.package_size+","+item.cost+","+item.calculated_quantity;
+        //csvContent += row + "\r\n";
+      //});
+      //var encodedUri = encodeURI(csvContent);
+      //window.open(encodedUri);
+    //}
+    exportCSV() {
+      var csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Name,SKU" + "\r\n";
+      for (var ing = 0; ing < this.ingredientList.length; ing++) {
+        let myIng = this.ingredientList[ing];
+        myIng.skus.forEach(function(sku) {
+          let t = sku.name + " : " + sku.size + " * " + sku.count;
+          csvContent += myIng.name + "," + t + "\r\n";
+        });
+      }
+      var encodedUri = encodeURI(csvContent);
+      window.open(encodedUri);
+      console.log(this.ingredientList);
+    }
 
 }
