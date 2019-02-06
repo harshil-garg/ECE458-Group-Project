@@ -58,16 +58,16 @@ export class SearchSkuComponent implements OnInit {
 
   keyPressedProductLine(event){
     if(event.keyCode == 13){ //enter pressed
-      console.log("ENTER:");
-      console.log(this.suggestedProductLines[0].name);
       this.productLine = [];
       this.productLine.push(this.suggestedProductLines[0].name);
+      this.productLineField.setValue(this.suggestedProductLines[0].name);
     }
   }
 
   keyPressedSku(event){
     if(event.keyCode == 13){ //enter pressed
       this.addManufacturingGoalDialogComponent.setSku(this.suggestedSkus[0].name);
+      this.skuField.setValue(this.suggestedSkus[0].name);
     }
   }
 

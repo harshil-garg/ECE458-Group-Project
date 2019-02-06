@@ -12,7 +12,7 @@
       <td>
         <ng-container *ngFor="let sku_quant of manufGoal.skus; let id=index">
           <a *ngIf="sku_quant.sku_name!=null">{{sku_quant.sku_name}} : {{sku_quant.case_quantity}}
-            <i (click)="removeSkuQuant(id)" class="fa fa-remove"> </i><br></a>
+            <i (click)="removeSku(id)" class="fa fa-remove"> </i><br></a>
         </ng-container>
         <app-search-sku></app-search-sku>
         <!--<app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>-->
