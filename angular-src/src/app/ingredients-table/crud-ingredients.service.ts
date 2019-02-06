@@ -9,7 +9,7 @@ export class CreateMessage {
   number : string;
   vendor_info : string;
   package_size: string;
-  cost : string;
+  cost : number;
   comment : string;
 }
 
@@ -23,7 +23,7 @@ export class EditMessage {
   number : string;
   vendor_info : string;
   package_size: string;
-  cost : string;
+  cost : number;
   comment : string;
 }
 
@@ -46,6 +46,7 @@ export class CrudIngredientsService {
 	constructor(private http: HttpClient) { }
 
   add(requestedIngredient: CreateMessage): Observable<Response>{
+    console.log(requestedIngredient);
     return this.http.post<Response>('api/ingredients/create', requestedIngredient, httpOptions);
   }
 

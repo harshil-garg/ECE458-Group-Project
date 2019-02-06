@@ -10,7 +10,7 @@ export class LoginCredentials {
 }
 
 export class LoginResponse {
-  success: boolean; 
+  success: boolean;
   message: string;
   admin: boolean;
 }
@@ -26,10 +26,10 @@ const httpOptions = {
 })
 export class AuthenticationService {
 
-  loginState = {loggedIn: false, isAdmin: false};
+  loginState = {loggedIn: false, isAdmin: false, user: ''};
 
 	constructor(private http: HttpClient) { }
-  
+
   login(credentials: LoginCredentials):Observable<LoginResponse> {
     return this.http.post<LoginResponse>('api/users/login', credentials, httpOptions);
   }
