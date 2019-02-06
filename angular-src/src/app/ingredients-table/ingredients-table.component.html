@@ -13,6 +13,7 @@
   <div class="card-body">
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
+      <button class = "add" type="button" (click)="export()">Export</button>
       <app-add-ingredient *ngIf="isAdmin()"></app-add-ingredient>
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
@@ -53,7 +54,7 @@
               <td contenteditable="false">{{ingredient.package_size}}</td>
               <td contenteditable="false">{{ingredient.cost_per_package}}</td>
               <td contenteditable="false">{{ingredient.comment}}</td>
-              <td contenteditable="false" (click) = "skuShown[id] = !skuShown[id] && getNumSkus(ingredient)>0">{{getNumSkus(ingredient)}} <i *ngIf="getNumSkus(ingredient)>0 (skuShown[id]==false || skuShown[id]==null)" class="fa fa-sort-desc"></i> <i *ngIf="(skuShown[id]==true)" class="fa fa-sort-asc"></i></td>
+              <td contenteditable="false" (click) = "skuShown[id] = !skuShown[id] && getNumSkus(ingredient)>0">{{getNumSkus(ingredient)}} <i *ngIf="getNumSkus(ingredient)>0 && (skuShown[id]==false || skuShown[id]==null)" class="fa fa-sort-desc"></i> <i *ngIf="(skuShown[id]==true)" class="fa fa-sort-asc"></i></td>
             </tr>
           </ng-container>
 

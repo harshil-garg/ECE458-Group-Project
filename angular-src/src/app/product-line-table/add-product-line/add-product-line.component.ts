@@ -47,7 +47,9 @@ export class AddProductLineComponent {
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      if (!response.success) {
+        alert(response.message);
+      }
       this.productLineTableComponent.refresh();
     }
 

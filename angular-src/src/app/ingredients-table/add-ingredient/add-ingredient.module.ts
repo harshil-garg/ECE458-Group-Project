@@ -8,12 +8,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
  import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ResponseDialogComponent } from './response-dialog/response-dialog.component';
 
 @NgModule({
   imports: [CommonModule, MatButtonModule, MatDialogModule, MatListModule, FlexLayoutModule, HttpClientModule, BrowserAnimationsModule, MatProgressBarModule, FormsModule, ReactiveFormsModule],
-  declarations: [AddIngredientComponent, AddIngredientDialogComponent],
+  declarations: [AddIngredientComponent, AddIngredientDialogComponent, ResponseDialogComponent],
   exports: [AddIngredientComponent],
-  entryComponents: [AddIngredientDialogComponent], // Add the DialogComponent as entry component
+  entryComponents: [AddIngredientDialogComponent, ResponseDialogComponent], // Add the DialogComponent as entry component
   providers: [
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: MatDialogRef, useValue: {} }]

@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material';
 import { AddIngredientDialogComponent } from './add-ingredient-dialog/add-ingredient-dialog.component';
 import { CrudIngredientsService, Response } from '../crud-ingredients.service';
 import { IngredientsTableComponent } from '../ingredients-table.component';
+import { ResponseDialogComponent } from './response-dialog/response-dialog.component';
 
 import { Ingredient } from '../../model/ingredient';
 
@@ -16,7 +17,7 @@ export class AddIngredientComponent {
     ingredient: Ingredient = new Ingredient();
 
     constructor(public dialog: MatDialog, public crudIngredientsService: CrudIngredientsService,
-      public ingredientsTableComponent: IngredientsTableComponent) {}
+      public ingredientsTableComponent: IngredientsTableComponent, public resultDialog: MatDialog) {}
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddIngredientDialogComponent, {
@@ -52,8 +53,17 @@ export class AddIngredientComponent {
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
-      this.ingredientsTableComponent.refresh();
+      if (!response.success) {
+        let dialogRef = this.resultDialog.open(ResponseDialogComponent, {
+          height: '300px',
+          width: '300px',
+          data: response
+        });
+        dialogRef.afterClosed().subscribe(result => {
+        })
+      } else {
+        this.ingredientsTableComponent.refresh();
+      }
     }
 
 }

@@ -3,7 +3,7 @@ import { Ingredient } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { CrudIngredientsService, Response } from './crud-ingredients.service';
-import { FilterIngredientsService, FilterResponse } from './filter-ingredients.service'
+import { FilterIngredientsService, FilterResponse, IngredientCsvData } from './filter-ingredients.service'
 
 @Component({
   selector: 'ingredients-table',
@@ -210,6 +210,47 @@ export class IngredientsTableComponent implements OnInit{
     setSearchedSkus(newSkus : Array<any>){
       this.skus = newSkus;
       this.refresh();
+    }
+
+    export(){
+      this.filterIngredientsService.export({
+        sortBy : this.sortBy,
+      	keywords: this.keywords,
+      	skus : this.skus
+      }).subscribe(
+      response => this.handleExportResponse(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExportResponse(response){
+      var csvResponseData : Array<any>;
+      if(response.success){
+        csvResponseData = [];
+        for(let csv_data of response.data){
+          csvResponseData.push({
+            "Ingr#": csv_data["Ingr#"]==undefined ? "" : csv_data["Ingr#"],
+            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"],
+            "Vendor Info": csv_data["Vendor Info"]==undefined ? "" : csv_data["Vendor Info"],
+            "Size": csv_data["Size"]==undefined ? "" : csv_data["Size"],
+            "Cost": csv_data["Cost"]==undefined ? "" : csv_data["Cost"],
+            "Comment": csv_data["Comment"]==undefined ? "" : csv_data["Comment"]
+          });
+          console.log(csv_data);
+        }
+        console.log(csvResponseData);
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += ["Ingr#", "Name", "Vendor Info", "Size", "Cost", "Comment"].join(",") + "\r\n";
+        csvResponseData.forEach(function(response) {
+          csvContent += response["Ingr#"]+","+response["Name"]+","+response["Vendor Info"]+","+response["Size"]+","+response["Cost"]+","+response["Comment"]+"\r\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        window.open(encodedUri);
+      }
     }
 
 }

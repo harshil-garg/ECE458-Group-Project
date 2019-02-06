@@ -51,7 +51,7 @@ export class CreateDependencyReportComponent{
         });
       }
       let dialogRef = this.dialog.open(DependencyReportDialogComponent, {
-        height: '1000px',
+        height: '800px',
         width: '1400px',
         data: this.ingredients
       });

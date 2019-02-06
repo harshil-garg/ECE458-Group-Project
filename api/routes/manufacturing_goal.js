@@ -105,7 +105,7 @@ router.post('/all', async (req, res) => {
     if(!input_validator.passed(required_params, res)){
         return;
     }
-    let results = await pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy, res);
+    let results = await pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy);
     res.json(results);
 });
 
