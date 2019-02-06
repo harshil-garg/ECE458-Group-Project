@@ -412,9 +412,10 @@ router.post('/commit', function (req, res) {
                 }
                 // other wise validate and add
                 else {
-                  if (await validateSKU(row, results)) {
-                    results.skus.createlist.push(row);
-                  }
+                    var validated = await validateSKU(row, results);
+                    if (validated) {
+                      results.skus.createlist.push(row);
+                    }
                 }
                 resolve2();
               });
@@ -605,7 +606,7 @@ router.post('/commit', function (req, res) {
       return false;
     }
     if (isNaN(sku['SKU#'] || isNaN(sku['Count per case']))) {
-      results.ingredients.errorlist.push({
+      results.skus.errorlist.push({
         message: 'A value that must be a number is not a number',
         data: sku
       });
@@ -614,7 +615,7 @@ router.post('/commit', function (req, res) {
     // check whether there is a product line in product lines
     // if not, check whether there is a product line in the document
     var found = false;
-    for (row in results.product_lines.createlist) {
+    for (var row of results.product_lines.createlist) {
       if (row['Name'] == sku['Product Line Name']) {
         found = true;
         break;
@@ -624,7 +625,7 @@ router.post('/commit', function (req, res) {
       var searchPromise = new Promise((resolve, reject) => {
         ProductLine.findOne({name: sku['Product Line Name']}, (err, result) => {
           if (!result) {
-            results.ingredients.errorlist.push({
+            results.skus.errorlist.push({
               message: 'This SKU is referring to a product line that does not exist',
               data: sku
             });
