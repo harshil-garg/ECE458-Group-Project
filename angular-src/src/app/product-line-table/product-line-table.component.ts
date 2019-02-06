@@ -148,4 +148,36 @@ export class ProductLineTableComponent implements OnInit{
         return numbers;
       }
     }
+
+    export(){
+      this.crudProductLineService.export({
+      }).subscribe(
+      response => this.handleExportResponse(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExportResponse(response){
+      var csvResponseData : Array<any>;
+      if(response.success){
+        csvResponseData = [];
+        for(let csv_data of response.data){
+          csvResponseData.push({
+            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"]
+          });
+        }
+        console.log(csvResponseData);
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Name" + "\r\n";
+        csvResponseData.forEach(function(response) {
+          csvContent += response["Name"]+"\r\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        window.open(encodedUri);
+      }
+    }
 }

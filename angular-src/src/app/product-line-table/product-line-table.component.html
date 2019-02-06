@@ -9,6 +9,7 @@
   <a (click) = "nextPage()">&raquo;</a>
 </div>
   <div class="card-body">
+    <button class = "add" type="button" (click)="export()">Export</button>
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
       <app-add-product-line *ngIf="isAdmin()"></app-add-product-line>
