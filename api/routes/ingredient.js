@@ -122,7 +122,9 @@ router.post('/update', (req, res) => {
 
     var json = {};
 
+    let propagate = false;
     if (newname) {
+        propagate = true;
         json["name"] = newname;
     }
     if (number) {
@@ -142,11 +144,25 @@ router.post('/update', (req, res) => {
         json["comment"] = comment;
     }
 
-    Ingredient.updateIngredient(name, json, (error) => {
+    Ingredient.updateIngredient(name, json, async (error) => {
         if (error) {
             res.json({success: false, message: `Failed to update ingredient. Error: ${error}`});
         } else {
-            res.json({success: true, message: "Updated successfully."});
+            if(propagate){
+                let results = await SKU.find({'ingredients.ingredient_name': name}).exec();
+                for(let result of results){
+                    await SKU.findOneAndUpdate({number: result.number, 'ingredients.ingredient_name': name},
+                    {'ingredients.$.ingredient_name' : newname}).exec((err) => {
+                        if(err){
+                            res.json({success: false, message: err});
+                            return;
+                        }
+                    });              
+                }
+                res.json({success: true, message: "Updated successfully."});
+            }else{
+                res.json({success: true, message: "Updated successfully."});
+            }  
         }
     });
 });
@@ -160,12 +176,22 @@ router.post('/delete', (req, res) => {
         return;
     }
 
-    Ingredient.deleteIngredient(name, (error, result) => {
+    Ingredient.deleteIngredient(name, async (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
         } else if(result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
+            let skus = await SKU.find({'ingredients.ingredient_name': name}).exec();
+                for(let sku of skus){
+                    await SKU.findOneAndUpdate({number: sku.number, 'ingredients.ingredient_name': name},
+                    {$unset: {'ingredients.$.ingredient_name': 1}}).exec((err) => {
+                        if(err){
+                            res.json({success: false, message: err});
+                            return;
+                        }
+                    });              
+                }
             res.json({success: true, message: "Removed successfully."});
         }
     });
