@@ -1,7 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FilterSkuService, FilterResponse } from '../filter-sku.service'
 import { FormControl } from '@angular/forms';
-import { SkuTableComponent } from '../sku-table.component';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/switchMap';
@@ -18,7 +17,7 @@ export class IngredientAutocompleteComponent implements OnInit {
 
     @Output() messageEvent = new EventEmitter<string>();
 
-    constructor(public skuTableComponent: SkuTableComponent, public filterSkuService: FilterSkuService) { }
+    constructor(public filterSkuService: FilterSkuService) { }
 
     ngOnInit() {
       this.inputField.valueChanges.debounceTime(200)
