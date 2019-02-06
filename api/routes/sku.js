@@ -3,6 +3,7 @@ const router = express.Router();
 const SKU = require('../model/sku_model');
 const Ingredient = require('../model/ingredient_model');
 const ProductLine = require('../model/product_line_model');
+const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
 const validator = require('../controllers/sku_validation');
@@ -120,8 +121,9 @@ router.post('/update', async (req, res) => {
     }
 
     var json = {};
-
+    let propagate = false;
     if (name) {
+        propagate = true;
         json["name"] = name;
     }
     if (newnumber) {
@@ -174,10 +176,14 @@ router.post('/update', async (req, res) => {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(number, json, (err) => {
+    SKU.updateSKU(number, json, async (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else {
+            if(propagate){
+                await ManufacturingGoal.update({'skus.sku_number': number}, {'skus.$.sku_name' : name}, {multi: true}).exec();
+            }
+            
             res.json({success: true, message: "Updated successfully."});
         }
     })
@@ -193,13 +199,14 @@ router.post('/delete', (req, res) => {
         return;
     }
 
-    SKU.deleteSKU(number, (err, result) => {
+    SKU.deleteSKU(number, async (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
 
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
+            await ManufacturingGoal.update({'skus.sku_number': name}, {$pull: {skus : {sku_number : number}}}, {multi: true}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
     })
