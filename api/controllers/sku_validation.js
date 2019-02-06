@@ -1,11 +1,18 @@
 // Dependency checks
 module.exports.itemExists = async function(model, itemName) {
     let ans = false;
-    await model.findOne({name: itemName}).exec((err, result) => {       
-        ans = !(!result);     
-    })
+    let result = await model.findOne({name: itemName}).exec();
+    ans = !(!result);     
+    
     console.log(`${model.modelName} exists: ${ans}`);
-    return ans;
+    if(model.modelName == 'Ingredient'){
+        return {
+            bool : ans,
+            number : result.number
+        }
+    }else{
+        return ans;
+    } 
 }
 
 const first_digit = new Set(['0', '1', '6', '7', '8', '9'])

@@ -35,8 +35,7 @@ router.post('/autocomplete_product_lines', (req, res) => {
 
 
 //Filter
-router.post('/filter', (req, res) => {
-
+router.post('/filter', async (req, res) => {
     const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
     const required_params = { sortBy, pageNum, keywords, ingredients, product_lines };
 
@@ -49,21 +48,29 @@ router.post('/filter', (req, res) => {
     });
     
     if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
-        sku_filter.none(pageNum, sortBy, res);
+        let results = await sku_filter.none(pageNum, sortBy);
+        res.json(results);
     }else if(ingredients.length == 0 && product_lines.length == 0){
-        sku_filter.keywords(pageNum, sortBy, key_exps, res);
+        let results = await sku_filter.keywords(pageNum, sortBy, key_exps);
+        res.json(results);
     }else if(keywords.length == 0 && product_lines.length == 0){
-        sku_filter.ingredients(pageNum, sortBy, ingredients, res);
+        let results = await sku_filter.ingredients(pageNum, sortBy, ingredients);
+        res.json(results);
     }else if(keywords.length == 0 && ingredients.length == 0){
-        sku_filter.productLines(pageNum, sortBy, product_lines, res);
+        let results = await sku_filter.productLines(pageNum, sortBy, product_lines);
+        res.json(results);
     }else if(product_lines.length == 0){
-        sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients, res)
+        let results = await sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients);
+        res.json(results);
     }else if(keywords.length == 0){
-        sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines, res)
+        let results = await sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines);
+        res.json(results);
     }else if(ingredients.length == 0){
-        sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines, res)
+        let results = await sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines);
+        res.json(results);
     }else{
-        sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines, res)
+        let results = await sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines);
+        res.json(results);
     }
 });
 
@@ -78,10 +85,10 @@ router.post('/create', async (req, res) => {
 
     let ingredient_passed = true;
     for(let ingredient of ingredients) {
-        let bool = await validator.itemExists(Ingredient, ingredient.ingredient_name);
-        ingredient_passed = bool && ingredient_passed;
+        let ans = await validator.itemExists(Ingredient, ingredient.ingredient_name);
+        ingredient['ingredient_number'] = ans.number
+        ingredient_passed = ans.bool && ingredient_passed;
     }
-    
     
     let product_passed = await validator.itemExists(ProductLine, product_line);
     let case_passed = validator.isUPCStandard(case_upc);
@@ -104,7 +111,7 @@ router.post('/create', async (req, res) => {
 });
 
 //Update
-router.post('/update', (req, res) => {
+router.post('/update', async (req, res) => {
     const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
     const required_params = { number };
 
@@ -121,9 +128,19 @@ router.post('/update', (req, res) => {
         json["number"] = newnumber;
     }
     if (case_upc) {
+        let case_passed = validator.isUPCStandard(case_upc);
+        if(!case_passed){
+            res.json({success: false, message: 'Input invalid'});
+            return;
+        }
         json["case_upc"] = case_upc;
     }
     if (unit_upc) {
+        let unit_passed = validator.isUPCStandard(unit_upc);
+        if(!unit_passed){
+            res.json({success: false, message: 'Input invalid'});
+            return;
+        }
         json["unit_upc"] = unit_upc;
     }
     if (size) {
@@ -133,9 +150,24 @@ router.post('/update', (req, res) => {
         json["count"] = count;
     }
     if (product_line) {
+        let product_passed = await validator.itemExists(ProductLine, product_line);
+        if(!product_passed){
+            res.json({success: false, message: 'Input invalid'});
+            return;
+        }
         json["product_line"] = product_line;
     }
     if (ingredients) {
+        let ingredient_passed = true;
+        for(let ingredient of ingredients) {
+            let ans = await validator.itemExists(Ingredient, ingredient.ingredient_name);
+            ingredient['ingredient_number'] = ans.number
+            ingredient_passed = ans.bool && ingredient_passed;
+        }
+        if(!ingredient_passed){
+            res.json({success: false, message: 'Input invalid'});
+            return;
+        }
         json["ingredients"] = ingredients;
     }
     if (comment) {

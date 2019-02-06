@@ -3,8 +3,15 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 const Tuple = new Schema({
-    ingredient_name: String,
-    quantity: Number
+    ingredient_name: {
+        type: String,
+        required: true
+    },
+    ingredient_number: Number,
+    quantity: {
+        type: Number,
+        required: true
+    }
 });
 const SKUSchema = new Schema({
     name: {

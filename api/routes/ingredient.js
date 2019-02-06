@@ -34,28 +34,28 @@ router.post('/filter', async (req, res) => {
 
     //No filter, return all
     if(keywords.length == 0 && skus.length == 0){
-        ingredient_filter.none(pageNum, sortBy, res);
+        let results = await ingredient_filter.none(pageNum, sortBy);
+        res.json(results);
     }
     //Keywords no SKUs
     else if(skus.length == 0){
-        ingredient_filter.keywords(pageNum, sortBy, key_exps, res);
+        let results = await ingredient_filter.keywords(pageNum, sortBy, key_exps);
+        res.json(results);
     }
     //SKUs no keywords
     else if(keywords.length == 0){
         //get all ingredients with given SKUs
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec((err, results) => {
-            return results;
-        });
+        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
 
-        ingredient_filter.skus(pageNum, sortBy, skuList, res);
+        let results = await ingredient_filter.skus(pageNum, sortBy, skuList);
+        res.json(results);
     }
     //Keywords and SKUs
     else{
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec((err, results) => {
-            return results;
-        });
+        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
         
-        ingredient_filter.keywordsAndSkus(pageNum, sortBy, key_exps, skuList, res);
+        let results = await ingredient_filter.keywordsAndSkus(pageNum, sortBy, key_exps, skuList);
+        res.json(results);
     }
 });
 
