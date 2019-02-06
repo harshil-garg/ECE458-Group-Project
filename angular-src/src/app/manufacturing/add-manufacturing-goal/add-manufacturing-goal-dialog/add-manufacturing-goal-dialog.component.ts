@@ -39,5 +39,9 @@ export class AddManufacturingGoalDialogComponent {
       this.manufGoal.skus.splice(id, 1);
     }
 
+    setSku(sku){
+      this.skuInput = sku;
+    }
+
 
 }

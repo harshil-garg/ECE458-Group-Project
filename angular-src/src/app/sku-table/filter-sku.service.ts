@@ -56,6 +56,7 @@ export class FilterSkuService {
 	constructor(private http: HttpClient) { }
 
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
+		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/skus/filter', filterMessage, httpOptions);
   }
 
