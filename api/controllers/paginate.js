@@ -17,7 +17,12 @@ module.exports.paginate = function (filter, model, pageNum, sortBy, res){
             let slice = Math.min(limit, results.length);
 
             if(model.modelName === 'Ingredient'){
-                appender.append(results.slice(0, slice), pages, res);
+                let data = results.slice(0, slice);
+                for(let ingredient of data){
+                    ingredient.cost = ingredient.cost.toFixed(2);
+                }
+
+                appender.append(data, pages, res);
             }else{
                 res.json({
                     success: true,

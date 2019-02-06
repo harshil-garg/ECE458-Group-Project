@@ -68,6 +68,7 @@ router.post('/create', (req, res) => {
         return;
     }
     let rounded_cost = (isNaN(cost)) ? cost : Number(cost).toFixed(2); //makes sure that toFixed is not called on strings
+    console.log(rounded_cost)
     //Autogen number logic
     if (number) {
         create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
