@@ -11,6 +11,8 @@
   <a (click) = "nextPage()">&raquo;</a>
 </div>
   <div class="card-body">
+    <button class = "add" type="button" (click)="exportSkus()">Export SKUS</button>
+    <button class = "add" type="button" (click)="exportFormulas()">Export Formulas</button>
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
       <app-add-sku *ngIf="isAdmin()"></app-add-sku>

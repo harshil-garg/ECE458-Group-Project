@@ -13,6 +13,7 @@
   <div class="card-body">
     <div id="table" class="table-editable">
       <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
+      <button class = "add" type="button" (click)="export()">Export</button>
       <app-add-ingredient *ngIf="isAdmin()"></app-add-ingredient>
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>

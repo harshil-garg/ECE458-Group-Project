@@ -42,6 +42,47 @@ export class AutocompleteResponse {
 	data : string[];
 }
 
+export class ExportSkusMessage {
+	sortBy : string;
+	keywords: Array<string>;
+	ingredients: Array<string>;
+	product_lines: Array<string>;
+}
+
+export class SkuCsvData {
+	"SKU#"​: number;
+  "Name": string;
+	"Case UPC": string;
+  "Unit UPC": string;
+	"Unit size": string;
+	"Count per case": string;
+	"ProductLine Name": string;
+	"Comment": string;
+}
+
+export class ExportSkusResponse {
+  success: boolean;
+  data: Array<SkuCsvData>;
+}
+
+export class ExportFormulasMessage {
+	sortBy : string;
+	keywords: Array<string>;
+	ingredients: Array<string>;
+	product_lines: Array<string>;
+}
+
+export class FormulasCsvData {
+	"SKU#": number;
+	"Ingr#": number;
+	"Quantity": number;
+}
+
+export class ExportFormulasResponse {
+  success: boolean;
+  data: Array<FormulasCsvData>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -59,6 +100,14 @@ export class FilterSkuService {
 		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/skus/filter', filterMessage, httpOptions);
   }
+
+	exportSkus(exportSkusMessage: ExportSkusMessage): Observable<ExportSkusResponse>{
+		return this.http.post<ExportSkusResponse>('api/export/skus', exportSkusMessage, httpOptions);
+	}
+
+	exportFormulas(exportFormulasMessage: ExportFormulasMessage): Observable<ExportFormulasResponse>{
+		return this.http.post<ExportFormulasResponse>('api/export/formulas', exportFormulasMessage, httpOptions);
+	}
 
 	autocompleteIngredients(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
 		console.log(autocompleteMessage);

@@ -148,4 +148,29 @@ export class ProductLineTableComponent implements OnInit{
         return numbers;
       }
     }
+
+    export(){
+      this.crudProductLineService.export({
+      }).subscribe(
+      response => this.handleExportResponse(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExportResponse(response){
+      var csvResponseData : Array<any>;
+      if(response.success){
+        csvResponseData = [];
+        for(let csv_data of response.data){
+          csvResponseData.push({
+            "Name": csv_data["Name"]
+          });
+        }
+        console.log(csvResponseData);
+      }
+    }
 }

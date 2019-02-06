@@ -263,6 +263,73 @@ export class SkuTableComponent implements OnInit{
       }
     }
 
+    exportSkus(){
+      this.filterSkuService.exportSkus({
+        sortBy : this.sortBy,
+        keywords: this.keywords,
+        ingredients : this.ingredients,
+        product_lines : this.productLines
+      }).subscribe(
+      response => this.handleExportSkusResponse(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExportSkusResponse(response){
+      var csvResponseData : Array<any>;
+      if(response.success){
+        csvResponseData = [];
+        for(let csv_data of response.data){
+          csvResponseData.push({
+            "SKU#"​: csv_data["SKU#"],
+            "Name": csv_data["Name"],
+            "Case UPC": csv_data["Case UPC"],
+            "Unit UPC": csv_data["Unit UPC"],
+            "Unit size": csv_data["Unit size"],
+            "Count per case": csv_data["Count per case"],
+            "ProductLine Name": csv_data["ProductLine Name"],
+            "Comment": csv_data["Comment"],
+          });
+        }
+        console.log(csvResponseData);
+      }
+    }
+
+    exportFormulas(){
+      this.filterSkuService.exportFormulas({
+        sortBy : this.sortBy,
+        keywords: this.keywords,
+        ingredients : this.ingredients,
+        product_lines : this.productLines
+      }).subscribe(
+      response => this.handleExportFormulasResponse(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExportFormulasResponse(response){
+      var csvResponseData : Array<any>;
+      if(response.success){
+        csvResponseData = [];
+        for(let csv_data of response.data){
+          csvResponseData.push({
+            "SKU#": csv_data["SKU#"],
+            "Ingr#": csv_data["Ingr#"],
+            "Quantity": csv_data["Quantity"],
+          });
+        }
+        console.log(csvResponseData);
+      }
+    }
+
     setIngredientInput(id, event){
       this.ingredientInputs[id] = event;
     }

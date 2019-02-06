@@ -36,6 +36,18 @@ export class Response {
   message: string;
 }
 
+export class ExportMessage {
+}
+
+export class ProductLineCsvData {
+	"Name": string;
+}
+
+export class ExportResponse {
+  success: boolean;
+  data: Array<ProductLineCsvData>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -63,5 +75,9 @@ export class CrudProductLineService {
 
   read(requestedProductLine: ReadMessage): Observable<ReadResponse>{
     return this.http.post<ReadResponse>('api/product_lines/read', requestedProductLine, httpOptions);
+  }
+
+  export(exportRequest: ExportMessage): Observable<ExportResponse>{
+    return this.http.post<ExportResponse>('api/export/product_lines', exportRequest, httpOptions);
   }
 }

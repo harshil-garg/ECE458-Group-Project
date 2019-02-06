@@ -38,6 +38,26 @@ export class AutocompleteResponse {
 	data : string[];
 }
 
+export class ExportMessage {
+	sortBy : string;
+	keywords: Array<string>;
+	skus : Array<string>;
+}
+
+export class IngredientCsvData {
+	"Ingr#": number;
+	"Name": string;
+	"Vendor Info": string;
+	"Size": string;
+	"Cost": number;
+	"Comment": string;
+}
+
+export class ExportResponse {
+  success: boolean;
+  data: Array<IngredientCsvData>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -52,12 +72,14 @@ export class FilterIngredientsService {
 	constructor(private http: HttpClient) { }
 
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
-		console.log("FILTER:");
-		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/ingredients/filter', filterMessage, httpOptions);
   }
 
 	autocomplete(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
 		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
+	}
+
+	export(exportMessage: ExportMessage): Observable<ExportResponse>{
+		return this.http.post<ExportResponse>('api/export/ingredients', exportMessage, httpOptions);
 	}
 }
