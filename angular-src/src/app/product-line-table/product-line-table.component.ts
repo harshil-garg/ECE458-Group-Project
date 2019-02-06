@@ -167,10 +167,17 @@ export class ProductLineTableComponent implements OnInit{
         csvResponseData = [];
         for(let csv_data of response.data){
           csvResponseData.push({
-            "Name": csv_data["Name"]
+            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"]
           });
         }
         console.log(csvResponseData);
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Name" + "\r\n";
+        csvResponseData.forEach(function(response) {
+          csvContent += response["Name"]+"\r\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        window.open(encodedUri);
       }
     }
 }
