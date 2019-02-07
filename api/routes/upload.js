@@ -12,6 +12,8 @@ const ManufacturingGoalModel = require('../model/manufacturing_goal_model');
 const ProductLine = require('../model/product_line_model');
 var extract = require('extract-zip');
 
+const directoryPath = path.join(__dirname, '../../tmp/csv/');
+
 var storage = multer.diskStorage(
   {
       destination: './tmp/csv/',
@@ -116,7 +118,6 @@ router.post('/commit', function (req, res) {
       }
     };
 
-    const directoryPath = path.join(__dirname, '../../tmp/csv/');
     fsPromise = new Promise(function (resolve, reject) {
       fs.readdir(directoryPath, async function (err, files) {
         //handling error
@@ -220,6 +221,9 @@ router.post('/commit', function (req, res) {
   
               await csvPromise;
             }
+            else if (file.includes(".zip")) {
+              // ignore if its the zip file
+            }
             else {
               errorOn = true;
               results = {
@@ -285,9 +289,10 @@ router.post('/commit', function (req, res) {
 
   async function handleZip(file, res) {
     var results = {};
-    extract(file.path, {dir: 'tmp/csv/'}, async function (err) {
+    extract(file.path, {dir: directoryPath}, async function (err) {
       // extraction is complete. make sure to handle the err
       if (err) {
+        console.log(err);
         uploadSessionStarted = false;
         results.success = false;
         results.uploadErrorType = 'Zip error';
@@ -295,6 +300,7 @@ router.post('/commit', function (req, res) {
       }
       else {
         await handleFiles(res);
+        fs.unlinkSync(file.path);
       }
      }
     )
