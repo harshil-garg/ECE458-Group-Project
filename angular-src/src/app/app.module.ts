@@ -12,8 +12,7 @@ import { UploadModule } from './upload/upload.module';
 import { RouterModule, Routes } from '@angular/router';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { AuthGuard } from './auth-guard';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { AuthGuard } from './auth-guard';;
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 import { AddProductLineModule } from './product-line-table/add-product-line/add-product-line.module';
@@ -29,7 +28,7 @@ import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomp
 import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 import { ManufacturingComponent } from './manufacturing/manufacturing.component';
-import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule } from '@angular/material';
+import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule } from '@angular/material';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
 
@@ -84,7 +83,6 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     FormsModule,
     ReactiveFormsModule,
-    NgbModule.forRoot(),
     CommonModule,
     IngredientAutocompleteModule,
     MatAutocompleteModule,
@@ -93,7 +91,12 @@ const routes: Routes = [
     MatButtonModule,
     MatRippleModule,
     MatDialogModule,
-    MatListModule
+    MatListModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatMenuModule,
+    MatToolbarModule
   ],
   providers: [],
   bootstrap: [AppComponent],

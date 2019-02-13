@@ -10,6 +10,7 @@ import { AuthenticationService } from '../authentication.service';
 export class RegisterComponent implements OnInit {
 	registerError = false;
 	successfulRegistration = false;
+  errorMessage = '';
 
 	constructor(private authenticationService: AuthenticationService, private accountsService: AccountsService) { }
 
@@ -20,6 +21,7 @@ export class RegisterComponent implements OnInit {
 			this.successfulRegistration = response.success;
 			if (!response.success) {
 				this.registerError = true;
+        this.errorMessage = response.message;
 			}
 		}, (err) => {
 			this.registerError = true;
