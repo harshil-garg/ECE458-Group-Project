@@ -10,5 +10,5 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
 	constructor (private authService: AuthenticationService, private router: Router) { }
-	title = 'Hypo Meals';
+	title = 'Hypo®Mea3s';
 }
