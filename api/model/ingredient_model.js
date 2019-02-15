@@ -20,6 +20,11 @@ const IngredientSchema = new Schema({
         type: String,
         required: true
     }, 
+    unit: {
+        type: String,
+        enum: ['oz.', 'lb.', 'ton', 'g', 'kg', 'fl. oz.', 'pt.', 'qt.', 'gal.', 'mL', 'L', 'count'],
+        required: true
+    },
     cost: {
         type: Number,
         required: true

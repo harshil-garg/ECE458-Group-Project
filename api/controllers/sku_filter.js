@@ -10,8 +10,8 @@ module.exports.keywords = async function (pageNum, sortBy, keywords){
     let filter = SKU.find({
         $or:[
             {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}]
+            {case_upc: {$all: keywords}},
+            {unit_upc: {$all: keywords}}]
         }
     );
     return await pagination.paginate(filter, SKU, pageNum, sortBy);
@@ -31,8 +31,8 @@ module.exports.keywordsandIngredients = async function (pageNum, sortBy, keyword
     let filter = SKU.find({'ingredients.ingredient_name': {$all: ingredients},       
         $or:[
             {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}
+            {case_upc: {$all: keywords}},
+            {unit_upc: {$all: keywords}}
         ]
     });
     return await pagination.paginate(filter, SKU, pageNum, sortBy);
@@ -42,8 +42,8 @@ module.exports.keywordsandLines = async function (pageNum, sortBy, keywords, pro
     let filter = SKU.find({product_line: {$all: product_lines},
         $or:[
             {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}
+            {case_upc: {$all: keywords}},
+            {unit_upc: {$all: keywords}}
         ]
     });
     return await pagination.paginate(filter, SKU, pageNum, sortBy);
@@ -62,8 +62,8 @@ module.exports.allFilters = async function (pageNum, sortBy, keywords, ingredien
         'ingredients.ingredient_name': {$all: ingredients},
         $or:[
             {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}
+            {case_upc: {$all: keywords}},
+            {unit_upc: {$all: keywords}}
         ]
     });
     return await pagination.paginate(filter, SKU, pageNum, sortBy);

@@ -5,14 +5,10 @@ module.exports.itemExists = async function(model, itemName) {
     ans = !(!result);     
     
     console.log(`${model.modelName} exists: ${ans}`);
-    if(model.modelName == 'Ingredient' || model.modelName == 'SKU'){
-        return {
-            bool : ans,
-            number : result.number
-        }
-    }else{
-        return ans;
-    } 
+    return {
+        bool : ans,
+        id : result._id
+    }
 }
 
 const first_digit = new Set(['0', '1', '6', '7', '8', '9'])
@@ -54,4 +50,8 @@ module.exports.isUPCStandard = function(upc_num) {
 
     return true;
 
+}
+
+module.exports.proper_name_length = function(name){
+    return name.length <= 32;
 }

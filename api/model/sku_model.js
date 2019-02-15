@@ -2,20 +2,6 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const Formula = new Schema({
-    ingredient_name: {
-        type: String,
-        required: true
-    },
-    ingredient_number: {
-        type: Number,
-        required: true
-    },
-    quantity: {
-        type: Number,
-        required: true
-    }
-});
 const SKUSchema = new Schema({
     name: {
         type: String,
@@ -44,11 +30,25 @@ const SKUSchema = new Schema({
         required: true
     },
     product_line: {
-        type: String,
+        type: Schema.ObjectId,
         required: true
     },
-    ingredients: {
-        type: [Formula],
+    formula: {
+        type: Schema.ObjectId,
+        required: true
+    },
+    formula_scale_factor: {
+        type: Number,
+        required: true,
+        default: 1.0
+    },
+    manufacturing_lines: {
+        type: [Schema.ObjectId],
+        required: true
+    },
+    manufacturing_rate: {
+        type: Number,
+        required: true
     },
     comment: {
         type: String

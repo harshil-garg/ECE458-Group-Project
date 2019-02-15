@@ -5,7 +5,8 @@ const SKU = require('../model/sku_model');
 const ingredient_filter = require('../controllers/ingredient_filter');
 const autocomplete = require('../controllers/autocomplete');
 const input_validator = require('../controllers/input_validation');
-
+const generator = require('../controllers/autogen');
+const validator = require('../controllers/ingredient_validation');
 
 //Autocomplete
 router.post('/autocomplete', (req, res) => {
@@ -60,21 +61,26 @@ router.post('/filter', async (req, res) => {
 });
 
 //CREATE
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
+    //TODO: add unit
     const { name, number, vendor_info, package_size, cost, comment } = req.body;
     const required_params = { name, package_size, cost };
 
     if(!input_validator.passed(required_params, res)){
         return;
     }
-    let rounded_cost = (isNaN(cost)) ? cost : Number(cost).toFixed(2); //makes sure that toFixed is not called on strings
+    if(!validator.valid_cost(cost)){
+        res.json({success: false, message: 'Input invalid'});
+        return;
+    }
+
+    let rounded_cost = validator.round_cost(cost);
     //Autogen number logic
     if (number) {
         create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
     } else {
-        create_ingredient_number(function(id) {
-            return create_ingredient(res, name, id, vendor_info, package_size, rounded_cost, comment);
-        });
+        let gen_number = await generator.autogen(Ingredient);
+        create_ingredient(res, name, gen_number, vendor_info, package_size, rounded_cost, comment);
     }
 });
 
@@ -87,25 +93,6 @@ function create_ingredient(res, name, number, vendor_info, package_size, cost, c
             res.json({success: true, message: "Added successfully."});
         }
     });
-}
-
-function create_ingredient_number(callback) {
-    Ingredient.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec(function(error, ingredients) {
-        if (error) return error;
-        return callback(smallest_missing_number(ingredients, 0, ingredients.length - 1));
-    })
-}
-
-function smallest_missing_number(ingredients, lo, hi) {
-    if (lo > hi)
-        return lo + 1;
-    let mid =  Math.floor(lo + (hi - lo) / 2);
-
-    if (ingredients[mid].number == mid+1) {
-        return smallest_missing_number(ingredients, mid + 1, hi);
-    } else {
-        return smallest_missing_number(ingredients, lo, mid - 1);
-    }
 }
 
 // TODO: READ (SEARCH)
@@ -136,7 +123,11 @@ router.post('/update', (req, res) => {
         json["package_size"] = package_size;
     }
     if (cost) {
-        let rounded_cost = (isNaN(cost)) ? cost : Number(cost).toFixed(2);
+        if(!validator.valid_cost(cost)){
+            res.json({success: false, message: 'Input invalid'});
+            return;
+        }
+        let rounded_cost = validator.round_cost(cost);
         json["cost"] = rounded_cost;
     }
     if (comment) {
