@@ -39,8 +39,7 @@
         <input type="number" min="0" class="form-control" id="number" [(ngModel)]="ingredient.id" name="number" #number="ngModel">
 
         <label for="vendor_info">Vendor Information</label>
-        <input type="text" class="form-control" id="vendor_info" required [(ngModel)]="ingredient.vendor_info" name="vendor_info" #vendor_info="ngModel">
-        <div [hidden]="vendor_info.valid || vendor_info.pristine" class="alert alert-danger">Vendor Info is required</div>
+        <textarea type="text" class="form-control" id="vendor_info" [(ngModel)]="ingredient.vendor_info" name="vendor_info" #vendor_info="ngModel"></textarea>
 
         <label for="vendor_info">Package Size</label>
         <input type="text" class="form-control" id="package_size" required [(ngModel)]="ingredient.package_size" name="package_size" #package_size="ngModel">
@@ -51,7 +50,7 @@
         <div [hidden]="cost_per_package.valid || cost_per_package.pristine" class="alert alert-danger">Cost Per Package is required</div>
 
         <label for="comment">Comment</label>
-        <input type="text" class="form-control" id="comment" [(ngModel)]="ingredient.comment" name="comment" #comment="ngModel">
+        <textarea type="text" class="form-control" id="comment" [(ngModel)]="ingredient.comment" name="comment" #comment="ngModel"></textarea>
       </div>
 
       <button type="submit" class="btn btn-success" [disabled]="!ingredientForm.form.valid" [mat-dialog-close]="ingredient">Submit</button>

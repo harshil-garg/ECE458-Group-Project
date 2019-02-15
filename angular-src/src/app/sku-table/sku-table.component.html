@@ -1,6 +1,139 @@
+<h2 class="mat-display-2">SKUs</h2>
+<div class="search-div">
+    <app-search-sku class="search"></app-search-sku>
+    <br style="clear:both" />
+</div>
+<div class="button-div">
+  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+  <app-add-sku class="add" *ngIf="isAdmin()"></app-add-sku>
+  <button mat-raised-button="export_skus" class="export_skus" type="button" (click)="exportSkus()" color="accent">Export SKUS</button>
+  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="exportFormulas()" color="accent">Export Formulas</button>
+</div>
+<div class="example-loading-shade" *ngIf="loadingResults">
+  <mat-spinner></mat-spinner>
+</div>
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Checkbox Column -->
+  <ng-container matColumnDef="select">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+      </mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let row">
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)">
+      </mat-checkbox>
+    </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+			  <input #name matInput placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
+			</mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="number">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #number matInput placeholder="Number" [value]="element.id" (blur)="edit(element.id, 'id', number.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Vendor Info Column -->
+  <ng-container matColumnDef="case_upc">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Case UPC Number</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #case_upc matInput placeholder="Case UPC" [value]="element.case_upc" (blur)="edit(element.id, 'case_upc', case_upc.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Package Size Column -->
+  <ng-container matColumnDef="unit_upc">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit UPC Number</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #unit_upc matInput placeholder="Unit UPC" [value]="element.unit_upc" (blur)="edit(element.id, 'unit_upc', unit_upc.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Cost Per Package Column -->
+  <ng-container matColumnDef="unit_size">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit Size</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #unit_size matInput placeholder="Unit Size" [value]="element.unit_size" (blur)="edit(element.id, 'unit_size', unit_size.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Comment Column -->
+  <ng-container matColumnDef="count_per_case">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Count Per Case</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #count_per_case matInput placeholder="Count Per Case" [value]="element.count_per_case" (blur)="edit(element.id, 'count_per_case', count_per_case.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Comment Column -->
+  <ng-container matColumnDef="product_line">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Line</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #product_line matInput placeholder="Product Line" [value]="element.product_line" (blur)="edit(element.id, 'product_line', product_line.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Comment Column -->
+  <ng-container matColumnDef="formula">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #formula matInput placeholder="Comment" [value]="element.comment" (blur)="edit(element.id, 'comment', formula.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Comment Column -->
+  <ng-container matColumnDef="comment">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <textarea #comment matInput placeholder="Comment" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr> -->
+</table>
+
+<mat-paginator [length]="maxPages*10" [pageSize]="10" showFirstLastButtons></mat-paginator>
+
+
 <!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
 <!-- <app-search-ingredient></app-search-ingredient> -->
-<div class="card">
+<!-- <div class="card">
   <h3 class="card-header text-center font-weight-bold py-4">SKUs</h3>
   <app-search-sku></app-search-sku>
 <div class="pagination">
@@ -14,7 +147,6 @@
     <button class = "add" type="button" (click)="exportSkus()">Export SKUS</button>
     <button class = "add" type="button" (click)="exportFormulas()">Export Formulas</button>
     <div id="table" class="table-editable">
-      <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
       <app-add-sku *ngIf="isAdmin()"></app-add-sku>
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
@@ -30,7 +162,6 @@
         </tr>
 
        <ng-container *ngFor="let sku of skuList; let id=index">
-         <!-- TABLE VIEWED BY ADMIN -->
          <ng-container *ngIf="isAdmin()==true">
             <tr>
               <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="edit(sku.id, 'name', $event)">{{sku.name}}</td>
@@ -48,7 +179,6 @@
                 </ng-container>
                 <app-ingredient-autocomplete (messageEvent)="setIngredientInput(id, $event)"></app-ingredient-autocomplete>
                 <br>
-                <!--<input [(ngModel)]="ingredientInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text"placeholder="Ingredient Name"/><br>-->
                 <mat-form-field style="width: 200px;">
                   <input matInput [(ngModel)]="quantityInputs[id]" (keydown) = "keyPressed(sku.id, id, $event)" type="text" placeholder="Quantity"/><br>
                 </mat-form-field>
@@ -60,7 +190,6 @@
             </tr>
           </ng-container>
 
-          <!-- TABLE VIEWED BY NON-ADMIN -->
           <ng-container *ngIf="isAdmin()==false">
             <tr>
               <td contenteditable="false">{{sku.name}}</td>
@@ -84,4 +213,4 @@
       </table>
     </div>
   </div>
-</div>
+</div> -->

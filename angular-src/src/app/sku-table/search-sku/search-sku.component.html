@@ -1,33 +1,16 @@
-<ng-container *ngFor="let keyword of keywords; let id=index">
-  <label class="keyword">{{keyword}} <i (click)="removeKeyword(id)" class="fa fa-remove"> </i></label>
-</ng-container>
-<ng-container *ngFor="let ingredient of ingredients; let id=index">
-  <label class="ingredient">{{ingredient}} <i (click)="removeIngredient(id)" class="fa fa-remove"> </i></label>
-</ng-container>
-<ng-container *ngFor="let productLine of productLines; let id=index">
-  <label class="product-line">{{productLine}} <i (click)="removeProductLine(id)" class="fa fa-remove"> </i></label>
-</ng-container>
+<mat-chip-list>
+  <ng-container *ngFor="let keyword of keywords; let id=index">
+    <mat-chip>{{keyword}} <mat-icon (click)="removeKeyword(id)">clear</mat-icon></mat-chip>
+  </ng-container>
+  <ng-container *ngFor="let ingredient of ingredients; let id=index">
+    <mat-chip color="primary" selected>{{ingredient}} <mat-icon (click)="removeIngredient(id)">clear</mat-icon></mat-chip>
+  </ng-container>
+  <ng-container *ngFor="let productLine of productLines; let id=index">
+    <mat-chip color="accent" selected>{{productLine}} <mat-icon (click)="removeProductLine(id)">clear</mat-icon></mat-chip>
+  </ng-container>
+</mat-chip-list>
 
 <br>
-<!-- <section class="filter-wrapper">
- <div class="dropdown">
-   <span>
-<input [formControl]="inputField" type="text" id="keyword" placeholder="Search for skus/ingredients/product lines"
-  (keydown)="keyPressed($event)" autofocus/>
-  </span>
-
-    <div class="dropdown-content" *ngIf="inputField.value?.length > 0">
-      <ul>
-        <li *ngFor="let ingredient of suggestedIngredients" class="ingredient-list">
-          <p class="ingredient-name" (click) = "addIngredient(ingredient.name)">{{ingredient.name}}</p>
-        </li>
-        <li *ngFor="let productLine of suggestedProductLines" class="product-line-list">
-          <p class="product-line-name" (click) = "addProductLine(productLine.name)">{{productLine.name}}</p>
-        </li>
-      </ul>
-    </div>
-    </div>
-</section> -->
 
 <mat-form-field style="width: 400px;">
   <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Search for skus/ingredients/product lines" (keydown)="keyPressed($event)">

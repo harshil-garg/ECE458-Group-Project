@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Ingredient, Tuple } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { CrudSkuService, Response } from './crud-sku.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'sku-table',
@@ -13,8 +15,6 @@ import { FilterSkuService, FilterResponse } from './filter-sku.service'
 export class SkuTableComponent implements OnInit{
     editField: string;
     skuList: Array<any> = [];
-    currentPage: number;
-    maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
     ingredients: Array<any> = [];
@@ -23,71 +23,92 @@ export class SkuTableComponent implements OnInit{
     ingredientInputs: Array<any> = [];
     quantityInputs: Array<any> = [];
 
+    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'comment'];
+    selection = new SelectionModel<Sku>(true, []);
+    dataSource = new MatTableDataSource<Sku>(this.skuList);
+    maxPages: number;
+    loadingResults: boolean = false;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort) sort: MatSort;
+
     ngOnInit() {
-      this.currentPage = 1;
+      this.paginator.pageIndex = 0
+      this.paginator.page.subscribe(x => this.refresh());
+      this.sort.sortChange.subscribe(x => {
+        this.sortBy = x.active;
+        this.refresh();
+        this.paginator.pageIndex = 0; //reset page to 0 when sort by new field
+      });
       this.refresh();
     }
 
     constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService,
-      public filterSkuService: FilterSkuService){}
+      public filterSkuService: FilterSkuService, private snackBar: MatSnackBar){}
 
-    updateList(id: number, property: string, event: any) {
-      const editField = event.target.textContent;
-      this.skuList[id][property] = editField;
-    }
-
-    remove(deleted_number: any) {
-      this.crudSkuService.remove({
-          number : deleted_number
-        }).subscribe(
-        response => this.handleResponse(response),
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+    remove() {
+      for(let selected of this.selection.selected){
+        var deleted_number = selected.id;
+        this.crudSkuService.remove({
+            number : deleted_number
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+              this.refresh();
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
           }
-        }
-      );
+        );
+      }
+      this.selection.clear();
     }
 
-    edit(num:any, property:string, event:any) {
+    edit(num:any, property:string, updated_value:any) {
       var editedSku : Sku = new Sku();
       var newNumber : number;
       editedSku.id = num*1;
       switch(property){
         case 'name':{
-          editedSku.name = event.target.textContent;
+          editedSku.name = updated_value;
           break;
         }
         case 'id':{
-          newNumber = event.target.textContent;
+          newNumber = updated_value;
           break;
         }
         case 'case_upc':{
-          editedSku.case_upc = event.target.textContent;
+          editedSku.case_upc = updated_value;
           break;
         }
         case 'unit_upc':{
-          editedSku.unit_upc = event.target.textContent;
+          editedSku.unit_upc = updated_value;
           break;
         }
         case 'unit_size':{
-          editedSku.unit_size = event.target.textContent;
+          editedSku.unit_size = updated_value;
           break;
         }
         case 'count_per_case':{
-          editedSku.count_per_case = event.target.textContent*1;
+          editedSku.count_per_case = updated_value;
           break;
         }
         case 'product_line':{
-          editedSku.product_line = event.target.textContent;
+          editedSku.product_line = updated_value;
           break;
         }
         case 'ingredient_quantity':{
-          editedSku.ingredient_quantity = event.target.textContent;
+          editedSku.ingredient_quantity = updated_value;
           break;
         }
         case 'comment':{
-          editedSku.comment = event.target.textContent;
+          editedSku.comment = updated_value;
           break;
         }
       }
@@ -103,12 +124,24 @@ export class SkuTableComponent implements OnInit{
           ingredients: editedSku.ingredient_quantity,
           comment: editedSku.comment
         }).subscribe(
-        response => this.handleResponse(response),
+        response => {
+          if(response.success){
+            this.handleResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
         err => {
           if (err.status === 401) {
             console.log("401 Error")
           }
         });
+    }
+
+    private handleError(response){
+      this.snackBar.open(response.message, "Close", {duration:3000});
+      this.refresh();//refresh changes back to old value
     }
 
     updateIngredientQuantity(editedSku : Sku){
@@ -124,7 +157,14 @@ export class SkuTableComponent implements OnInit{
         ingredients: editedSku.ingredient_quantity,
         comment: editedSku.comment
       }).subscribe(
-        response => this.handleResponse(response),
+        response => {
+          if(response.success){
+            this.handleResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
         err => {
           if (err.status === 401) {
             console.log("401 Error")
@@ -150,9 +190,10 @@ export class SkuTableComponent implements OnInit{
       this.updateIngredientQuantity(editedSku);
     }
 
-    private handleResponse(response: Response) {
+    private handleResponse(response) {
       console.log(response);
-      this.refresh();
+      //don't refresh b/c deselects focued item
+      //this.refresh();
     }
 
     changeValue(id: number, property: string, event: any) {
@@ -164,14 +205,22 @@ export class SkuTableComponent implements OnInit{
     }
 
     refresh(){
+      this.loadingResults = true;
       this.filterSkuService.filter({
           sortBy : this.sortBy,
-          pageNum: this.currentPage.toString(),
+          pageNum: this.paginator.pageIndex.toString()+1,
           keywords: this.keywords,
           ingredients: this.ingredients,
           product_lines: this.productLines
         }).subscribe(
-        response => this.handleRefreshResponse(response),
+        response => {
+          if(response.success){
+            this.handleRefreshResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
         err => {
           if (err.status === 401) {
             console.log("401 Error")
@@ -198,55 +247,57 @@ export class SkuTableComponent implements OnInit{
               comment: sku.comment
           });
         }
+        this.dataSource.data = this.skuList;
         this.maxPages = response.pages;
+        this.loadingResults = false;
       }
     }
-
-    setSortBy(property: string){
-      this.sortBy = property;
-      this.refresh();
-    }
-
-    nextPage(){
-      if(this.currentPage<this.maxPages){
-        this.currentPage++;
-        this.refresh();
-      }
-    }
-
-    prevPage(){
-      if(this.currentPage>1){
-        this.currentPage--;
-        this.refresh();
-      }
-    }
-
-    setPage(i){
-      this.currentPage = i;
-      this.refresh();
-    }
-
-    showAll(){
-      this.currentPage = -1;
-    }
-
-    shownPages(){
-      var numbers : Array<number> = [];
-      if(this.maxPages>5)
-      {
-        for (var i = 1; i < 5; i++) {
-          numbers.push(i);
-        }
-        numbers.push(this.maxPages)
-        return numbers;
-      }
-      else{
-        for (var i = 1; i <= this.maxPages; i++) {
-          numbers.push(i);
-        }
-        return numbers;
-      }
-    }
+    //
+    // setSortBy(property: string){
+    //   this.sortBy = property;
+    //   this.refresh();
+    // }
+    //
+    // nextPage(){
+    //   if(this.currentPage<this.maxPages){
+    //     this.currentPage++;
+    //     this.refresh();
+    //   }
+    // }
+    //
+    // prevPage(){
+    //   if(this.currentPage>1){
+    //     this.currentPage--;
+    //     this.refresh();
+    //   }
+    // }
+    //
+    // setPage(i){
+    //   this.currentPage = i;
+    //   this.refresh();
+    // }
+    //
+    // showAll(){
+    //   this.currentPage = -1;
+    // }
+    //
+    // shownPages(){
+    //   var numbers : Array<number> = [];
+    //   if(this.maxPages>5)
+    //   {
+    //     for (var i = 1; i < 5; i++) {
+    //       numbers.push(i);
+    //     }
+    //     numbers.push(this.maxPages)
+    //     return numbers;
+    //   }
+    //   else{
+    //     for (var i = 1; i <= this.maxPages; i++) {
+    //       numbers.push(i);
+    //     }
+    //     return numbers;
+    //   }
+    // }
 
     keyPressed(sku_num, id, event){
       if(event.keyCode == 13){ //enter pressed
@@ -362,6 +413,19 @@ export class SkuTableComponent implements OnInit{
     setSearchedProductLines(newProductLines : Array<any>){
       this.productLines = newProductLines;
       this.refresh();
+    }
+
+    isAllSelected() {
+      const numSelected = this.selection.selected.length;
+      const numRows = this.dataSource.data.length;
+      return numSelected === numRows;
+    }
+
+/** Selects all rows if they are not all selected; otherwise clear selection. */
+    masterToggle() {
+      this.isAllSelected() ?
+          this.selection.clear() :
+          this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
 }

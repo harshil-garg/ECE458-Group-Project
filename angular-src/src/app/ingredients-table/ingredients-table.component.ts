@@ -45,6 +45,7 @@ export class IngredientsTableComponent implements OnInit{
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
         this.refresh();
+        this.paginator.pageIndex = 0; //reset page to 0 when sort by new field
       });
       this.refresh();
     }

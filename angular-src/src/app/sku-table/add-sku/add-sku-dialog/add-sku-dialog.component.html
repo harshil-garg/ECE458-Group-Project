@@ -1,4 +1,47 @@
-<h1 mat-dialog-title>Add SKU</h1>
+<div class="container">
+    <h1>Add SKU</h1>
+    <form (ngSubmit)="submit()" #skuForm="ngForm">
+      <div class="form-group">
+        <label for="name">SKU Name</label>
+        <input type="text" class="form-control" id="name" maxlength="32" required [(ngModel)]="sku.name" name="name" #name="ngModel">
+        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">Name is required</div>
+
+        <label for="number">SKU Number</label>
+        <input type="number" min="0" class="form-control" id="number" [(ngModel)]="sku.id" name="number" #number="ngModel">
+
+        <label for="case_upc">Case UPC Number</label>
+        <input type="number" class="form-control" id="case_upc" pattern="^[0-1,6-9][0-9]{11}$" required [(ngModel)]="sku.case_upc" name="case_upc" #case_upc="ngModel">
+        <div [hidden]="case_upc.valid || case_upc.pristine" class="alert alert-danger">Must be valid Case UPC</div>
+
+        <label for="unit_upc">Unit UPC Number</label>
+        <input type="number" class="form-control" id="unit_upc" pattern="^[0-1,6-9][0-9]{11}$" required [(ngModel)]="sku.unit_upc" name="unit_upc" #unit_upc="ngModel">
+        <div [hidden]="unit_upc.valid || unit_upc.pristine" class="alert alert-danger">Must be valid Unit UPC</div>
+
+        <label for="unit_size">Unit Size</label>
+        <input type="text" min="0" class="form-control" id="cost_per_package" required [(ngModel)]="sku.unit_size" name="unit_size" #unit_size="ngModel">
+        <div [hidden]="unit_size.valid || unit_size.pristine" class="alert alert-danger">Unit Size is required</div>
+
+        <label for="count_per_case">Count Per Case</label>
+        <input type="number" min="0" class="form-control" id="count_per_case" required [(ngModel)]="sku.count_per_case" name="count_per_case" #count_per_case="ngModel">
+        <div [hidden]="count_per_case.valid || count_per_case.pristine" class="alert alert-danger">Count Per Case is required</div>
+
+        <label for="product_line">Product Line</label>
+        <input type="text" min="0" class="form-control" id="product_line" required [(ngModel)]="sku.product_line" name="product_line" #product_line="ngModel">
+        <div [hidden]="product_line.valid || product_line.pristine" class="alert alert-danger">Product Line is required</div>
+
+        <label for="formula">Formula</label>
+        <input type="text" min="0" class="form-control" id="formula" name="formula">
+
+        <label for="comment">Comment</label>
+        <textarea type="text" class="form-control" id="comment" [(ngModel)]="sku.comment" name="comment" #comment="ngModel"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-success" [disabled]="!skuForm.form.valid || !nameLengthValid" [mat-dialog-close]="sku">Submit</button>
+
+    </form>
+</div>
+
+<!-- <h1 mat-dialog-title>Add SKU</h1>
 <div mat-dialog-content>
   <table class="table table-bordered table-responsive-md table-striped text-center">
     <tr>
@@ -22,7 +65,7 @@
       <td> <input class = "input" [(ngModel)]="sku.unit_size"></td>
       <td> <input class = "input" [(ngModel)]="sku.count_per_case"></td>
       <td> <input class = "input" [(ngModel)]="sku.product_line"></td>
-      <!-- Need way of inputing {product line, quantity} tuples -->
+
       <td contenteditable="false">
         <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
           <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
@@ -41,4 +84,4 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">No Thanks</button>
   <button mat-button [mat-dialog-close]="sku" cdkFocusInitial>Ok</button>
-</div>
+</div> -->

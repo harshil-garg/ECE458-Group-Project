@@ -21,12 +21,13 @@ export class AddSkuComponent {
 
   public openDialog() {
     let dialogRef = this.dialog.open(AddSkuDialogComponent, {
-      height: '400px',
-      width: '1400px',
+      height: '800px',
+      width: '400px',
       data: this.sku
     });
 
     dialogRef.afterClosed().subscribe(result =>{
+      console.log(result);
       if(result!=null){
         this.sku = result;
         this.add(this.sku);

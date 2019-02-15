@@ -13,6 +13,8 @@ export class AddSkuDialogComponent{
 
   ingredientInput: string;
   quantityInput: any;
+  formValid: boolean = true;
+  nameLengthValid: boolean = true;
 
   constructor(
     public dialogRef: MatDialogRef<AddSkuDialogComponent>,
@@ -20,6 +22,14 @@ export class AddSkuDialogComponent{
 
     onNoClick(): void {
       this.dialogRef.close();
+    }
+
+    submit(): void {
+      this.dialogRef.close(this.sku);
+    }
+
+    validateName(form): void{
+      this.nameLengthValid = this.sku.name!=null && this.sku.name.length<33;
     }
 
     keyPressed(event){
