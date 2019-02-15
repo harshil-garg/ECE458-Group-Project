@@ -20,7 +20,7 @@ body: { “email” : “admin”,
 	“name”: “admin”,  
 	“admin”: true  
 }  
-
+  
 admin account: admin  
 admin password: password  
 

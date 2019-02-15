@@ -18,4 +18,8 @@ export class AddProductLineDialogComponent {
       this.dialogRef.close();
     }
 
+    submit(): void {
+      this.dialogRef.close(this.productLine);
+    }
+
 }

@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Add Product Line</h1>
+<!-- <h1 mat-dialog-title>Add Product Line</h1>
 <div mat-dialog-content>
   <table class="table table-bordered table-responsive-md table-striped text-center">
     <tr>
@@ -15,4 +15,20 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">No Thanks</button>
   <button mat-button [mat-dialog-close]="productLine" cdkFocusInitial>Ok</button>
+</div> -->
+
+<div class="container">
+    <h1>Add Product Line</h1>
+    <form (ngSubmit)="submit()" #productLineForm="ngForm">
+      <div class="form-group">
+        <label for="name">Product Line Name</label>
+        <input type="text" class="form-control" id="name" required [(ngModel)]="productLine.name" name="name" #name="ngModel">
+        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+          Name is required
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success" [disabled]="!productLineForm.form.valid" [mat-dialog-close]="productLine">Submit</button>
+
+    </form>
 </div>
