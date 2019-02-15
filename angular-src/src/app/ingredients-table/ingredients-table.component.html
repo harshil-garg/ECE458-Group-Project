@@ -1,5 +1,133 @@
+<h2 class="mat-display-2">Ingredients</h2>
+<div class="search-div">
+    <app-search-ingredient class="search"></app-search-ingredient>
+    <br style="clear:both" />
+</div>
+<div class="button-div">
+  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+  <app-add-ingredient class="add" *ngIf="isAdmin()"></app-add-ingredient>
+  <app-create-dependency-report class="dependency" [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
+  <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
+</div>
+<div class="example-loading-shade" *ngIf="loadingResults">
+  <mat-spinner></mat-spinner>
+</div>
+<table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="mat-elevation-z8">
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Checkbox Column -->
+  <ng-container matColumnDef="select">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+      </mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let row">
+      <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)">
+      </mat-checkbox>
+    </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+			  <input #name matInput placeholder="Name" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
+			</mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="number">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #number matInput placeholder="Number" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Vendor Info Column -->
+  <ng-container matColumnDef="vendor_info">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Vendor Info</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #vendor_info matInput placeholder="Vendor Info" [value]="element.vendor_info" (blur)="edit(element.name, 'vendor_info', vendor_info.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Package Size Column -->
+  <ng-container matColumnDef="package_size">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Package Size</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size', package_size.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Cost Per Package Column -->
+  <ng-container matColumnDef="cost_per_package">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Cost Per Package</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #cost_per_package matInput placeholder="Cost Per Package" [value]="element.cost_per_package" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Comment Column -->
+  <ng-container matColumnDef="comment">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-form-field floatLabel="never">
+        <input #comment matInput placeholder="Comment" [value]="element.comment" (blur)="edit(element.name, 'comment', comment.value)" optional>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Num Skus Column -->
+  <ng-container matColumnDef="num_skus">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>SKUs</th>
+    <td mat-cell *matCellDef="let element"> {{getNumSkus(element)}}
+    <mat-icon *ngIf="expandedIngredient!=element" (click)="expandedIngredient = expandedIngredient === element ? null : element" color="accent">keyboard_arrow_down</mat-icon>
+    <mat-icon *ngIf="expandedIngredient==element" (click)="expandedIngredient = expandedIngredient === element ? null : element" color="accent">keyboard_arrow_up</mat-icon></td>
+  </ng-container>
+
+  <!-- Expanded SKUs Column -->
+  <ng-container matColumnDef="expandedDetail">
+    <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+      <div class="example-element-detail" [@detailExpand]="element == expandedIngredient ? 'expanded' : 'collapsed'">
+        <mat-list>
+          <ng-container *ngFor = "let sku of element.skus; let id2=index">
+            <mat-list-item> {{sku.name}} : {{sku.size}} * {{sku.count}} </mat-list-item>
+          </ng-container>
+        </mat-list>
+      </div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+    class="example-element-row"
+    [class.example-expanded-row]="expandedIngredient === element">
+  </tr>
+  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+  <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr> -->
+</table>
+
+<mat-paginator [length]="maxPages*10" [pageSize]="10" showFirstLastButtons></mat-paginator>
+
+
 <!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
-<div class="card">
+<!-- <div class="card">
   <h3 class="card-header text-center font-weight-bold py-4">Ingredients</h3>
   <app-search-ingredient></app-search-ingredient>
 <div class="pagination">
@@ -12,7 +140,6 @@
 <app-create-dependency-report [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
   <div class="card-body">
     <div id="table" class="table-editable">
-      <!-- <button *ngIf="isAdmin()==true" class = "add" type="button" (click)="add()"><i class="fa fa-plus"></i></button> -->
       <button class = "add" type="button" (click)="export()">Export</button>
       <app-add-ingredient *ngIf="isAdmin()"></app-add-ingredient>
       <table class="table table-bordered table-responsive-md table-striped text-center">
@@ -28,7 +155,6 @@
         </tr>
 
        <ng-container *ngFor="let ingredient of ingredientList; let id=index">
-         <!-- TABLE VIEWED BY ADMIN -->
          <ng-container *ngIf="isAdmin()==true">
             <tr>
               <td contenteditable="true" (keyup)="changeValue(id, 'name', $event); contenteditable = true" (blur)="edit(ingredient.name, 'name', $event)">{{ingredient.name}}</td>
@@ -45,7 +171,6 @@
             </tr>
           </ng-container>
 
-          <!-- TABLE VIEWED BY NON-ADMIN -->
           <ng-container *ngIf="isAdmin()==false">
             <tr>
               <td contenteditable="false">{{ingredient.name}}</td>
@@ -58,7 +183,6 @@
             </tr>
           </ng-container>
 
-          <!--<ng-container *ngIf="(skuShown[id].shown == true)">-->
           <ng-container *ngIf="(skuShown[id]==true)">
             <tr class="blankcell" *ngFor = "let sku of ingredient.skus; let id2=index">
               <td class="blankcell"></td>
@@ -70,4 +194,4 @@
       </table>
     </div>
   </div>
-</div>
+</div> -->

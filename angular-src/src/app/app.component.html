@@ -29,25 +29,25 @@
 			</div>
 	 	</div>
  	</div> -->
-	<div *ngIf="this.authService.loginState.loggedIn">
-<mat-toolbar color="primary" *ngIf="this.authService.loginState.loggedIn">
-<mat-toolbar-row>
-<span>{{title}}</span>
-    <span class="example-fill-remaining-space"></span>
-    <span class="align-center"></span>
-    <span class="example-spacer"></span>
-    <button mat-button (click)="router.navigate(['dashboard'])">Home</button>
-		<button mat-button [matMenuTriggerFor]="menu">Database</button>
-			<mat-menu #menu="matMenu">
-			  <button mat-menu-item (click)="router.navigate(['dashboard/ingredients'])">Ingredients</button>
-			  <button mat-menu-item (click)="router.navigate(['dashboard/product-lines'])">Product Lines</button>
-				<button mat-menu-item (click)="router.navigate(['dashboard/skus'])">SKUs</button>
-			</mat-menu>
-			<button mat-button (click)="router.navigate(['dashboard/manufacturing'])">Manufacturing</button>
-			<button mat-button (click)="router.navigate(['dashboard/upload'])">Data Import</button>
-			<button mat-button (click)="router.navigate(['dashboard/accounts'])">Accounts</button>
- </mat-toolbar-row>
-</mat-toolbar>
+<div *ngIf="this.authService.loginState.loggedIn">
+	<mat-toolbar class="fixed-header" color="primary" *ngIf="this.authService.loginState.loggedIn">
+	<mat-toolbar-row>
+	<span>{{title}}</span>
+	    <span class="example-fill-remaining-space"></span>
+	    <span class="align-center"></span>
+	    <span class="example-spacer"></span>
+	    <button mat-button (click)="router.navigate(['dashboard'])">Home</button>
+			<button mat-button [matMenuTriggerFor]="menu">Database</button>
+				<mat-menu #menu="matMenu">
+				  <button mat-menu-item (click)="router.navigate(['dashboard/ingredients'])">Ingredients</button>
+				  <button mat-menu-item (click)="router.navigate(['dashboard/product-lines'])">Product Lines</button>
+					<button mat-menu-item (click)="router.navigate(['dashboard/skus'])">SKUs</button>
+				</mat-menu>
+				<button mat-button (click)="router.navigate(['dashboard/manufacturing'])">Manufacturing</button>
+				<button mat-button (click)="router.navigate(['dashboard/upload'])">Data Import</button>
+				<button mat-button (click)="router.navigate(['dashboard/accounts'])">Accounts</button>
+	 </mat-toolbar-row>
+	</mat-toolbar>
 </div>
 <router-outlet></router-outlet>
 <!-- </div> -->

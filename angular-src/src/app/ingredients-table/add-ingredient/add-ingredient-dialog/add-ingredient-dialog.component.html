@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Add Ingredient</h1>
+<!-- <h1 mat-dialog-title>Add Ingredient</h1>
 <div mat-dialog-content>
   <table class="table table-bordered table-responsive-md table-striped text-center">
     <tr>
@@ -25,4 +25,36 @@
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">No Thanks</button>
   <button mat-button [mat-dialog-close]="ingredient" cdkFocusInitial>Ok</button>
+</div> -->
+
+<div class="container">
+    <h1>Add Ingredient</h1>
+    <form (ngSubmit)="submit()" #ingredientForm="ngForm">
+      <div class="form-group">
+        <label for="name">Ingredient Name</label>
+        <input type="text" class="form-control" id="name" required [(ngModel)]="ingredient.name" name="name" #name="ngModel">
+        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">Name is required</div>
+
+        <label for="number">Ingredient Number</label>
+        <input type="number" min="0" class="form-control" id="number" [(ngModel)]="ingredient.id" name="number" #number="ngModel">
+
+        <label for="vendor_info">Vendor Information</label>
+        <input type="text" class="form-control" id="vendor_info" required [(ngModel)]="ingredient.vendor_info" name="vendor_info" #vendor_info="ngModel">
+        <div [hidden]="vendor_info.valid || vendor_info.pristine" class="alert alert-danger">Vendor Info is required</div>
+
+        <label for="vendor_info">Package Size</label>
+        <input type="text" class="form-control" id="package_size" required [(ngModel)]="ingredient.package_size" name="package_size" #package_size="ngModel">
+        <div [hidden]="package_size.valid || package_size.pristine" class="alert alert-danger">Package Size is required</div>
+
+        <label for="cost_per_package">Cost Per Package</label>
+        <input type="number" min="0" class="form-control" id="cost_per_package" required [(ngModel)]="ingredient.cost_per_package" name="cost_per_package" #cost_per_package="ngModel">
+        <div [hidden]="cost_per_package.valid || cost_per_package.pristine" class="alert alert-danger">Cost Per Package is required</div>
+
+        <label for="comment">Comment</label>
+        <input type="text" class="form-control" id="comment" [(ngModel)]="ingredient.comment" name="comment" #comment="ngModel">
+      </div>
+
+      <button type="submit" class="btn btn-success" [disabled]="!ingredientForm.form.valid" [mat-dialog-close]="ingredient">Submit</button>
+
+    </form>
 </div>

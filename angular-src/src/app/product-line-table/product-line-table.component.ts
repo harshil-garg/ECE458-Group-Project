@@ -29,7 +29,6 @@ export class ProductLineTableComponent implements OnInit{
 
     remove() {
       for(let selected of this.selection.selected){
-        console.log(selected.name);
         var deleted_name = selected.name;
         this.crudProductLineService.remove({
             name : deleted_name
@@ -50,6 +49,7 @@ export class ProductLineTableComponent implements OnInit{
           }
         );
       }
+      this.selection.clear();
     }
 
     edit(name:any, property:string, updated_value:any) {

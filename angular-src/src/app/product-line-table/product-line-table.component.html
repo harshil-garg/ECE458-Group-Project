@@ -1,6 +1,6 @@
 <!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
-<h4 class="mat-display-4">Product Lines</h4>
-<div>
+<h2 class="mat-display-2">Product Lines</h2>
+<div id="search-div">
   <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
   <app-add-product-line class="add" *ngIf="isAdmin()"></app-add-product-line>
   <button  class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
