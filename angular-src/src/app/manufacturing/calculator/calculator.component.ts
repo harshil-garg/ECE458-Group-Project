@@ -10,6 +10,7 @@ import { CalculatorDialogComponent } from './calculator-dialog/calculator-dialog
 export class CalculatorComponent {
 
       @Input() manufGoal: string;
+      @Input() disabled: boolean;
 
       constructor(public dialog: MatDialog) {}
 

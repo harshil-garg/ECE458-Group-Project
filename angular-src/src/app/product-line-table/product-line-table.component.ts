@@ -17,6 +17,7 @@ export class ProductLineTableComponent implements OnInit{
     selection = new SelectionModel<ProductLine>(true, []);
     dataSource = new MatTableDataSource<ProductLine>(this.productLineList);
     maxPages: number;
+    loadingResults: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
@@ -96,6 +97,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     refresh(){
+      this.loadingResults = true;
       this.crudProductLineService.read({
           pageNum: this.paginator.pageIndex+1
         }).subscribe(
@@ -117,7 +119,8 @@ export class ProductLineTableComponent implements OnInit{
           });
         }
         this.dataSource.data = this.productLineList;
-        this.maxPages = response.pages;
+        this.maxPages = response.pages
+        this.loadingResults = false;
       }
     }
 
