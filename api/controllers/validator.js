@@ -7,7 +7,7 @@ module.exports.compileErrors = function(){
         //arg[0] contains the boolean value of iff the test passed
         if(!arg[0]){
             //arg[1] contains the error messages
-            errors.push(arg[1]);
+            errors = errors.concat(arg[1]);
         }
     }
     return errors;

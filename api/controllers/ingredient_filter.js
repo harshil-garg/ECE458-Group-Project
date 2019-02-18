@@ -24,8 +24,7 @@ module.exports.filter = async function(pageNum, sortBy, keywords, skus){
         let formulaList = await Formula.find({_id: {$in: formulaIDs}});
         let ingredientIDs = getIngredients(formulaList);
 
-        pipeline.push({$match: {_id: {$in: ingredientIDs}}},
-            {$addFields: {skus: skuList}});
+        pipeline.push({$match: {_id: {$in: ingredientIDs}}});
     }
     pipeline.push({$addFields: {cost: validator.roundCost('$cost')}})
 
@@ -33,7 +32,9 @@ module.exports.filter = async function(pageNum, sortBy, keywords, skus){
 
     let result = await pagination.paginate(agg, Ingredient, pageNum, sortBy);
 
-    return result;
+
+
+    return appendSKUs(result);
 }
 
 function getFormulas(skus){
@@ -52,6 +53,28 @@ function getIngredients(formulas){
         }
     }
     return Array.from(ingredients);
+}
+
+async function appendSKUs(ingredients){
+    for(let ingredient of ingredients.data){
+        let formulas = await Formula.find({'ingredient_tuples.ingredient': ingredient._id}).exec();
+        let skus = [];
+        for(let formula of formulas){
+            let skuList = await SKU.find({formula: formula._id}, 'name size count number').exec();
+            skus = skus.concat(skuList);
+        }
+        ingredient.num_skus = skus.length;
+        //save num skus
+        await Ingredient.updateIngredient(ingredient.name, ingredient, (err) => {
+            if(err){
+                res.json({success: false, message: err});
+            }       
+        });
+        ingredient.skus = skus;
+    }
+
+    return ingredients;
+    
 }
 
 
