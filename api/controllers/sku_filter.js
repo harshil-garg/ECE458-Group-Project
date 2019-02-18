@@ -1,70 +1,62 @@
 const SKU = require('../model/sku_model');
 const pagination = require('./paginate');
 
-module.exports.none = async function (pageNum, sortBy){
-    let filter = SKU.find({});
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
+module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, product_lines){
+    let pipeline = [];
 
-module.exports.keywords = async function (pageNum, sortBy, keywords){
-    let filter = SKU.find({
-        $or:[
-            {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}]
+    if(keywords.length > 0){
+        pipeline.push({$addFields: {num2str: {'$toLower' : '$number'}}},
+        {
+            $match: {
+                $or:[
+                    {name: {$all: keywords}},
+                    {num2str: {$all: keywords}},
+                    {case_upc: {$all: keywords}},
+                    {unit_upc: {$all: keywords}}]
+                }
+        });
+    }
+    pipeline.push({
+        $lookup: {
+            from: 'formulas',
+            localField: 'formula',
+            foreignField: '_id',
+            as: 'formula'
         }
-    );
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
+    },
+    {$unwind: '$formula'})
+    if(ingredients.length > 0){
+        pipeline.push({
+            $lookup: {
+                from: 'ingredients',
+                localField: 'formula.ingredient_tuples.ingredient',
+                foreignField: '_id',
+                as: 'ingredients'
+            }
+        },
+        {
+            $unwind: '$ingredients'
+        },
+        {
+            $match: {'ingredients.name': {$all: ingredients}}
+        });
+    }
+    pipeline.push({
+        $lookup: {
+            from: 'productlines',
+            localField: 'product_line',
+            foreignField: '_id',
+            as: 'product_line'
+        }
+    },
+    {$unwind: '$product_line'});
+    if(product_lines.length > 0){
+        pipeline.push({$match: {'product_line.name': {$all: product_lines}}});   
+    }
 
-module.exports.ingredients = async function (pageNum, sortBy, ingredients){
-    let filter = SKU.find({'ingredients.ingredient_name': {$all: ingredients}});
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
+    let agg = SKU.aggregate(pipeline);
 
-module.exports.productLines = async function (pageNum, sortBy, product_lines){
-    let filter = SKU.find({product_line: {$all: product_lines}});
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
+    let result = await pagination.paginate(agg, SKU, pageNum, sortBy);
 
-module.exports.keywordsandIngredients = async function (pageNum, sortBy, keywords, ingredients){
-    let filter = SKU.find({'ingredients.ingredient_name': {$all: ingredients},       
-        $or:[
-            {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}
-        ]
-    });
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
-
-module.exports.keywordsandLines = async function (pageNum, sortBy, keywords, product_lines){
-    let filter = SKU.find({product_line: {$all: product_lines},
-        $or:[
-            {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}
-        ]
-    });
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
-
-module.exports.ingredientsandLines = async function (pageNum, sortBy, ingredients, product_lines){
-    let filter = SKU.find({'ingredients.ingredient_name': {$all: ingredients},
-        product_line: {$all: product_lines}
-    });
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
-
-module.exports.allFilters = async function (pageNum, sortBy, keywords, ingredients, product_lines) {
-    let filter = SKU.find({      
-        product_line: {$all: product_lines},
-        'ingredients.ingredient_name': {$all: ingredients},
-        $or:[
-            {name: {$all: keywords}},
-            {size: {$all: keywords}},
-            {comment: {$all: keywords}}
-        ]
-    });
-    return await pagination.paginate(filter, SKU, pageNum, sortBy);
-};
+    return result;
+}

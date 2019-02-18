@@ -111,7 +111,7 @@ router.post('/all', async (req, res) => {
 
 // CREATE
 router.post('/create', async (req, res) => {
-    const { name, skus } = req.body;
+    const { name, skus, deadline } = req.body;
     const required_params = { name, skus };
 
     if(!input_validator.passed(required_params, res)){
@@ -139,7 +139,7 @@ router.post('/create', async (req, res) => {
         user = req.user.email;
     }
 
-    let goal = new ManufacturingGoal({name, skus, user});
+    let goal = new ManufacturingGoal({name, skus, user, deadline});
 
     ManufacturingGoal.create(goal, (error) => {
         if (error) {
