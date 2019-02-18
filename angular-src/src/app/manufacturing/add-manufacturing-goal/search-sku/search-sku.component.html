@@ -1,5 +1,5 @@
 <mat-form-field style="width: 300px;">
-  <input type="text" matInput [formControl]="productLineField" [matAutocomplete]="productLine" placeholder="Product Line" (keydown)="keyPressedProductLine($event)">
+  <input type="search" matInput [formControl]="productLineField" [matAutocomplete]="productLine" placeholder="Product Line" (keydown)="keyPressedProductLine($event)">
 </mat-form-field>
 
 <mat-autocomplete #productLine="matAutocomplete" (optionSelected)="onProductLineSelection($event)">
@@ -8,7 +8,7 @@
 </mat-autocomplete>
 
 <mat-form-field style="width: 300px;">
-  <input type="text" matInput [formControl]="skuField" [matAutocomplete]="sku" placeholder="SKU" (keydown)="keyPressedSku($event)">
+  <input type="search" matInput [formControl]="skuField" [matAutocomplete]="sku" placeholder="SKU" (keydown)="keyPressedSku($event)">
 </mat-form-field>
 
 <mat-autocomplete #sku="matAutocomplete" (optionSelected)="onSkuSelection($event)">

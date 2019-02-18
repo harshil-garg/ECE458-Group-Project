@@ -21,6 +21,10 @@ export class AddManufacturingGoalDialogComponent {
       this.dialogRef.close();
     }
 
+    submit(): void {
+      this.dialogRef.close(this.manufGoal);
+    }
+
     keyPressed(event){
       if(event.keyCode == 13){ //enter pressed
         if(this.skuInput!=null && this.skuInput.length>0 && this.quantityInput!=null && this.quantityInput.length>0){

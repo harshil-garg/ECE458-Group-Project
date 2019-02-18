@@ -98,3 +98,11 @@ mat-icon:hover{
   align-items: center;
   justify-content: center;
 }
+
+button {
+  margin: 5px;
+}
+
+.unit-picker-component .mat-form-field-infix {
+  display: inherit;
+}

@@ -8,10 +8,10 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
  import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SearchSkuComponent } from './search-sku/search-sku.component';
-import { MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule } from '@angular/material';
+import { MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule } from '@angular/material';
 
 @NgModule({
-  imports: [CommonModule, FlexLayoutModule, HttpClientModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule, FlexLayoutModule, HttpClientModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule],
   declarations: [AddManufacturingGoalComponent, AddManufacturingGoalDialogComponent, SearchSkuComponent],
   exports: [AddManufacturingGoalComponent],
   entryComponents: [AddManufacturingGoalDialogComponent], // Add the DialogComponent as entry component

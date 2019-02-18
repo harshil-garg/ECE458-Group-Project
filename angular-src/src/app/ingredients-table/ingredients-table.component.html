@@ -70,6 +70,17 @@
       <mat-form-field floatLabel="never">
         <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size', package_size.value)" required>
       </mat-form-field>
+      <!-- <div class="unit-picker-component">
+        <mat-form-field>
+           <mat-label>Package Size</mat-label>
+           <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size_number', package_size.value)" required>
+           <mat-select name="unit" class="unit" [(ngModel)]="element.package_size.unit">
+             <ng-container *ngFor="let type of measUnits">
+               <mat-option>{{type}}</mat-option>
+             </ng-container>
+           </mat-select>
+         </mat-form-field>
+      </div> -->
     </td>
   </ng-container>
 

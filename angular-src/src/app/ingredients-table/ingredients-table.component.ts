@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Ingredient } from '../model/ingredient'
+import { MeasurementUnit } from '../model/measurement-unit'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { CrudIngredientsService, Response } from './crud-ingredients.service';
@@ -22,6 +23,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 })
 export class IngredientsTableComponent implements OnInit{
 
+    measUnits: Array<any>;
     editField: string;
     ingredientList: Array<any> = [];
     sortBy: string = "name";
@@ -47,6 +49,7 @@ export class IngredientsTableComponent implements OnInit{
         this.refresh();
         this.paginator.pageIndex = 0; //reset page to 0 when sort by new field
       });
+      this.measUnits = MeasurementUnit.values();
       this.refresh();
     }
 

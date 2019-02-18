@@ -10,3 +10,7 @@
   font-size: 12px;
   cursor: pointer;
 }
+
+button {
+  margin: 5px;
+}

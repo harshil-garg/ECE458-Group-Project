@@ -20,8 +20,8 @@ export class AddManufacturingGoalComponent {
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddManufacturingGoalDialogComponent, {
-        height: '400px',
-        width: '1400px',
+        height: '800px',
+        width: '600px',
         data: this.manufGoal
       });
 

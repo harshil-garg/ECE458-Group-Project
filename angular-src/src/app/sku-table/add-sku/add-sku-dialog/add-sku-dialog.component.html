@@ -10,11 +10,11 @@
         <input type="number" min="0" class="form-control" id="number" [(ngModel)]="sku.id" name="number" #number="ngModel">
 
         <label for="case_upc">Case UPC Number</label>
-        <input type="number" class="form-control" id="case_upc" pattern="^[0-1,6-9][0-9]{11}$" required [(ngModel)]="sku.case_upc" name="case_upc" #case_upc="ngModel">
+        <input type="text" class="form-control" id="case_upc" pattern="^[0-1,6-9][0-9]{11}$" required [(ngModel)]="sku.case_upc" name="case_upc" #case_upc="ngModel">
         <div [hidden]="case_upc.valid || case_upc.pristine" class="alert alert-danger">Must be valid Case UPC</div>
 
         <label for="unit_upc">Unit UPC Number</label>
-        <input type="number" class="form-control" id="unit_upc" pattern="^[0-1,6-9][0-9]{11}$" required [(ngModel)]="sku.unit_upc" name="unit_upc" #unit_upc="ngModel">
+        <input type="text" class="form-control" id="unit_upc" pattern="^[0-1,6-9][0-9]{11}$" required [(ngModel)]="sku.unit_upc" name="unit_upc" #unit_upc="ngModel">
         <div [hidden]="unit_upc.valid || unit_upc.pristine" class="alert alert-danger">Must be valid Unit UPC</div>
 
         <label for="unit_size">Unit Size</label>
