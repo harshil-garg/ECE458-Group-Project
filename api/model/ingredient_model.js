@@ -17,7 +17,7 @@ const IngredientSchema = new Schema({
         type: String
     },
     package_size: {
-        type: String,
+        type: Number,
         required: true
     }, 
     unit: {

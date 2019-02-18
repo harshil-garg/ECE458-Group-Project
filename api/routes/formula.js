@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Formula = require('../model/formula_model');
 const Ingredient = require('../model/ingredient_model');
 const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
@@ -59,23 +60,26 @@ router.post('/delete', (req, res) => {
 module.exports.createFormula = async function(name, number, ingredient_tuples, comment, res){
     const required_params = { name, number, ingredient_tuples };
     let inputs_exist = validator.inputsExist(required_params);
+
+    //Check if given ingredients exist and have valid units
     let valid_tuples = [];
     for(let tuple of ingredient_tuples){
-        await valid_tuples.push(validator.validIngredientTuple(tuple.ingredient_name, tuple.unit));
+        valid_tuples.push(await validator.validIngredientTuple(tuple.ingredient, tuple.unit));
     }
     
     let errors = validator.compileErrors(inputs_exist, ...valid_tuples);
 
     if(errors.length > 0){
+        console.log(errors)
         res.json({success: false, message: errors});
         return;
     }
-
+    //change from ingredient name to id
     for(let i = 0; i < valid_tuples.length; i++){
-        ingredient_tuples[i]['ingredient'] = valid_tuples[2]; //id of ingredient
+        ingredient_tuples[i]['ingredient'] = valid_tuples[i][2]; //id of ingredient
     }
-
     const formula = new Formula({name, number, ingredient_tuples, comment});
+
     return Formula.create(formula);
 }
 

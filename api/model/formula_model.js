@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const Ingredient_Tuple = new Schema({
     ingredient: {
         type: Schema.ObjectId,
-        required: true
+        required: true,
+        ref: 'Ingredient'
     },
     quantity: {
         type: Number,

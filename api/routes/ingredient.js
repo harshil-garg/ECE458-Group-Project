@@ -6,16 +6,12 @@ const ingredient_filter = require('../controllers/ingredient_filter');
 const autocomplete = require('../controllers/autocomplete');
 const input_validator = require('../controllers/input_validation');
 const generator = require('../controllers/autogen');
-const validator = require('../controllers/ingredient_validation');
+const validator = require('../controllers/validator');
 
 //Autocomplete
 router.post('/autocomplete', (req, res) => {
     const {input} = req.body;
-    const required_params = { input };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
     autocomplete.skus(SKU, input, res);
 });
 
@@ -23,11 +19,6 @@ router.post('/autocomplete', (req, res) => {
 //request params: sortBy, direction, pageNum, keywords, skus
 router.post('/filter', async (req, res) => {
     const { sortBy, pageNum, keywords, skus } = req.body;
-    const required_params = { sortBy, pageNum, keywords, skus };
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     let key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
@@ -63,29 +54,26 @@ router.post('/filter', async (req, res) => {
 //CREATE
 router.post('/create', async (req, res) => {
     //TODO: add unit
-    const { name, number, vendor_info, package_size, cost, comment } = req.body;
-    const required_params = { name, package_size, cost };
+    const { name, number, vendor_info, package_size, unit, cost, comment } = req.body;
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
-    if(!validator.valid_cost(cost)){
-        res.json({success: false, message: 'Input invalid'});
+    let cost_passed = validator.isPositive(cost);
+    if(!cost_passed[0]){
+        res.json({success: false, message: cost_passed[1]});
         return;
     }
 
-    let rounded_cost = validator.round_cost(cost);
+    let rounded_cost = validator.roundCost(cost);
     //Autogen number logic
     if (number) {
-        create_ingredient(res, name, number, vendor_info, package_size, rounded_cost, comment);
+        create_ingredient(res, name, number, vendor_info, package_size, unit, rounded_cost, comment);
     } else {
         let gen_number = await generator.autogen(Ingredient);
-        create_ingredient(res, name, gen_number, vendor_info, package_size, rounded_cost, comment);
+        create_ingredient(res, name, gen_number, vendor_info, package_size, unit, rounded_cost, comment);
     }
 });
 
-function create_ingredient(res, name, number, vendor_info, package_size, cost, comment) {
-    let ingredient = new Ingredient({name, number, vendor_info, package_size, cost, comment});
+function create_ingredient(res, name, number, vendor_info, package_size, unit, cost, comment) {
+    let ingredient = new Ingredient({name, number, vendor_info, package_size, unit, cost, comment});
     Ingredient.createIngredient(ingredient, (error) => {
         if (error) {
             res.json({success: false, message: `Failed to create a new ingredient. Error: ${error}`});

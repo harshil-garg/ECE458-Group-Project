@@ -7,6 +7,39 @@ module.exports.none = async function (pageNum, sortBy){
 };
 
 module.exports.keywords = async function (pageNum, sortBy, keywords){
+    //add field for string version of number to filter by
+    let cursor = SKU.aggregate({$addFields: {num2str: {'$toLower' : '$number'}}})
+        .match({
+        $or:[
+            {name: {$all: keywords}},
+            {num2str: {$all: keywords}},
+            {case_upc: {$all: keywords}},
+            {unit_upc: {$all: keywords}}]
+        })
+        .lookup({
+            from: 'Formula',
+            localField: 'formula',
+            foreignField: '_id',
+            as: 'formula_docs'
+        })
+        .lookup({
+            from: 'Ingredient',
+            localField: 'formula_docs.ingredient_tuples.ingredient',
+            foreignField: '_id',
+            as: 'ingredient_docs'
+        })
+        .match({'ingredient_docs.name': {$all: ingredients}})
+        .lookup({
+            from: 'ProductLine',
+            localField: 'product_line',
+            foreignField: '_id',
+            as: 'product_line_docs'
+        })
+        .match({'product_line_docs.name': {$all: product_lines}})
+        .cursor({}).exec();
+
+
+    
     let filter = SKU.find({
         $or:[
             {name: {$all: keywords}},

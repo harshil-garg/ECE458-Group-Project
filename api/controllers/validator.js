@@ -7,7 +7,7 @@ module.exports.compileErrors = function(){
         //arg[0] contains the boolean value of iff the test passed
         if(!arg[0]){
             //arg[1] contains the error messages
-            errors.concat(arg[1]);
+            errors.push(arg[1]);
         }
     }
     return errors;
@@ -47,7 +47,7 @@ module.exports.inputsExist = function(params){
         }
     }
 
-    return [errors.length > 0, errors];
+    return [errors.length == 0, errors];
 }
 
 const first_digit = new Set(['0', '1', '6', '7', '8', '9'])
@@ -99,11 +99,11 @@ module.exports.proper_name_length = function(name){
 
 module.exports.proper_shortname_length = function(shortname){
     let err_msg = 'Shortname must be 5 characters or fewer';
-    return [name.length <= 5, err_msg];
+    return [shortname.length <= 5, err_msg];
 }
 
-module.exports.isPositive = function(number){
-    let err_msg = 'Value must be positive';
+module.exports.isPositive = function(number, field){
+    let err_msg = `${field} must be positive`;
     return [number >= 0, err_msg];
 }
 

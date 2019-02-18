@@ -3,9 +3,12 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const Tuple = new Schema({
-    sku_name: String,
-    sku_number: Number,
+const SKU_Tuple = new Schema({
+    sku: {
+        type: Schema.ObjectId,
+        required: true,
+        ref: 'SKU'
+    },
     case_quantity: Number
 });
 
@@ -16,7 +19,7 @@ const ManufacturingGoalSchema = new Schema({
         unique: true
     },
     skus: {
-        type: [Tuple],
+        type: [SKU_Tuple],
         required: true
     },
     user: {

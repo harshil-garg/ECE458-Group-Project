@@ -35,37 +35,78 @@ router.post('/filter', async (req, res) => {
     let key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
+
+    let skus = []
+    let cursor = filter(key_exps, ingredients, product_lines)    
+    await cursor.eachAsync((sku) => {
+        skus.push(sku);
+    });
     
-    if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.none(pageNum, sortBy);
-        res.json(results);
-    }else if(ingredients.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.keywords(pageNum, sortBy, key_exps);
-        res.json(results);
-    }else if(keywords.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.ingredients(pageNum, sortBy, ingredients);
-        res.json(results);
-    }else if(keywords.length == 0 && ingredients.length == 0){
-        let results = await sku_filter.productLines(pageNum, sortBy, product_lines);
-        res.json(results);
-    }else if(product_lines.length == 0){
-        let results = await sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients);
-        res.json(results);
-    }else if(keywords.length == 0){
-        let results = await sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines);
-        res.json(results);
-    }else if(ingredients.length == 0){
-        let results = await sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines);
-        res.json(results);
-    }else{
-        let results = await sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines);
-        res.json(results);
-    }
+    res.json({success: true, data: skus});
+
+    // if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
+    //     let results = await sku_filter.none(pageNum, sortBy);
+    //     res.json(results);
+    // }else if(ingredients.length == 0 && product_lines.length == 0){
+    //     let results = await sku_filter.keywords(pageNum, sortBy, key_exps);
+    //     res.json(results);
+    // }else if(keywords.length == 0 && product_lines.length == 0){
+    //     let results = await sku_filter.ingredients(pageNum, sortBy, ingredients);
+    //     res.json(results);
+    // }else if(keywords.length == 0 && ingredients.length == 0){
+    //     let results = await sku_filter.productLines(pageNum, sortBy, product_lines);
+    //     res.json(results);
+    // }else if(product_lines.length == 0){
+    //     let results = await sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients);
+    //     res.json(results);
+    // }else if(keywords.length == 0){
+    //     let results = await sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines);
+    //     res.json(results);
+    // }else if(ingredients.length == 0){
+    //     let results = await sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines);
+    //     res.json(results);
+    // }else{
+    //     let results = await sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines);
+    //     res.json(results);
+    // }
 });
+
+function filter(keywords, ingredients, product_lines){
+    let cursor = SKU.aggregate({$addFields: {num2str: {'$toLower' : '$number'}}})
+        .match({
+        $or:[
+            {name: {$all: keywords}},
+            {num2str: {$all: keywords}},
+            {case_upc: {$all: keywords}},
+            {unit_upc: {$all: keywords}}]
+        })
+        // .lookup({
+        //     from: 'Formula',
+        //     localField: 'formula',
+        //     foreignField: '_id',
+        //     as: 'formula_docs'
+        // })
+        // .lookup({
+        //     from: 'Ingredient',
+        //     localField: 'formula_docs.ingredient_tuples.ingredient',
+        //     foreignField: '_id',
+        //     as: 'ingredient_docs'
+        // })
+        // .match({'ingredient_docs.name': {$all: ingredients}})
+        // .lookup({
+        //     from: 'ProductLine',
+        //     localField: 'product_line',
+        //     foreignField: '_id',
+        //     as: 'product_line_docs'
+        // })
+        // .match({'product_line_docs.name': {$all: product_lines}})
+        .cursor({}).exec();
+    return cursor;
+}
 
 //Create
 router.post('/create', async (req, res) => {
-    const { name, number, case_upc, unit_upc, size, count, product_line, formula, scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
+    const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
 
     let product_passed = await validator.itemExists(ProductLine, product_line);
     let manufacturings_passed = []
@@ -78,32 +119,33 @@ router.post('/create', async (req, res) => {
     let case_passed = validator.isUPCStandard(case_upc);
     let unit_passed = validator.isUPCStandard(unit_upc);
     let name_passed = validator.proper_name_length(name);
-    let count_passed = validator.isPositive(count);
-    let scale_passed = validator.isPositive(scale_factor);
-    let rate_passed = validator.isPositive(manufacturing_rate);
+    let count_passed = validator.isPositive(count, 'Count');
+    let scale_passed = validator.isPositive(formula_scale_factor, 'Scale factor');
+    let rate_passed = validator.isPositive(manufacturing_rate, 'Manufacturing Rate');
     
-    let errors = validator.compileErrors(product_passed, ...manufacturing_passed, case_passed, unit_passed, name_passed, count_passed, scale_passed, rate_passed);
+    let errors = validator.compileErrors(product_passed, ...manufacturings_passed, case_passed, unit_passed, name_passed, count_passed, scale_passed, rate_passed);
     if(errors.length > 0){
         res.json({success: false, message: errors});
         return;
     }
-    count = validator.roundCost(count);
+    let int_count = validator.forceInteger(count);
     let product_line_id = product_passed[2];
 
-    let formula_id = await formulaHandler(formula);
+    let formula_id = await formulaHandler(formula, res);
+    // console.log(formula_id)
     if(!formula_id){
         return;
     }
 
     if(number){
-        create_SKU(name, number, case_upc, unit_upc, size, count, product_line_id, formula_id, scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
+        create_SKU(name, number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
     }else{
         let gen_number = await generator.autogen(SKU);
-        create_SKU(name, gen_number, case_upc, unit_upc, size, count, product_line_id, formula_id, scale_factor, manufacturing_ids, manufacturing_rate, comment, res);        
+        create_SKU(name, gen_number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);        
     }    
 });
 
-async function formulaHandler(formula){
+async function formulaHandler(formula, res){
     if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
         let formula_passed = await validator.itemExists(Formula, formula.name);
         if(!formula_passed[0]){
@@ -115,6 +157,9 @@ async function formulaHandler(formula){
         if(formula.number){
             try{
                 let new_formula = await FormulaRoute.createFormula(formula.name, formula.number, formula.ingredient_tuples, formula.comment);
+                if(!new_formula){
+                    return;
+                }
                 return new_formula._id;
             }catch(err){
                 res.json({success: false, message: err});
@@ -124,6 +169,9 @@ async function formulaHandler(formula){
             let gen_number = await generator.autogen(Formula);
             try{
                 let new_formula = await FormulaRoute.createFormula(formula.name, gen_number, formula.ingredient_tuples, formula.comment);
+                if(!new_formula){
+                    return;
+                }
                 return new_formula._id;
             }catch(err){
                 res.json({success: false, message: err});
@@ -133,8 +181,8 @@ async function formulaHandler(formula){
     }
 }
 
-function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
-    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, scale_factor, manufacturing_lines, manufacturing_rate, comment});
+function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
+    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment});
     SKU.createSKU(sku, (err) => {
         if(err){
             res.json({success: false, message: `Failed to create SKU. Error: ${err}`});
@@ -146,7 +194,7 @@ function create_SKU(name, number, case_upc, unit_upc, size, count, product_line,
 
 //Update
 router.post('/update', async (req, res) => {
-    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
+    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
     const required_params = { number };
 
     if(!validator.passed(required_params, res)){
@@ -210,13 +258,13 @@ router.post('/update', async (req, res) => {
 
         json["formula"] = formula_id;
     }
-    if (scale_factor) {
-        let scale_passed = validator.isPositive(scale_factor);
+    if (formula_scale_factor) {
+        let scale_passed = validator.isPositive(formula_scale_factor);
         if(!scale_passed[0]){
             res.json({success: false, message: scale_passed[1]});
             return;
         }
-        json["formula_scale_factor"] = scale_factor;
+        json["formula_scale_factor"] = formula_scale_factor;
     }
     if (manufacturing_lines) {
         let manufacturings_passed = []
