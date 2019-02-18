@@ -18,13 +18,17 @@ const ManufacturingGoalSchema = new Schema({
         required: true,
         unique: true
     },
-    skus: {
+    sku_tuples: {
         type: [SKU_Tuple],
         required: true
     },
     user: {
         type: String,
         required: true,
+    },
+    deadline: {
+        type: Date,
+        required: true
     }
 });
 

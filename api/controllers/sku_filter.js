@@ -23,7 +23,8 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
             foreignField: '_id',
             as: 'formula'
         }
-    })
+    },
+    {$unwind: '$formula'})
     if(ingredients.length > 0){
         pipeline.push({
             $lookup: {
@@ -40,18 +41,17 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
             $match: {'ingredients.name': {$all: ingredients}}
         });
     }
+    pipeline.push({
+        $lookup: {
+            from: 'productlines',
+            localField: 'product_line',
+            foreignField: '_id',
+            as: 'product_line'
+        }
+    },
+    {$unwind: '$product_line'});
     if(product_lines.length > 0){
-        pipeline.push({
-            $lookup: {
-                from: 'productlines',
-                localField: 'product_line',
-                foreignField: '_id',
-                as: 'product_line'
-            }
-        },
-        {
-            $match: {'product_line.name': {$all: product_lines}}
-        });
+        pipeline.push({$match: {'product_line.name': {$all: product_lines}}});   
     }
 
     let agg = SKU.aggregate(pipeline);
