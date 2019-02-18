@@ -24,31 +24,9 @@ router.post('/filter', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
 
-    //No filter, return all
-    if(keywords.length == 0 && skus.length == 0){
-        let results = await ingredient_filter.none(pageNum, sortBy);
-        res.json(results);
-    }
-    //Keywords no SKUs
-    else if(skus.length == 0){
-        let results = await ingredient_filter.keywords(pageNum, sortBy, key_exps);
-        res.json(results);
-    }
-    //SKUs no keywords
-    else if(keywords.length == 0){
-        //get all ingredients with given SKUs
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
-
-        let results = await ingredient_filter.skus(pageNum, sortBy, skuList);
-        res.json(results);
-    }
-    //Keywords and SKUs
-    else{
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
-        
-        let results = await ingredient_filter.keywordsAndSkus(pageNum, sortBy, key_exps, skuList);
-        res.json(results);
-    }
+    let result = await ingredient_filter.filter(pageNum, sortBy, key_exps, skus);
+    
+    res.json(result);
 });
 
 //CREATE
@@ -87,7 +65,7 @@ function create_ingredient(res, name, number, vendor_info, package_size, unit, c
 
 // UPDATE
 router.post('/update', (req, res) => {
-    const { name, newname, number, vendor_info, package_size, cost, comment } = req.body;
+    const { name, newname, number, vendor_info, package_size, unit, cost, comment } = req.body;
     const required_params = { name };
 
     if(!input_validator.passed(required_params, res)){
@@ -109,6 +87,9 @@ router.post('/update', (req, res) => {
     }
     if (package_size) {
         json["package_size"] = package_size;
+    }
+    if (package_size) {
+        json["unit"] = unit;
     }
     if (cost) {
         if(!validator.valid_cost(cost)){

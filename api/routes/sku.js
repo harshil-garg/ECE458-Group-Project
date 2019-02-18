@@ -32,77 +32,17 @@ router.post('/autocomplete_product_lines', (req, res) => {
 router.post('/filter', async (req, res) => {
     const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
 
-    let key_exps = keywords.map((keyword) => {
+    let key_exps;
+    key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
-
-    let skus = []
-    let cursor = filter(key_exps, ingredients, product_lines)    
-    await cursor.eachAsync((sku) => {
-        skus.push(sku);
-    });
     
-    res.json({success: true, data: skus});
 
-    // if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
-    //     let results = await sku_filter.none(pageNum, sortBy);
-    //     res.json(results);
-    // }else if(ingredients.length == 0 && product_lines.length == 0){
-    //     let results = await sku_filter.keywords(pageNum, sortBy, key_exps);
-    //     res.json(results);
-    // }else if(keywords.length == 0 && product_lines.length == 0){
-    //     let results = await sku_filter.ingredients(pageNum, sortBy, ingredients);
-    //     res.json(results);
-    // }else if(keywords.length == 0 && ingredients.length == 0){
-    //     let results = await sku_filter.productLines(pageNum, sortBy, product_lines);
-    //     res.json(results);
-    // }else if(product_lines.length == 0){
-    //     let results = await sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients);
-    //     res.json(results);
-    // }else if(keywords.length == 0){
-    //     let results = await sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines);
-    //     res.json(results);
-    // }else if(ingredients.length == 0){
-    //     let results = await sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines);
-    //     res.json(results);
-    // }else{
-    //     let results = await sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines);
-    //     res.json(results);
-    // }
+    let result = await sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines);
+    
+    res.json(result);
 });
 
-function filter(keywords, ingredients, product_lines){
-    let cursor = SKU.aggregate({$addFields: {num2str: {'$toLower' : '$number'}}})
-        .match({
-        $or:[
-            {name: {$all: keywords}},
-            {num2str: {$all: keywords}},
-            {case_upc: {$all: keywords}},
-            {unit_upc: {$all: keywords}}]
-        })
-        // .lookup({
-        //     from: 'Formula',
-        //     localField: 'formula',
-        //     foreignField: '_id',
-        //     as: 'formula_docs'
-        // })
-        // .lookup({
-        //     from: 'Ingredient',
-        //     localField: 'formula_docs.ingredient_tuples.ingredient',
-        //     foreignField: '_id',
-        //     as: 'ingredient_docs'
-        // })
-        // .match({'ingredient_docs.name': {$all: ingredients}})
-        // .lookup({
-        //     from: 'ProductLine',
-        //     localField: 'product_line',
-        //     foreignField: '_id',
-        //     as: 'product_line_docs'
-        // })
-        // .match({'product_line_docs.name': {$all: product_lines}})
-        .cursor({}).exec();
-    return cursor;
-}
 
 //Create
 router.post('/create', async (req, res) => {
