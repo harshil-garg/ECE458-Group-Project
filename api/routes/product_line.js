@@ -68,7 +68,6 @@ router.post('/delete', async (req, res) => {
     ProductLine.deleteProductLine(name, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete product line. Error: ${err}`});
-
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'Product Line does not exist to delete'});
         }else{

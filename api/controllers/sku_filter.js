@@ -35,9 +35,6 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
             }
         },
         {
-            $unwind: '$ingredients'
-        },
-        {
             $match: {'ingredients.name': {$all: ingredients}}
         });
     }

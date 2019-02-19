@@ -2,16 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
+const Formula = require('../model/formula_model');
 const ingredient_filter = require('../controllers/ingredient_filter');
 const autocomplete = require('../controllers/autocomplete');
 const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
 
 //Autocomplete
-router.post('/autocomplete', (req, res) => {
+router.post('/autocomplete', async (req, res) => {
     const {input} = req.body;
 
-    autocomplete.skus(SKU, input, res);
+    let results = await autocomplete.nameOrNumber(SKU, input);
+    res.json({success: true, data: results});
 });
 
 //Filter ingredients
@@ -59,8 +61,6 @@ function create_ingredient(res, name, number, vendor_info, package_size, unit, c
         }
     });
 }
-
-// TODO: READ (SEARCH)
 
 // UPDATE
 router.post('/update', (req, res) => {
@@ -119,6 +119,8 @@ router.post('/delete', (req, res) => {
         } else if(result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
+            let ingredient = await Ingredient.findOne({name: name}).exec();
+            await Formula.update({'ingredient_tuples.ingredient': ingredient._id}, {$pull: {ingredient_tuples: {ingredient: ingredient._id}}}, {multi: true}).exec();
             res.json({success: true, message: "Removed successfully."});
         }
     });

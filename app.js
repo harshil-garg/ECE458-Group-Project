@@ -19,6 +19,8 @@ const ingredients = require('./api/routes/ingredient');
 const skus = require('./api/routes/sku');
 const product_lines = require('./api/routes/product_line');
 const manufacturing_goals = require('./api/routes/manufacturing_goal');
+const formulas = require('./api/routes/formula');
+const manufacturing_lines = require('./api/routes/manufacturing_lines');
 
 //Connect mongoose to our database
 mongoose.connect(mongoCreds.database, function(err){
@@ -67,7 +69,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 // Routes
-//app.use('/api/*', ensureAuthenticated);
+// app.use('/api/*', ensureAuthenticated);
 app.use('/api/upload', uploadroute);
 app.use('/api/export', exportroute);
 app.use('/api/ingredients', ingredients);
@@ -75,6 +77,8 @@ app.use('/api/skus', skus)
 app.use('/api/product_lines', product_lines);
 app.use('/api/users', users);
 app.use('/api/manufacturing_goals', manufacturing_goals);
+app.use('/api/formulas', formulas.router);
+app.use('/api/manufacturing_lines', manufacturing_lines);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
