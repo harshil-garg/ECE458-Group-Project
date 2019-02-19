@@ -45,7 +45,7 @@
 
   <!-- Name Column -->
   <ng-container matColumnDef="number">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Ingr#</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
         <input #number matInput placeholder="Number" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
@@ -67,20 +67,27 @@
   <ng-container matColumnDef="package_size">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Package Size</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
+      <!-- <mat-form-field floatLabel="never">
         <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size', package_size.value)" required>
-      </mat-form-field>
-      <!-- <div class="unit-picker-component">
+      </mat-form-field> -->
+      <div class="unit-picker-component">
         <mat-form-field>
            <mat-label>Package Size</mat-label>
-           <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size_number', package_size.value)" required>
-           <mat-select name="unit" class="unit" [(ngModel)]="element.package_size.unit">
-             <ng-container *ngFor="let type of measUnits">
-               <mat-option>{{type}}</mat-option>
-             </ng-container>
+           <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size', package_size.value)" required>
+           <mat-select name="unit" class="unit" [value]="element.unit" (selectionChange)="edit(element.name, 'unit', $event.value)">
+               <mat-option *ngFor="let type of measUnits" [value]="type">{{type}}</mat-option>
            </mat-select>
          </mat-form-field>
-      </div> -->
+      </div>
+      <!-- <mat-form-field appearance="outline" style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
+       <mat-label>Package Size</mat-label>
+       <mat-select name="unit" class="unit">
+         <mat-option *ngFor="let type of measUnits" [value]="type">
+           {{type}}
+         </mat-option>
+       </mat-select>
+       <input matInput type="time" placeholder="HH:MM" id="end_time_hour" [formControl]="timeFormControl">
+     </mat-form-field> -->
     </td>
   </ng-container>
 
@@ -118,7 +125,7 @@
       <div class="example-element-detail" [@detailExpand]="element == expandedIngredient ? 'expanded' : 'collapsed'">
         <mat-list>
           <ng-container *ngFor = "let sku of element.skus; let id2=index">
-            <mat-list-item> {{sku.name}} : {{sku.size}} * {{sku.count}} </mat-list-item>
+            <mat-list-item> {{sku.name}} : {{sku.size}} * {{sku.count}} ({{sku.number}}) </mat-list-item>
           </ng-container>
         </mat-list>
       </div>

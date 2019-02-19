@@ -30,7 +30,55 @@
         <div [hidden]="product_line.valid || product_line.pristine" class="alert alert-danger">Product Line is required</div>
 
         <label for="formula">Formula</label>
-        <input type="text" min="0" class="form-control" id="formula" name="formula">
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <input matInput (click)="handleClick($event)" placeholder="Formula Name">
+              </mat-panel-title>
+              <mat-panel-description>
+                Edit Formula
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+              <div>
+                <mat-form-field floatLabel="never">
+                  <input matInput placeholder="Formula#">
+                </mat-form-field>
+                <mat-form-field floatLabel="never">
+                  <textarea matInput placeholder="Comment"></textarea>
+                </mat-form-field>
+              </div>
+              <mat-card>
+                <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
+                <mat-chip-list>
+                  <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
+                    <div>
+                      <mat-chip>{{ingredient.ingredient_name}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
+                    </div>
+                  </ng-container>
+                </mat-chip-list>
+                <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
+                <mat-form-field style="width: 200px;">
+                  <input matInput [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" name="quantity" type="text" placeholder="Quantity"/><br>
+                </mat-form-field>
+                <button mat-raised-button type="button" (click)="addIngredientQuantity($event)" color="accent"
+                  [disabled]="ingredientInput==null || ingredientInput.length==0 || quantityInput==null || quantityInput.length==0">Add Ingr-Quant</button>
+              </mat-card>
+            </mat-expansion-panel>
+          </mat-accordion>
+        <!-- <mat-card>
+          <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
+            <div>
+              <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
+                <i (click)="removeIngrQuant(ingr_id)" class="fa fa-remove"> </i><br></a>
+            </div>
+          </ng-container>
+          <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
+          <mat-form-field style="width: 200px;">
+            <input matInput [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
+          </mat-form-field>
+        </mat-card> -->
+
 
         <label for="comment">Comment</label>
         <textarea type="text" class="form-control" id="comment" [(ngModel)]="sku.comment" name="comment" #comment="ngModel"></textarea>

@@ -22,6 +22,7 @@ export class ResponseData {
   number: string;
   vendor_info: string;
   package_size: string;
+	unit: string;
   cost: string;
   comment: string;
   __v: number;

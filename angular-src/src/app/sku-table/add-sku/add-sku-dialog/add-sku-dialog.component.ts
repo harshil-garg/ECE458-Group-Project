@@ -28,22 +28,33 @@ export class AddSkuDialogComponent{
       this.dialogRef.close(this.sku);
     }
 
-    validateName(form): void{
-      this.nameLengthValid = this.sku.name!=null && this.sku.name.length<33;
-    }
-
     keyPressed(event){
       if(event.keyCode == 13){ //enter pressed
-        if(this.ingredientInput!=null && this.ingredientInput.length>0 && this.quantityInput!=null && this.quantityInput.length>0){
-          var added_ingr_quant: Tuple = {
-            ingredient_name: this.ingredientInput,
-            quantity: this.quantityInput
-          }
-          this.sku.ingredient_quantity.push(added_ingr_quant);
-          this.ingredientInput = '';
-          this.quantityInput = '';
-        }
+        this.addIngrQuantity();
       }
+    }
+
+    addIngredientQuantity(ev){
+      ev.stopPropagation();
+      this.addIngrQuantity();
+    }
+
+    addIngrQuantity(){
+      console.log(this.ingredientInput);
+      console.log(this.quantityInput);
+      if(this.ingredientInput!=null && this.ingredientInput.length>0 && this.quantityInput!=null && this.quantityInput.length>0){
+        var added_ingr_quant: Tuple = {
+          ingredient_name: this.ingredientInput,
+          quantity: this.quantityInput
+        }
+        this.sku.ingredient_quantity.push(added_ingr_quant);
+        this.ingredientInput = '';
+        this.quantityInput = '';
+      }
+    }
+
+    handleClick(ev) {//prevent accordion from opening when edit formula name
+      ev.stopPropagation();
     }
 
     setIngredientInput(event){

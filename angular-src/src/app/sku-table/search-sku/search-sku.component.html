@@ -13,7 +13,7 @@
 <br>
 
 <mat-form-field style="width: 400px;">
-  <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Search for skus/ingredients/product lines" (keydown)="keyPressed($event)">
+  <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Search for SKUs/ingredients/product lines" (keydown)="keyPressed($event)">
 </mat-form-field>
 
 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">

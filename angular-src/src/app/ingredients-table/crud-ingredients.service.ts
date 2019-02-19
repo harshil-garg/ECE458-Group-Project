@@ -23,6 +23,7 @@ export class EditMessage {
   number : string;
   vendor_info : string;
   package_size: string;
+  unit: string;
   cost : number;
   comment : string;
 }

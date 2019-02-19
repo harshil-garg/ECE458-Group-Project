@@ -98,6 +98,11 @@ export class IngredientsTableComponent implements OnInit{
           editedIngredient.vendor_info = updated_value;
           break;
         }
+        case 'unit':{
+          editedIngredient.unit = updated_value;
+          console.log(updated_value);
+          break;
+        }
         case 'package_size':{
           editedIngredient.package_size = updated_value;
           break;
@@ -116,6 +121,7 @@ export class IngredientsTableComponent implements OnInit{
           newname: newName,
           number : editedIngredient.id,
           vendor_info : editedIngredient.vendor_info,
+          unit: editedIngredient.unit,
           package_size: editedIngredient.package_size,
           cost : editedIngredient.cost_per_package*1,
           comment : editedIngredient.comment
@@ -188,6 +194,7 @@ export class IngredientsTableComponent implements OnInit{
               name: ingredient.name,
               vendor_info: ingredient.vendor_info,
               package_size: ingredient.package_size,
+              unit: ingredient.unit,
               cost_per_package: ingredient.cost,
               skus: ingredient.skus,
               comment: ingredient.comment

@@ -18,6 +18,6 @@ export namespace MeasurementUnit {
   export function values() {
     return Object.keys(MeasurementUnit).filter(
       (type) => isNaN(<any>type) && type !== 'values'
-    );
+    ).map(key => MeasurementUnit[key]);
   }
 }

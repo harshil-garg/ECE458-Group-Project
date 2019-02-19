@@ -35,7 +35,7 @@
         <input type="text" class="form-control" id="name" required [(ngModel)]="ingredient.name" name="name" #name="ngModel">
         <div [hidden]="name.valid || name.pristine" class="alert alert-danger">Name is required</div>
 
-        <label for="number">Ingredient Number</label>
+        <label for="number">Ingr#</label>
         <input type="number" min="0" class="form-control" id="number" [(ngModel)]="ingredient.id" name="number" #number="ngModel">
 
         <label for="vendor_info">Vendor Information</label>

@@ -80,7 +80,7 @@ export class SkuTableComponent implements OnInit{
           break;
         }
         case 'id':{
-          newNumber = updated_value;
+          newNumber = updated_value*1;
           break;
         }
         case 'case_upc':{
@@ -192,7 +192,7 @@ export class SkuTableComponent implements OnInit{
 
     private handleResponse(response) {
       console.log(response);
-      //don't refresh b/c deselects focued item
+      //don't refresh b/c deselects focused item
       //this.refresh();
     }
 
