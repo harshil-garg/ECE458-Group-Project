@@ -95,7 +95,7 @@ router.post('/create', async (req, res) => {
 
 async function formulaHandler(formula, res){
     if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
-        let formula_passed = await validator.itemExists(Formula, formula.name);
+        let formula_passed = await validator.itemExists(Formula, formula.number);
         if(!formula_passed[0]){
             res.json({success: false, message: formula_passed[1]});
             return;

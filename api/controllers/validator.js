@@ -33,8 +33,8 @@ module.exports.validIngredientTuple = async function(ingredient_name, unit){
 }
 
 // Dependency checks
-module.exports.itemExists = async function(model, itemName) {
-    let result = await model.findOne({name: itemName}).exec();    
+module.exports.itemExists = async function(model, item) {
+    let result = await model.findOne({$or: [{name: item}, {number: item}]}).exec();    
     let err_msg = `${model.modelName} doesn't exist`;
 
     if(!result){
