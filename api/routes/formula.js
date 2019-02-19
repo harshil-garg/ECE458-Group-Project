@@ -60,7 +60,7 @@ router.post('/create', async (req, res) => {
 router.post('/update', async (req, res) => {
     const { name, number, newnumber, ingredient_tuples, comment} = req.body;
 
-    var json = {};
+    let json = {};
 
     if (name) {
         name_passed = validator.proper_name_length(name);
@@ -92,7 +92,7 @@ router.post('/update', async (req, res) => {
 
     Formula.findOneAndUpdate({number: number}, json, (err) => {
         if (err) {
-            res.json({success: false, message: `Failed to update Formula. Error: ${err}`});
+            res.json({success: false, message: `Failed to update formula. Error: ${err}`});
         } else {
             res.json({success: true, message: "Updated successfully."});
         }
@@ -113,7 +113,7 @@ router.post('/delete', async (req, res) => {
 
     Formula.deleteOne({number: number}, (err, result) => {
         if(err) {
-            res.json({success: false, message: `Failed to delete Formula. Error: ${err}`});
+            res.json({success: false, message: `Failed to delete formula. Error: ${err}`});
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'Formula does not exist to delete'});
         }else{

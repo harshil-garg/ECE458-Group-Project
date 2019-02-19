@@ -131,14 +131,17 @@ router.post('/read', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-  const { name } = req.body;
-  ManufacturingGoal.deleteOne({name: name}, (error, goal) => {
-    if (error) {
-      res.send("Deletion failed");
-    }
-    res.json({success: true});
-  });
-
-})
+    const { name } = req.body;
+    
+    ManufacturingGoal.deleteOne({name: name}, (err, result) => {
+        if(err) {
+            res.json({success: false, message: `Failed to delete manufacturing goal. Error: ${err}`});
+        }else if(result.deletedCount == 0){
+            res.json({success: false, message: 'Manufacturing goal does not exist to delete'});
+        }else{
+            res.json({success: true, message: "Deleted successfully."});
+        }
+    });
+});
 
 module.exports = router;
