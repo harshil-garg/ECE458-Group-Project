@@ -72,7 +72,6 @@ router.post('/create', async (req, res) => {
     let product_line_id = product_passed[2];
 
     let formula_id = await formulaHandler(formula, res);
-    // console.log(formula_id)
     if(!formula_id){
         return;
     }
@@ -96,7 +95,7 @@ async function formulaHandler(formula, res){
     }else{  //create new formula
         if(formula.number){
             try{
-                let new_formula = await FormulaRoute.createFormula(formula.name, formula.number, formula.ingredient_tuples, formula.comment);
+                let new_formula = await FormulaRoute.createFormula(formula.name, formula.number, formula.ingredient_tuples, formula.comment, res);                
                 if(!new_formula){
                     return;
                 }
@@ -108,7 +107,7 @@ async function formulaHandler(formula, res){
         }else{
             let gen_number = await generator.autogen(Formula);
             try{
-                let new_formula = await FormulaRoute.createFormula(formula.name, gen_number, formula.ingredient_tuples, formula.comment);
+                let new_formula = await FormulaRoute.createFormula(formula.name, gen_number, formula.ingredient_tuples, formula.comment, res);
                 if(!new_formula){
                     return;
                 }

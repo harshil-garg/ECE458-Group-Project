@@ -70,9 +70,8 @@ module.exports.createFormula = async function(name, number, ingredient_tuples, c
     let errors = validator.compileErrors(inputs_exist, ...valid_tuples);
 
     if(errors.length > 0){
-        console.log(errors)
         res.json({success: false, message: errors});
-        return;
+        return errors;
     }
     //change from ingredient name to id
     for(let i = 0; i < valid_tuples.length; i++){

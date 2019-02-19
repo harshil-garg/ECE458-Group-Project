@@ -36,7 +36,12 @@ module.exports.validIngredientTuple = async function(ingredient_name, unit){
 module.exports.itemExists = async function(model, itemName) {
     let result = await model.findOne({name: itemName}).exec();    
     let err_msg = `${model.modelName} doesn't exist`;
-    return [!(!result), err_msg, result._id];
+
+    if(!result){
+        return [!(!result), err_msg];
+    }else{
+        return [!(!result), err_msg, result._id];
+    }   
 }
 
 module.exports.inputsExist = function(params){
