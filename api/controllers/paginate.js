@@ -2,7 +2,7 @@ const appender = require('./append_skus');
 
 const limit = 10;
 
-module.exports.paginate = async function (aggregate, model, pageNum, sortBy){
+module.exports.paginate = async function (aggregate, pageNum, sortBy){
     let pipeline = [];
     //don't skip if pagenum == -1
     if(pageNum != -1){
