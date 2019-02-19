@@ -8,13 +8,21 @@ const pagination = require('../controllers/paginate');
 const validator = require('../controllers/sku_validation');
 const input_validator = require('../controllers/input_validation');
 
-router.post('/calculator', (req, res) => {
+
+
+
+router.post('/calculator', async (req, res) => {
     const { name } = req.body;
     const required_params = { name };
 
     if(!input_validator.passed(required_params, res)){
         return;
     }
+
+    let goal = await ManufacturingGoal.findOne({name: name}).exec();
+
+    let skus = await SKU.find({_id: {$in: goal.sku_tuples}})
+
 
     ManufacturingGoal.findOne({name: name}, (error, goal) => {
         if (error) {
@@ -105,7 +113,8 @@ router.post('/all', async (req, res) => {
     if(!input_validator.passed(required_params, res)){
         return;
     }
-    let results = await pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy);
+    let agg = ManufacturingGoal.aggregate({$match: {}});
+    let results = await pagination.paginate(agg, pageNum, sortBy);
     res.json(results);
 });
 

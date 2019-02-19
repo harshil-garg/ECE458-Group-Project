@@ -57,7 +57,7 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
 
     let agg = SKU.aggregate(pipeline);
 
-    let result = await pagination.paginate(agg, SKU, pageNum, sortBy);
+    let result = await pagination.paginate(agg, pageNum, sortBy);
 
     return result;
 }

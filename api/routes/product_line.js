@@ -36,8 +36,9 @@ router.post('/read', async (req, res) => {
         return;
     }
 
-    let filter = ProductLine.find({});
-    let results = await pagination.paginate(filter, ProductLine, pageNum, 'name');
+    let agg = ProductLine.aggregate({$match: {}});
+
+    let results = await pagination.paginate(agg, pageNum, 'name');
     res.json(results);
 });
 
