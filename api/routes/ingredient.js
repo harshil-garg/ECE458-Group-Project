@@ -4,7 +4,6 @@ const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
 const ingredient_filter = require('../controllers/ingredient_filter');
 const autocomplete = require('../controllers/autocomplete');
-const input_validator = require('../controllers/input_validation');
 const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
 
@@ -68,7 +67,7 @@ router.post('/update', (req, res) => {
     const { name, newname, number, vendor_info, package_size, unit, cost, comment } = req.body;
     const required_params = { name };
 
-    if(!input_validator.passed(required_params, res)){
+    if(!validator.inputsExist(required_params, res)){
         return;
     }
 
@@ -113,11 +112,6 @@ router.post('/update', (req, res) => {
 // DELETE
 router.post('/delete', (req, res) => {
     const {name} = req.body;
-    const required_params = { name };
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     Ingredient.deleteIngredient(name, async (error, result) => {
         if (error) {

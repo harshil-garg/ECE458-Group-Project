@@ -135,11 +135,6 @@ function create_SKU(name, number, case_upc, unit_upc, size, count, product_line,
 //Update
 router.post('/update', async (req, res) => {
     const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
-    const required_params = { number };
-
-    if(!validator.passed(required_params, res)){
-        return;
-    }
 
     var json = {};
     if (name) {
@@ -232,7 +227,7 @@ router.post('/update', async (req, res) => {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(number, json, async (err) => {
+    SKU.updateSKU(number, json, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else {
@@ -245,11 +240,6 @@ router.post('/update', async (req, res) => {
 router.post('/delete', (req, res) => {
     const { number } = req.body;
 
-    const required_params = { number};
-
-    if(!validator.passed(required_params, res)){
-        return;
-    }
 
     SKU.deleteSKU(number, async (err, result) => {
         if(err) {

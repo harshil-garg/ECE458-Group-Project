@@ -3,19 +3,13 @@ const router = express.Router();
 const ProductLine = require('../model/product_line_model');
 const SKU = require('../model/sku_model');
 const pagination = require('../controllers/paginate');
-const input_validator = require('../controllers/input_validation');
-const validator = require('../controllers/product_line_validation');
+const validator = require('../controllers/validator');
 
 
 //Create
 router.post('/create', (req, res) => {
     const {name} = req.body;
-    //check required fields
-    const required_params = { name };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     let product_line = new ProductLine({name});
     ProductLine.createProductLine(product_line, (err) => {
@@ -30,11 +24,7 @@ router.post('/create', (req, res) => {
 //Read
 router.post('/read', async (req, res) => {
     const {pageNum}  = req.body;
-    const required_params = { pageNum };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     let agg = ProductLine.aggregate({$match: {}});
 
@@ -45,11 +35,7 @@ router.post('/read', async (req, res) => {
 //Update
 router.post('/update', (req, res) => {
     const { name, newname } = req.body;
-    const required_params = { name, newname };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     var json = {};
 
@@ -70,16 +56,12 @@ router.post('/update', (req, res) => {
 //Delete
 router.post('/delete', async (req, res) => {
     const {name} = req.body;
-    const required_params = { name };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
+    let line = await ProductLine.findOne({name: name}).exec();
+    let line_passed = await validator.productLineClear(line._id);
 
-    let bool = await validator.in_use(name);
-
-    if(bool){
-        res.json({success: false, message: 'Cannot delete, SKUs dependent on this line'});
+    if(!line_passed[0]){
+        res.json({success: false, message: line_passed[1]});
         return;
     }
 
