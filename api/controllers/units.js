@@ -6,6 +6,10 @@ const count_set = new Set(['count']);
 //create units to go with our syntax
 math.createUnit('count');
 
+module.exports.validUnit = function(unit){
+    return (weight_set.has(unit) || volume_set.has(unit) || count_set.has(unit));
+}
+
 module.exports.category = function(unit){
     if(weight_set.has(unit)){
         return 'weight';

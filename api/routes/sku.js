@@ -29,6 +29,14 @@ router.post('/autocomplete_product_lines', async (req, res) => {
     res.json({success: true, data: results});
 });
 
+//Autocomplete formulas
+router.post('/autocomplete_formulas', async (req, res) => {
+    const {input} = req.body;
+
+    let results = await autocomplete.nameOrNumber(Formula, input);
+    res.json({success: true, data: results});
+});
+
 
 //Filter
 router.post('/filter', async (req, res) => {
