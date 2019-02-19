@@ -5,23 +5,19 @@ const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const Ingredient = require('../model/ingredient_model');
 const pagination = require('../controllers/paginate');
-const validator = require('../controllers/sku_validation');
-const input_validator = require('../controllers/input_validation');
+const validator = require('../controllers/validator');
 
 
 
 
 router.post('/calculator', async (req, res) => {
     const { name } = req.body;
-    const required_params = { name };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     let goal = await ManufacturingGoal.findOne({name: name}).exec();
 
-    let skus = await SKU.find({_id: {$in: goal.sku_tuples}})
+    let skus = await SKU.find({_id: {$in: goal.sku_tuples.sku}});
+    console.log(skus);
 
 
     ManufacturingGoal.findOne({name: name}, (error, goal) => {
@@ -108,11 +104,6 @@ function runIngredientDBQuery(result, res) {
 router.post('/all', async (req, res) => {
     const { pageNum, sortBy, user } = req.body;
 
-    const required_params = { pageNum, sortBy, user };
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
     let agg = ManufacturingGoal.aggregate({$match: {}});
     let results = await pagination.paginate(agg, pageNum, sortBy);
     res.json(results);
@@ -121,11 +112,7 @@ router.post('/all', async (req, res) => {
 // CREATE
 router.post('/create', async (req, res) => {
     const { name, skus, deadline } = req.body;
-    const required_params = { name, skus };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     // Need to have a sanity check validation (SKUs must exist!)
     // TODO (will need a mongo query)
@@ -162,11 +149,7 @@ router.post('/create', async (req, res) => {
 
 router.post('/read', (req, res) => {
     const { name, user } = req.body;
-    const required_params = { name, user };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     ManufacturingGoal.findOne({name: name, user: user}, (error, goal) => {
         if (error) {
