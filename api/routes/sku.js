@@ -142,14 +142,12 @@ router.post('/update', async (req, res) => {
     }
 
     var json = {};
-    let propagate = false;
     if (name) {
         name_passed = validator.proper_name_length(name);
         if(!name_passed[0]){
             res.json({success: false, message: name_passed[1]});
             return;
         }
-        propagate = true;
         json["name"] = name;
     }
     if (newnumber) {
@@ -238,10 +236,6 @@ router.post('/update', async (req, res) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else {
-            if(propagate){
-                await ManufacturingGoal.update({'skus.sku_number': number}, {'skus.$.sku_name' : name}, {multi: true}).exec();
-            }
-            
             res.json({success: true, message: "Updated successfully."});
         }
     })
@@ -264,7 +258,6 @@ router.post('/delete', (req, res) => {
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
-            await ManufacturingGoal.update({'skus.sku_number': name}, {$pull: {skus : {sku_number : number}}}, {multi: true}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
     })

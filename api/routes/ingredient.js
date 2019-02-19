@@ -74,9 +74,7 @@ router.post('/update', (req, res) => {
 
     var json = {};
 
-    let propagate = false;
     if (newname) {
-        propagate = true;
         json["name"] = newname;
     }
     if (number) {
@@ -88,7 +86,7 @@ router.post('/update', (req, res) => {
     if (package_size) {
         json["package_size"] = package_size;
     }
-    if (package_size) {
+    if (unit) {
         json["unit"] = unit;
     }
     if (cost) {
@@ -107,9 +105,6 @@ router.post('/update', (req, res) => {
         if (error) {
             res.json({success: false, message: `Failed to update ingredient. Error: ${error}`});
         } else {
-            if(propagate){
-                await SKU.update({'ingredients.ingredient_name': name}, {'ingredients.$.ingredient_name' : newname}, {multi: true}).exec();               
-            }
             res.json({success: true, message: "Updated successfully."});
         }
     });
@@ -130,7 +125,6 @@ router.post('/delete', (req, res) => {
         } else if(result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
-            await SKU.update({'ingredients.ingredient_name': name}, {$pull: {ingredients : {ingredient_name : name}}}, {multi: true}).exec();
             res.json({success: true, message: "Removed successfully."});
         }
     });
