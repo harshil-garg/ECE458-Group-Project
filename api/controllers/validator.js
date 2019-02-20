@@ -1,4 +1,6 @@
 const Ingredient = require('../model/ingredient_model');
+const SKU = require('../model/sku_model');
+const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const Units = require('../controllers/units');
 
 module.exports.compileErrors = function(){
@@ -32,9 +34,32 @@ module.exports.validIngredientTuple = async function(ingredient_name, unit){
     }
 }
 
+module.exports.validActivity = async function(activity){
+    let err_msg;
+    let sku = await SKU.findOne({number: activity.sku}).exec();
+    let goal = await ManufacturingGoal.findOne({name: activity.manufacturing_goal}).exec();
+
+    if(!sku){
+        err_msg = `SKU ${activity.sku} doesn't exist`;
+        return [false, err_msg];
+    }
+    if(!goal){
+        err_msg = `Manufacturing goal ${activity.manufacturing_goal} doesn't exist`;
+        return [false, err_msg];
+    }
+    let valid = false;
+    err_msg = 'Invalid activity';
+    for(let tuple of goal.sku_tuples){
+        if(tuple.sku.equals(sku._id)){
+            valid = true;
+        }
+    }
+    return [valid, err_msg, sku._id, goal._id];
+}
+
 // Dependency checks
 module.exports.itemExists = async function(model, item) {
-    let result = await model.findOne({$or: [{name: item}, {number: item}]}).exec();    
+    let result = await model.findOne({$or: [{name: item}, {number: item}, {shortname: item}]}).exec();    
     let err_msg = `${model.modelName} doesn't exist`;
 
     if(!result){
@@ -49,6 +74,17 @@ module.exports.inputsExist = function(params){
     for(let key of Object.keys(params)){
         if(!params[key]){
             errors.push(`Please fill in ${key}`);
+        }
+    }
+
+    return [errors.length == 0, errors];
+}
+
+module.exports.objectFieldsExist = function(obj, requiredFields){
+    let errors = [];
+    for(let field of requiredFields){
+        if(!(field in obj)){
+            errors.push(`Please fill in ${field}`);
         }
     }
 
@@ -132,3 +168,15 @@ module.exports.formulaClear = async function(id) {
     let result = await SKU.findOne({formula: id}).exec();
     return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
 };
+
+module.exports.validDate = function(date){
+    let err_msg = 'Invalid date';
+    let dateobj = new Date(date);
+
+    return [isNaN(dateobj), err_msg, dateobj];
+}
+
+module.exports.isNumeric = function(number){
+    let err_msg = `${number} is not numeric`;
+    return [!isNaN(number), err_msg];
+}

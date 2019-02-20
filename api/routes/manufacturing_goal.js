@@ -97,6 +97,7 @@ router.post('/create', async (req, res) => {
         return;
     }
 
+    //TODO: replace with validator
     let deadline_date = new Date(deadline);
     if(isNaN(deadline_date)){
         res.json({success: false, message: deadline_date}); //message is: invalid date

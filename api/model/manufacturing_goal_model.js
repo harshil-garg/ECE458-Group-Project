@@ -29,6 +29,10 @@ const ManufacturingGoalSchema = new Schema({
     deadline: {
         type: Date,
         required: true
+    },
+    enabled: {
+        type: Boolean,
+        default: false
     }
 });
 

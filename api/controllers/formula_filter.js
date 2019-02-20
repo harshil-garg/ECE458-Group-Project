@@ -20,7 +20,8 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients){
             localField: 'ingredient_tuples.ingredient',
             foreignField: '_id',
             as: 'ingredients'
-        }
+        }//,
+        // $addFields: {'ingredient_tuples.ingredient': {$match: {'ingredient_tuples.ingredient': 'ingredients.id'}}}
     });
     if(ingredients.length > 0){
         pipeline.push({$match: {'ingredients.name': {$all: ingredients}}});
@@ -30,5 +31,20 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients){
 
     let result = await pagination.paginate(agg, pageNum, sortBy);
 
+    populateIngredients(result);
+
     return result;
+}
+
+function populateIngredients(result){
+    for(let item of result.data){
+        for(let ingredient of item.ingredients){
+            for(let tuple of item.ingredient_tuples){
+                if(ingredient._id.equals(tuple.ingredient)){
+                    tuple.ingredient = ingredient;
+                }
+            }
+        }
+        delete item.ingredients;
+    }
 }

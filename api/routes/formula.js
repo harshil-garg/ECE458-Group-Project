@@ -71,7 +71,7 @@ router.post('/update', async (req, res) => {
         json["name"] = name;
     }
     if(newnumber){
-        json["number"] = number;
+        json["number"] = newnumber;
     }
     if(ingredient_tuples){
         let valid_tuples = [];
