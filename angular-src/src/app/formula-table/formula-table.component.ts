@@ -103,7 +103,7 @@ export class FormulaTableComponent implements OnInit{
           name : editedFormula.name,
           number : editedFormula.number.toString(),
           newnumber: newnumber,
-          ingredient_tuples: null,
+          ingredient_tuples: undefined,
           comment : editedFormula.comment
         }).subscribe(
         response => {
@@ -154,7 +154,9 @@ export class FormulaTableComponent implements OnInit{
     }
 
     handleRefreshResponse(response: FilterResponse){
+      console.log("RESPONSE");
       if(response.success){
+        console.log(response);
         this.formulaList = [];
         for(let formula of response.data){
           this.formulaList.push({

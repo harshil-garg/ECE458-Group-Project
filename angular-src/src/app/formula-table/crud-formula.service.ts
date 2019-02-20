@@ -4,7 +4,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Tuple } from '../model/ingredient';
-``
+
 export class CreateMessage {
   name : string;
   number : string;
@@ -52,6 +52,7 @@ export class CrudFormulaService {
   }
 
   edit(requestedFormula: EditMessage): Observable<Response>{
+    console.log(requestedFormula);
     return this.http.post<Response>('api/formulas/update', requestedFormula, httpOptions);
   }
 }
