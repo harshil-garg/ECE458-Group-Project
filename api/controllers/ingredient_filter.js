@@ -32,8 +32,6 @@ module.exports.filter = async function(pageNum, sortBy, keywords, skus){
 
     let result = await pagination.paginate(agg, pageNum, sortBy);
 
-
-
     return appendSKUs(result);
 }
 
