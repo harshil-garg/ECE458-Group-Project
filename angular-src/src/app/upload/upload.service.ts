@@ -1,11 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpRequest, HttpEventType, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { UploadResponse } from '../model/upload-response';
 import { ValidationData } from '../model/validation-data';
 
 const url = 'api/upload';
+
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type':  'application/json',
+  })
+};
 
 @Injectable()
 export class UploadService {
@@ -46,7 +52,6 @@ export class UploadService {
         // Close the progress-stream if we get an answer form the API
         // The upload is complete
         validation.next(event.body as ValidationData);
-        console.log(event.body);
         validation.complete();
         progress.complete();
       }
@@ -61,5 +66,9 @@ export class UploadService {
     
       // return the map of progress.observables
     return status;
+  }
+
+  public commit(on: boolean):Observable<ValidationData> {
+    return this.http.post<ValidationData>('api/upload/commit', {commit: on}, httpOptions)
   }
 }

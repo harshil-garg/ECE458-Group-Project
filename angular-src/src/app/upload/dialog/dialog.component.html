@@ -1,30 +1,149 @@
 <input type="file" #file style="display: none" (change)="onFilesAdded()" multiple />
 <div class="container" fxLayout="column" fxLayoutAlign="space-evenly stretch">
   <h1 mat-dialog-title>Upload Files</h1>
-  <div>
-    <button [disabled]="uploading || uploadSuccessful" mat-raised-button color="primary" class="add-files-btn" (click)="addFiles()">
-      Add Files
-    </button>
-  </div>
-
-  <!-- This is the content of the dialog, containing a list of the files to upload -->
-  <mat-dialog-content fxFlex>
-    <mat-list>
-      <mat-list-item *ngFor="let file of files">
-
-        <h4 mat-line>{{file.name}}</h4>
-
-        <mat-progress-bar *ngIf="response" mode="determinate" [value]="response[file.name].progress | async"></mat-progress-bar>
-
-      </mat-list-item>
-    </mat-list>
-    <div *ngIf="uploadComplete && !uploadSuccessful">
-      You have some data errors.
+  <div *ngIf="!uploadSuccessful">
+    <div>
+      <button [disabled]="uploading || uploadSuccessful" mat-raised-button color="primary" class="add-files-btn" (click)="addFiles()">
+        Add Files
+      </button>
     </div>
-  </mat-dialog-content>
 
+    <!-- This is the content of the dialog, containing a list of the files to upload -->
+    <mat-dialog-content fxFlex>
+      <mat-list>
+        <mat-list-item *ngFor="let file of files">
+
+          <h4 mat-line>{{file.name}}</h4>
+
+          <mat-progress-bar *ngIf="response" mode="determinate" [value]="response.progress | async"></mat-progress-bar>
+
+        </mat-list-item>
+      </mat-list>
+      <div *ngIf="uploadComplete && !uploadSuccessful">
+        You have some data errors.
+      </div>
+    </mat-dialog-content>
+  </div>
+  <div *ngIf="uploadErrorType">
+    Upload Error: {{uploadErrorType}}
+  </div>
+  <div *ngIf="errorMode">
+    <mat-dialog-content fxFlex>
+      <div *ngIf="pErrorList.length">
+        <div>Product Line Errors</div>
+        <mat-list>
+          <mat-list-item>
+              <h4 mat-line>message</h4>
+              <h4 mat-line>Name</h4>
+          </mat-list-item>
+          <mat-list-item *ngFor="let pError of pErrorList">
+            <h4 mat-line>{{pError.message}}</h4>
+            <h4 mat-line>{{pError.data['Name']}}</h4>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div *ngIf="iErrorList.length">
+        <div>Ingredients Errors</div>
+        <mat-list>
+          <mat-list-item>
+              <h4 mat-line>message</h4>
+              <h4 mat-line>Ingr#</h4>
+          </mat-list-item>
+          <mat-list-item *ngFor="let iError of iErrorList">
+            <h4 mat-line>{{iError.message}}</h4>
+            <h4 mat-line>{{iError.data['Ingr#']}}</h4>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div *ngIf="sErrorList.length">
+          <div>Skus Errors</div>
+          <mat-list>
+            <mat-list-item>
+                <h4 mat-line>message</h4>
+                <h4 mat-line>SKU#</h4>
+            </mat-list-item>
+            <mat-list-item *ngFor="let sError of sErrorList">
+              <h4 mat-line>{{sError.message}}</h4>
+              <h4 mat-line>{{sError.data['SKU#']}}</h4>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <div *ngIf="fErrorList.length">
+          <div>Formulas Errors</div>
+          <mat-list>
+            <mat-list-item>
+                <h4 mat-line>message</h4>
+                <h4 mat-line>SKU#</h4>
+            </mat-list-item>
+            <mat-list-item *ngFor="let fError of fErrorList">
+              <h4 mat-line>{{fError.message}}</h4>
+              <h4 mat-line>{{fError.data['SKU#']}}</h4>
+            </mat-list-item>
+          </mat-list>
+        </div>
+    </mat-dialog-content>
+  </div>
+  <div *ngIf="collisionMode">
+      <mat-dialog-content fxFlex>
+          <div>Do you consent to these changes?</div>
+          <div *ngIf="iChangeList.length">
+            <div>Ingredients Changes</div>
+            <mat-list>
+              <mat-list-item>
+                  <h4 mat-line>Ingr#</h4>
+                  <h4 mat-line>Name</h4>
+                  <h4 mat-line>Vendor Info</h4>
+                  <h4 mat-line>Size</h4>
+                  <h4 mat-line>Cost</h4>
+                  <h4 mat-line>Comment</h4>
+              </mat-list-item>
+              <mat-list-item *ngFor="let iChange of iChangeList">
+                  <h4 mat-line>{{iChange['Ingr#']}}</h4>
+                  <h4 mat-line>{{iChange['Name']}}</h4>
+                  <h4 mat-line>{{iChange['Vendor Info']}}</h4>
+                  <h4 mat-line>{{iChange['Size']}}</h4>
+                  <h4 mat-line>{{iChange['Cost']}}</h4>
+                  <h4 mat-line>{{iChange['Comment']}}</h4>
+              </mat-list-item>
+            </mat-list>
+          </div>
+          <div *ngIf="sChangeList.length">
+              <div>Skus Changes</div>
+              <mat-list>
+                <mat-list-item>
+                    <h4 mat-line>SKU#</h4>
+                    <h4 mat-line>Name#</h4>
+                    <h4 mat-line>Case UPC</h4>
+                    <h4 mat-line>Unit UPC</h4>
+                    <h4 mat-line>Unit size</h4>
+                    <h4 mat-line>Count per case</h4>
+                    <h4 mat-line>Product Line Name</h4>
+                    <h4 mat-line>Comment</h4>
+                </mat-list-item>
+                <mat-list-item *ngFor="let sChange of sChangeList">
+                    <h4 mat-line>{{sChange['SKU#']}}</h4>
+                    <h4 mat-line>{{sChange['Name']}}</h4>
+                    <h4 mat-line>{{sChange['Case UPC']}}</h4>
+                    <h4 mat-line>{{sChange['Unit UPC']}}</h4>
+                    <h4 mat-line>{{sChange['Unit size']}}</h4>
+                    <h4 mat-line>{{sChange['Count per case']}}</h4>
+                    <h4 mat-line>{{sChange['Product Line Name']}}</h4>
+                    <h4 mat-line>{{sChange['Comment']}}</h4>
+                </mat-list-item>
+              </mat-list>
+            </div>
+            
+        </mat-dialog-content>
+  </div>
+  <div *ngIf="succeededMode">
+      <mat-dialog-content fxFlex>
+          <div>Here is what was committed</div>
+        </mat-dialog-content>
+  </div>
   <!-- This are the actions of the dialog, containing the primary and the cancel button-->
   <mat-dialog-actions class="actions">
+    <button *ngIf="collisionMode" mat-button (click)="commit(true)">Consent</button>
+    <button *ngIf="collisionMode" mat-button mat-dialog-close (click)="commit(false)">Cancel</button>
     <button *ngIf="showCancelButton" mat-button mat-dialog-close>Cancel</button>
     <button mat-raised-button color="primary" [disabled]="!canBeClosed" (click)="closeDialog()">{{primaryButtonText}}</button>
   </mat-dialog-actions>

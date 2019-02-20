@@ -1,6 +1,25 @@
-import { ValidationError } from './val-error';
 export class ValidationData {
     success: boolean;
-    errorList: ValidationError[];
-    updateList: ValidationError[];
+    skus: {
+        createlist: [];
+        ignorelist: [];
+        errorlist: [];
+        changelist: [];
+    };
+    ingredients: {
+        createlist: [];
+        ignorelist: [];
+        errorlist: [];
+        changelist: [];
+    };
+    product_lines: {
+        createlist: [];
+        ignorelist: [];
+        errorlist: [];
+    };
+    formulas: {
+        createlist: [];
+        errorlist: [];
+        ignorelist: [];
+    };
 }
