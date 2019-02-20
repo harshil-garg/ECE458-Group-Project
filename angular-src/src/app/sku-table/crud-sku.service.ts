@@ -14,7 +14,10 @@ export class CreateMessage {
   size: string;
   count: number;
   product_line: string;
-  ingredients: Tuple[];
+  formula: string;
+  formula_scale_factor: string;
+  manufacturing_lines: string[];
+  manufacturing_rate: string;
   comment: string;
 }
 
@@ -31,7 +34,10 @@ export class EditMessage {
   size: string;
   count: number;
   product_line: string;
-  ingredients: Tuple[];
+  formula: string;
+  formula_scale_factor: string;
+  manufacturing_lines: string[];
+  manufacturing_rate: string;
   comment: string;
 }
 

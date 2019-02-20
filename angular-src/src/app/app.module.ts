@@ -28,9 +28,10 @@ import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomp
 import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 import { ManufacturingComponent } from './manufacturing/manufacturing.component';
-import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule } from '@angular/material';
+import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule } from '@angular/material';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
+import { FormulaTableComponent } from './formula-table/formula-table.component';
 
 const routes: Routes = [
   {
@@ -42,6 +43,7 @@ const routes: Routes = [
         	{ path: 'ingredients', component: IngredientsTableComponent },
           { path: 'product-lines', component: ProductLineTableComponent },
           { path: 'skus', component: SkuTableComponent },
+          { path: 'formulas', component: FormulaTableComponent },
           { path: 'accounts', component: AccountsComponent },
           { path: 'upload', component: UploadComponent},
           { path: 'manufacturing', component: ManufacturingComponent}
@@ -68,7 +70,8 @@ const routes: Routes = [
     SearchSkuComponent,
     ManufacturingComponent,
     CreateDependencyReportComponent,
-    DependencyReportDialogComponent
+    DependencyReportDialogComponent,
+    FormulaTableComponent
   ],
   imports: [
     BrowserModule,
@@ -103,7 +106,8 @@ const routes: Routes = [
     MatPaginatorModule,
     MatSortModule,
     MatChipsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatExpansionModule
   ],
   providers: [Title],
   bootstrap: [AppComponent],

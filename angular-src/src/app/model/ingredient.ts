@@ -1,7 +1,7 @@
 import { MeasurementUnit } from './measurement-unit'
 
 export class Tuple {
-    ingredient_name: string;
+    ingredient: string;
     quantity: number;
 }
 

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Ingredient, Tuple } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
+import { Formula } from '../model/formula'
 import { CrudSkuService, Response } from './crud-sku.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
@@ -23,7 +24,7 @@ export class SkuTableComponent implements OnInit{
     ingredientInputs: Array<any> = [];
     quantityInputs: Array<any> = [];
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'comment'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'comment'];
     selection = new SelectionModel<Sku>(true, []);
     dataSource = new MatTableDataSource<Sku>(this.skuList);
     maxPages: number;
@@ -72,6 +73,8 @@ export class SkuTableComponent implements OnInit{
 
     edit(num:any, property:string, updated_value:any) {
       var editedSku : Sku = new Sku();
+      var formula : Formula = new Formula();
+      editedSku.formula = formula;
       var newNumber : number;
       editedSku.id = num*1;
       switch(property){
@@ -104,7 +107,7 @@ export class SkuTableComponent implements OnInit{
           break;
         }
         case 'ingredient_quantity':{
-          editedSku.ingredient_quantity = updated_value;
+          //editedSku.ingredient_quantity = updated_value;
           break;
         }
         case 'comment':{
@@ -121,7 +124,10 @@ export class SkuTableComponent implements OnInit{
           size : editedSku.unit_size,
           count: editedSku.count_per_case,
           product_line : editedSku.product_line,
-          ingredients: editedSku.ingredient_quantity,
+          formula: editedSku.formula.name,
+          formula_scale_factor: editedSku.formula_scale_factor,
+          manufacturing_lines: editedSku.manufacturing_lines,
+          manufacturing_rate: editedSku.manufacturing_rate,
           comment: editedSku.comment
         }).subscribe(
         response => {
@@ -154,7 +160,10 @@ export class SkuTableComponent implements OnInit{
         size : editedSku.unit_size,
         count: editedSku.count_per_case,
         product_line : editedSku.product_line,
-        ingredients: editedSku.ingredient_quantity,
+        formula: editedSku.formula.name,
+        formula_scale_factor: editedSku.formula_scale_factor,
+        manufacturing_lines: editedSku.manufacturing_lines,
+        manufacturing_rate: editedSku.manufacturing_rate,
         comment: editedSku.comment
       }).subscribe(
         response => {
@@ -174,19 +183,20 @@ export class SkuTableComponent implements OnInit{
 
     addIngredientQuantity(num:any, id:number, ingr_quant: Tuple){
       var editedSku : Sku = new Sku();
-      var ingr_quant_list: Array<any> = this.skuList[id].ingredient_quantity;
+      editedSku.formula = new Formula();
+      var ingr_quant_list: Array<any> = this.skuList[id].formula.ingredient_tuples;
       editedSku.id = num*1;
       ingr_quant_list.push(ingr_quant);
-      editedSku.ingredient_quantity = ingr_quant_list;
+      editedSku.formula.ingredient_tuples = ingr_quant_list;
       this.updateIngredientQuantity(editedSku);
     }
 
     removeIngrQuant(ingr_id:number, id:number, sku_id:number){
       var editedSku : Sku = new Sku();
-      var ingr_quant_list: Array<any> = this.skuList[id].ingredient_quantity;
+      var ingr_quant_list: Array<any>;// = this.skuList[id].ingredient_quantity;
       editedSku.id = sku_id*1;
       ingr_quant_list.splice(ingr_id, 1);
-      editedSku.ingredient_quantity = ingr_quant_list;
+      //editedSku.ingredient_quantity = ingr_quant_list;
       this.updateIngredientQuantity(editedSku);
     }
 
@@ -235,6 +245,11 @@ export class SkuTableComponent implements OnInit{
       if(response.success){
         this.skuList = [];
         for(let sku of response.data){
+          var formula = new Formula();
+          formula.name = sku.formula.name;
+          formula.number = sku.formula.number;
+          formula.comment = sku.formula.comment;
+          formula.ingredient_tuples = sku.formula.ingredient_tuples;
           this.skuList.push({
               id: sku.number,
               name: sku.name,
@@ -243,7 +258,10 @@ export class SkuTableComponent implements OnInit{
               unit_size: sku.size,
               count_per_case: sku.count,
               product_line: sku.product_line,
-              ingredient_quantity: sku.ingredients,
+              formula: formula,
+              formula_scale_factor: sku.formula_scale_factor,
+              manufacturing_lines: sku.manufacturing_lines,
+              manufacturing_rate: sku.manufacturing_rate,
               comment: sku.comment
           });
         }
@@ -303,7 +321,7 @@ export class SkuTableComponent implements OnInit{
       if(event.keyCode == 13){ //enter pressed
         if(this.ingredientInputs[id]!=null && this.ingredientInputs[id].length>0 && this.quantityInputs[id]!=null && this.quantityInputs[id].length>0){
           var added_ingr_quant: Tuple = {
-            ingredient_name: this.ingredientInputs[id],
+            ingredient: this.ingredientInputs[id],
             quantity: this.quantityInputs[id]
           }
           this.addIngredientQuantity(sku_num, id, added_ingr_quant);
@@ -318,7 +336,7 @@ export class SkuTableComponent implements OnInit{
       this.filterSkuService.exportSkus({
         sortBy : this.sortBy,
         keywords: this.keywords,
-        ingredients : this.ingredients,
+        ingredients : [],//this.ingredients,
         product_lines : this.productLines
       }).subscribe(
       response => this.handleExportSkusResponse(response),
@@ -426,6 +444,10 @@ export class SkuTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    stopPropagation(ev) {
+      ev.stopPropagation();
     }
 
 }
