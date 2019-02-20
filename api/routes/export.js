@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const ingredient_filter = require('../controllers/ingredient_filter');
 const sku_filter = require('../controllers/sku_filter');
-const input_validator = require('../controllers/input_validation');
 const pagination = require('../controllers/paginate');
 const ProductLine = require('../model/product_line_model');
 
@@ -11,9 +10,7 @@ router.post('/ingredients', async (req, res) => {
     const { sortBy, keywords, skus} = req.body;
     const required_params = { sortBy, keywords, skus };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
+
 
     let key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
@@ -130,9 +127,7 @@ async function filter_skus(req, res, format){
     const { sortBy, keywords, ingredients, product_lines } = req.body;
     const required_params = { sortBy, keywords, ingredients, product_lines };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
+
 
     let key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');

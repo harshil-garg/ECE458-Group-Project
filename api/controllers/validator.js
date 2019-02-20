@@ -33,10 +33,15 @@ module.exports.validIngredientTuple = async function(ingredient_name, unit){
 }
 
 // Dependency checks
-module.exports.itemExists = async function(model, itemName) {
-    let result = await model.findOne({name: itemName}).exec();    
+module.exports.itemExists = async function(model, item) {
+    let result = await model.findOne({$or: [{name: item}, {number: item}]}).exec();    
     let err_msg = `${model.modelName} doesn't exist`;
-    return [!(!result), err_msg, result._id];
+
+    if(!result){
+        return [!(!result), err_msg];
+    }else{
+        return [!(!result), err_msg, result._id];
+    }   
 }
 
 module.exports.inputsExist = function(params){
@@ -119,5 +124,11 @@ module.exports.forceInteger = function(number){
 module.exports.productLineClear = async function(id) {
     let err_msg = `Product Line is in use`;
     let result = await SKU.findOne({product_line: id}).exec();
+    return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
+};
+
+module.exports.formulaClear = async function(id) {
+    let err_msg = `Formula is in use`;
+    let result = await SKU.findOne({formula: id}).exec();
     return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
 };

@@ -14,17 +14,27 @@ const generator = require('../controllers/autogen');
 
 
 //Autocomplete ingredients
-router.post('/autocomplete_ingredients', (req, res) => {
+router.post('/autocomplete_ingredients', async (req, res) => {
     const {input} = req.body;
 
-    autocomplete.ingredients(Ingredient, input, res);
+    let results = await autocomplete.nameOrNumber(Ingredient, input);
+    res.json({success: true, data: results});
 });
 
 //Autocomplete product lines
-router.post('/autocomplete_product_lines', (req, res) => {
+router.post('/autocomplete_product_lines', async (req, res) => {
     const {input} = req.body;
 
-    autocomplete.productLines(ProductLine, input, res);
+    let results = await autocomplete.nameOrNumber(ProductLine, input);
+    res.json({success: true, data: results});
+});
+
+//Autocomplete formulas
+router.post('/autocomplete_formulas', async (req, res) => {
+    const {input} = req.body;
+
+    let results = await autocomplete.nameOrNumber(Formula, input);
+    res.json({success: true, data: results});
 });
 
 
@@ -72,11 +82,9 @@ router.post('/create', async (req, res) => {
     let product_line_id = product_passed[2];
 
     let formula_id = await formulaHandler(formula, res);
-    // console.log(formula_id)
     if(!formula_id){
         return;
     }
-
     if(number){
         create_SKU(name, number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
     }else{
@@ -87,7 +95,7 @@ router.post('/create', async (req, res) => {
 
 async function formulaHandler(formula, res){
     if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
-        let formula_passed = await validator.itemExists(Formula, formula.name);
+        let formula_passed = await validator.itemExists(Formula, formula.number);
         if(!formula_passed[0]){
             res.json({success: false, message: formula_passed[1]});
             return;
@@ -96,7 +104,7 @@ async function formulaHandler(formula, res){
     }else{  //create new formula
         if(formula.number){
             try{
-                let new_formula = await FormulaRoute.createFormula(formula.name, formula.number, formula.ingredient_tuples, formula.comment);
+                let new_formula = await FormulaRoute.createFormula(formula.name, formula.number, formula.ingredient_tuples, formula.comment, res);                
                 if(!new_formula){
                     return;
                 }
@@ -108,7 +116,7 @@ async function formulaHandler(formula, res){
         }else{
             let gen_number = await generator.autogen(Formula);
             try{
-                let new_formula = await FormulaRoute.createFormula(formula.name, gen_number, formula.ingredient_tuples, formula.comment);
+                let new_formula = await FormulaRoute.createFormula(formula.name, gen_number, formula.ingredient_tuples, formula.comment, res);
                 if(!new_formula){
                     return;
                 }
@@ -184,7 +192,7 @@ router.post('/update', async (req, res) => {
         json["product_line"] = product_line;
     }
     if (formula) {
-        let formula_id = await formulaHandler(formula);
+        let formula_id = await formulaHandler(formula, res);
         if(!formula_id){
             return;
         }
@@ -240,7 +248,6 @@ router.post('/update', async (req, res) => {
 router.post('/delete', (req, res) => {
     const { number } = req.body;
 
-
     SKU.deleteSKU(number, async (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
@@ -248,8 +255,10 @@ router.post('/delete', (req, res) => {
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
+            let sku = await SKU.findOne({number: number}).exec();
+            await ManufacturingGoal.update({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}, {multi: true}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
-    })
+    });
 });
 module.exports = router;

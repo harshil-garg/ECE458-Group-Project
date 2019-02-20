@@ -1,57 +1,20 @@
-module.exports.ingredients = (model, input, res) => {
-    let regex = new RegExp('^'+input, 'i'); //only checks from beginning of string
-    model.find({name: regex}, 'name').limit(10).collation({locale: 'en'}).sort('name').lean().exec((err, results) => {
-        if(err){
-            res.json({success: false, message: err});
-        }else{
-            res.json({
-                success: true,
-                data: results
-            });
-        }
-    });
-}
-
-module.exports.skus = async (model, input, res) => {
+const limit = 10;
+module.exports.nameOrNumber = async (model, input) => {
     let regex = new RegExp('^'+input, 'i');
     if(isNaN(input)){
-        model.find({name: regex}, 'name size count').limit(10).collation({locale: 'en'}).sort('name').lean().exec((err, results) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                res.json({
-                    success: true,
-                    data: results
-                });
-            }
-        })
+        let results = await model.find({name: regex}).limit(limit).collation({locale: 'en'}).sort('name').lean().exec();
+        return results;
     }else{
         //tolower converts number to string, 1 means to include
-        let skus = [];
-        let cursor = model.aggregate({$project: {num2str: {'$toLower' : '$number'}, name: 1, size: 1, count: 1}}).match({num2str: regex}).cursor({}).exec();
+        let results = [];
+        let cursor = model.aggregate({$addFields: {num2str: {'$toLower' : '$number'}}}).match({num2str: regex}).limit(limit).cursor({}).exec();
         await cursor.eachAsync((sku) => {
-            skus.push(sku);
+            results.push(sku);
         });
 
-        res.json({
-            success: true,
-            data: skus
-        });
+        return results;
     }
 }
 
-module.exports.productLines = (model, input, res) => {
-    let regex = new RegExp('^'+input, 'i'); //only checks from beginning of string
-    model.find({name: regex}, 'name').limit(10).collation({locale: 'en'}).sort('name').lean().exec((err, results) => {
-        if(err){
-            res.json({success: false, message: err});
-        }else{
-            res.json({
-                success: true,
-                data: results
-            });
-        }
-    });
-}
 
 
