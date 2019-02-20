@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ingredient_filter = require('../controllers/ingredient_filter');
 const sku_filter = require('../controllers/sku_filter');
+const formula_filter = require('../controllers/formula_filter');
 const pagination = require('../controllers/paginate');
 const ProductLine = require('../model/product_line_model');
 
@@ -16,44 +17,30 @@ router.post('/ingredients', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
 
-    //No filter, return all
-    if(keywords.length == 0 && skus.length == 0){
-        let results = await ingredient_filter.none(pageNum, sortBy);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-    //Keywords no SKUs
-    else if(skus.length == 0){
-        let results = await ingredient_filter.keywords(pageNum, sortBy, key_exps);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-    //SKUs no keywords
-    else if(keywords.length == 0){
-        //get all ingredients with given SKUs
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
-
-        let results = await ingredient_filter.skus(pageNum, sortBy, skuList);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-    //Keywords and SKUs
-    else{
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
-        
-        let results = await ingredient_filter.keywordsAndSkus(pageNum, sortBy, key_exps, skuList);
-        format_ingredients(results.data);
-        res.json(results);
-    }
+    let results = await ingredient_filter.filter(pageNum, sortBy, key_exps, skus);
+    format_ingredients(results.data);
+    res.json(results)
 });
 
 router.post('/skus', async (req, res) => {
-    filter_skus(req, res, format_skus);
+    const { sortBy, keywords, ingredients, product_lines } = req.body;
+    const required_params = { sortBy, keywords, ingredients, product_lines };
+
+
+
+    let key_exps = keywords.map((keyword) => {
+        return new RegExp(keyword, 'i');
+    });
+
+    let results = await sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines);
+    format_skus(results.data);
+    res.json(results);
 });
 
 router.post('/product_lines', async (req, res) => {
-    let filter = ProductLine.find({});
-    let results = await pagination.paginate(filter, ProductLine, pageNum, 'name');
+    let agg = ProductLine.aggregate({$match: {}});
+
+    let results = await pagination.paginate(agg, pageNum, 'name');
     format_product_lines(results.data);
     res.json(results);
 });
