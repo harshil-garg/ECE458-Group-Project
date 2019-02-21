@@ -76,7 +76,7 @@ router.post('/commit', function (req, res) {
   else {
     res.json({
       success: false,
-      uploadErrorType: 'Cannot commit if server is not ready'
+      uploadErrorType: 'Upload session expired'
     })
   }
 });
@@ -275,6 +275,8 @@ router.post('/commit', function (req, res) {
         }
         //if theres no errors, but there are changes, continue the session
         else {
+          // end the session if the user doesn't submit consent or cancel after 2 mins
+          setTimeout(() => { resetSession() }, 120000);
           results.success = false;
           uploadHalfComplete = true;
         }
@@ -299,8 +301,8 @@ router.post('/commit', function (req, res) {
         res.json(results);
       }
       else {
-        await handleFiles(res);
         fs.unlinkSync(file.path);
+        handleFiles(res);
       }
      }
     )
