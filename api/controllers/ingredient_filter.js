@@ -1,45 +1,78 @@
 const Ingredient = require('../model/ingredient_model');
+const SKU = require('../model/sku_model');
+const Formula = require('../model/formula_model');
 const pagination = require('./paginate');
+const validator = require('./validator');
 
-module.exports.none = async function (pageNum, sortBy){
-    let filter = Ingredient.find({});
-    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
-};
+module.exports.filter = async function(pageNum, sortBy, keywords, skus){
+    let pipeline = [];
 
-module.exports.keywords = async function (pageNum, sortBy, keywords){
-    let filter = Ingredient.find({$or:[
-        {name: {$all: keywords}},
-        {vendor_info: {$all: keywords}},
-        {package_size: {$all: keywords}},
-        {comment: {$all: keywords}}]
-    });
-    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
-};
+    if(keywords.length > 0){
+        pipeline.push({$addFields: {num2str: {'$toLower' : '$number'}}},
+        {
+            $match: {
+                $or:[
+                    {name: {$all: keywords}},
+                    {num2str: {$all: keywords}}]
+                }
+        });
+    }
+    if(skus.length > 0){
+        let skuList = await SKU.find({name: {$in: skus}}, 'name size count number formula').exec();
+        let formulaIDs = getFormulas(skuList);
 
-module.exports.skus = async function (pageNum, sortBy, skus){
-    let filter = Ingredient.find({name: {$in: getNames(skus)}});
-    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
+        let formulaList = await Formula.find({_id: {$in: formulaIDs}});
+        let ingredientIDs = getIngredients(formulaList);
+
+        pipeline.push({$match: {_id: {$in: ingredientIDs}}});
+    }
+    pipeline.push({$addFields: {cost: validator.roundCost('$cost')}})
+
+    let agg = Ingredient.aggregate(pipeline);
+
+    let result = await pagination.paginate(agg, pageNum, sortBy);
+
+    return appendSKUs(result);
 }
 
-module.exports.keywordsAndSkus = async function(pageNum, sortBy, keywords, skus){
-    let filter = Ingredient.find({name: {$in: getNames(skus)},
-        $or:[
-            {name: {$all: keywords}},
-            {vendor_info: {$all: keywords}},
-            {package_size: {$all: keywords}},
-            {comment: {$all: keywords}}]
-    });
-    return await pagination.paginate(filter, Ingredient, pageNum, sortBy);
-
+function getFormulas(skus){
+    let formulas = new Set();
+    for(sku of skus){
+        formulas.add(sku.formula);
+    }
+    return Array.from(formulas);
 }
 
-function getNames(skus) {
-    let ingredient_names = new Set();
-    for(let sku of skus){
-        for(let ingredient of sku.ingredients){
-            ingredient_names.add(ingredient.ingredient_name);
+function getIngredients(formulas){
+    let ingredients = new Set();
+    for(let formula of formulas){
+        for (let tuple of formula.ingredient_tuples){
+            ingredients.add(tuple.ingredient);
         }
     }
-    return Array.from(ingredient_names);
+    return Array.from(ingredients);
 }
+
+async function appendSKUs(ingredients){
+    for(let ingredient of ingredients.data){
+        let formulas = await Formula.find({'ingredient_tuples.ingredient': ingredient._id}).exec();
+        let skus = [];
+        for(let formula of formulas){
+            let skuList = await SKU.find({formula: formula._id}, 'name size count number').exec();
+            skus = skus.concat(skuList);
+        }
+        ingredient.num_skus = skus.length;
+        //save num skus
+        await Ingredient.updateIngredient(ingredient.name, ingredient, (err) => {
+            if(err){
+                res.json({success: false, message: err});
+            }       
+        });
+        ingredient.skus = skus;
+    }
+
+    return ingredients;
+    
+}
+
 

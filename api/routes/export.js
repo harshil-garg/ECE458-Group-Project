@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ingredient_filter = require('../controllers/ingredient_filter');
 const sku_filter = require('../controllers/sku_filter');
-const input_validator = require('../controllers/input_validation');
+const formula_filter = require('../controllers/formula_filter');
 const pagination = require('../controllers/paginate');
 const ProductLine = require('../model/product_line_model');
 
@@ -11,58 +11,47 @@ router.post('/ingredients', async (req, res) => {
     const { sortBy, keywords, skus} = req.body;
     const required_params = { sortBy, keywords, skus };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
+    let key_exps = keywords.map((keyword) => {
+        return new RegExp(keyword, 'i');
+    });
+
+    let results = await ingredient_filter.filter(pageNum, sortBy, key_exps, skus);
+    format_ingredients(results.data);
+    res.json(results)
+});
+
+router.post('/skus', async (req, res) => {
+    const { sortBy, keywords, ingredients, product_lines } = req.body;
+    const required_params = { sortBy, keywords, ingredients, product_lines };
 
     let key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
 
-    //No filter, return all
-    if(keywords.length == 0 && skus.length == 0){
-        let results = await ingredient_filter.none(pageNum, sortBy);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-    //Keywords no SKUs
-    else if(skus.length == 0){
-        let results = await ingredient_filter.keywords(pageNum, sortBy, key_exps);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-    //SKUs no keywords
-    else if(keywords.length == 0){
-        //get all ingredients with given SKUs
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
-
-        let results = await ingredient_filter.skus(pageNum, sortBy, skuList);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-    //Keywords and SKUs
-    else{
-        let skuList = await SKU.find({name: {$in: skus}}, 'ingredients.ingredient_name').exec();
-        
-        let results = await ingredient_filter.keywordsAndSkus(pageNum, sortBy, key_exps, skuList);
-        format_ingredients(results.data);
-        res.json(results);
-    }
-});
-
-router.post('/skus', async (req, res) => {
-    filter_skus(req, res, format_skus);
+    let results = await sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines);
+    format_skus(results.data);
+    res.json(results);
 });
 
 router.post('/product_lines', async (req, res) => {
-    let filter = ProductLine.find({});
-    let results = await pagination.paginate(filter, ProductLine, pageNum, 'name');
+    let agg = ProductLine.aggregate({$match: {}});
+
+    let results = await pagination.paginate(agg, pageNum, 'name');
     format_product_lines(results.data);
     res.json(results);
 });
 
-router.post('/formulas', (req, res) => {
-    filter_skus(req, res, format_formulas);
+router.post('/formulas', async (req, res) => {
+    const { sortBy, keywords, ingredients } = req.body;
+    const required_params = { sortBy, keywords, ingredients };
+
+    let key_exps = keywords.map((keyword) => {
+        return new RegExp(keyword, 'i');
+    });
+
+    let results = await formula_filter.filter(pageNum, sortBy, key_exps, ingredients);
+    format_formulas(results.data);
+    res.json(results);
 });
 
 
@@ -74,7 +63,7 @@ function format_ingredients(ingredients) {
         delete ingredient.name;
         ingredient['Vendor Info'] = ingredient.vendor_info;
         delete ingredient.vendor_info;
-        ingredient['Size'] = ingredient.package_size;
+        ingredient['Size'] = `${ingredient.package_size} ${ingredient.unit}`;
         delete ingredient.size;
         ingredient['Cost'] = ingredient.cost;
         delete ingredient.cost;
@@ -99,8 +88,21 @@ function format_skus(skus) {
         delete sku.size;
         sku['Count per case'] = sku.count;
         delete sku.count;
-        sku['Product Line Name'] = sku.product_line;
+        sku['PL Name'] = sku.product_line;
         delete sku.product_line;
+        sku['Formula#'] = sku.formula.number;
+        delete sku.formula;
+        sku['Formula Factor'] = sku.formula_scale_factor;
+        delete sku.formula_scale_factor;
+
+        let mls = [];
+        for(let ml of sku.manufacturing_lines){
+            mls.push(ml.shortname);
+        }
+        sku['ML Shortnames'] = mls;
+        delete sku.manufacturing_lines;
+        sku['Rate'] = sku.manufacturing_rate;
+        delete sku.manufacturing_rate;
         sku['Comment'] = sku.comment;
         delete sku.comment;
         delete sku.ingredients;
@@ -114,63 +116,26 @@ function format_product_lines(product_lines) {
     }
 }
 
-function format_formulas(skus){
-    let formulas = [];
-    for(let i = skus.length-1; i >= 0; i-- ){
-        for(let formula of skus[i].ingredients){
-            formulas.push({ 'SKU#': skus[i].number, 'Ingr#': formula.ingredient_number, Quantity: formula.quantity })
+function format_formulas(formulas){
+    for(let formula of formulas){
+        formula['Formula#'] = formula.number;
+        delete formula.number;
+        formula['Name'] = formula.name;
+        delete formula.name;
+
+        let ingredients = [];
+        let quantities = [];
+        for(let tuple of formula.ingredient_tuples){
+            ingredients.push(tuple.ingredient.number);
+            let unit = tuple.unit.replace(/\W/g, '');
+            quantities.push(`${tuple.quantity} ${unit}`);
         }
-        skus.splice(i, 1); //delete the sku after extracting the data
 
-    }
-    skus.push(...formulas);
-}
-
-async function filter_skus(req, res, format){
-    const { sortBy, keywords, ingredients, product_lines } = req.body;
-    const required_params = { sortBy, keywords, ingredients, product_lines };
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
-
-    let key_exps = keywords.map((keyword) => {
-        return new RegExp(keyword, 'i');
-    });
-    
-    if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.none(pageNum, sortBy);
-        format(results.data);
-        res.json(results);
-    }else if(ingredients.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.keywords(pageNum, sortBy, key_exps);
-        format(results.data);
-        res.json(results);
-    }else if(keywords.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.ingredients(pageNum, sortBy, ingredients);
-        format(results.data);
-        res.json(results);
-    }else if(keywords.length == 0 && ingredients.length == 0){
-        let results = await sku_filter.productLines(pageNum, sortBy, product_lines);
-        format(results.data);
-        res.json(results);
-    }else if(product_lines.length == 0){
-        let results = await sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients);
-        format(results.data);
-        res.json(results);
-    }else if(keywords.length == 0){
-        let results = await sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines);
-        format(results.data);
-        res.json(results);
-    }else if(ingredients.length == 0){
-        let results = await sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines);
-        format(results.data);
-        res.json(results);
-    }else{
-        let results = await sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines);
-        format(results.data);
-        res.json(results);
+        formula['Ingr#'] = ingredients;
+        formula['Quantity'] = quantities;
+        formula['Comment'] = comment;
     }
 }
+
 
 module.exports = router;

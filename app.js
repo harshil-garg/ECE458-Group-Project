@@ -19,6 +19,9 @@ const ingredients = require('./api/routes/ingredient');
 const skus = require('./api/routes/sku');
 const product_lines = require('./api/routes/product_line');
 const manufacturing_goals = require('./api/routes/manufacturing_goal');
+const formulas = require('./api/routes/formula');
+const manufacturing_lines = require('./api/routes/manufacturing_line');
+const manufacturing_schedule = require('./api/routes/manufacturing_schedule');
 
 //Connect mongoose to our database
 mongoose.connect(mongoCreds.database, function(err){
@@ -75,6 +78,9 @@ app.use('/api/skus', skus)
 app.use('/api/product_lines', product_lines);
 app.use('/api/users', users);
 app.use('/api/manufacturing_goals', manufacturing_goals);
+app.use('/api/formulas', formulas.router);
+app.use('/api/manufacturing_lines', manufacturing_lines);
+app.use('/api/manufacturing_schedule', manufacturing_schedule);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));

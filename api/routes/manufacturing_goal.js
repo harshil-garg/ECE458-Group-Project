@@ -4,142 +4,134 @@ const router = express.Router();
 const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const Ingredient = require('../model/ingredient_model');
+const Formula = require('../model/formula_model');
 const pagination = require('../controllers/paginate');
-const validator = require('../controllers/sku_validation');
-const input_validator = require('../controllers/input_validation');
+const validator = require('../controllers/validator');
+const unit = require('../controllers/units');
 
-router.post('/calculator', (req, res) => {
-    const { name } = req.body;
-    const required_params = { name };
 
-    if(!input_validator.passed(required_params, res)){
+function getUser(req){
+    if(!req.user){
         return;
-    }
-
-    ManufacturingGoal.findOne({name: name}, (error, goal) => {
-        if (error) {
-            res.send("Manufacturing goal not found " + error);
-        }
-
-        var queue = [];
-        var data = [];
-
-        for (i = 0; i < goal.skus.length; i++) {
-            queue.push(i);
-            SKU.findOne({name: goal.skus[i].sku_name}, (error, sku) => {
-                if (error) {
-                    res.send("SKU not found " + error);
-                }
-                queue.pop();
-                data.push(sku);
-                if (queue.length == 0) {
-                    var result = {};
-                    data.forEach(e => {
-                        e.ingredients.forEach(f => {
-                            let name = f.ingredient_name;
-                            let quantity = f.quantity;
-                            if (!result[name])
-                                result[name] = 0;
-                            // Since this is embedded in a callback, we can't access the case quantity of the SKU
-                            // from the goal object via goal.skus[i]
-                            for (j = 0; j < goal.skus.length; j++) {
-                                if (goal.skus[j].sku_name == e.name) {
-                                    result[name] += goal.skus[j].case_quantity * quantity;
-                                }
-                            }
-                        });
-                    });
-                    runIngredientDBQuery(result, res);
-                }
-            });
-        }
-    });
-});
-
-function runIngredientDBQuery(result, res) {
-    var queue = [];
-    var ingredients = [];
-    for (var key in result) {
-        if (!result.hasOwnProperty(key)) {
-            continue;
-        }
-        queue.push(key);
-        Ingredient.findOne({name: key}, (error, ingredient) => {
-            if (error) {
-                res.send("Ingredient not found " + error);
-                return;
-            }
-            queue.pop();
-            ingredients.push(ingredient);
-            if (queue.length == 0) {
-                var data = [];
-                for (i = 0; i < ingredients.length; i++) {
-                    var temp = {};
-                    let p = ingredients[i];
-                    for (var k in p) {
-                        if (!p.hasOwnProperty(k) || k != "_doc") {
-                            continue;
-                        }
-                        for (var k2 in p[k]) {
-                            if (!p[k].hasOwnProperty(k2)) {
-                                continue;
-                            }
-                            temp[k2] = p[k][k2];
-                        }
-                    }
-                    temp["calculated_quantity"] = result[p.name];
-                    data.push(temp);
-                }
-                res.send(data);
-            }
-        });
+    }else{
+        return req.user.email;
     }
 }
 
-// Get all
-router.post('/all', async (req, res) => {
-    const { pageNum, sortBy, user } = req.body;
+router.post('/calculator', async (req, res) => {
+    const { name } = req.body;
 
-    const required_params = { pageNum, sortBy, user };
 
-    if(!input_validator.passed(required_params, res)){
+    let user = getUser(req);
+    if(!user){
+        res.json({success: false, message: 'No user logged in'});
         return;
     }
-    let results = await pagination.paginate(ManufacturingGoal.find({user: user}), ManufacturingGoal, pageNum, sortBy);
+
+    let ingredientMap = {}
+
+    let goal = await ManufacturingGoal.findOne({name: name, user: user}).exec();
+
+    for(let sku_tuple of goal.sku_tuples){
+        let sku = await SKU.findOne({_id: sku_tuple.sku}).exec();
+        let formula = await Formula.findOne({_id: sku.formula}).exec();
+
+        for(let ingr_tuple of formula.ingredient_tuples){
+            // let key = ingr_tuple.ingredient; //maybe use id as key
+            let ingredient = await Ingredient.findOne({_id: ingr_tuple.ingredient}).exec();
+            let key = ingredient.name;
+
+            let unit_value = sku_tuple.case_quantity * sku.formula_scale_factor * ingr_tuple.quantity * unit.convert(ingr_tuple.unit, ingredient.unit); // goal case quantity * sku scale factor * formula quantity * conversion
+
+
+            // If ingredient already in map, update values
+            if(key in ingredientMap){
+                ingredientMap[key]['unit_value'] += unit_value;
+                ingredientMap[key]['package_value'] = ingredientMap[key]['unit_value'] / ingredient.package_size;
+            }else{
+                ingredientMap[key] = {};
+                ingredientMap[key]['unit_value'] = unit_value;
+                ingredientMap[key]['unit'] = ingredient.unit;
+                ingredientMap[key]['package_value'] = unit_value / ingredient.package_size;
+            }          
+        }
+    }
+
+    res.json({success: true, data: ingredientMap});
+});
+
+// Get all
+router.post('/all', async (req, res) => {
+    const { pageNum, sortBy } = req.body;
+
+    let user = getUser(req);
+    if(!user){
+        res.json({success: false, message: 'No user logged in'});
+        return;
+    }
+
+    let agg = ManufacturingGoal.aggregate({$match: {user: user}}).lookup({
+        from: 'skus',
+        localField: 'sku_tuples.sku',
+        foreignField: '_id',
+        as: 'skus'
+    });
+    let results = await pagination.paginate(agg, pageNum, sortBy);
+
+    for(let item of results.data){
+        for(let sku of item.skus){
+            for(let tuple of item.sku_tuples){
+                if(sku._id.equals(tuple.sku)){
+                    tuple.sku = sku;
+                }
+            }
+        }
+        delete item.skus;
+    }
     res.json(results);
 });
 
 // CREATE
 router.post('/create', async (req, res) => {
-    const { name, skus } = req.body;
-    const required_params = { name, skus };
+    const { name, sku_tuples, deadline } = req.body;
 
-    if(!input_validator.passed(required_params, res)){
+    // Check that SKUS exist
+    let valid_tuples = [];
+    for(let tuple of sku_tuples){
+        valid_tuples.push(await validator.itemExists(SKU, tuple.sku));
+    }
+
+    let errors = validator.compileErrors(...valid_tuples);
+    // Return errors if any
+    if(errors.length > 0){
+        res.json({success: false, message: errors});
         return;
     }
 
-    // Need to have a sanity check validation (SKUs must exist!)
-    // TODO (will need a mongo query)
-    let sku_exists = true;
-    for (let sku of skus) {
-        let ans = await validator.itemExists(SKU, sku.sku_name)
-        sku['sku_number'] = ans.number;
-        sku_exists = sku_exists && ans.bool;
+    // Change from sku name to id
+    for(let i = 0; i < valid_tuples.length; i++){
+        sku_tuples[i]['sku'] = valid_tuples[i][2]; //id of sku
     }
 
-    if(!sku_exists){
-        res.json({success: false, message: 'One or more SKU does not exist'});
-        return;
-    }
-    let user;
-    if(!req.user){
+    let user = getUser(req);
+    if(!user){
         res.json({success: false, message: 'No user logged in'});
         return;
-    }else{
-        user = req.user.email;
     }
 
-    let goal = new ManufacturingGoal({name, skus, user});
+    //TODO: replace with validator
+    let deadline_date = new Date(deadline);
+    if(isNaN(deadline_date)){
+        res.json({success: false, message: deadline_date}); //message is: invalid date
+        return;
+    }
+
+    createManufacturingGoal(name, sku_tuples, user, deadline_date, res);    
+
+});
+
+function createManufacturingGoal(name, sku_tuples, user, deadline, res){
+    let goal = new ManufacturingGoal({name, sku_tuples, user, deadline});
 
     ManufacturingGoal.create(goal, (error) => {
         if (error) {
@@ -148,16 +140,10 @@ router.post('/create', async (req, res) => {
             res.json({success: true, message: "Added successfully."});
         }
     });
-
-});
+}
 
 router.post('/read', (req, res) => {
     const { name, user } = req.body;
-    const required_params = { name, user };
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
     ManufacturingGoal.findOne({name: name, user: user}, (error, goal) => {
         if (error) {
@@ -168,14 +154,17 @@ router.post('/read', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-  const { name } = req.body;
-  ManufacturingGoal.deleteOne({name: name}, (error, goal) => {
-    if (error) {
-      res.send("Deletion failed");
-    }
-    res.json({success: true});
-  });
-
-})
+    const { name } = req.body;
+    
+    ManufacturingGoal.deleteOne({name: name}, (err, result) => {
+        if(err) {
+            res.json({success: false, message: `Failed to delete manufacturing goal. Error: ${err}`});
+        }else if(result.deletedCount == 0){
+            res.json({success: false, message: 'Manufacturing goal does not exist to delete'});
+        }else{
+            res.json({success: true, message: "Deleted successfully."});
+        }
+    });
+});
 
 module.exports = router;

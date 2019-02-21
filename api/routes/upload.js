@@ -5,7 +5,7 @@ const csv = require('fast-csv');
 const fs = require('fs');
 const path = require('path');
 
-const skuValidator = require('../controllers/sku_validation');
+const validator = require('../controllers/validator');
 const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
 const ManufacturingGoalModel = require('../model/manufacturing_goal_model');
@@ -606,9 +606,11 @@ router.post('/commit', function (req, res) {
   // returns true if the row is valid syntactically and referentially
   // otherwise returns false and adds the row to the errorlist with the correct explanation message
   async function validateSKU(sku, results) {
-    if (!skuValidator.isUPCStandard(sku['Case UPC'] || !skuValidator.isUPCStandard(sku['Unit UPC']))) {
+    let case_upc_passed = validator.isUPCStandard(sku['Case UPC']);
+    let unit_upc_passed = validator.isUPCStandard(sku['Unit UPC']);
+    if (!case_upc_passed[0] || !unit_upc_passed[0]) {
       results.skus.errorlist.push({
-        message: 'UPC numbers are not up to standard',
+        message: case_upc_passed[1],
         data: sku
       });
       return false;

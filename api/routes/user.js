@@ -2,7 +2,6 @@ const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../model/user_model');
-const input_validator = require('../controllers/input_validation');
 
 const router = express.Router();
 
@@ -15,11 +14,7 @@ router.get('/register', (req,res) => {
 //request params: name, email, password, password2
 router.post('/register', (req,res) => {
     const {name, email, password, password2, admin} = req.body;
-    const required_params = { name, email, password, password2 };
-    //check fields completed
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
+
 
     //check passwords match
     if(password !== password2){

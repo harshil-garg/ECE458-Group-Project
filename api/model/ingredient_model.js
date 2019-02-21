@@ -17,9 +17,14 @@ const IngredientSchema = new Schema({
         type: String
     },
     package_size: {
-        type: String,
+        type: Number,
         required: true
     }, 
+    unit: {
+        type: String,
+        enum: ['oz.', 'lb.', 'ton', 'g', 'kg', 'fl. oz.', 'pt.', 'qt.', 'gal.', 'mL', 'L', 'count'],
+        required: true
+    },
     cost: {
         type: Number,
         required: true

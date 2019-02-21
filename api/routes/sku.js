@@ -4,104 +4,133 @@ const SKU = require('../model/sku_model');
 const Ingredient = require('../model/ingredient_model');
 const ProductLine = require('../model/product_line_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
+const Formula = require('../model/formula_model');
+const ManufacturingLine = require('../model/manufacturing_line_model');
+const FormulaRoute = require('../routes/formula');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
-const validator = require('../controllers/sku_validation');
-const input_validator = require('../controllers/input_validation');
+const validator = require('../controllers/validator');
+const generator = require('../controllers/autogen');
 
 
 //Autocomplete ingredients
-router.post('/autocomplete_ingredients', (req, res) => {
+router.post('/autocomplete_ingredients', async (req, res) => {
     const {input} = req.body;
-    const required_params = {input};
-    
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
-    autocomplete.ingredients(Ingredient, input, res);
+    let results = await autocomplete.nameOrNumber(Ingredient, input);
+    res.json({success: true, data: results});
 });
 
 //Autocomplete product lines
-router.post('/autocomplete_product_lines', (req, res) => {
+router.post('/autocomplete_product_lines', async (req, res) => {
     const {input} = req.body;
-    const required_params = {input};
-    
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
 
-    autocomplete.productLines(ProductLine, input, res);
+    let results = await autocomplete.nameOrNumber(ProductLine, input);
+    res.json({success: true, data: results});
+});
+
+//Autocomplete formulas
+router.post('/autocomplete_formulas', async (req, res) => {
+    const {input} = req.body;
+
+    let results = await autocomplete.nameOrNumber(Formula, input);
+    res.json({success: true, data: results});
 });
 
 
 //Filter
 router.post('/filter', async (req, res) => {
     const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
-    const required_params = { sortBy, pageNum, keywords, ingredients, product_lines };
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
-
-    let key_exps = keywords.map((keyword) => {
+    let key_exps;
+    key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
     
-    if(keywords.length == 0 && ingredients.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.none(pageNum, sortBy);
-        res.json(results);
-    }else if(ingredients.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.keywords(pageNum, sortBy, key_exps);
-        res.json(results);
-    }else if(keywords.length == 0 && product_lines.length == 0){
-        let results = await sku_filter.ingredients(pageNum, sortBy, ingredients);
-        res.json(results);
-    }else if(keywords.length == 0 && ingredients.length == 0){
-        let results = await sku_filter.productLines(pageNum, sortBy, product_lines);
-        res.json(results);
-    }else if(product_lines.length == 0){
-        let results = await sku_filter.keywordsandIngredients(pageNum, sortBy, key_exps, ingredients);
-        res.json(results);
-    }else if(keywords.length == 0){
-        let results = await sku_filter.ingredientsandLines(pageNum, sortBy, ingredients, product_lines);
-        res.json(results);
-    }else if(ingredients.length == 0){
-        let results = await sku_filter.keywordsandLines(pageNum, sortBy, key_exps, product_lines);
-        res.json(results);
-    }else{
-        let results = await sku_filter.allFilters(pageNum, sortBy, key_exps, ingredients, product_lines);
-        res.json(results);
-    }
+
+    let result = await sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines);
+    
+    res.json(result);
 });
+
 
 //Create
 router.post('/create', async (req, res) => {
-    const { name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-    const required_params = { name, number, case_upc, unit_upc, size, count, product_line, ingredients };
+    const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
 
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
-
-    let ingredient_passed = true;
-    for(let ingredient of ingredients) {
-        let ans = await validator.itemExists(Ingredient, ingredient.ingredient_name);
-        ingredient['ingredient_number'] = ans.number
-        ingredient_passed = ans.bool && ingredient_passed;
-    }
-    
     let product_passed = await validator.itemExists(ProductLine, product_line);
+    let manufacturings_passed = []
+    let manufacturing_ids = [];
+    for(let line of manufacturing_lines){
+        let manufacturing_passed = await validator.itemExists(ManufacturingLine, line);
+        manufacturings_passed.push(manufacturing_passed);
+        manufacturing_ids.push(manufacturing_passed[2]);
+    }   
     let case_passed = validator.isUPCStandard(case_upc);
     let unit_passed = validator.isUPCStandard(unit_upc);
+    let name_passed = validator.proper_name_length(name);
+    let count_passed = validator.isPositive(count, 'Count');
+    let scale_passed = validator.isPositive(formula_scale_factor, 'Scale factor');
+    let rate_passed = validator.isPositive(manufacturing_rate, 'Manufacturing Rate');
     
-    if(!ingredient_passed || !product_passed || !case_passed || !unit_passed){
-        res.json({success: false, message: 'Input invalid'});
+    let errors = validator.compileErrors(product_passed, ...manufacturings_passed, case_passed, unit_passed, name_passed, count_passed, scale_passed, rate_passed);
+    if(errors.length > 0){
+        res.json({success: false, message: errors});
         return;
     }
+    let int_count = validator.forceInteger(count);
+    let product_line_id = product_passed[2];
 
+    let formula_id = await formulaHandler(formula, res);
+    if(!formula_id){
+        return;
+    }
+    if(number){
+        create_SKU(name, number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
+    }else{
+        let gen_number = await generator.autogen(SKU);
+        create_SKU(name, gen_number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);        
+    }    
+});
 
-    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, ingredients, comment});
+async function formulaHandler(formula, res){
+    if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
+        let formula_passed = await validator.itemExists(Formula, formula.number);
+        if(!formula_passed[0]){
+            res.json({success: false, message: formula_passed[1]});
+            return;
+        }
+        return formula_passed[2];
+    }else{  //create new formula
+        if(formula.number){
+            try{
+                let new_formula = await FormulaRoute.createFormula(formula.name, formula.number, formula.ingredient_tuples, formula.comment, res);                
+                if(!new_formula){
+                    return;
+                }
+                return new_formula._id;
+            }catch(err){
+                res.json({success: false, message: err});
+                return;
+            }           
+        }else{
+            let gen_number = await generator.autogen(Formula);
+            try{
+                let new_formula = await FormulaRoute.createFormula(formula.name, gen_number, formula.ingredient_tuples, formula.comment, res);
+                if(!new_formula){
+                    return;
+                }
+                return new_formula._id;
+            }catch(err){
+                res.json({success: false, message: err});
+                return;
+            }        
+        }
+    }
+}
+
+function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
+    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment});
     SKU.createSKU(sku, (err) => {
         if(err){
             res.json({success: false, message: `Failed to create SKU. Error: ${err}`});
@@ -109,21 +138,19 @@ router.post('/create', async (req, res) => {
             res.json({success: true, message: "Created successfully"});
         }
     });
-});
+}
 
 //Update
 router.post('/update', async (req, res) => {
-    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, ingredients, comment } = req.body;
-    const required_params = { number };
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
+    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
 
     var json = {};
-    let propagate = false;
     if (name) {
-        propagate = true;
+        name_passed = validator.proper_name_length(name);
+        if(!name_passed[0]){
+            res.json({success: false, message: name_passed[1]});
+            return;
+        }
         json["name"] = name;
     }
     if (newnumber) {
@@ -131,16 +158,16 @@ router.post('/update', async (req, res) => {
     }
     if (case_upc) {
         let case_passed = validator.isUPCStandard(case_upc);
-        if(!case_passed){
-            res.json({success: false, message: 'Input invalid'});
+        if(!case_passed[0]){
+            res.json({success: false, message: case_passed[1]});
             return;
         }
         json["case_upc"] = case_upc;
     }
     if (unit_upc) {
         let unit_passed = validator.isUPCStandard(unit_upc);
-        if(!unit_passed){
-            res.json({success: false, message: 'Input invalid'});
+        if(!unit_passed[0]){
+            res.json({success: false, message: unit_passed[1]});
             return;
         }
         json["unit_upc"] = unit_upc;
@@ -149,41 +176,69 @@ router.post('/update', async (req, res) => {
         json["size"] = size;
     }
     if (count) {
+        let count_passed = validator.isUPCStandard(count);
+        if(!count_passed[0]){
+            res.json({success: false, message: count_passed[1]});
+            return;
+        }
         json["count"] = count;
     }
     if (product_line) {
         let product_passed = await validator.itemExists(ProductLine, product_line);
-        if(!product_passed){
-            res.json({success: false, message: 'Input invalid'});
+        if(!product_passed[0]){
+            res.json({success: false, message: product_passed[1]});
             return;
         }
         json["product_line"] = product_line;
     }
-    if (ingredients) {
-        let ingredient_passed = true;
-        for(let ingredient of ingredients) {
-            let ans = await validator.itemExists(Ingredient, ingredient.ingredient_name);
-            ingredient['ingredient_number'] = ans.number
-            ingredient_passed = ans.bool && ingredient_passed;
-        }
-        if(!ingredient_passed){
-            res.json({success: false, message: 'Input invalid'});
+    if (formula) {
+        let formula_id = await formulaHandler(formula, res);
+        if(!formula_id){
             return;
         }
-        json["ingredients"] = ingredients;
+
+        json["formula"] = formula_id;
+    }
+    if (formula_scale_factor) {
+        let scale_passed = validator.isPositive(formula_scale_factor);
+        if(!scale_passed[0]){
+            res.json({success: false, message: scale_passed[1]});
+            return;
+        }
+        json["formula_scale_factor"] = formula_scale_factor;
+    }
+    if (manufacturing_lines) {
+        let manufacturings_passed = []
+        let ids = []
+        for(let line of manufacturing_lines){
+            let manufacturing_passed = await validator.itemExists(ManufacturingLine, line);
+            manufacturings_passed.push(manufacturing_passed);
+            ids.push(manufacturing_passed[2]);
+        }   
+        let errors = validator.compileErrors(manufacturings_passed);
+
+        if(errors.length > 0){
+            res.json({success: false, message: errors[0]});
+            return;
+        }
+        json["manufacturing_lines"] = ids;
+    }
+    if (manufacturing_rate) {
+        let rate_passed = validator.isPositive(manufacturing_rate);
+        if(!rate_passed[0]){
+            res.json({success: false, message: rate_passed[1]});
+            return;
+        }
+        json["manufacturing_rate"] = manufacturing_rate;
     }
     if (comment) {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(number, json, async (err) => {
+    SKU.updateSKU(number, json, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else {
-            if(propagate){
-                await ManufacturingGoal.update({'skus.sku_number': number}, {'skus.$.sku_name' : name}, {multi: true}).exec();
-            }
-            
             res.json({success: true, message: "Updated successfully."});
         }
     })
@@ -193,12 +248,6 @@ router.post('/update', async (req, res) => {
 router.post('/delete', (req, res) => {
     const { number } = req.body;
 
-    const required_params = { number};
-
-    if(!input_validator.passed(required_params, res)){
-        return;
-    }
-
     SKU.deleteSKU(number, async (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
@@ -206,9 +255,10 @@ router.post('/delete', (req, res) => {
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
-            await ManufacturingGoal.update({'skus.sku_number': name}, {$pull: {skus : {sku_number : number}}}, {multi: true}).exec();
+            let sku = await SKU.findOne({number: number}).exec();
+            await ManufacturingGoal.update({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}, {multi: true}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
-    })
+    });
 });
 module.exports = router;
