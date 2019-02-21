@@ -10,12 +10,12 @@ import { ManufacturingGoal, SkuNameQuantity } from '../../../model/manufacturing
 })
 export class AddManufacturingGoalDialogComponent {
 
-  skuInput: string;
+  skuInput: any;
   quantityInput: any;
 
   constructor(
     public dialogRef: MatDialogRef<AddManufacturingGoalDialogComponent>,
-      @Inject(MAT_DIALOG_DATA) public manufGoal: ManufacturingGoal){this.manufGoal.skus = [];}
+      @Inject(MAT_DIALOG_DATA) public manufGoal: ManufacturingGoal){this.manufGoal.sku_tuples = [];}
 
     onNoClick(): void {
       this.dialogRef.close();
@@ -27,23 +27,29 @@ export class AddManufacturingGoalDialogComponent {
 
     keyPressed(event){
       if(event.keyCode == 13){ //enter pressed
-        if(this.skuInput!=null && this.skuInput.length>0 && this.quantityInput!=null && this.quantityInput.length>0){
-          var added_sku_quant: SkuNameQuantity = {
-            sku_name: this.skuInput,
-            case_quantity: this.quantityInput
-          }
-          this.manufGoal.skus.push(added_sku_quant);
-          this.skuInput = '';
-          this.quantityInput = '';
+        this.addSkuQuantity(event);
+      }
+    }
+
+    addSkuQuantity(event){
+      if(this.skuInput!=undefined && this.skuInput.name.length>0 && this.quantityInput!=undefined && this.quantityInput.length>0){
+        var added_sku_quant: SkuNameQuantity = {
+          sku: this.skuInput.number,
+          case_quantity: this.quantityInput
         }
+        this.manufGoal.sku_tuples.push(added_sku_quant);
+        this.skuInput = undefined;
+        this.quantityInput = '';
       }
     }
 
     removeSku(id){
-      this.manufGoal.skus.splice(id, 1);
+      this.manufGoal.sku_tuples.splice(id, 1);
     }
 
     setSku(sku){
+      console.log("SKU SET");
+      console.log(sku);
       this.skuInput = sku;
     }
 

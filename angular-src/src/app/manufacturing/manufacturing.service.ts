@@ -7,7 +7,8 @@ import { catchError } from 'rxjs/operators';
 
 export class CreateMessage {
   name : string;
-  skus : SkuNameQuantity[];
+  sku_tuples : SkuNameQuantity[];
+  deadline: Date;
 }
 
 export class CreateResponse {
@@ -23,7 +24,8 @@ export class RefreshMessage {
 
 export class ResponseData {
   name: string;
-	skus: SkuNameQuantity[];
+	sku_tuples: SkuNameQuantity[];
+  deadline: Date;
 }
 
 export class RefreshResponse {
@@ -66,6 +68,7 @@ export class ManufacturingService {
   constructor(private http: HttpClient) { }
 
   create(requestedManufacturingGoal: CreateMessage): Observable<CreateResponse>{
+    console.log(requestedManufacturingGoal);
     return this.http.post<CreateResponse>('/api/manufacturing_goals/create', requestedManufacturingGoal, httpOptions);
   }
 

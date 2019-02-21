@@ -66,7 +66,7 @@ export class SearchSkuComponent implements OnInit {
 
   keyPressedSku(event){
     if(event.keyCode == 13){ //enter pressed
-      this.addManufacturingGoalDialogComponent.setSku(this.suggestedSkus[0].name);
+      this.addManufacturingGoalDialogComponent.setSku(this.suggestedSkus[0]);
       this.skuField.setValue(this.suggestedSkus[0].name);
     }
   }
@@ -86,6 +86,10 @@ export class SearchSkuComponent implements OnInit {
     console.log("SKU SELECTED");
     console.log(event.option.value);
     this.addManufacturingGoalDialogComponent.setSku(event.option.value);
+  }
+
+  displaySku(sku): string | undefined{
+    return sku ? sku.name : undefined;
   }
 
 }

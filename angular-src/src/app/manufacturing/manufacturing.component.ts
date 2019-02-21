@@ -13,7 +13,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 export class ManufacturingComponent implements OnInit {
 
   manufGoalList: Array<any> = [];
-  displayedColumns: string[] = ['select', 'name', 'skus'];
+  displayedColumns: string[] = ['select', 'name', 'skus', 'deadline'];
   selection = new SelectionModel<ManufacturingGoal>(true, []);
   dataSource = new MatTableDataSource<ManufacturingGoal>(this.manufGoalList);
   maxPages: number;
@@ -83,11 +83,11 @@ export class ManufacturingComponent implements OnInit {
     for(let selected of this.selection.selected){
       var csvContent = "data:text/csv;charset=utf-8,";
       csvContent += ["sku_name", "case_quantity"].join(",") + "\r\n";
-      selected.skus.forEach(function(item) {
+      selected.sku_tuples.forEach(function(item) {
         //let row = item.number+","+item.name+","+item.package_size+","+item.cost+","+item.calculated_quantity;
         //csvContent += row + "\r\n";
         console.log(item);
-        csvContent += item.sku_name+","+item.case_quantity+"\r\n";
+        csvContent += item.sku+","+item.case_quantity+"\r\n";
       });
       var encodedUri = encodeURI(csvContent);
       window.open(encodedUri);
@@ -101,7 +101,8 @@ export class ManufacturingComponent implements OnInit {
       for(let manufGoal of response.data){
         this.manufGoalList.push({
             name: manufGoal.name,
-            skus: manufGoal.skus
+            sku_tuples: manufGoal.sku_tuples,
+            deadline: manufGoal.deadline
         });
       }
       this.dataSource.data = this.manufGoalList;

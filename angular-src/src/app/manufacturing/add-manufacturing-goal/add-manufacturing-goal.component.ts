@@ -36,7 +36,8 @@ export class AddManufacturingGoalComponent {
     add(manufGoal: ManufacturingGoal) {
       this.manufacturingService.create({
           name : manufGoal.name,
-          skus : manufGoal.skus
+          sku_tuples : manufGoal.sku_tuples,
+          deadline: manufGoal.deadline
         }).subscribe(
         response => this.handleResponse(response),
         err => {

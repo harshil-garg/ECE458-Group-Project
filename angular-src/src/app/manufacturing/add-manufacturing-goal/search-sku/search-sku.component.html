@@ -11,7 +11,7 @@
   <input type="search" matInput [formControl]="skuField" [matAutocomplete]="sku" placeholder="SKU" (keydown)="keyPressedSku($event)">
 </mat-form-field>
 
-<mat-autocomplete #sku="matAutocomplete" (optionSelected)="onSkuSelection($event)">
-  <mat-option *ngFor="let sku of suggestedSkus" [value]="sku.name">{{sku.name}}
+<mat-autocomplete #sku="matAutocomplete" (optionSelected)="onSkuSelection($event)" [displayWith]="displaySku">
+  <mat-option *ngFor="let sku of suggestedSkus" [value]="sku">{{sku.name}} ({{sku.number}})
      <font color="lightgray">SKU</font> </mat-option>
 </mat-autocomplete>

@@ -7,6 +7,37 @@
         <div [hidden]="name.valid || name.pristine" class="alert alert-danger">Name is required</div>
       </div>
 
+      <label for="sku_quantities">Sku-Quantities</label>
+      <mat-chip-list>
+        <ng-container *ngFor="let sku_quant of manufGoal.sku_tuples; let id=index">
+          <div>
+            <mat-chip>sku id = {{sku_quant.sku}} : quantity = {{sku_quant.case_quantity}} <mat-icon (click)="removeSku(id)">clear</mat-icon></mat-chip><br>
+          </div>
+        </ng-container>
+      </mat-chip-list>
+      <mat-card>
+        <mat-card-subtitle [style.color]="'black'">New Sku-Quantity Pair</mat-card-subtitle>
+        <app-search-sku></app-search-sku>
+        <input class="form-control" name="quantity" [(ngModel)]="quantityInput" name="quantity" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
+        <button mat-raised-button type="button" (click)="addSkuQuantity($event)" color="accent"
+          [disabled]="skuInput==undefined || skuInput.name.length==0 || quantityInput==undefined || quantityInput.length==0">Add Sku-Quantity</button>
+      </mat-card>
+
+      <div class="form-group">
+        <label for="deadline">Manufacturing Goal Deadline</label>
+        <input class="form-control" id="deadline" required [(ngModel)]="manufGoal.deadline" name="deadline" #deadline="ngModel" [matDatepicker]="myDatepicker">
+        <!-- <input [(ngModel)]="manufGoal.deadline" required name="deadline" #deadline="ngModel" id="deadline" [matDatepicker]="myDatepicker"> -->
+        <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
+        <mat-datepicker #myDatepicker></mat-datepicker>
+        <div [hidden]="deadline.valid || deadline.pristine" class="alert alert-danger">Deadline is required</div>
+      </div>
+
+      <!-- <div class="form-group">
+        <label for="deadline">Deadline</label>
+        <input type="text" class="form-control" id="deadline" required [(ngModel)]="manufGoal.name" name="name" #name="ngModel">
+        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">Name is required</div>
+      </div> -->
+
       <button type="submit" class="btn btn-success" [disabled]="!manufGoalForm.form.valid" [mat-dialog-close]="manufGoal">Submit</button>
 
     </form>
