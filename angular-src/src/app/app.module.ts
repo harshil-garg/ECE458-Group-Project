@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title  } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import {CommonModule} from "@angular/common";
@@ -16,8 +16,8 @@ import { AuthGuard } from './auth-guard';;
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 import { AddProductLineModule } from './product-line-table/add-product-line/add-product-line.module';
-import { AddManufacturingGoalModule } from './manufacturing/add-manufacturing-goal/add-manufacturing-goal.module';
-import { CalculatorModule } from './manufacturing/calculator/calculator.module';
+import { AddManufacturingGoalModule } from './manufacturing-goal-table/add-manufacturing-goal/add-manufacturing-goal.module';
+import { CalculatorModule } from './manufacturing-goal-table/calculator/calculator.module';
 import { AddSkuModule } from './sku-table/add-sku/add-sku.module';
 import { UploadComponent } from './upload/upload.component';
 import { SearchIngredientComponent } from './ingredients-table/search-ingredient/search-ingredient.component';
@@ -27,10 +27,15 @@ import { SkuTableComponent } from './sku-table/sku-table.component';
 import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.component';
 import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
-import { ManufacturingComponent } from './manufacturing/manufacturing.component';
-import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule } from '@angular/material';
+import { ManufacturingGoalTableComponent } from './manufacturing-goal-table/manufacturing-goal-table.component';
+import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule } from '@angular/material';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
+import { FormulaTableComponent } from './formula-table/formula-table.component';
+import { ManufacturingLineTableComponent } from './manufacturing-line-table/manufacturing-line-table.component';
+import { AddManufacturingLineComponent } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.component';
+import { AddManufacturingLineDialogComponent } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line-dialog/add-manufacturing-line-dialog.component';
+import { AddManufacturingLineModule } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.module';
 
 const routes: Routes = [
   {
@@ -42,9 +47,11 @@ const routes: Routes = [
         	{ path: 'ingredients', component: IngredientsTableComponent },
           { path: 'product-lines', component: ProductLineTableComponent },
           { path: 'skus', component: SkuTableComponent },
+          { path: 'formulas', component: FormulaTableComponent },
           { path: 'accounts', component: AccountsComponent },
-          { path: 'upload', component: UploadComponent},
-          { path: 'manufacturing', component: ManufacturingComponent}
+          { path: 'upload', component: UploadComponent },
+          { path: 'manufacturing-goals', component: ManufacturingGoalTableComponent },
+          { path: 'manufacturing-lines', component: ManufacturingLineTableComponent }
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -66,9 +73,11 @@ const routes: Routes = [
     ProductLineTableComponent,
     SkuTableComponent,
     SearchSkuComponent,
-    ManufacturingComponent,
+    ManufacturingGoalTableComponent,
     CreateDependencyReportComponent,
-    DependencyReportDialogComponent
+    DependencyReportDialogComponent,
+    FormulaTableComponent,
+    ManufacturingLineTableComponent
   ],
   imports: [
     BrowserModule,
@@ -77,6 +86,7 @@ const routes: Routes = [
     AddIngredientModule,
     AddProductLineModule,
     AddManufacturingGoalModule,
+    AddManufacturingLineModule,
     CalculatorModule,
     AddSkuModule,
     HttpClientModule,
@@ -100,9 +110,13 @@ const routes: Routes = [
     MatSnackBarModule,
     MatTableModule,
     MatCheckboxModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatSortModule,
+    MatChipsModule,
+    MatSelectModule,
+    MatExpansionModule
   ],
-  providers: [],
+  providers: [Title],
   bootstrap: [AppComponent],
   entryComponents: [DependencyReportDialogComponent]
 })

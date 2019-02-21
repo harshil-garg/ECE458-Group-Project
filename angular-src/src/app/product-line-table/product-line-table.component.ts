@@ -17,10 +17,12 @@ export class ProductLineTableComponent implements OnInit{
     selection = new SelectionModel<ProductLine>(true, []);
     dataSource = new MatTableDataSource<ProductLine>(this.productLineList);
     maxPages: number;
+    totalDocs: number;
+    loadingResults: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
-      this.paginator.pageIndex = 0
+      this.paginator.pageIndex = 0;
       this.paginator.page.subscribe(x => this.refresh());
       this.refresh();
     }
@@ -29,7 +31,6 @@ export class ProductLineTableComponent implements OnInit{
 
     remove() {
       for(let selected of this.selection.selected){
-        console.log(selected.name);
         var deleted_name = selected.name;
         this.crudProductLineService.remove({
             name : deleted_name
@@ -50,6 +51,7 @@ export class ProductLineTableComponent implements OnInit{
           }
         );
       }
+      this.selection.clear();
     }
 
     edit(name:any, property:string, updated_value:any) {
@@ -96,6 +98,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     refresh(){
+      this.loadingResults = true;
       this.crudProductLineService.read({
           pageNum: this.paginator.pageIndex+1
         }).subscribe(
@@ -110,6 +113,7 @@ export class ProductLineTableComponent implements OnInit{
 
     handleRefreshResponse(response: ReadResponse){
       if(response.success){
+        console.log(response);
         this.productLineList = [];
         for(let productLine of response.data){
           this.productLineList.push({
@@ -117,7 +121,9 @@ export class ProductLineTableComponent implements OnInit{
           });
         }
         this.dataSource.data = this.productLineList;
-        this.maxPages = response.pages;
+        this.totalDocs = response.total_docs;
+        this.maxPages = response.pages
+        this.loadingResults = false;
       }
     }
 

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { Ingredient } from '../model/ingredient'
+import { Formula } from '../model/formula'
 
 export class FilterMessage {
 	sortBy : string;
@@ -23,7 +24,10 @@ export class ResponseData {
 	size: string;
 	count: number;
   product_line: string;
-	ingredients: Array<[Ingredient, number]>;
+	formula: Formula;
+	formula_scale_factor: string;
+	manufacturing_lines: string[];
+	manufacturing_rate: string;
 	comment: string;
   __v: number;
 }
@@ -36,6 +40,7 @@ export class FilterResponse {
   success: boolean;
   data: Array<ResponseData>;
 	pages: number;
+	total_docs: number;
 }
 
 export class AutocompleteResponse {

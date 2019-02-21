@@ -21,8 +21,8 @@ export class AddIngredientComponent {
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddIngredientDialogComponent, {
-        height: '400px',
-        width: '1400px',
+        height: '800px',
+        width: '400px',
         data: this.ingredient
       });
 

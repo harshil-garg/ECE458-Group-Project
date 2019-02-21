@@ -1,10 +1,13 @@
+import {Sku} from './sku'
+
 export class SkuNameQuantity {
-  sku_name: string;
+  sku: Sku;
   case_quantity: number;
 }
 
 export class ManufacturingGoal {
   name: string;
   user: string;
-  skus: SkuNameQuantity[];
+  sku_tuples: SkuNameQuantity[];
+  deadline: Date;
 }
