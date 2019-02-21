@@ -1,5 +1,6 @@
 const SKU = require('../model/sku_model');
 const pagination = require('./paginate');
+const formula_filter = require('./formula_filter');
 
 module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, product_lines){
     let pipeline = [];
@@ -51,10 +52,33 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
     if(product_lines.length > 0){
         pipeline.push({$match: {'product_line.name': {$all: product_lines}}});   
     }
+    pipeline.push({
+        $lookup: {
+            from: 'manufacturinglines',
+            localField: 'manufacturing_lines',
+            foreignField: '_id',
+            as: 'manufacturing_lines'
+        }
+    });
 
     let agg = SKU.aggregate(pipeline);
 
     let result = await pagination.paginate(agg, pageNum, sortBy);
 
+    populateIngredients(result);
+
     return result;
+}
+
+function populateIngredients(result){
+    for(let item of result.data){
+        for(let ingredient of item.ingredients){
+            for(let tuple of item.formula.ingredient_tuples){
+                if(ingredient._id.equals(tuple.ingredient)){
+                    tuple.ingredient = ingredient;
+                }
+            }
+        }
+        delete item.ingredients;
+    }
 }
