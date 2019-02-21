@@ -32,6 +32,10 @@ import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonMod
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
 import { FormulaTableComponent } from './formula-table/formula-table.component';
+import { ManufacturingLineTableComponent } from './manufacturing-line-table/manufacturing-line-table.component';
+import { AddManufacturingLineComponent } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.component';
+import { AddManufacturingLineDialogComponent } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line-dialog/add-manufacturing-line-dialog.component';
+import { AddManufacturingLineModule } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.module';
 
 const routes: Routes = [
   {
@@ -45,8 +49,9 @@ const routes: Routes = [
           { path: 'skus', component: SkuTableComponent },
           { path: 'formulas', component: FormulaTableComponent },
           { path: 'accounts', component: AccountsComponent },
-          { path: 'upload', component: UploadComponent},
-          { path: 'manufacturing', component: ManufacturingGoalTableComponent}
+          { path: 'upload', component: UploadComponent },
+          { path: 'manufacturing-goals', component: ManufacturingGoalTableComponent },
+          { path: 'manufacturing-lines', component: ManufacturingLineTableComponent }
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -71,7 +76,8 @@ const routes: Routes = [
     ManufacturingGoalTableComponent,
     CreateDependencyReportComponent,
     DependencyReportDialogComponent,
-    FormulaTableComponent
+    FormulaTableComponent,
+    ManufacturingLineTableComponent
   ],
   imports: [
     BrowserModule,
@@ -80,6 +86,7 @@ const routes: Routes = [
     AddIngredientModule,
     AddProductLineModule,
     AddManufacturingGoalModule,
+    AddManufacturingLineModule,
     CalculatorModule,
     AddSkuModule,
     HttpClientModule,
