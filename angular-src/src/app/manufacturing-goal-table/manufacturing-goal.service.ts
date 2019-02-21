@@ -32,6 +32,7 @@ export class RefreshResponse {
   success: boolean;
   data: ResponseData[];
   pages: number;
+  total_docs: number;
 }
 
 export class CalculateMessage {

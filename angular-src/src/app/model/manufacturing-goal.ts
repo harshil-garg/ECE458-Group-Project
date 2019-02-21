@@ -1,5 +1,7 @@
+import {Sku} from './sku'
+
 export class SkuNameQuantity {
-  sku: string;
+  sku: Sku;
   case_quantity: number;
 }
 

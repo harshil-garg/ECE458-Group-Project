@@ -17,6 +17,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
   selection = new SelectionModel<ManufacturingGoal>(true, []);
   dataSource = new MatTableDataSource<ManufacturingGoal>(this.manufGoalList);
   maxPages: number;
+  totalDocs: number;
   loadingResults: boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -102,10 +103,11 @@ export class ManufacturingGoalTableComponent implements OnInit {
         this.manufGoalList.push({
             name: manufGoal.name,
             sku_tuples: manufGoal.sku_tuples,
-            deadline: manufGoal.deadline
+            deadline: manufGoal.deadline,
         });
       }
       this.dataSource.data = this.manufGoalList;
+      this.totalDocs = response.total_docs;
       this.maxPages = response.pages;
       this.loadingResults = false;
     }

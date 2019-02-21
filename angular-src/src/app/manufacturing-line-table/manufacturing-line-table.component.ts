@@ -17,6 +17,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     selection = new SelectionModel<ManufacturingLine>(true, []);
     dataSource = new MatTableDataSource<ManufacturingLine>(this.manufacturingLineList);
     maxPages: number;
+    totalDocs: number;
     loadingResults: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -131,6 +132,7 @@ export class ManufacturingLineTableComponent implements OnInit{
           });
         }
         this.dataSource.data = this.manufacturingLineList;
+        this.totalDocs = response.total_docs;
         this.maxPages = response.pages;
         this.loadingResults = false;
       }

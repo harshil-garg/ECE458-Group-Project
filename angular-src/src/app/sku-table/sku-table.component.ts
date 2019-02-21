@@ -28,6 +28,7 @@ export class SkuTableComponent implements OnInit{
     selection = new SelectionModel<Sku>(true, []);
     dataSource = new MatTableDataSource<Sku>(this.skuList);
     maxPages: number;
+    totalDocs: number;
     loadingResults: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
@@ -266,56 +267,11 @@ export class SkuTableComponent implements OnInit{
           });
         }
         this.dataSource.data = this.skuList;
+        this.totalDocs = response.total_docs;
         this.maxPages = response.pages;
         this.loadingResults = false;
       }
     }
-    //
-    // setSortBy(property: string){
-    //   this.sortBy = property;
-    //   this.refresh();
-    // }
-    //
-    // nextPage(){
-    //   if(this.currentPage<this.maxPages){
-    //     this.currentPage++;
-    //     this.refresh();
-    //   }
-    // }
-    //
-    // prevPage(){
-    //   if(this.currentPage>1){
-    //     this.currentPage--;
-    //     this.refresh();
-    //   }
-    // }
-    //
-    // setPage(i){
-    //   this.currentPage = i;
-    //   this.refresh();
-    // }
-    //
-    // showAll(){
-    //   this.currentPage = -1;
-    // }
-    //
-    // shownPages(){
-    //   var numbers : Array<number> = [];
-    //   if(this.maxPages>5)
-    //   {
-    //     for (var i = 1; i < 5; i++) {
-    //       numbers.push(i);
-    //     }
-    //     numbers.push(this.maxPages)
-    //     return numbers;
-    //   }
-    //   else{
-    //     for (var i = 1; i <= this.maxPages; i++) {
-    //       numbers.push(i);
-    //     }
-    //     return numbers;
-    //   }
-    // }
 
     keyPressed(sku_num, id, event){
       if(event.keyCode == 13){ //enter pressed

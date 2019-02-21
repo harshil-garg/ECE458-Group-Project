@@ -34,6 +34,7 @@ export class IngredientsTableComponent implements OnInit{
     selection = new SelectionModel<Ingredient>(true, []);
     dataSource = new MatTableDataSource<Ingredient>(this.ingredientList);
     maxPages: number;
+    totalDocs: number;
     loadingResults: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
@@ -201,6 +202,7 @@ export class IngredientsTableComponent implements OnInit{
           });
         }
         this.dataSource.data = this.ingredientList;
+        this.totalDocs = response.total_docs;
         this.maxPages = response.pages;
         this.loadingResults = false;
       }

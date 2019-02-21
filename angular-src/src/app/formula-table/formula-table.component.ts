@@ -34,6 +34,7 @@ export class FormulaTableComponent implements OnInit{
     selection = new SelectionModel<Formula>(true, []);
     dataSource = new MatTableDataSource<Formula>(this.formulaList);
     maxPages: number;
+    totalDocs: number;
     loadingResults: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
@@ -166,6 +167,7 @@ export class FormulaTableComponent implements OnInit{
           });
         }
         this.dataSource.data = this.formulaList;
+        this.totalDocs = response.total_docs;
         this.maxPages = response.pages;
         this.loadingResults = false;
       }
