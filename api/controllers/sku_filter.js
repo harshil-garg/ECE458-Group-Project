@@ -25,16 +25,17 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
             as: 'formula'
         }
     },
-    {$unwind: '$formula'})
+    {$unwind: '$formula'},
+    {
+        $lookup: {
+            from: 'ingredients',
+            localField: 'formula.ingredient_tuples.ingredient',
+            foreignField: '_id',
+            as: 'ingredients'
+        }
+    });
     if(ingredients.length > 0){
-        pipeline.push({
-            $lookup: {
-                from: 'ingredients',
-                localField: 'formula.ingredient_tuples.ingredient',
-                foreignField: '_id',
-                as: 'ingredients'
-            }
-        },
+        pipeline.push(
         {
             $match: {'ingredients.name': {$all: ingredients}}
         });
