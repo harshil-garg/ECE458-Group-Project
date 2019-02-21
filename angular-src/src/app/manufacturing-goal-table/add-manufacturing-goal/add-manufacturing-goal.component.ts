@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { AddManufacturingGoalDialogComponent } from './add-manufacturing-goal-dialog/add-manufacturing-goal-dialog.component';
-import { ManufacturingService, CreateResponse } from '../manufacturing.service';
-import { ManufacturingComponent } from '../manufacturing.component';
+import { ManufacturingGoalService, CreateResponse } from '../manufacturing-goal.service';
+import { ManufacturingGoalTableComponent } from '../manufacturing-goal-table.component';
 
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
 
@@ -15,8 +15,8 @@ export class AddManufacturingGoalComponent {
 
     manufGoal: ManufacturingGoal = new ManufacturingGoal();
 
-    constructor(public dialog: MatDialog, public manufacturingService: ManufacturingService,
-      public manufacturingComponent: ManufacturingComponent) {}
+    constructor(public dialog: MatDialog, public manufacturingService: ManufacturingGoalService,
+      public manufacturingComponent: ManufacturingGoalTableComponent) {}
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddManufacturingGoalDialogComponent, {

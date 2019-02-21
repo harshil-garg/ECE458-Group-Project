@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ManufacturingGoal } from '../model/manufacturing-goal'
 import { AuthenticationService } from '../authentication.service'
-import { ManufacturingService, RefreshResponse } from './manufacturing.service';
+import { ManufacturingGoalService, RefreshResponse } from './manufacturing-goal.service';
 import {MatTableDataSource, MatPaginator, MatSnackBar} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-manufacturing',
-  templateUrl: './manufacturing.component.html',
-  styleUrls: ['./manufacturing.component.css']
+  templateUrl: './manufacturing-goal-table.component.html',
+  styleUrls: ['./manufacturing-goal-table.component.css']
 })
-export class ManufacturingComponent implements OnInit {
+export class ManufacturingGoalTableComponent implements OnInit {
 
   manufGoalList: Array<any> = [];
   displayedColumns: string[] = ['select', 'name', 'skus', 'deadline'];
@@ -20,7 +20,7 @@ export class ManufacturingComponent implements OnInit {
   loadingResults: boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingService, private snackBar: MatSnackBar) { }
+  constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.paginator.pageIndex = 0

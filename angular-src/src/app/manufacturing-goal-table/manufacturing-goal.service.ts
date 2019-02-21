@@ -63,7 +63,7 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class ManufacturingService {
+export class ManufacturingGoalService {
 
   constructor(private http: HttpClient) { }
 

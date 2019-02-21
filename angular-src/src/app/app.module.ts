@@ -16,8 +16,8 @@ import { AuthGuard } from './auth-guard';;
 import { AccountsComponent } from './accounts/accounts.component';
 import { AddIngredientModule } from './ingredients-table/add-ingredient/add-ingredient.module';
 import { AddProductLineModule } from './product-line-table/add-product-line/add-product-line.module';
-import { AddManufacturingGoalModule } from './manufacturing/add-manufacturing-goal/add-manufacturing-goal.module';
-import { CalculatorModule } from './manufacturing/calculator/calculator.module';
+import { AddManufacturingGoalModule } from './manufacturing-goal-table/add-manufacturing-goal/add-manufacturing-goal.module';
+import { CalculatorModule } from './manufacturing-goal-table/calculator/calculator.module';
 import { AddSkuModule } from './sku-table/add-sku/add-sku.module';
 import { UploadComponent } from './upload/upload.component';
 import { SearchIngredientComponent } from './ingredients-table/search-ingredient/search-ingredient.component';
@@ -27,7 +27,7 @@ import { SkuTableComponent } from './sku-table/sku-table.component';
 import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.component';
 import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
-import { ManufacturingComponent } from './manufacturing/manufacturing.component';
+import { ManufacturingGoalTableComponent } from './manufacturing-goal-table/manufacturing-goal-table.component';
 import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule } from '@angular/material';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
@@ -46,7 +46,7 @@ const routes: Routes = [
           { path: 'formulas', component: FormulaTableComponent },
           { path: 'accounts', component: AccountsComponent },
           { path: 'upload', component: UploadComponent},
-          { path: 'manufacturing', component: ManufacturingComponent}
+          { path: 'manufacturing', component: ManufacturingGoalTableComponent}
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -68,7 +68,7 @@ const routes: Routes = [
     ProductLineTableComponent,
     SkuTableComponent,
     SearchSkuComponent,
-    ManufacturingComponent,
+    ManufacturingGoalTableComponent,
     CreateDependencyReportComponent,
     DependencyReportDialogComponent,
     FormulaTableComponent

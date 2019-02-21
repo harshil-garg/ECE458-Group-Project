@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import { ManufacturingService } from '../../manufacturing.service';
+import { ManufacturingGoalService } from '../../manufacturing-goal.service';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -15,7 +15,7 @@ export class CalculatorDialogComponent implements OnInit {
   calculateList : Array<any> = [];
 
   constructor(
-    public dialogRef: MatDialogRef<CalculatorDialogComponent>, public manufacturingService: ManufacturingService,
+    public dialogRef: MatDialogRef<CalculatorDialogComponent>, public manufacturingService: ManufacturingGoalService,
       @Inject(MAT_DIALOG_DATA) public manufGoal: string){}
 
     onNoClick(): void {
