@@ -54,7 +54,7 @@ router.post('/update', (req, res) => {
             res.json({success: false, message: shortname_passed[1]});
             return;
         }
-        json["name"] = newshortname;
+        json["shortname"] = newshortname;
     }
     if(comment){
         json["comment"] = comment;

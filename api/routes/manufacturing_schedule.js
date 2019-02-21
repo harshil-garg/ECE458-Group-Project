@@ -20,6 +20,23 @@ router.post('/create', async (req, res) => {
         res.json({success: false, message: error});
         return;
     }
+
+    //calculate duration
+    if(!duration){
+        let sku = await SKU.findOne({_id: activity_passed[2]}).exec();
+        let goal = await ManufacturingGoal.findOne({_id: activity_passed[3]}).exec();
+        let quantity;
+        for(let tuple of goal.sku_tuples){
+            if(tuple.sku.equals(sku._id)){
+                quantity = tuple.case_quantity;
+            }
+        }
+        duration = quantity / sku.manufacturing_rate;
+        
+    }else{
+        duration_override = true;
+    }
+
     activity.sku = error.sku;
     activity.manufacturing_goal = error.manufacturing_goal;
     manufacturing_line = error.manufacturing_line;
@@ -36,8 +53,23 @@ router.post('/create', async (req, res) => {
 
 
 //Update a mapping
-router.post('/update', (req, res) => {
-    //can change
+router.post('/update', async (req, res) => {
+    //can change line, start date, and duration
+    let { activity, manufacturing_line, start_date, new_start_date, duration } = req.body;
+
+    let json = {};
+    if(manufacturing_line){
+
+    }
+    if(new_start_date){
+
+    }
+    if(duration){
+
+    }
+
+    await ManufacturingSchedule.findOneAndUpdate({'activity.sku': activity.sku, 'activity.manufacturing_goal': activity.manufacturing_goal, start_date: start_date}).exec();
+
 
 });
 

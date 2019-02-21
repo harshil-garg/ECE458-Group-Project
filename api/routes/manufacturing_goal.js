@@ -62,10 +62,32 @@ router.post('/calculator', async (req, res) => {
 
 // Get all
 router.post('/all', async (req, res) => {
-    const { pageNum, sortBy, user } = req.body;
+    const { pageNum, sortBy } = req.body;
 
-    let agg = ManufacturingGoal.aggregate({$match: {user: user}});
+    let user = getUser(req);
+    if(!user){
+        res.json({success: false, message: 'No user logged in'});
+        return;
+    }
+
+    let agg = ManufacturingGoal.aggregate({$match: {user: user}}).lookup({
+        from: 'skus',
+        localField: 'sku_tuples.sku',
+        foreignField: '_id',
+        as: 'skus'
+    });
     let results = await pagination.paginate(agg, pageNum, sortBy);
+
+    for(let item of results.data){
+        for(let sku of item.skus){
+            for(let tuple of item.sku_tuples){
+                if(sku._id.equals(tuple.sku)){
+                    tuple.sku = sku;
+                }
+            }
+        }
+        delete item.skus;
+    }
     res.json(results);
 });
 
