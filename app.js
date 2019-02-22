@@ -24,7 +24,7 @@ const manufacturing_lines = require('./api/routes/manufacturing_line');
 const manufacturing_schedule = require('./api/routes/manufacturing_schedule');
 
 //Connect mongoose to our database
-mongoose.connect(mongoCreds.database, function(err){
+mongoose.connect(mongoCreds.database, {useMongoClient: true}, function(err){
     if(err){
         console.log("Not connected to database: "+err);
     }else{

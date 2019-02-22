@@ -12,6 +12,8 @@ const ManufacturingGoalModel = require('../model/manufacturing_goal_model');
 const ProductLine = require('../model/product_line_model');
 var extract = require('extract-zip');
 
+const directoryPath = path.join(__dirname, '../../tmp/csv/');
+
 var storage = multer.diskStorage(
   {
       destination: './tmp/csv/',
@@ -74,7 +76,7 @@ router.post('/commit', function (req, res) {
   else {
     res.json({
       success: false,
-      uploadErrorType: 'Cannot commit if server is not ready'
+      uploadErrorType: 'Upload session expired'
     })
   }
 });
@@ -116,7 +118,6 @@ router.post('/commit', function (req, res) {
       }
     };
 
-    const directoryPath = path.join(__dirname, '../../tmp/csv/');
     fsPromise = new Promise(function (resolve, reject) {
       fs.readdir(directoryPath, async function (err, files) {
         //handling error
@@ -220,6 +221,9 @@ router.post('/commit', function (req, res) {
   
               await csvPromise;
             }
+            else if (file.includes(".zip")) {
+              // ignore if its the zip file
+            }
             else {
               errorOn = true;
               results = {
@@ -271,6 +275,8 @@ router.post('/commit', function (req, res) {
         }
         //if theres no errors, but there are changes, continue the session
         else {
+          // end the session if the user doesn't submit consent or cancel after 2 mins
+          setTimeout(() => { resetSession() }, 120000);
           results.success = false;
           uploadHalfComplete = true;
         }
@@ -285,16 +291,18 @@ router.post('/commit', function (req, res) {
 
   async function handleZip(file, res) {
     var results = {};
-    extract(file.path, {dir: 'tmp/csv/'}, async function (err) {
+    extract(file.path, {dir: directoryPath}, async function (err) {
       // extraction is complete. make sure to handle the err
       if (err) {
+        console.log(err);
         uploadSessionStarted = false;
         results.success = false;
         results.uploadErrorType = 'Zip error';
         res.json(results);
       }
       else {
-        await handleFiles(res);
+        fs.unlinkSync(file.path);
+        handleFiles(res);
       }
      }
     )
@@ -412,9 +420,10 @@ router.post('/commit', function (req, res) {
                 }
                 // other wise validate and add
                 else {
-                  if (await validateSKU(row, results)) {
-                    results.skus.createlist.push(row);
-                  }
+                    var validated = await validateSKU(row, results);
+                    if (validated) {
+                      results.skus.createlist.push(row);
+                    }
                 }
                 resolve2();
               });
@@ -461,7 +470,7 @@ router.post('/commit', function (req, res) {
           // if we find an existing entry, we check to ignore, change, or error
           if (result) {
             //if an ingredient is identical, add it to the ignore list
-            if (result.name == row['Name'] && result.vendor_info == row['Vendor Info'] && result.package_size == row['Size'] && result.cost == row['Cost'] && result.comment == row['Comment']) {
+            if (result.name == row['Name'] && result.vendor_info == row['Vendor Info'] && (result.package_size + ' ' + result.unit) == row['Size'] && result.cost == row['Cost'] && result.comment == row['Comment']) {
               results.ingredients.ignorelist.push(row);
             }
             // if matches on the primary key AND the unique key, validate and update
@@ -607,7 +616,7 @@ router.post('/commit', function (req, res) {
       return false;
     }
     if (isNaN(sku['SKU#'] || isNaN(sku['Count per case']))) {
-      results.ingredients.errorlist.push({
+      results.skus.errorlist.push({
         message: 'A value that must be a number is not a number',
         data: sku
       });
@@ -616,7 +625,7 @@ router.post('/commit', function (req, res) {
     // check whether there is a product line in product lines
     // if not, check whether there is a product line in the document
     var found = false;
-    for (row in results.product_lines.createlist) {
+    for (var row of results.product_lines.createlist) {
       if (row['Name'] == sku['Product Line Name']) {
         found = true;
         break;
@@ -626,7 +635,7 @@ router.post('/commit', function (req, res) {
       var searchPromise = new Promise((resolve, reject) => {
         ProductLine.findOne({name: sku['Product Line Name']}, (err, result) => {
           if (!result) {
-            results.ingredients.errorlist.push({
+            results.skus.errorlist.push({
               message: 'This SKU is referring to a product line that does not exist',
               data: sku
             });
@@ -690,7 +699,8 @@ router.post('/commit', function (req, res) {
             name: row.Name,
             number: row['Ingr#'],
             vendor_info: row['Vendor Info'],
-            package_size: row['Size'],
+            package_size: row['Size'].split(' ')[0],
+            unit: row['Size'].split(' ')[1],
             cost: row['Cost'],
             comment: row['Comment'],
           }
@@ -713,10 +723,11 @@ router.post('/commit', function (req, res) {
             name: row.Name,
             number: row['Ingr#'],
             vendor_info: row['Vendor Info'],
-            package_size: row['Size'],
+            package_size: row['Size'].split(' ')[0],
+            unit: row['Size'].split(' ')[1],
             cost: row['Cost'],
             comment: row['Comment'],
-          }
+          };
           Ingredient.updateIngredient(row.Name, update, (error) => {
               if (error) {
                 errorOn = true;

@@ -5,10 +5,10 @@ const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 
 router.post('/all', async (req, res) => {
-    const { pageNum, sortBy } = req.body;
+    const { pageNum, sortBy, page_size } = req.body;
 
     let agg = ManufacturingLine.aggregate({$match: {}});
-    let results = await pagination.paginate(agg, pageNum, sortBy);
+    let results = await pagination.paginate(agg, pageNum, sortBy, page_size);
     res.json(results);
 });
 

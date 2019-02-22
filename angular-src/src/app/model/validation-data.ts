@@ -1,5 +1,6 @@
 export class ValidationData {
     success: boolean;
+    uploadErrorType: string;
     skus: {
         createlist: [];
         ignorelist: [];

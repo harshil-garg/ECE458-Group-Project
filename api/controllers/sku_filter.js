@@ -2,7 +2,7 @@ const SKU = require('../model/sku_model');
 const pagination = require('./paginate');
 const formula_filter = require('./formula_filter');
 
-module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, product_lines){
+module.exports.filter = async function(pageNum, sortBy, page_size, keywords, ingredients, product_lines){
     let pipeline = [];
 
     if(keywords.length > 0){
@@ -64,7 +64,7 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients, p
 
     let agg = SKU.aggregate(pipeline);
 
-    let result = await pagination.paginate(agg, pageNum, sortBy);
+    let result = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
     populateIngredients(result);
 
