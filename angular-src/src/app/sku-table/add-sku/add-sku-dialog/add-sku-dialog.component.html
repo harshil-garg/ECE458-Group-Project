@@ -35,7 +35,7 @@
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <!-- <input matInput (click)="handleClick($event)" placeholder="Formula Name"> -->
-                <input type="text" class="form-control" id="formula" (click)="handleClick($event)" placeholder="Formula Name" required [(ngModel)]="sku.formula" name="formula" #formula="ngModel">
+                <input type="text" class="form-control" id="formula" (click)="handleClick($event)" placeholder="Formula Name" required [(ngModel)]="sku.formula.name" name="formula" #formula="ngModel">
               </mat-panel-title>
               <mat-panel-description>
                 Edit Formula
@@ -43,10 +43,10 @@
             </mat-expansion-panel-header>
             <div>
               <mat-form-field floatLabel="never">
-                <input matInput placeholder="Formula#">
+                <input matInput [(ngModel)]="sku.formula.number" name="formula#" placeholder="Formula#">
               </mat-form-field>
               <mat-form-field floatLabel="never">
-                <textarea matInput placeholder="Comment"></textarea>
+                <textarea matInput [(ngModel)]="sku.formula.comment" name="formula comment" placeholder="Comment"></textarea>
               </mat-form-field>
             </div>
             <mat-card>

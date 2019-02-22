@@ -1,5 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {CrudManufacturingLineService} from '../../../manufacturing-line-table/crud-manufacturing-line.service';
 
 import { Sku } from '../../../model/sku';
 import { Tuple } from '../../../model/ingredient';
@@ -10,24 +11,43 @@ import { Formula } from '../../../model/formula';
   templateUrl: './add-sku-dialog.component.html',
   styleUrls: ['./add-sku-dialog.component.css']
 })
-export class AddSkuDialogComponent{
+export class AddSkuDialogComponent implements OnInit{
 
   ingredientInput: string;
   quantityInput: any;
   formValid: boolean = true;
   nameLengthValid: boolean = true;
   formula: Formula;
-  manufacturingLines = ["ManufLine1", "ManufLine2"];
+  manufacturingLines = [];
 
   constructor(
-    public dialogRef: MatDialogRef<AddSkuDialogComponent>,
+    public dialogRef: MatDialogRef<AddSkuDialogComponent>, private crudManufacturingLineService: CrudManufacturingLineService,
       @Inject(MAT_DIALOG_DATA) public sku: Sku)
       {
         this.formula=new Formula();
         this.formula.ingredient_tuples = [];
+        sku.formula = this.formula;
         sku.formula_scale_factor = "1.0";
         sku.manufacturing_lines = [];
       }
+
+    ngOnInit(){
+      this.crudManufacturingLineService.read({
+          pageNum: -1,
+          sortBy: "name"
+        }).subscribe(
+        response => {
+          for(let manufacturingLine of response.data){
+            this.manufacturingLines.push(manufacturingLine.shortname);
+          }
+        },
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
 
     onNoClick(): void {
       this.dialogRef.close();
