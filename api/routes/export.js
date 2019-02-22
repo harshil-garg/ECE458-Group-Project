@@ -15,7 +15,7 @@ router.post('/ingredients', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
 
-    let results = await ingredient_filter.filter(pageNum, sortBy, key_exps, skus);
+    let results = await ingredient_filter.filter(pageNum, sortBy, 0, key_exps, skus);
     format_ingredients(results.data);
     res.json(results)
 });
@@ -28,7 +28,7 @@ router.post('/skus', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
 
-    let results = await sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines);
+    let results = await sku_filter.filter(pageNum, sortBy, 0, key_exps, ingredients, product_lines);
     format_skus(results.data);
     res.json(results);
 });
@@ -36,7 +36,7 @@ router.post('/skus', async (req, res) => {
 router.post('/product_lines', async (req, res) => {
     let agg = ProductLine.aggregate({$match: {}});
 
-    let results = await pagination.paginate(agg, pageNum, 'name');
+    let results = await pagination.paginate(agg, pageNum, 'name', 0);
     format_product_lines(results.data);
     res.json(results);
 });
@@ -49,7 +49,7 @@ router.post('/formulas', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
 
-    let results = await formula_filter.filter(pageNum, sortBy, key_exps, ingredients);
+    let results = await formula_filter.filter(pageNum, sortBy, 0, key_exps, ingredients);
     format_formulas(results.data);
     res.json(results);
 });

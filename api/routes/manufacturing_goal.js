@@ -62,7 +62,7 @@ router.post('/calculator', async (req, res) => {
 
 // Get all
 router.post('/all', async (req, res) => {
-    const { pageNum, sortBy } = req.body;
+    const { pageNum, sortBy, page_size } = req.body;
 
     let user = getUser(req);
     if(!user){
@@ -76,7 +76,7 @@ router.post('/all', async (req, res) => {
         foreignField: '_id',
         as: 'skus'
     });
-    let results = await pagination.paginate(agg, pageNum, sortBy);
+    let results = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
     for(let item of results.data){
         for(let sku of item.skus){

@@ -40,7 +40,7 @@ router.post('/autocomplete_formulas', async (req, res) => {
 
 //Filter
 router.post('/filter', async (req, res) => {
-    const { sortBy, pageNum, keywords, ingredients, product_lines } = req.body;
+    const { sortBy, pageNum, page_size, keywords, ingredients, product_lines } = req.body;
 
     let key_exps;
     key_exps = keywords.map((keyword) => {
@@ -48,7 +48,7 @@ router.post('/filter', async (req, res) => {
     });
     
 
-    let result = await sku_filter.filter(pageNum, sortBy, key_exps, ingredients, product_lines);
+    let result = await sku_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients, product_lines);
     
     res.json(result);
 });

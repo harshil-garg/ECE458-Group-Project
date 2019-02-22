@@ -91,7 +91,8 @@ module.exports.objectFieldsExist = function(obj, requiredFields){
     return [errors.length == 0, errors];
 }
 
-const first_digit = new Set(['0', '1', '6', '7', '8', '9'])
+const first_digit = new Set(['0', '1', '6', '7', '8', '9']);
+
 // Syntax checks
 module.exports.isUPCStandard = function(upc_num) {
     let err_msg;
@@ -132,6 +133,14 @@ module.exports.isUPCStandard = function(upc_num) {
     return [true, err_msg];
 
 }
+function generateUPCNumbers(){
+    for(let i = 100000000000; i < 200000000000; i++){
+        if(this.isUPCStandard(i.toString())[0]){
+            console.log(i)
+        }
+    }
+}
+
 
 module.exports.proper_name_length = function(name){
     let err_msg = 'Name must be 32 characters or fewer';

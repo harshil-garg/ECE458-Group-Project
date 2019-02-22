@@ -23,12 +23,12 @@ router.post('/create', (req, res) => {
 
 //Read
 router.post('/read', async (req, res) => {
-    const {pageNum}  = req.body;
+    const {pageNum, page_size}  = req.body;
 
 
     let agg = ProductLine.aggregate({$match: {}});
 
-    let results = await pagination.paginate(agg, pageNum, 'name');
+    let results = await pagination.paginate(agg, pageNum, 'name', page_size);
     res.json(results);
 });
 

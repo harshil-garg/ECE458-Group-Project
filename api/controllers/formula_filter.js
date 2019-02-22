@@ -1,7 +1,7 @@
 const Formula = require('../model/formula_model');
 const pagination = require('./paginate');
 
-module.exports.filter = async function(pageNum, sortBy, keywords, ingredients){
+module.exports.filter = async function(pageNum, sortBy, page_size, keywords, ingredients){
     let pipeline = [];
 
     if(keywords.length > 0){
@@ -29,7 +29,7 @@ module.exports.filter = async function(pageNum, sortBy, keywords, ingredients){
 
     let agg = Formula.aggregate(pipeline);
 
-    let result = await pagination.paginate(agg, pageNum, sortBy);
+    let result = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
     populateIngredients(result);
 

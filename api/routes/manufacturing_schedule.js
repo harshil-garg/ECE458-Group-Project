@@ -57,18 +57,33 @@ router.post('/update', async (req, res) => {
     //can change line, start date, and duration
     let { activity, manufacturing_line, start_date, new_start_date, duration } = req.body;
 
+    let errors = await createValidation(activity, manufacturing_line, start_date);
+    if(!('sku' in error)){
+        res.json({success: false, message: error});
+        return;
+    }
+
     let json = {};
     if(manufacturing_line){
-
+        json['manufacturing_line'] = errors.manufacturing_line;
     }
     if(new_start_date){
-
+        json['start_date'] = new_start_date;
     }
     if(duration){
-
+        json['duration'] = duration;
+        json['duration_override'] = true;
     }
 
-    await ManufacturingSchedule.findOneAndUpdate({'activity.sku': activity.sku, 'activity.manufacturing_goal': activity.manufacturing_goal, start_date: start_date}).exec();
+    ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
+        'activity.manufacturing_goal': errors.manufacturing_goal, 
+        start_date: start_date}, json, (err) => {
+            if (err) {
+                res.json({success: false, message: `Failed to update mapping. Error: ${err}`});
+            } else{
+                res.json({success: true, message: "Updated successfully."});
+            }
+        });
 
 
 });
@@ -78,7 +93,7 @@ router.post('/delete', (req, res) => {
 
 });
 
-async function createValidation(activity, manufacturing_line, start_date, duration, duration_override){
+async function createValidation(activity, manufacturing_line, start_date){
     let required_params = { activity, manufacturing_line, start_date };
     let required_activity_params = ['sku', 'manufacturing_goal'];
 

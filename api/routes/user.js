@@ -5,6 +5,15 @@ const User = require('../model/user_model');
 
 const router = express.Router();
 
+//Autcomplete
+router.post('/autocomplete', async (req, res) => {
+    const {input} = req.body;
+    const required_params = {input};
+    
+    let results = await autocomplete.email(User, input);
+    res.json({success: true, data: results});
+});
+
 //Register page
 router.get('/register', (req,res) => {
     res.send('register');
