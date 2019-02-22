@@ -10,6 +10,7 @@ import { ManufacturingLine } from '../model/manufacturing-line'
 
 export class FilterMessage {
 	sortBy : string;
+	page_size: number;
 	pageNum: string;
 	keywords: Array<string>;
 	ingredients: Array<[Ingredient, number]>;

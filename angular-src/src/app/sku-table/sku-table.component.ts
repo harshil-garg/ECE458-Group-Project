@@ -34,7 +34,8 @@ export class SkuTableComponent implements OnInit{
     @ViewChild(MatSort) sort: MatSort;
 
     ngOnInit() {
-      this.paginator.pageIndex = 0
+      this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
       this.paginator.page.subscribe(x => this.refresh());
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
@@ -220,6 +221,7 @@ export class SkuTableComponent implements OnInit{
       this.filterSkuService.filter({
           sortBy : this.sortBy,
           pageNum: this.paginator.pageIndex.toString()+1,
+          page_size: this.paginator.pageSize,
           keywords: this.keywords,
           ingredients: this.ingredients,
           product_lines: this.productLines

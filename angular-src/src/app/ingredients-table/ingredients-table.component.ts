@@ -43,7 +43,8 @@ export class IngredientsTableComponent implements OnInit{
     expandedIngredient;
 
     ngOnInit() {
-      this.paginator.pageIndex = 0
+      this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
       this.paginator.page.subscribe(x => this.refresh());
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
@@ -174,6 +175,7 @@ export class IngredientsTableComponent implements OnInit{
       this.filterIngredientsService.filter({
           sortBy : this.sortBy,
           pageNum: this.paginator.pageIndex.toString()+1,
+          page_size: this.paginator.pageSize,
           keywords: this.keywords,
           skus : this.skus
         }).subscribe(

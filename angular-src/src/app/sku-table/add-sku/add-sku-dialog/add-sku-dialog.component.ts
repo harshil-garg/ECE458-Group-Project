@@ -34,6 +34,7 @@ export class AddSkuDialogComponent implements OnInit{
     ngOnInit(){
       this.crudManufacturingLineService.read({
           pageNum: -1,
+          page_size: 0,
           sortBy: "name"
         }).subscribe(
         response => {
