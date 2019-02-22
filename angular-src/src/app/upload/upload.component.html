@@ -38,123 +38,20 @@
                     <mat-tab-group>
                             <mat-tab *ngIf="sChangeList.length>0" label="SKUs">
                                 <mat-table class="upload-table" [dataSource]="sChangeList">
-
-                                        <!--- Note that these columns can be defined in any order.
-                                                The actual rendered columns are set as a property on the row definition" -->
-                                        
-                                        <!-- Position Column -->
-                                        <ng-container matColumnDef="SKU#">
-                                            <mat-header-cell *matHeaderCellDef> SKU# </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['SKU#']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Name Column -->
-                                        <ng-container matColumnDef="Name">
-                                            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Weight Column -->
-                                        <ng-container matColumnDef="Case UPC">
-                                            <mat-header-cell *matHeaderCellDef> Case UPC </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Case UPC']}} </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="Unit UPC">
-                                            <mat-header-cell *matHeaderCellDef> Unit UPC </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Unit UPC']}} </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="Unit size">
-                                            <mat-header-cell *matHeaderCellDef> Unit size </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Unit size']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Name Column -->
-                                        <ng-container matColumnDef="Count per case">
-                                            <mat-header-cell *matHeaderCellDef> Count per case </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Count per case']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Weight Column -->
-                                        <ng-container matColumnDef="PL Name">
-                                            <mat-header-cell *matHeaderCellDef> PL Name </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['PL Name']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Symbol Column -->
-                                        <ng-container matColumnDef="Formula#">
-                                            <mat-header-cell *matHeaderCellDef> Formula# </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Formula#']}} </mat-cell>
-                                        </ng-container>
-
-                                        <ng-container matColumnDef="Formula factor">
-                                            <mat-header-cell *matHeaderCellDef> Formula factor </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Formula factor']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Name Column -->
-                                        <ng-container matColumnDef="ML Shortnames">
-                                            <mat-header-cell *matHeaderCellDef> ML Shortnames </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['ML Shortnames']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Weight Column -->
-                                        <ng-container matColumnDef="Rate">
-                                            <mat-header-cell *matHeaderCellDef> Rate </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Rate']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <!-- Symbol Column -->
-                                        <ng-container matColumnDef="Comment">
-                                            <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                            <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                        </ng-container>
-                                        
-                                        <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
-                                        <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
+                                    <ng-container *ngFor="let column of sdisplayedColumns" [matColumnDef]="column">
+                                        <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                        <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
                                 </mat-table>
                             </mat-tab>
                             <mat-tab *ngIf="iChangeList.length>0" label="Ingredients">
                                 <mat-table class="upload-table" [dataSource]="iChangeList">
-
-                                    <!--- Note that these columns can be defined in any order.
-                                            The actual rendered columns are set as a property on the row definition" -->
-                                    
-                                    <!-- Position Column -->
-                                    <ng-container matColumnDef="Ingr#">
-                                        <mat-header-cell *matHeaderCellDef> Ingr# </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"> {{element['Ingr#']}} </mat-cell>
+                                    <ng-container *ngFor="let column of idisplayedColumns" [matColumnDef]="column">
+                                        <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                        <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
                                     </ng-container>
-                                    
-                                    <!-- Name Column -->
-                                    <ng-container matColumnDef="Name">
-                                        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                    </ng-container>
-                                    
-                                    <!-- Weight Column -->
-                                    <ng-container matColumnDef="Vendor Info">
-                                        <mat-header-cell *matHeaderCellDef> Vendor Info </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"> {{element['Vendor Info']}} </mat-cell>
-                                    </ng-container>
-                                    
-                                    <!-- Symbol Column -->
-                                    <ng-container matColumnDef="Size">
-                                        <mat-header-cell *matHeaderCellDef> Size </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"> {{element['Size']}} </mat-cell>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="Cost">
-                                        <mat-header-cell *matHeaderCellDef> Cost </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"> {{element['Cost']}} </mat-cell>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="Comment">
-                                        <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                    </ng-container>
-                                    
                                     <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
                                     <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
                                 </mat-table>
@@ -183,376 +80,67 @@
                             <mat-tab-group>
                                 <mat-tab *ngIf="hasElements(results.skus.createlist)" label="New">
                                         <mat-table class="upload-table" [dataSource]="results.skus.createlist">
-
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="SKU#">
-                                                    <mat-header-cell *matHeaderCellDef> SKU# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['SKU#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Case UPC">
-                                                    <mat-header-cell *matHeaderCellDef> Case UPC </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Case UPC']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Unit UPC">
-                                                    <mat-header-cell *matHeaderCellDef> Unit UPC </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Unit UPC']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Unit size">
-                                                    <mat-header-cell *matHeaderCellDef> Unit size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Unit size']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Count per case">
-                                                    <mat-header-cell *matHeaderCellDef> Count per case </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Count per case']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="PL Name">
-                                                    <mat-header-cell *matHeaderCellDef> PL Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['PL Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Formula#">
-                                                    <mat-header-cell *matHeaderCellDef> Formula# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Formula#']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Formula factor">
-                                                    <mat-header-cell *matHeaderCellDef> Formula factor </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Formula factor']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="ML Shortnames">
-                                                    <mat-header-cell *matHeaderCellDef> ML Shortnames </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['ML Shortnames']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Rate">
-                                                    <mat-header-cell *matHeaderCellDef> Rate </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Rate']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
+                                            <ng-container *ngFor="let column of sdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
                                         </mat-table>
                                 </mat-tab>
                                 <mat-tab *ngIf="hasElements(results.skus.changelist)" label="Updated">
                                         <mat-table class="upload-table" [dataSource]="results.skus.changelist">
+                                            <ng-container *ngFor="let column of sdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
 
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="SKU#">
-                                                    <mat-header-cell *matHeaderCellDef> SKU# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['SKU#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Case UPC">
-                                                    <mat-header-cell *matHeaderCellDef> Case UPC </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Case UPC']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Unit UPC">
-                                                    <mat-header-cell *matHeaderCellDef> Unit UPC </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Unit UPC']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Unit size">
-                                                    <mat-header-cell *matHeaderCellDef> Unit size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Unit size']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Count per case">
-                                                    <mat-header-cell *matHeaderCellDef> Count per case </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Count per case']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="PL Name">
-                                                    <mat-header-cell *matHeaderCellDef> PL Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['PL Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Formula#">
-                                                    <mat-header-cell *matHeaderCellDef> Formula# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Formula#']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Formula factor">
-                                                    <mat-header-cell *matHeaderCellDef> Formula factor </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Formula factor']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="ML Shortnames">
-                                                    <mat-header-cell *matHeaderCellDef> ML Shortnames </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['ML Shortnames']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Rate">
-                                                    <mat-header-cell *matHeaderCellDef> Rate </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Rate']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
+                                            <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
                                         </mat-table>
                                 </mat-tab>
                                 <mat-tab *ngIf="hasElements(results.skus.ignorelist)" label="Ignored">
                                         <mat-table class="upload-table" [dataSource]="results.skus.ignorelist">
-
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="SKU#">
-                                                    <mat-header-cell *matHeaderCellDef> SKU# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['SKU#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Case UPC">
-                                                    <mat-header-cell *matHeaderCellDef> Case UPC </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Case UPC']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Unit UPC">
-                                                    <mat-header-cell *matHeaderCellDef> Unit UPC </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Unit UPC']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Unit size">
-                                                    <mat-header-cell *matHeaderCellDef> Unit size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Unit size']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Count per case">
-                                                    <mat-header-cell *matHeaderCellDef> Count per case </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Count per case']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="PL Name">
-                                                    <mat-header-cell *matHeaderCellDef> PL Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['PL Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Formula#">
-                                                    <mat-header-cell *matHeaderCellDef> Formula# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Formula#']}} </mat-cell>
-                                                </ng-container>
-            
-                                                <ng-container matColumnDef="Formula factor">
-                                                    <mat-header-cell *matHeaderCellDef> Formula factor </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Formula factor']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="ML Shortnames">
-                                                    <mat-header-cell *matHeaderCellDef> ML Shortnames </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['ML Shortnames']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Rate">
-                                                    <mat-header-cell *matHeaderCellDef> Rate </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Rate']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
+                                            <ng-container *ngFor="let column of sdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
                                         </mat-table>
                                 </mat-tab>
                             </mat-tab-group>
-                            
                         </mat-tab>
                         <mat-tab *ngIf="ingredientsImported()" label="Ingredients">
                             <mat-tab-group>
                                 <mat-tab *ngIf="hasElements(results.ingredients.createlist)" label="New">
                                         <mat-table class="upload-table" [dataSource]="results.ingredients.createlist">
-
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="Ingr#">
-                                                    <mat-header-cell *matHeaderCellDef> Ingr# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Ingr#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Vendor Info">
-                                                    <mat-header-cell *matHeaderCellDef> Vendor Info </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Vendor Info']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Size">
-                                                    <mat-header-cell *matHeaderCellDef> Size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Size']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Cost">
-                                                    <mat-header-cell *matHeaderCellDef> Cost </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Cost']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
+                                            <ng-container *ngFor="let column of idisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
                                         </mat-table>
                                 </mat-tab>
                                 <mat-tab *ngIf="hasElements(results.ingredients.changelist)" label="Updated">
                                         <mat-table class="upload-table" [dataSource]="results.ingredients.changelist">
-
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="Ingr#">
-                                                    <mat-header-cell *matHeaderCellDef> Ingr# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Ingr#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Vendor Info">
-                                                    <mat-header-cell *matHeaderCellDef> Vendor Info </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Vendor Info']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Size">
-                                                    <mat-header-cell *matHeaderCellDef> Size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Size']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Cost">
-                                                    <mat-header-cell *matHeaderCellDef> Cost </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Cost']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
+                                            <ng-container *ngFor="let column of idisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
                                         </mat-table>
                                 </mat-tab>
                                 <mat-tab *ngIf="hasElements(results.ingredients.ignorelist)" label="Ignored">
                                         <mat-table class="upload-table" [dataSource]="results.ingredients.ignorelist">
-
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="Ingr#">
-                                                    <mat-header-cell *matHeaderCellDef> Ingr# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Ingr#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Vendor Info">
-                                                    <mat-header-cell *matHeaderCellDef> Vendor Info </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Vendor Info']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Size">
-                                                    <mat-header-cell *matHeaderCellDef> Size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Size']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Cost">
-                                                    <mat-header-cell *matHeaderCellDef> Cost </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Cost']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
+                                            <ng-container *ngFor="let column of idisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="idisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
                                         </mat-table>
                                 </mat-tab>
                             </mat-tab-group>
@@ -561,54 +149,44 @@
                             <mat-tab-group>
                                 <mat-tab *ngIf="hasElements(results.formulas.createlist)" label="New">
                                         <mat-table class="upload-table" [dataSource]="results.formulas.createlist">
-
-                                                <!--- Note that these columns can be defined in any order.
-                                                        The actual rendered columns are set as a property on the row definition" -->
-                                                
-                                                <!-- Position Column -->
-                                                <ng-container matColumnDef="Ingr#">
-                                                    <mat-header-cell *matHeaderCellDef> Ingr# </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Ingr#']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Name Column -->
-                                                <ng-container matColumnDef="Name">
-                                                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Name']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Weight Column -->
-                                                <ng-container matColumnDef="Vendor Info">
-                                                    <mat-header-cell *matHeaderCellDef> Vendor Info </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Vendor Info']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <!-- Symbol Column -->
-                                                <ng-container matColumnDef="Size">
-                                                    <mat-header-cell *matHeaderCellDef> Size </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Size']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Cost">
-                                                    <mat-header-cell *matHeaderCellDef> Cost </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Cost']}} </mat-cell>
-                                                </ng-container>
-                
-                                                <ng-container matColumnDef="Comment">
-                                                    <mat-header-cell *matHeaderCellDef> Comment </mat-header-cell>
-                                                    <mat-cell *matCellDef="let element"> {{element['Comment']}} </mat-cell>
-                                                </ng-container>
-                                                
-                                                <mat-header-row *matHeaderRowDef="fdisplayedColumns"></mat-header-row>
-                                                <mat-row *matRowDef="let row; columns: fdisplayedColumns;"></mat-row>
+                                            <ng-container *ngFor="let column of fdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="fdisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: fdisplayedColumns;"></mat-row>
                                         </mat-table>
+                                </mat-tab>
+                            </mat-tab-group>
+                        </mat-tab>
+                        <mat-tab *ngIf="productLinesImported()" label="Product Lines">
+                            <mat-tab-group>
+                                <mat-tab *ngIf="hasElements(results.product_lines.createlist)" label="New">
+                                    <mat-table class="upload-table" [dataSource]="results.product_lines.createlist">
+                                            <ng-container *ngFor="let column of pdisplayedColumns" [matColumnDef]="column">
+                                                    <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                    <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                                </ng-container>
+                                                <mat-header-row *matHeaderRowDef="pdisplayedColumns"></mat-header-row>
+                                                <mat-row *matRowDef="let row; columns: pdisplayedColumns;"></mat-row>
+                                    </mat-table>
+                                </mat-tab>
+                                <mat-tab *ngIf="hasElements(results.product_lines.ignorelist)" label="Ignored">
+                                    <mat-table class="upload-table" [dataSource]="results.product_lines.ignorelist">
+                                            <ng-container *ngFor="let column of pdisplayedColumns" [matColumnDef]="column">
+                                                    <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                    <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                                </ng-container>
+                                                <mat-header-row *matHeaderRowDef="pdisplayedColumns"></mat-header-row>
+                                                <mat-row *matRowDef="let row; columns: pdisplayedColumns;"></mat-row>
+                                    </mat-table>
                                 </mat-tab>
                             </mat-tab-group>
                         </mat-tab>
                 </mat-tab-group>
             </mat-card-content>
             <mat-card-actions>
-                <button mat-raised-button color="primary" class="submit-files-btn" (click)="changeState(UploadingState.SELECTING)">
+                <button mat-raised-button color="primary" class="submit-files-btn" (click)="restartUpload()">
                         Restart
                 </button>
             </mat-card-actions>

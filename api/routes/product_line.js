@@ -26,7 +26,7 @@ router.post('/read', async (req, res) => {
     const {pageNum}  = req.body;
 
 
-    let agg = ProductLine.aggregate({$match: {}});
+    let agg = ProductLine.aggregate([{$match: {}}]);
 
     let results = await pagination.paginate(agg, pageNum, 'name');
     res.json(results);

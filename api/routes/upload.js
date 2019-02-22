@@ -470,7 +470,7 @@ router.post('/commit', function (req, res) {
           // if we find an existing entry, we check to ignore, change, or error
           if (result) {
             //if an ingredient is identical, add it to the ignore list
-            if (result.name == row['Name'] && result.vendor_info == row['Vendor Info'] && result.package_size == row['Size'] && result.cost == row['Cost'] && result.comment == row['Comment']) {
+            if (result.name == row['Name'] && result.vendor_info == row['Vendor Info'] && (result.package_size + ' ' + result.unit) == row['Size'] && result.cost == row['Cost'] && result.comment == row['Comment']) {
               results.ingredients.ignorelist.push(row);
             }
             // if matches on the primary key AND the unique key, validate and update
@@ -699,7 +699,8 @@ router.post('/commit', function (req, res) {
             name: row.Name,
             number: row['Ingr#'],
             vendor_info: row['Vendor Info'],
-            package_size: row['Size'],
+            package_size: row['Size'].split(' ')[0],
+            unit: row['Size'].split(' ')[1],
             cost: row['Cost'],
             comment: row['Comment'],
           }
@@ -722,10 +723,11 @@ router.post('/commit', function (req, res) {
             name: row.Name,
             number: row['Ingr#'],
             vendor_info: row['Vendor Info'],
-            package_size: row['Size'],
+            package_size: row['Size'].split(' ')[0],
+            unit: row['Size'].split(' ')[1],
             cost: row['Cost'],
             comment: row['Comment'],
-          }
+          };
           Ingredient.updateIngredient(row.Name, update, (error) => {
               if (error) {
                 errorOn = true;

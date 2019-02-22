@@ -34,6 +34,8 @@ export class UploadComponent {
   sChangeList = [];
   sdisplayedColumns: string[] = ['SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate','Comment'];
   idisplayedColumns: string[] = ['Ingr#','Name','Vendor Info','Size','Cost','Comment'];
+  fdisplayedColumns: string[] = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
+  pdisplayedColumns: string[] = ['Name'];
   results;
 
 
@@ -112,6 +114,11 @@ export class UploadComponent {
 
   changeState(state: UploadState) {
     this.uploadState = state;
+  }
+
+  restartUpload() {
+    this.files = new Set<File>();
+    this.changeState(UploadState.SELECTING);
   }
 
   inSelectingState(): boolean {
