@@ -22,7 +22,8 @@ export class ManufacturingLineTableComponent implements OnInit{
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
-      this.paginator.pageIndex = 0
+      this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
       this.paginator.page.subscribe(x => this.refresh());
       this.refresh();
     }
@@ -110,6 +111,7 @@ export class ManufacturingLineTableComponent implements OnInit{
       this.loadingResults = true;
       this.crudManufacturingLineService.read({
           pageNum: this.paginator.pageIndex+1,
+          page_size: this.paginator.pageSize,
           sortBy: "name"
         }).subscribe(
         response => this.handleRefreshResponse(response),

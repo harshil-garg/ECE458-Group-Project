@@ -7,6 +7,7 @@ import { Tuple } from '../model/ingredient';
 
 export class FilterMessage {
 	sortBy : string;
+	page_size: number;
 	pageNum: string;
 	keywords: Array<string>;
 	skus : Array<string>;

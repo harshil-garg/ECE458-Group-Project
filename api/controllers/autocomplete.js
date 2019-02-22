@@ -16,5 +16,10 @@ module.exports.nameOrNumber = async (model, input) => {
     }
 }
 
+module.exports.email = async (model, input) => {
+    let regex = new RegExp('^'+input, 'i');
+    return await model.find({email: regex}).limit(limit).collation({locale: 'en'}).sort('email').lean().exec();
+}
+
 
 

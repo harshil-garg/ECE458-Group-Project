@@ -91,7 +91,8 @@ module.exports.objectFieldsExist = function(obj, requiredFields){
     return [errors.length == 0, errors];
 }
 
-const first_digit = new Set(['0', '1', '6', '7', '8', '9'])
+const first_digit = new Set(['0', '1', '6', '7', '8', '9']);
+
 // Syntax checks
 module.exports.isUPCStandard = function(upc_num) {
     let err_msg;
@@ -132,6 +133,14 @@ module.exports.isUPCStandard = function(upc_num) {
     return [true, err_msg];
 
 }
+function generateUPCNumbers(){
+    for(let i = 100000000000; i < 200000000000; i++){
+        if(this.isUPCStandard(i.toString())[0]){
+            console.log(i)
+        }
+    }
+}
+
 
 module.exports.proper_name_length = function(name){
     let err_msg = 'Name must be 32 characters or fewer';
@@ -179,4 +188,88 @@ module.exports.validDate = function(date){
 module.exports.isNumeric = function(number){
     let err_msg = `${number} is not numeric`;
     return [!isNaN(number), err_msg];
+}
+
+//Only for ingredients, skus, and product_lines
+module.exports.conflictCheck = async function(model, data, results, type){
+    let unique_keys = {};
+    let properties = [];
+    for(let field of Object.keys(model.schema.obj)){
+        if(field.unique){
+            unique_keys[field] = field;
+        }
+        properties.push(field);
+    }
+
+    duplicateCheck(unique_keys, data, results, type);
+
+    for(let row of data){
+        let key = getPrimaryKey(model)
+        let item = await model.findOne({[key]: row[key]}).exec();
+
+        if(item){
+            //check identical
+            let identical = true;
+            for(let property of properties){
+                identical = identical && row[property] == item[property]
+            }
+            //check unique match
+            let unique_match = false;
+            for(let property of Object.keys(unique_keys)){
+                if(property != key && row[property] == item[property]){
+                    unique_match = true;
+                    break;
+                }
+            }
+
+
+            //If row is identical to something in db, ignore
+            if(identical){
+                results[type].ignorelist.push(row);
+            }
+            
+            else if(unique_match){
+
+            }
+        }
+
+        
+    }
+    
+    if(unique_keys.length > 1){
+        // if()
+    }else{
+
+    }
+
+
+}
+
+function getPrimaryKey(model){
+    if(model.name == 'ProductLine'){
+        return 'name';
+    }
+    return 'number';
+}
+
+function duplicateCheck(unique_keys, data, results, type){
+    let unique_key_sets = {}
+    //create a set for every unique key to check for duplicates
+    for(let key of Object.keys(unique_keys)){
+        unique_key_sets[key] = new Set();
+    }
+
+    for(let row of data){
+        for(let field of Object.keys(unique_key_sets)){
+            if(unique_key_sets[field].has(row[field])){
+                results[type].errorlist.push({
+                    message: 'Duplicate row in SKUs',
+                    data: row
+                });
+                return;
+            }else{
+                unique_key_sets[field].add(row[field]);
+            }
+        }
+    }
 }

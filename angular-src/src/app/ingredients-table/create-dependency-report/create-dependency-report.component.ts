@@ -22,6 +22,7 @@ export class CreateDependencyReportComponent{
     this.filterIngredientsService.filter({
         sortBy : this.sortBy,
         pageNum: '-1',
+        page_size: 0,
         keywords: this.keywords,
         skus : this.skus
       }).subscribe(

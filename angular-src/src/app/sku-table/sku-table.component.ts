@@ -34,7 +34,8 @@ export class SkuTableComponent implements OnInit{
     @ViewChild(MatSort) sort: MatSort;
 
     ngOnInit() {
-      this.paginator.pageIndex = 0
+      this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
       this.paginator.page.subscribe(x => this.refresh());
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
@@ -220,6 +221,7 @@ export class SkuTableComponent implements OnInit{
       this.filterSkuService.filter({
           sortBy : this.sortBy,
           pageNum: this.paginator.pageIndex.toString()+1,
+          page_size: this.paginator.pageSize,
           keywords: this.keywords,
           ingredients: this.ingredients,
           product_lines: this.productLines
@@ -251,6 +253,8 @@ export class SkuTableComponent implements OnInit{
           formula.number = sku.formula.number;
           formula.comment = sku.formula.comment;
           formula.ingredient_tuples = sku.formula.ingredient_tuples;
+          var manufLines = [];
+          sku.manufacturing_lines.forEach(manufLine => manufLines.push(manufLine.name));
           this.skuList.push({
               id: sku.number,
               name: sku.name,
@@ -261,11 +265,13 @@ export class SkuTableComponent implements OnInit{
               product_line: sku.product_line,
               formula: formula,
               formula_scale_factor: sku.formula_scale_factor,
-              manufacturing_lines: sku.manufacturing_lines,
+              manufacturing_lines: manufLines,
               manufacturing_rate: sku.manufacturing_rate,
               comment: sku.comment
           });
         }
+        console.log("SKULIST:");
+        console.log(this.skuList);
         this.dataSource.data = this.skuList;
         this.totalDocs = response.total_docs;
         this.maxPages = response.pages;

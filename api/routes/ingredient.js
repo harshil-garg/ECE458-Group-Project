@@ -19,13 +19,13 @@ router.post('/autocomplete', async (req, res) => {
 //Filter ingredients
 //request params: sortBy, direction, pageNum, keywords, skus
 router.post('/filter', async (req, res) => {
-    const { sortBy, pageNum, keywords, skus } = req.body;
+    const { sortBy, pageNum, page_size, keywords, skus } = req.body;
 
     let key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
 
-    let result = await ingredient_filter.filter(pageNum, sortBy, key_exps, skus);
+    let result = await ingredient_filter.filter(pageNum, sortBy, page_size, key_exps, skus);
     
     res.json(result);
 });
@@ -86,6 +86,7 @@ router.post('/update', (req, res) => {
         json["package_size"] = package_size;
     }
     if (unit) {
+        //check that new unit is of saame type
         json["unit"] = unit;
     }
     if (cost) {

@@ -23,6 +23,7 @@ export class ProductLineTableComponent implements OnInit{
 
     ngOnInit() {
       this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
       this.paginator.page.subscribe(x => this.refresh());
       this.refresh();
     }
@@ -100,7 +101,8 @@ export class ProductLineTableComponent implements OnInit{
     refresh(){
       this.loadingResults = true;
       this.crudProductLineService.read({
-          pageNum: this.paginator.pageIndex+1
+          pageNum: this.paginator.pageIndex+1,
+          page_size: this.paginator.pageSize
         }).subscribe(
         response => this.handleRefreshResponse(response),
         err => {

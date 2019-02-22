@@ -78,6 +78,14 @@ module.exports.updateSKU = (sku_number, sku_update, cb) => {
     SKU.findOneAndUpdate(query, sku_update, cb);
 }
 
+module.exports.attemptImport = (skus, results) => {
+
+}
+
+module.exports.commitImport = () => {
+    
+}
+
 module.exports.importFormulas = async (formulas) => {
     var skuMap = new Map();
     formulas.forEach((formula) => {

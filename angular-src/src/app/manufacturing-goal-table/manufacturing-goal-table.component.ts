@@ -24,7 +24,8 @@ export class ManufacturingGoalTableComponent implements OnInit {
   constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.paginator.pageIndex = 0
+    this.paginator.pageIndex = 0;
+    this.paginator.pageSize = 10;
     this.paginator.page.subscribe(x => this.refresh());
     this.refresh();
   }
@@ -33,6 +34,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
     this.loadingResults = true;
       this.manufacturingService.refresh({
           sortBy : "name",
+          page_size: this.paginator.pageSize,
           pageNum: this.paginator.pageIndex+1,
           user : this.authenticationService.loginState.user
         }).subscribe(

@@ -1,8 +1,6 @@
 const appender = require('./append_skus');
 
-const limit = 10;
-
-module.exports.paginate = async function (aggregate, pageNum, sortBy){
+module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
     let pipeline = [];
     //don't skip if pagenum == -1
     if(pageNum != -1){
@@ -28,7 +26,7 @@ module.exports.paginate = async function (aggregate, pageNum, sortBy){
         success: true,
         data: results.slice(0, slice),
         pages: pages,
-        total_docs: results.length
+        total_docs: (pageNum == -1) ? results.length : results.length + (pageNum-1)*limit
     }
     
 }

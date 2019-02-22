@@ -19,6 +19,7 @@ export class EditMessage {
 
 export class ReadMessage {
   pageNum : number;
+  page_size : number;
 }
 
 export class ResponseData {
