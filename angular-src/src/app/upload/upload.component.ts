@@ -66,8 +66,8 @@ export class UploadComponent {
             this.changeState(UploadState.SUCCESS);
           }
           else {
-            this.snackBar.open(val.uploadErrorType, "close", {duration: 3000});
             this.changeState(UploadState.SELECTING);
+            this.snackBar.open(val.uploadErrorType, "close", {duration: 3000});
           }
         }
         else if (!on && !val.success){
