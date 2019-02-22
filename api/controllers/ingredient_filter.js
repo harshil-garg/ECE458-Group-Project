@@ -63,16 +63,10 @@ async function appendSKUs(ingredients){
         }
         ingredient.num_skus = skus.length;
         //save num skus
-        await Ingredient.updateIngredient(ingredient.name, ingredient, (err) => {
-            if(err){
-                res.json({success: false, message: err});
-            }       
-        });
+        await Ingredient.findOneAndUpdate({name: ingredient.name}, ingredient).exec();
         ingredient.skus = skus;
     }
 
     return ingredients;
     
 }
-
-

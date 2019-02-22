@@ -17,7 +17,7 @@ router.post('/autocomplete', async (req, res) => {
 
 //Filter
 router.post('/filter', async (req, res) => {
-    const { sortBy, pageNum, keywords, ingredients } = req.body;
+    const { sortBy, pageNum, page_size, keywords, ingredients } = req.body;
     const required_params = { sortBy, pageNum, keywords, ingredients };
 
     let key_exps;
@@ -25,8 +25,8 @@ router.post('/filter', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
     
-
-    let result = await formula_filter.filter(pageNum, sortBy, key_exps, ingredients);
+    console.log(Formula.schema.obj)
+    let result = await formula_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients);
     
     res.json(result);
 });

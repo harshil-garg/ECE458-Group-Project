@@ -136,6 +136,7 @@ router.post('/commit', function (req, res) {
                   return ((data['SKU#'] != null) && (data['Name'] != null) && (data['Case UPC'] != null) && (data['Unit UPC'] != null) && (data['Unit size'] != null) && (data['Count per case'] != null) && (data['Product Line Name'] != null) && (data['Comment'] != null));
                 })
                 .on("data", function (data) {
+                  
                   csvSkus.push(data); // push each row
                 })
                 .on("end", function () {
@@ -241,6 +242,7 @@ router.post('/commit', function (req, res) {
       
     if (!errorOn) {
       if (csvProduct_lines.length>0) {
+        // await ProductLine.import(csvProduct_lines, results)
         await handleProductLines(csvProduct_lines, results);
       }
   
