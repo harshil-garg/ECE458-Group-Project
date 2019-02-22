@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProductLine } from '../model/product-line'
 import { AuthenticationService } from '../authentication.service'
 import { CrudProductLineService, Response, ReadResponse } from './crud-product-line.service'
+import {MatTableDataSource, MatPaginator, MatSnackBar} from '@angular/material';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-product-line-table',
@@ -11,72 +13,84 @@ import { CrudProductLineService, Response, ReadResponse } from './crud-product-l
 export class ProductLineTableComponent implements OnInit{
     editField: string;
     productLineList: Array<any> = [];
-    currentPage: number;
+    displayedColumns: string[] = ['select', 'name'];
+    selection = new SelectionModel<ProductLine>(true, []);
+    dataSource = new MatTableDataSource<ProductLine>(this.productLineList);
     maxPages: number;
+    totalDocs: number;
+    loadingResults: boolean = false;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
-      this.currentPage = 1;
+      this.paginator.pageIndex = 0;
+      this.paginator.page.subscribe(x => this.refresh());
       this.refresh();
     }
 
-    constructor(private authenticationService: AuthenticationService, public crudProductLineService: CrudProductLineService){}
+    constructor(private authenticationService: AuthenticationService, public crudProductLineService: CrudProductLineService, private snackBar: MatSnackBar){}
 
-    updateList(id: number, property: string, event: any) {
-      const editField = event.target.textContent;
-      if(property === 'cost_per_package')
-      {
-        this.productLineList[id][property] = parseFloat(editField).toFixed(2);
-      }
-      else{
-        this.productLineList[id][property] = editField;
-      }
-    }
-
-    remove(deleted_name: any) {
-      this.crudProductLineService.remove({
-          name : deleted_name
-        }).subscribe(
-        response => this.handleResponse(response),
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+    remove() {
+      for(let selected of this.selection.selected){
+        var deleted_name = selected.name;
+        this.crudProductLineService.remove({
+            name : deleted_name
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+              this.refresh();
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
           }
-        }
-      );
+        );
+      }
+      this.selection.clear();
     }
 
-    edit(name:any, property:string, event:any) {
+    edit(name:any, property:string, updated_value:any) {
       var editedProductLine : ProductLine = new ProductLine();
       var newName : string;
       editedProductLine.name = name;
       switch(property){
         case 'name':{
-          newName = event.target.textContent; //new name
+          newName = updated_value; //new name
         }
       }
       this.crudProductLineService.edit({
           name : editedProductLine.name,
           newname: newName
         }).subscribe(
-        response => this.handleResponse(response),
+        response => {
+          if(response.success){
+            this.handleResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
         err => {
           if (err.status === 401) {
             console.log("401 Error")
-          }
+          };
         });
+    }
+
+    private handleError(response){
+      this.snackBar.open(response.message, "Close", {duration:3000});
+      this.refresh();//refresh changes back to old value
     }
 
     private handleResponse(response: Response) {
       console.log(response);
-      this.refresh();
-    }
-
-    changeValue(id: number, property: string, event: any) {
-      if(property === 'cost_per_package')
-      {
-        this.editField = parseFloat(event.target.textContent).toFixed(2);
-      }
-      this.editField = event.target.textContent;
+      //refreshing every time gets rid of active element
+      //this.refresh();
     }
 
     isAdmin() {
@@ -84,8 +98,9 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     refresh(){
+      this.loadingResults = true;
       this.crudProductLineService.read({
-          pageNum: this.currentPage
+          pageNum: this.paginator.pageIndex+1
         }).subscribe(
         response => this.handleRefreshResponse(response),
         err => {
@@ -98,54 +113,17 @@ export class ProductLineTableComponent implements OnInit{
 
     handleRefreshResponse(response: ReadResponse){
       if(response.success){
+        console.log(response);
         this.productLineList = [];
         for(let productLine of response.data){
           this.productLineList.push({
               name: productLine.name
           });
         }
-        this.maxPages = response.pages;
-      }
-    }
-
-    nextPage(){
-      if(this.currentPage<this.maxPages){
-        this.currentPage++;
-        this.refresh();
-      }
-    }
-
-    prevPage(){
-      if(this.currentPage>1){
-        this.currentPage--;
-        this.refresh();
-      }
-    }
-
-    setPage(i){
-      this.currentPage = i;
-      this.refresh();
-    }
-
-    showAll(){
-      this.currentPage = -1;
-    }
-
-    shownPages(){
-      var numbers : Array<number> = [];
-      if(this.maxPages>5)
-      {
-        for (var i = 1; i < 5; i++) {
-          numbers.push(i);
-        }
-        numbers.push(this.maxPages)
-        return numbers;
-      }
-      else{
-        for (var i = 1; i <= this.maxPages; i++) {
-          numbers.push(i);
-        }
-        return numbers;
+        this.dataSource.data = this.productLineList;
+        this.totalDocs = response.total_docs;
+        this.maxPages = response.pages
+        this.loadingResults = false;
       }
     }
 
@@ -179,5 +157,18 @@ export class ProductLineTableComponent implements OnInit{
         var encodedUri = encodeURI(csvContent);
         window.open(encodedUri);
       }
+    }
+
+    isAllSelected() {
+      const numSelected = this.selection.selected.length;
+      const numRows = this.dataSource.data.length;
+      return numSelected === numRows;
+    }
+
+/** Selects all rows if they are not all selected; otherwise clear selection. */
+    masterToggle() {
+      this.isAllSelected() ?
+          this.selection.clear() :
+          this.dataSource.data.forEach(row => this.selection.select(row));
     }
 }

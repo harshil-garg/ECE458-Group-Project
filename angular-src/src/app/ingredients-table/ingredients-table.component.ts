@@ -1,85 +1,119 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Ingredient } from '../model/ingredient'
+import { MeasurementUnit } from '../model/measurement-unit'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { CrudIngredientsService, Response } from './crud-ingredients.service';
 import { FilterIngredientsService, FilterResponse, IngredientCsvData } from './filter-ingredients.service'
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
+import {SelectionModel} from '@angular/cdk/collections';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'ingredients-table',
   templateUrl: './ingredients-table.component.html',
   styleUrls: ['./ingredients-table.component.css'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class IngredientsTableComponent implements OnInit{
+
+    measUnits: Array<any>;
     editField: string;
     ingredientList: Array<any> = [];
-    currentPage: number;
-    maxPages: number;
     sortBy: string = "name";
     keywords: Array<any> = [];
     skus: Array<any> = [];
 
-    skuShown: Array<boolean> = [false];
+    displayedColumns: string[] = ['select', 'name', 'number', 'vendor_info', 'package_size', 'cost_per_package', 'comment', 'num_skus'];
+    selection = new SelectionModel<Ingredient>(true, []);
+    dataSource = new MatTableDataSource<Ingredient>(this.ingredientList);
+    maxPages: number;
+    totalDocs: number;
+    loadingResults: boolean = false;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort) sort: MatSort;
+
+    //skuShown: Array<boolean> = [false];
+    expandedIngredient;
 
     ngOnInit() {
-      this.currentPage = 1;
+      this.paginator.pageIndex = 0
+      this.paginator.page.subscribe(x => this.refresh());
+      this.sort.sortChange.subscribe(x => {
+        this.sortBy = x.active;
+        this.refresh();
+        this.paginator.pageIndex = 0; //reset page to 0 when sort by new field
+      });
+      this.measUnits = MeasurementUnit.values();
       this.refresh();
     }
 
     constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService,
-      public filterIngredientsService: FilterIngredientsService){}
+      public filterIngredientsService: FilterIngredientsService, private snackBar: MatSnackBar){}
 
-    updateList(id: number, property: string, event: any) {
-      const editField = event.target.textContent;
-      if(property === 'cost_per_package')
-      {
-        this.ingredientList[id][property] = parseFloat(editField).toFixed(2);
-      }
-      else{
-        this.ingredientList[id][property] = editField;
-      }
-    }
-
-    remove(deleted_name: any) {
-      this.crudIngredientsService.remove({
-          name : deleted_name
-        }).subscribe(
-        response => this.handleResponse(response),
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+    remove() {
+      for(let selected of this.selection.selected){
+        var deleted_name = selected.name;
+        this.crudIngredientsService.remove({
+            name : deleted_name
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+              this.refresh();
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
           }
-        }
-      );
+        );
+      }
+      this.selection.clear();
     }
 
-    edit(name:any, property:string, event:any) {
+    edit(name:any, property:string, updated_value:any) {
       var editedIngredient : Ingredient = new Ingredient();
       var newName : string;
       editedIngredient.name = name;
       switch(property){
         case 'name':{
-          newName = event.target.textContent; //new name
+          newName = updated_value; //new name
           break;
         }
         case 'id':{
-          editedIngredient.id = event.target.textContent;
+          editedIngredient.id = updated_value;
           break;
         }
         case 'vendor_info':{
-          editedIngredient.vendor_info = event.target.textContent;
+          editedIngredient.vendor_info = updated_value;
+          break;
+        }
+        case 'unit':{
+          editedIngredient.unit = updated_value;
+          console.log(updated_value);
           break;
         }
         case 'package_size':{
-          editedIngredient.package_size = event.target.textContent;
+          editedIngredient.package_size = updated_value;
           break;
         }
         case 'cost_per_package':{
-          editedIngredient.cost_per_package = event.target.textContent;
+          editedIngredient.cost_per_package = updated_value;
           break;
         }
         case 'comment':{
-          editedIngredient.comment = event.target.textContent;
+          editedIngredient.comment = updated_value;
           break;
         }
       }
@@ -88,11 +122,19 @@ export class IngredientsTableComponent implements OnInit{
           newname: newName,
           number : editedIngredient.id,
           vendor_info : editedIngredient.vendor_info,
+          unit: editedIngredient.unit,
           package_size: editedIngredient.package_size,
           cost : editedIngredient.cost_per_package*1,
           comment : editedIngredient.comment
         }).subscribe(
-        response => this.handleResponse(response),
+        response => {
+          if(response.success){
+            this.handleResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
         err => {
           if (err.status === 401) {
             console.log("401 Error")
@@ -100,9 +142,15 @@ export class IngredientsTableComponent implements OnInit{
         });
     }
 
+    private handleError(response){
+      this.snackBar.open(response.message, "Close", {duration:3000});
+      this.refresh();//refresh changes back to old value
+    }
+
     private handleResponse(response: Response) {
       console.log(response);
-      this.refresh();
+      //don't refresh for edits
+      //this.refresh();
     }
 
     changeValue(id: number, property: string, event: any) {
@@ -122,9 +170,10 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     refresh(){
+      this.loadingResults = true;
       this.filterIngredientsService.filter({
           sortBy : this.sortBy,
-          pageNum: this.currentPage.toString(),
+          pageNum: this.paginator.pageIndex.toString()+1,
           keywords: this.keywords,
           skus : this.skus
         }).subscribe(
@@ -146,60 +195,22 @@ export class IngredientsTableComponent implements OnInit{
               name: ingredient.name,
               vendor_info: ingredient.vendor_info,
               package_size: ingredient.package_size,
+              unit: ingredient.unit,
               cost_per_package: ingredient.cost,
               skus: ingredient.skus,
               comment: ingredient.comment
           });
-          console.log(ingredient.skus);
         }
+        this.dataSource.data = this.ingredientList;
+        this.totalDocs = response.total_docs;
         this.maxPages = response.pages;
+        this.loadingResults = false;
       }
     }
 
     setSortBy(property: string){
       this.sortBy = property;
       this.refresh();
-    }
-
-    nextPage(){
-      if(this.currentPage<this.maxPages){
-        this.currentPage++;
-        this.refresh();
-      }
-    }
-
-    prevPage(){
-      if(this.currentPage>1){
-        this.currentPage--;
-        this.refresh();
-      }
-    }
-
-    setPage(i){
-      this.currentPage = i;
-      this.refresh();
-    }
-
-    showAll(){
-      this.currentPage = -1;
-    }
-
-    shownPages(){
-      var numbers : Array<number> = [];
-      if(this.maxPages>5)
-      {
-        for (var i = 1; i < 5; i++) {
-          numbers.push(i);
-        }
-        numbers.push(this.maxPages)
-        return numbers;
-      }
-      else{
-        for (var i = 1; i <= this.maxPages; i++) {
-          numbers.push(i);
-        }
-        return numbers;
-      }
     }
 
     setKeywords(newKeywords : Array<any>){
@@ -253,10 +264,19 @@ export class IngredientsTableComponent implements OnInit{
       }
     }
 
-}
+    isAllSelected() {
+      const numSelected = this.selection.selected.length;
+      const numRows = this.dataSource.data.length;
+      return numSelected === numRows;
+    }
 
-function nextId(ingredientList: Array<any>){
-  return ingredientList[ingredientList.length - 1].id + 1;
+/** Selects all rows if they are not all selected; otherwise clear selection. */
+    masterToggle() {
+      this.isAllSelected() ?
+          this.selection.clear() :
+          this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
 }
 //
 // function skuList(ingredient: Ingredient)

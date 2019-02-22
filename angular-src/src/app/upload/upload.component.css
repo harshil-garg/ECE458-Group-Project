@@ -1,3 +1,32 @@
-.upload-page {
-    padding-top: 20px;
+  :host {
+    height: 100%;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+  
+  .actions {
+    justify-content: flex-end;
+  }
+  
+  .select-file-card {
+    width: 500px;
+    margin: auto;
+  }
+  
+.confirm-card {
+    width: 95%;
+    margin: auto;
+}
+
+  .upload-content-container {
+      padding-top: 20px;
+  }
+
+.submit-files-btn {
+    float: right;
+}
+
+.upload-table {
+    width: 100%;
 }

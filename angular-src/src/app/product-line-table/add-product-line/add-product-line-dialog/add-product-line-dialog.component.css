@@ -21,3 +21,24 @@
   border: none;
   text-align: center;
 }
+
+table {
+  width: 100%;
+}
+
+mat-header-cell {
+ display:flex;
+ justify-content:flex-end;
+}
+
+.ng-valid[required], .ng-valid.required  {
+border-left: 5px solid #42A948; /* green */
+}
+
+.ng-invalid:not(form)  {
+border-left: 5px solid #a94442; /* red */
+}
+
+button {
+  margin: 5px;
+}

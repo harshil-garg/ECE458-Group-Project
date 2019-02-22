@@ -18,4 +18,8 @@ export class AddIngredientDialogComponent{
       this.dialogRef.close();
     }
 
+    submit(): void {
+      this.dialogRef.close(this.ingredient);
+    }
+
 }

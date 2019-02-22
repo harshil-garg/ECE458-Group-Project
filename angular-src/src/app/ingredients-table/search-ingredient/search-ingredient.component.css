@@ -47,3 +47,7 @@ i:hover {
 .suggested-type {
   color: gray;
 }
+
+mat-icon:hover {
+  cursor:pointer;
+}

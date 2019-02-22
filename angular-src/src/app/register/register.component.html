@@ -1,26 +1,47 @@
-<ng-container *ngIf="isAdmin()">
-  <h3>Add a new user</h3>
-  <div class="register">
-    <label>Name:
-      <input #name />
-    </label>
-    <br>
-    <label>Email:
-      <input #email />
-    </label>
-      <br>
-    <label>Password:
-      <input type="password" #password />
-    </label>
-    <br>
-    <label>Re-enter Password:
-      <input type="password" #password2 />
-    </label>
-    <br>
-    <button (click)="register(name.value, email.value, password.value, password2.value)">
-      Submit
-    </button>
-  </div>
-  <div *ngIf="successfulRegistration">Registered a user succesfully!</div>
-  <div *ngIf="registerError">Something wrong happened</div>
-</ng-container>
+<div *ngIf="isAdmin()">
+  <mat-card class="example-card">
+     <mat-card-header>
+       <mat-card-title>Register a new user</mat-card-title>
+     </mat-card-header>
+     <mat-card-content>
+       <div class="align-center">
+         <form class="example-form">
+           <table class="example-full-width" cellspacing="0">
+             <tr>
+               <td>
+               <mat-form-field class="example-full-width">
+                 <input #name matInput placeholder="Name" name="name" required>
+               </mat-form-field>
+               </td>
+             </tr>
+             <tr>
+               <td>
+               <mat-form-field class="example-full-width">
+                 <input #email matInput placeholder="Email" name="email" required>
+               </mat-form-field>
+               </td>
+             </tr>
+             <tr>
+               <td>
+                 <mat-form-field class="example-full-width">
+                     <input #password matInput placeholder="Password" type="password" name="password" required>
+                 </mat-form-field>
+               </td>
+             </tr>
+             <tr>
+               <td>
+                 <mat-form-field class="example-full-width">
+                     <input #password2 matInput placeholder="Repeat password" type="password" name="password2" required>
+                 </mat-form-field>
+               </td>
+             </tr>
+         </table>
+         </form>
+         <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
+       </div>
+     </mat-card-content>
+     <mat-card-actions>
+       <button mat-raised-button (click)="register(name.value, email.value, password.value, password2.value)" color="primary">Register</button>
+     </mat-card-actions>
+  </mat-card>
+</div>

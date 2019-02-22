@@ -1,10 +1,11 @@
-
-<ng-container *ngFor="let keyword of keywords; let id=index">
-  <label class="keyword">{{keyword}} <i (click)="remove(id)" class="fa fa-remove"> </i></label>
-</ng-container>
-<ng-container *ngFor="let sku of skus; let id=index">
-  <label class="sku">{{sku}} <i (click)="removeSku(id)" class="fa fa-remove"> </i></label>
-</ng-container>
+<mat-chip-list>
+  <ng-container *ngFor="let keyword of keywords; let id=index">
+    <mat-chip>{{keyword}} <mat-icon (click)="remove(id)">clear</mat-icon></mat-chip>
+  </ng-container>
+  <ng-container *ngFor="let sku of skus; let id=index">
+    <mat-chip color="accent" selected>{{sku}} <mat-icon (click)="removeSku(id)">clear</mat-icon></mat-chip>
+  </ng-container>
+</mat-chip-list>
 
 <br>
 

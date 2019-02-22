@@ -29,6 +29,7 @@ export class ReadResponse {
   success: boolean;
   data: Array<ResponseData>;
 	pages: number;
+  total_docs: number;
 }
 
 export class Response {

@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginState } from '../model/loginstate';
 import { AuthenticationService, LoginResponse } from '../authentication.service'
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-login',
@@ -10,8 +11,9 @@ import { AuthenticationService, LoginResponse } from '../authentication.service'
 })
 export class LoginComponent implements OnInit {
 	loginError = false;
+  showSpinner = false;
 
-	constructor(private authenticationService: AuthenticationService, private router: Router) { }
+	constructor(private authenticationService: AuthenticationService, private router: Router, private snackBar: MatSnackBar) { }
 
 	ngOnInit() { }
 
@@ -20,7 +22,9 @@ export class LoginComponent implements OnInit {
 			response => this.handleResponse(response, email),
 			err => {
 				if (err.status === 401) {
+          this.snackBar.open("Email or password incorrect", "Close");
 					this.loginError = true;
+          this.showSpinner = false;
 				}
 			}
 		);
@@ -33,6 +37,7 @@ export class LoginComponent implements OnInit {
           this.authenticationService.loginState.user = email;
 
 			this.loginError = false;
+      this.showSpinner = false;
 			this.router.navigate(['dashboard']);
 	    }
   	}
