@@ -2,6 +2,7 @@ import { MatSnackBar } from '@angular/material';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {ValidationData } from '../model/validation-data';
 import { UploadService } from './upload.service';
+import {AuthenticationService} from '../authentication.service';
 import {UploadState} from './uploadStates';
 
 @Component({
@@ -14,7 +15,7 @@ export class UploadComponent {
 
   public files: Set<File> = new Set();
 
-  constructor(public uploadService: UploadService, public snackBar: MatSnackBar) {}
+  constructor(public uploadService: UploadService, public authService: AuthenticationService, public snackBar: MatSnackBar) {}
 
   ngOnInit() {}
 
@@ -207,5 +208,9 @@ export class UploadComponent {
   }
   skusImported(): boolean {
     return  this.results.skus.createlist.length || this.results.skus.changelist.length || this.results.skus.ignorelist.length;
+  }
+
+  isAdmin(): boolean {
+    return this.authService.loginState.isAdmin;
   }
 }

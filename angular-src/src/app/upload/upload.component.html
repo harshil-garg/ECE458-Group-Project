@@ -1,5 +1,5 @@
 <input type="file" #file style="display: none" accept=".csv, .zip" (change)="onFilesAdded()" multiple />
-<div class="upload-content-container">
+<div *ngIf="isAdmin()" class="upload-content-container">
         <mat-card *ngIf="inSelectingState()" class="select-file-card">
                 <mat-card-header>
                   <mat-card-title>Import Utility</mat-card-title>
