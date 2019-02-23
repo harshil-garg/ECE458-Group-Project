@@ -1,7 +1,5 @@
-
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { forkJoin } from 'rxjs/observable/forkJoin';
 import {ValidationData } from '../model/validation-data';
 import { UploadService } from './upload.service';
 import {UploadState} from './uploadStates';
