@@ -1,0 +1,26 @@
+
+<mat-drawer-container class="example-container">
+  <mat-drawer mode="side" opened>
+      <div class="example-container">
+      <h2>To do</h2>
+
+      <div
+        cdkDropList
+        #todoList1="cdkDropList"
+        [cdkDropListData]="todo"
+        [cdkDropListConnectedTo]="['list-1', 'list-2']"
+        class="example-list"
+        (cdkDropListDropped)="drop($event)">
+        <div class="example-box" *ngFor="let item of todo" cdkDrag>{{item}}</div>
+      </div>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content>
+    <div class="fixed-container">
+      <h2>Manufacturing Schedule</h2>
+      <mat-card class="content">
+        <app-manufacturing-schedule></app-manufacturing-schedule>
+      </mat-card>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

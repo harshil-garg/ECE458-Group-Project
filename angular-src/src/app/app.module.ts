@@ -28,7 +28,8 @@ import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomp
 import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 import { ManufacturingGoalTableComponent } from './manufacturing-goal-table/manufacturing-goal-table.component';
-import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule } from '@angular/material';
+import { MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule, MatGridListModule, MatSidenavModule } from '@angular/material';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
 import { FormulaTableComponent } from './formula-table/formula-table.component';
@@ -36,6 +37,8 @@ import { ManufacturingLineTableComponent } from './manufacturing-line-table/manu
 import { AddManufacturingLineComponent } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.component';
 import { AddManufacturingLineDialogComponent } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line-dialog/add-manufacturing-line-dialog.component';
 import { AddManufacturingLineModule } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.module';
+import { ManufacturingScheduleComponent } from './manufacturing-schedule/manufacturing-schedule.component';
+import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule/manufacturing-schedule-display/manufacturing-schedule-display.component';
 
 const routes: Routes = [
   {
@@ -51,7 +54,8 @@ const routes: Routes = [
           { path: 'accounts', component: AccountsComponent },
           { path: 'upload', component: UploadComponent },
           { path: 'manufacturing-goals', component: ManufacturingGoalTableComponent },
-          { path: 'manufacturing-lines', component: ManufacturingLineTableComponent }
+          { path: 'manufacturing-lines', component: ManufacturingLineTableComponent },
+          { path: 'manufacturing-schedule', component: ManufacturingScheduleDisplayComponent },
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -77,7 +81,9 @@ const routes: Routes = [
     CreateDependencyReportComponent,
     DependencyReportDialogComponent,
     FormulaTableComponent,
-    ManufacturingLineTableComponent
+    ManufacturingLineTableComponent,
+    ManufacturingScheduleComponent,
+    ManufacturingScheduleDisplayComponent
   ],
   imports: [
     BrowserModule,
@@ -114,7 +120,10 @@ const routes: Routes = [
     MatSortModule,
     MatChipsModule,
     MatSelectModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatGridListModule,
+    DragDropModule,
+    MatSidenavModule
   ],
   providers: [Title],
   bootstrap: [AppComponent],
