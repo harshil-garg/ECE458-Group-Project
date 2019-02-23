@@ -12,6 +12,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   days : Array<Array<string>> = [[]];
   months : Array<Array<string>> = [[]];
   activities : Array<ManufacturingActivity> = [];
+  hourHeaders : Array<string> = [];
   manufLines : Array<string> = [];
 
   constructor() { }
@@ -25,33 +26,41 @@ export class ManufacturingScheduleComponent implements OnInit {
       activity: "beats",
       manufacturing_line: "Line1",
       start_date: newDate,
-      duration: 10
+      duration: 3
     })
-    for(var i=0; i<2; i++){
+    for(var j=0; j<10; j++){
+      if(j<4){
+        this.hourHeaders.push((j+8) + "AM");
+      }
+      else if(j==4){
+        this.hourHeaders.push((j+8) + "PM");
+      }
+      else {
+        this.hourHeaders.push((j-4) + "PM");
+      }
+    }
+    for(var i=0; i<this.manufLines.length; i++){
       this.hours[i] = [];
-      for(var j=0; j<24; j++){
+      for(var j=0; j<10; j++){
         this.hours[i].push("");
       }
     }
     this.hours[0][1] = "hello world";
+    this.hours[2][5] = "sup";
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    console.log(event.previousIndex);
-    console.log(event.currentIndex);
-    console.log(event.currentIndex - event.previousIndex);
-    console.log(event);
-    var initialValue = this.hours[0][event.previousIndex];
-    this.hours[0][event.previousIndex] = this.hours[0][event.currentIndex]
-    this.hours[0][event.currentIndex] = initialValue;
-    // if (event.previousContainer === event.container) {
-    //   moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    // } else {
-    //   transferArrayItem(event.previousContainer.data,
-    //                     event.container.data,
-    //                     event.previousIndex,
-    //                     event.currentIndex);
-    // }
+    if(event.previousContainer.id === "manufacturing-activities"){
+      var currId  = event.container.id.substring(5);//still a string, need to convert to int with unary operator (+)
+      this.hours[+currId][event.currentIndex] = event.previousContainer.data[event.previousIndex];
+    }
+    else {
+      var prevId = event.previousContainer.id.substring(5);
+      var currId = event.container.id.substring(5);
+      var initialValue = this.hours[prevId][event.previousIndex];
+      this.hours[+prevId][event.previousIndex] = "";
+      this.hours[+currId][event.currentIndex] = initialValue;
+    }
   }
 
   move(event) {
@@ -62,6 +71,14 @@ export class ManufacturingScheduleComponent implements OnInit {
   log(e) {
     console.log("LOGGED:");
     console.log(e);
+  }
+
+  getLists() {
+    var lists = [];
+    for(var i=0; i<this.manufLines.length; i++){
+      lists.push("list-"+i);
+    }
+    return lists;
   }
 
 }

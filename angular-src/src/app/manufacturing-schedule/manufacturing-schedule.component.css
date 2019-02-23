@@ -3,7 +3,7 @@
   display: inline-block;
   vertical-align: top;
   box-sizing: border-box;
-  width: 3000px;
+  width: 1375px;
 }
 
 .example-list {
@@ -28,8 +28,8 @@
   font-size: 14px;
   flex-grow: 1;
   flex-basis: 0;
-  min-width: 75px;
-  max-width: 75px;
+  min-width: 125px;
+  max-width: 125px;
 }
 
 .selected-box {
@@ -45,6 +45,29 @@
   font-size: 14px;
   flex-grow: 1;
   flex-basis: 0;
-  min-width: 75px;
-  max-width: 75px;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.header-list {
+  min-height: 60px;
+  display: flex;
+  flex-direction: row;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.header-box {
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: grey;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
 }

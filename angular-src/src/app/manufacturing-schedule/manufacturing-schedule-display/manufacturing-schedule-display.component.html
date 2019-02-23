@@ -9,18 +9,21 @@
         #todoList1="cdkDropList"
         [cdkDropListData]="todo"
         [cdkDropListConnectedTo]="['list-1', 'list-2']"
+        id="manufacturing-activities"
         class="example-list"
         (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of todo" cdkDrag>{{item}}</div>
+        <div class="example-box" *ngFor="let item of todo" cdkDrag>{{item}}
+          <mat-icon *cdkDragPreview></mat-icon>
+        </div>
       </div>
     </div>
   </mat-drawer>
   <mat-drawer-content>
     <div class="fixed-container">
       <h2>Manufacturing Schedule</h2>
-      <mat-card class="content">
+      <div class="content">
         <app-manufacturing-schedule></app-manufacturing-schedule>
-      </mat-card>
+      </div>
     </div>
   </mat-drawer-content>
 </mat-drawer-container>

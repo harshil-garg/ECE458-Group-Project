@@ -1,32 +1,29 @@
 <div class="example-container">
-  <div
-    cdkDropList
-    cdkDropListOrientation="horizontal"
-    #todoList="cdkDropList"
-    [cdkDropListData]="hours[0]"
-    [cdkDropListConnectedTo]="[todoList, doneList]"
-    class="example-list"
-    id="list-1"
-    (cdkDropListDropped)="drop($event)"
-    (cdkDropListEntered)="log($event)">
-    <ng-container *ngFor="let item of hours[0]">
-      <div [ngClass]="{'example-box': item==='', 'selected-box': item!=''}" cdkDrag [cdkDragDisabled]="item===''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item}}
-        <mat-icon *cdkDragPreview></mat-icon>
-      </div>
+  <div class="header-list">
+    <div class="header-box"></div>
+    <ng-container *ngFor="let item of hourHeaders">
+      <div class="header-box">{{item}}</div>
     </ng-container>
   </div>
 
-  <div
-    cdkDropList
-    cdkDropListOrientation="horizontal"
-    #doneList="cdkDropList"
-    [cdkDropListData]="hours[1]"
-    [cdkDropListConnectedTo]="[todoList]"
-    class="example-list"
-    id="list-2"
-    (cdkDropListDropped)="drop($event)">
-    <ng-container *ngFor="let item of hours[1]">
-      <div [ngClass]="{'example-box': item==='', 'selected-box': item!=''}" cdkDrag [cdkDragDisabled]="item===''">{{item}}</div>
-    </ng-container>
-  </div>
+  <ng-container *ngFor="let manufLine of manufLines; let id = index">
+    <div
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      #todoList="cdkDropList"
+      [cdkDropListData]="hours[id]"
+      [cdkDropListConnectedTo]="getLists()"
+      class="example-list"
+      [id]="'list-' + id"
+      (cdkDropListDropped)="drop($event)"
+      (cdkDropListEntered)="log($event)">
+      <div class="header-box">{{manufLine}}</div>
+      <ng-container *ngFor="let item of hours[id]">
+        <div [ngClass]="{'example-box': item==='', 'selected-box': item!=''}" cdkDrag [cdkDragDisabled]="item===''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item}}
+          <mat-icon *cdkDragPreview></mat-icon>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+
 </div>
