@@ -37,7 +37,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       activity: "as",
       manufacturing_line: "Line2",
       start_date: newDate2,
-      duration: 3
+      duration: 4
     });
     this.setupHourHeaders();
     this.refreshHours();
@@ -85,6 +85,7 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       }
     }
+    console.log("REFRESHEDHOURS");
   }
 
   zeroedDate(){
@@ -127,8 +128,6 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       });
       this.refreshHours();
-      // this.hours[+prevId][prevHour] = "";
-      // this.hours[+currId][currHour] = initialValue;
     }
   }
 
