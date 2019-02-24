@@ -9,3 +9,13 @@
    max-width: 300px;
    width: auto;
 }
+
+/* LEFT align */
+.mat-list .mat-list-item.left .mat-list-item-content{
+      justify-content: flex-start;
+}
+
+/* RIGHT align */
+.mat-list .mat-list-item.right .mat-list-item-content{
+      justify-content: flex-end;
+}

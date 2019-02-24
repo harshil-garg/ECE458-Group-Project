@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingActivity } from '../model/manufacturing_activity';
 import { MatSnackBar } from '@angular/material';
 
@@ -18,17 +19,14 @@ export class ManufacturingScheduleComponent implements OnInit {
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate();
 
-  constructor(private snackBar: MatSnackBar) { }
+  constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.manufLines.push("Line1");
-    this.manufLines.push("Line2");
-    this.manufLines.push("Line3");
     var newDate = this.zeroedDate();
     newDate.setHours(12);
     this.activities.push({
       activity: "beats",
-      manufacturing_line: "Line1",
+      manufacturing_line: "big12",
       start_date: newDate,
       duration: 3
     });
@@ -36,13 +34,34 @@ export class ManufacturingScheduleComponent implements OnInit {
     newDate2.setHours(10);
     this.activities.push({
       activity: "as",
-      manufacturing_line: "Line2",
+      manufacturing_line: "small",
       start_date: newDate2,
       duration: 10
     });
-    this.setupHourHeaders();
-    this.refreshHours();
-    console.log("REFRESHED");
+    this.populateManufLines();
+  }
+
+  populateManufLines(){
+    this.crudManufacturingLineService.read({
+        pageNum: -1,
+        page_size: 0,
+        sortBy: "name"
+      }).subscribe(
+      response => {
+        if(response.success){
+          response.data.forEach(data=> this.manufLines.push(data.shortname));
+          this.setupHourHeaders();
+          this.refreshHours();
+        } else {
+          this.displayError("Failed to populate Manufacturing Lines");
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
   }
 
   setupHourHeaders(){
@@ -173,7 +192,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       if(act.activity != activity && act.manufacturing_line == manufLine){
         var act_start = act.start_date;
         var act_end = this.calculateEndTime(act.start_date, act.duration);
-        if(!(this_end.getTime() < act_start.getTime() || this_start.getTime() > act_end.getTime())){ //collision
+        if(!(this_end.getTime() <= act_start.getTime() || this_start.getTime() >= act_end.getTime())){ //collision
           collision = true;
         }
       }

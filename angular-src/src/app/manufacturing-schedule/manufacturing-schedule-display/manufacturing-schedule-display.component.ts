@@ -23,6 +23,8 @@ export class ManufacturingScheduleDisplayComponent{
     'Walk dog'
   ];
 
+  selectedGoals : boolean[] = []; //[manufGoal]
+
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
@@ -31,6 +33,12 @@ export class ManufacturingScheduleDisplayComponent{
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
+    }
+  }
+
+  onSelectionChange(event){
+    if(!confirm("Are you sure?")){
+      event.preventDefault();
     }
   }
 

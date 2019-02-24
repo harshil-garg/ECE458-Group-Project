@@ -1,7 +1,13 @@
 
-<mat-drawer-container class="example-container">
-  <mat-drawer mode="side" opened>
-      <div class="example-container">
+<mat-sidenav-container class="example-container">
+  <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
+    <div class="example-container">
+      <h2>Goals</h2>
+      <mat-list>
+        <mat-list-item class="right" *ngFor="let item of todo">
+          {{item}} &nbsp; <mat-slide-toggle [(ngModel)]="selectedGoals[item]" (click)="onSelectionChange($event)"></mat-slide-toggle>
+        </mat-list-item>
+      </mat-list>
       <h2>Palette</h2>
 
       <div
@@ -17,13 +23,13 @@
         </div>
       </div>
     </div>
-  </mat-drawer>
-  <mat-drawer-content>
+  </mat-sidenav>
+  <mat-sidenav-content>
     <div class="fixed-container">
       <h2>Manufacturing Schedule</h2>
       <div class="content">
         <app-manufacturing-schedule></app-manufacturing-schedule>
       </div>
     </div>
-  </mat-drawer-content>
-</mat-drawer-container>
+  </mat-sidenav-content>
+</mat-sidenav-container>
