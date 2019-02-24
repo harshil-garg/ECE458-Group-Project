@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { ManufacturingActivity } from '../model/manufacturing_activity';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-manufacturing-schedule',
@@ -17,7 +18,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate();
 
-  constructor() { }
+  constructor(private snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.manufLines.push("Line1");
@@ -140,14 +141,44 @@ export class ManufacturingScheduleComponent implements OnInit {
       var initialValue = this.hours[+prevId][prevHour];
       var updatedDate = this.zeroedDate();
       updatedDate.setHours(8+ (+currHour));
-      this.activities.forEach(activity=>{
-        if(activity.activity == initialValue){
-          activity.start_date = updatedDate;
-          activity.manufacturing_line = this.manufLines[+currId];
-        }
-      });
+      if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId])){
+        this.activities.forEach(activity=>{
+          if(activity.activity == initialValue){
+            activity.start_date = updatedDate;
+            activity.manufacturing_line = this.manufLines[+currId];
+          }
+        });
+      }else{
+        this.displayError("This move is now allowed : overlapping activities on " + this.manufLines[+currId]);
+      }
       this.refreshHours();
     }
+  }
+
+  displayError(message){
+    this.snackBar.open(message, "Close", {duration:3000});
+  }
+
+  isCollision(date: Date, activity, manufLine){
+    var this_start = date;
+    var duration = 0;
+    var collision = false;
+    this.activities.forEach(act=>{
+      if(act.activity == activity){
+        duration = act.duration;
+      }
+    });
+    var this_end = this.calculateEndTime(date, duration);
+    this.activities.forEach(act=>{
+      if(act.activity != activity && act.manufacturing_line == manufLine){
+        var act_start = act.start_date;
+        var act_end = this.calculateEndTime(act.start_date, act.duration);
+        if(!(this_end.getTime() < act_start.getTime() || this_start.getTime() > act_end.getTime())){ //collision
+          collision = true;
+        }
+      }
+    });
+    return collision;
   }
 
   move(event) {
