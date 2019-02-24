@@ -32,12 +32,12 @@ export class ManufacturingScheduleComponent implements OnInit {
       duration: 3
     });
     var newDate2 = this.zeroedDate();
-    newDate2.setHours(8);
+    newDate2.setHours(10);
     this.activities.push({
       activity: "as",
       manufacturing_line: "Line2",
       start_date: newDate2,
-      duration: 4
+      duration: 10
     });
     this.setupHourHeaders();
     this.refreshHours();
@@ -75,17 +75,36 @@ export class ManufacturingScheduleComponent implements OnInit {
           this.starting_hours[manufIndex][hour-8] = this.activities[i].activity;
         }
       }
+      var endTime = this.calculateEndTime(this.activities[i].start_date, this.activities[i].duration).getTime();
       for(var j=0; j<10; j++){//iterate over hours
         this.currDate.setHours(j+8);
         var currTime = this.currDate.getTime();
         var startTime = this.activities[i].start_date.getTime();
-        var endTime = this.activities[i].start_date.getTime() + this.convertToMillis(this.activities[i].duration,0,0,0);
         if(currTime>=startTime && currTime<endTime){
           this.hours[manufIndex][j] = this.activities[i].activity;
         }
       }
     }
     console.log("REFRESHEDHOURS");
+  }
+
+  calculateEndTime(startTime: Date, duration: number){
+    var timeTil6 = 18 - startTime.getHours();
+    var date = new Date(startTime.getTime());
+    if(timeTil6 > duration){
+      date.setHours(date.getHours() + duration);
+      console.log(date);
+    }
+    else{
+      duration -= timeTil6;
+      date.setDate(date.getDate() + 1); //supports rollover
+      while(duration >= 10){
+        date.setDate(date.getDate() + 1);
+        duration-=10;
+      }
+      date.setHours(8+duration);
+    }
+    return date;
   }
 
   zeroedDate(){
