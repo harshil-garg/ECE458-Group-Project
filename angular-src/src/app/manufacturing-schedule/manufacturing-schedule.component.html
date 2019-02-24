@@ -20,7 +20,7 @@
           [id]="'list-' + id + '-hour-' + hour_id"
           (cdkDropListDropped)="drop($event)"
           (cdkDropListEntered)="log($event)">
-          <div [ngClass]="{'example-box': item==='', 'selected-box': item!=''}" cdkDrag [cdkDragDisabled]="item===''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item}}
+          <div [ngClass]="{'example-box': item==='', 'selected-box': starting_hours[id][hour_id]=='' && item!='', 'start-box': starting_hours[id][hour_id]!=''}" cdkDrag [cdkDragDisabled]="starting_hours[id][hour_id]==''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item}}
             <mat-icon *cdkDragPreview></mat-icon>
           </div>
         </div>

@@ -9,12 +9,13 @@ import { ManufacturingActivity } from '../model/manufacturing_activity';
 })
 export class ManufacturingScheduleComponent implements OnInit {
   hours : Array<Array<string>> = [[]];
+  starting_hours : Array<Array<string>> = [[]];
   days : Array<Array<string>> = [[]];
   months : Array<Array<string>> = [[]];
   activities : Array<ManufacturingActivity> = [];
   hourHeaders : Array<string> = [];
   manufLines : Array<string> = [];
-  currDate : Date = new Date();
+  currDate : Date = this.zeroedDate();
 
   constructor() { }
 
@@ -22,7 +23,7 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.manufLines.push("Line1");
     this.manufLines.push("Line2");
     this.manufLines.push("Line3");
-    var newDate = new Date();
+    var newDate = this.zeroedDate();
     newDate.setHours(12);
     this.activities.push({
       activity: "beats",
@@ -30,11 +31,11 @@ export class ManufacturingScheduleComponent implements OnInit {
       start_date: newDate,
       duration: 3
     });
-    var newDate2 = new Date();
+    var newDate2 = this.zeroedDate();
     newDate2.setHours(8);
     this.activities.push({
       activity: "as",
-      manufacturing_line: "Line1",
+      manufacturing_line: "Line2",
       start_date: newDate2,
       duration: 3
     });
@@ -60,22 +61,43 @@ export class ManufacturingScheduleComponent implements OnInit {
   refreshHours(){
     for(var i=0; i<this.manufLines.length; i++){
       this.hours[i] = [];
+      this.starting_hours[i] = [];
       for(var j=0; j<10; j++){
         this.hours[i].push("");
+        this.starting_hours[i].push("");
       }
     }
     for(var i=0; i<this.activities.length; i++){//iterate over activities
-      var currDate = new Date();
+      var manufIndex = this.manufLines.indexOf(this.activities[i].manufacturing_line);
+      if(this.sameDay(this.activities[i].start_date, this.currDate)){
+        var hour = this.activities[i].start_date.getHours();
+        if(hour>=8 && hour<18){
+          this.starting_hours[manufIndex][hour-8] = this.activities[i].activity;
+        }
+      }
       for(var j=0; j<10; j++){//iterate over hours
-        currDate.setHours(j+8);
-        var currTime = currDate.getTime();
+        this.currDate.setHours(j+8);
+        var currTime = this.currDate.getTime();
         var startTime = this.activities[i].start_date.getTime();
         var endTime = this.activities[i].start_date.getTime() + this.convertToMillis(this.activities[i].duration,0,0,0);
-        if(currTime>=startTime && currTime<=endTime){
-          this.hours[0][j] = this.activities[i].activity;
+        if(currTime>=startTime && currTime<endTime){
+          this.hours[manufIndex][j] = this.activities[i].activity;
         }
       }
     }
+  }
+
+  zeroedDate(){
+    var currDate = new Date();
+    currDate.setHours(0);
+    currDate.setMinutes(0);
+    currDate.setSeconds(0);
+    currDate.setMilliseconds(0);
+    return currDate;
+  }
+
+  sameDay(day1, day2){
+    return (day1.getYear() == day2.getYear() && day1.getMonth() == day2.getMonth() && day1.getDate() == day2.getDate());
   }
 
   convertToMillis(hour,minute,second,millis){
@@ -85,6 +107,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<string[]>) {
+    console.log(event);
     if(event.previousContainer.id === "manufacturing-activities"){
       var currId  = event.container.id.split("-")[1];//still a string, need to convert to int with unary operator (+)
       this.hours[+currId][event.currentIndex] = event.previousContainer.data[event.previousIndex];
@@ -95,8 +118,17 @@ export class ManufacturingScheduleComponent implements OnInit {
       var currId = event.container.id.split("-")[1];
       var currHour = event.container.id.split("-")[3];
       var initialValue = this.hours[+prevId][prevHour];
-      this.hours[+prevId][prevHour] = "";
-      this.hours[+currId][currHour] = initialValue;
+      var updatedDate = this.zeroedDate();
+      updatedDate.setHours(8+ (+currHour));
+      this.activities.forEach(activity=>{
+        if(activity.activity == initialValue){
+          activity.start_date = updatedDate;
+          activity.manufacturing_line = this.manufLines[+currId];
+        }
+      });
+      this.refreshHours();
+      // this.hours[+prevId][prevHour] = "";
+      // this.hours[+currId][currHour] = initialValue;
     }
   }
 
