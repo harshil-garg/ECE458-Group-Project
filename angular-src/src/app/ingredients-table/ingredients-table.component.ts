@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Ingredient } from '../model/ingredient'
+import { HttpResponse } from '@angular/common/http';
 import { MeasurementUnit } from '../model/measurement-unit'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
@@ -8,6 +9,7 @@ import { FilterIngredientsService, FilterResponse, IngredientCsvData } from './f
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import { AngularCsv } from 'angular7-csv/dist/Angular-csv'
 
 @Component({
   selector: 'ingredients-table',
@@ -241,29 +243,20 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     handleExportResponse(response){
-      var csvResponseData : Array<any>;
-      if(response.success){
-        csvResponseData = [];
-        for(let csv_data of response.data){
-          csvResponseData.push({
-            "Ingr#": csv_data["Ingr#"]==undefined ? "" : csv_data["Ingr#"],
-            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"],
-            "Vendor Info": csv_data["Vendor Info"]==undefined ? "" : csv_data["Vendor Info"],
-            "Size": csv_data["Size"]==undefined ? "" : csv_data["Size"],
-            "Cost": csv_data["Cost"]==undefined ? "" : csv_data["Cost"],
-            "Comment": csv_data["Comment"]==undefined ? "" : csv_data["Comment"]
-          });
-          console.log(csv_data);
-        }
-        console.log(csvResponseData);
-        var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += ["Ingr#", "Name", "Vendor Info", "Size", "Cost", "Comment"].join(",") + "\r\n";
-        csvResponseData.forEach(function(response) {
-          csvContent += response["Ingr#"]+","+response["Name"]+","+response["Vendor Info"]+","+response["Size"]+","+response["Cost"]+","+response["Comment"]+"\r\n";
-        });
-        var encodedUri = encodeURI(csvContent);
-        window.open(encodedUri);
+        // var url = window.URL.createObjectURL(response);
+        // var a = document.createElement('a');
+        // document.body.appendChild(a);
+        // a.setAttribute('style', 'display: none');
+        // a.href = url;
+        // a.download = 'ingredients.csv';
+        // a.click();
+        // window.URL.revokeObjectURL(url);
+        // a.remove();
+      const options = {
+        showLabels: true,
+        headers: ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment']
       }
+      new AngularCsv(response.data, 'ingredients', options);
     }
 
     isAllSelected() {

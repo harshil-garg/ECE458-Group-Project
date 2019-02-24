@@ -5,8 +5,8 @@ const sku_filter = require('../controllers/sku_filter');
 const formula_filter = require('../controllers/formula_filter');
 const pagination = require('../controllers/paginate');
 const ProductLine = require('../model/product_line_model');
-
 let pageNum = -1; //return all, don't paginate
+
 router.post('/ingredients', async (req, res) => {
     const { sortBy, keywords, skus} = req.body;
     const required_params = { sortBy, keywords, skus };
@@ -16,8 +16,7 @@ router.post('/ingredients', async (req, res) => {
     });
 
     let results = await ingredient_filter.filter(pageNum, sortBy, 0, key_exps, skus);
-    format_ingredients(results.data);
-    res.json(results)
+    res.json({success: true, data: format_ingredients(results.data)});
 });
 
 router.post('/skus', async (req, res) => {
@@ -56,22 +55,18 @@ router.post('/formulas', async (req, res) => {
 
 
 function format_ingredients(ingredients) {
+    result = [];
     for(let ingredient of ingredients){
-        ingredient['Ingr#'] = ingredient.number;
-        delete ingredient.number;
-        ingredient['Name'] = ingredient.name;
-        delete ingredient.name;
-        ingredient['Vendor Info'] = ingredient.vendor_info;
-        delete ingredient.vendor_info;
-        ingredient['Size'] = `${ingredient.package_size} ${ingredient.unit}`;
-        delete ingredient.size;
-        ingredient['Cost'] = ingredient.cost;
-        delete ingredient.cost;
-        ingredient["Comment"] = ingredient.comment;
-        delete ingredient.comment;
-        delete ingredient.skus;
-        delete ingredient.num_skus;
+        new_ingredient = {};
+        new_ingredient['Ingr#'] = ingredient.number;
+        new_ingredient['Name'] = ingredient.name;
+        new_ingredient['Vendor Info'] = ingredient.vendor_info;
+        new_ingredient['Size'] = `${ingredient.package_size} ${ingredient.unit}`;
+        new_ingredient['Cost'] = ingredient.cost;
+        new_ingredient["Comment"] = ingredient.comment;
+        result.push(new_ingredient);
     }
+    return result;
 }
 
 function format_skus(skus) {

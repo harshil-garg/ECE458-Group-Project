@@ -82,7 +82,7 @@ export class FilterIngredientsService {
 		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
 	}
 
-	export(exportMessage: ExportMessage): Observable<ExportResponse>{
+	export(exportMessage: ExportMessage): Observable<ExportResponse> {
 		return this.http.post<ExportResponse>('api/export/ingredients', exportMessage, httpOptions);
 	}
 }
