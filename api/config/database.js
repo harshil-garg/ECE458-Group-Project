@@ -1,4 +1,4 @@
 // 27017 is the default port number.
 module.exports = {
-    database: 'mongodb://127.0.0.1:27017/hypomeal'
+    database: 'mongodb://admin:admin458@ds155203.mlab.com:55203/hypotheticalmeals'
 }
