@@ -8,19 +8,21 @@
 
   <ng-container *ngFor="let manufLine of manufLines; let id = index">
     <div
-      cdkDropList
-      cdkDropListOrientation="horizontal"
-      #todoList="cdkDropList"
-      [cdkDropListData]="hours[id]"
-      [cdkDropListConnectedTo]="getLists()"
-      class="example-list"
-      [id]="'list-' + id"
-      (cdkDropListDropped)="drop($event)"
-      (cdkDropListEntered)="log($event)">
+      class="example-list">
       <div class="header-box">{{manufLine}}</div>
-      <ng-container *ngFor="let item of hours[id]">
-        <div [ngClass]="{'example-box': item==='', 'selected-box': item!=''}" cdkDrag [cdkDragDisabled]="item===''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item}}
-          <mat-icon *cdkDragPreview></mat-icon>
+      <ng-container *ngFor="let item of hours[id]; let hour_id = index">
+        <div
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          [cdkDropListData]="hours[id]"
+          [cdkDropListConnectedTo]="getLists()"
+          class="example-list"
+          [id]="'list-' + id + '-hour-' + hour_id"
+          (cdkDropListDropped)="drop($event)"
+          (cdkDropListEntered)="log($event)">
+          <div [ngClass]="{'example-box': item==='', 'selected-box': item!=''}" cdkDrag [cdkDragDisabled]="item===''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item}}
+            <mat-icon *cdkDragPreview></mat-icon>
+          </div>
         </div>
       </ng-container>
     </div>
