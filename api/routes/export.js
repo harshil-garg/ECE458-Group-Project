@@ -33,7 +33,7 @@ router.post('/skus', async (req, res) => {
 });
 
 router.post('/product_lines', async (req, res) => {
-    let agg = ProductLine.aggregate({$match: {}});
+    let agg = ProductLine.aggregate([{$match: {}}]);
 
     let results = await pagination.paginate(agg, pageNum, 'name', 0);
     format_product_lines(results.data);

@@ -7,7 +7,7 @@ module.exports.nameOrNumber = async (model, input) => {
     }else{
         //tolower converts number to string, 1 means to include
         let results = [];
-        let cursor = model.aggregate({$addFields: {num2str: {'$toLower' : '$number'}}}).match({num2str: regex}).limit(limit).cursor({}).exec();
+        let cursor = model.aggregate([{$addFields: {num2str: {'$toLower' : '$number'}}}]).match({num2str: regex}).limit(limit).cursor({}).exec();
         await cursor.eachAsync((sku) => {
             results.push(sku);
         });
