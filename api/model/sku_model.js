@@ -167,6 +167,10 @@ async function syntaxValidation(skus, skus_csv, results, type) {
                 message: errors,
                 data: sku_csv
             });
-        }       
+        }   
+        
+        sku.formula = formula_passed[2];
+        sku.product_line = product_passed[2];
+        sku.manufacturing_lines = manufacturing_ids;
     }
 }

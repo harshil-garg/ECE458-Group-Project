@@ -16,9 +16,9 @@ module.exports.nameOrNumber = async (model, input) => {
     }
 }
 
-module.exports.email = async (model, input) => {
+module.exports.nameOrEmail = async (model, input) => {
     let regex = new RegExp('^'+input, 'i');
-    return await model.find({email: regex}).limit(limit).collation({locale: 'en'}).sort('email').lean().exec();
+    return await model.find({$or: [{name: regex}, {email: regex}]}).limit(limit).collation({locale: 'en'}).sort('name').lean().exec();
 }
 
 

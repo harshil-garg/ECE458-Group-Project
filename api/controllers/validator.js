@@ -163,10 +163,12 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
                 results[type].ignorelist.push(row_csv);
             }else{
                 results[type].changelist.push(row_csv);
+                results[type].changelist_model.push(row);
             }
 
         }else{
             results[type].createlist.push(row_csv);
+            results[type].createlist_model.push(row);
         }
     }
 }

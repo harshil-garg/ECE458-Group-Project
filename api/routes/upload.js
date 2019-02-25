@@ -43,8 +43,8 @@ var toBeCommitted = {
     createlist: [],
   },
   formulas: {
-    createlist: [],
-    changelist: []
+    changelist: [],
+    createlist: []
   }
 };
 
@@ -104,23 +104,31 @@ async function handleFiles(res) {
     ingredients: {
       errorlist: [],
       changelist: [],
+      changelist_model: [],
       createlist: [],
+      createlist_model: [],
       ignorelist: []
     },
     product_lines: {
       errorlist: [],
       createlist: [],
+      createlist_model: [],
       ignorelist: []
     },
     skus: {
       errorlist: [],
       changelist: [],
+      changelist_model: [],
       createlist: [],
+      createlist_model: [],
       ignorelist: []
     },
     formulas: {
       errorlist: [],
+      changelist: [],
+      changelist_model: [],
       createlist: [],
+      createlist_model: [],
       ignorelist: []
     }
   };
@@ -192,12 +200,13 @@ async function handleFiles(res) {
       uploadSessionStarted = false;
     }
     else {
-      toBeCommitted.ingredients.createlist = results.ingredients.createlist;
-      toBeCommitted.ingredients.changelist = results.ingredients.changelist;
-      toBeCommitted.skus.createlist = results.skus.createlist;
-      toBeCommitted.skus.changelist = results.skus.changelist;
-      toBeCommitted.formulas.createlist = results.formulas.createlist;
-      toBeCommitted.product_lines.createlist = results.product_lines.createlist;
+      toBeCommitted.ingredients.createlist = results.ingredients.createlist_model;
+      toBeCommitted.ingredients.changelist = results.ingredients.changelist_model;
+      toBeCommitted.skus.createlist = results.skus.createlist_model;
+      toBeCommitted.skus.changelist = results.skus.changelist_model;
+      toBeCommitted.formulas.createlist = results.formulas.createlist_model;
+      toBeCommitted.formulas.changelist = results.formulas.changelist_model;
+      toBeCommitted.product_lines.createlist = results.product_lines.createlist_model;
 
       //if there's no errors and no potential changes, commit the changes
       if (!(results.ingredients.changelist.length || results.skus.changelist.length)) {

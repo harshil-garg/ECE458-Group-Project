@@ -79,9 +79,9 @@ module.exports.conflictCheck = async function(formulas, results){
             //push to changelist
             let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
             if(primary_match){
-                results.formulas.changelist.push(newObj);
+                results.formulas.changelist_model.push(newObj);
             }else{
-                results.formulas.createlist.push(newObj);
+                results.formulas.createlist_model.push(newObj);
             }
 
             current_number = formula.number;
@@ -119,14 +119,19 @@ module.exports.conflictCheck = async function(formulas, results){
                     unit: formula.unit
                 }
                 ingredient_tuples.push(tuple);
+                if(primary_match){
+                    results.formulas.changelist.push(formula);
+                }else{
+                    results.formulas.createlist.push(formula);
+                }
 
                 //At the end 
                 if(formula.equals(formulas.pop())){
                     let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                     if(primary_match){
-                        results.formulas.changelist.push(newObj);
+                        results.formulas.changelist_model.push(newObj);
                     }else{
-                        results.formulas.createlist.push(newObj);
+                        results.formulas.createlist_model.push(newObj);
                     }
                 }
                 
