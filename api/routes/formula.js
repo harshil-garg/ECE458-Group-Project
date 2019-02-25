@@ -4,6 +4,7 @@ const Formula = require('../model/formula_model');
 const Ingredient = require('../model/ingredient_model');
 const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
+const formula_validator = require('../controllers/formula_validator');
 const formula_filter = require('../controllers/formula_filter');
 
 //Autocomplete Ingredients
@@ -76,7 +77,7 @@ router.post('/update', async (req, res) => {
     if(ingredient_tuples){
         let valid_tuples = [];
         for(let tuple of ingredient_tuples){
-            valid_tuples.push(await validator.validIngredientTuple(tuple.ingredient, tuple.unit));
+            valid_tuples.push(await formula_validator.validIngredientTuple(tuple.ingredient, tuple.unit));
         }
         let errors = validator.compileErrors(...valid_tuples);
 
@@ -104,7 +105,7 @@ router.post('/delete', async (req, res) => {
     const { number } = req.body;
 
     let formula = await Formula.findOne({number: number}).exec();
-    let formula_passed = await validator.formulaClear(formula._id);
+    let formula_passed = await formula_validator.formulaClear(formula._id);
 
     if(!formula_passed[0]){
         res.json({success: false, message: formula_passed[1]});
@@ -131,7 +132,7 @@ module.exports.createFormula = async function(name, number, ingredient_tuples, c
     //Check if given ingredients exist and have valid units
     let valid_tuples = [];
     for(let tuple of ingredient_tuples){
-        valid_tuples.push(await validator.validIngredientTuple(tuple.ingredient, tuple.unit));
+        valid_tuples.push(await formula_validator.validIngredientTuple(tuple.ingredient, tuple.unit));
     }
     let errors = validator.compileErrors(inputs_exist, name_passed, ...valid_tuples);
 

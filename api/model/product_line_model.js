@@ -1,5 +1,6 @@
 //Require mongoose package
 const mongoose = require('mongoose');
+const validator = require('../controllers/validator');
 
 const Schema = mongoose.Schema;
 
@@ -26,4 +27,21 @@ module.exports.deleteProductLine = (product_line_name, callback) => {
 module.exports.updateProductLine = (product_line_name, product_line_update, cb) => {
     var query = {name: product_line_name};
     ProductLine.findOneAndUpdate(query, product_line_update, cb);
+}
+
+module.exports.attemptImport = async (product_lines, results) => {
+    let type = 'product_lines'
+    await validator.conflictCheck(ProductLine, product_lines, results, type);
+}
+
+module.exports.commitImport = async (createlist) => {
+    if(createlist){
+        for(let row of createlist){
+            let result = await ProductLine.create(row);
+            if(!result){
+                return false;
+            }
+        }
+    }
+    return true;
 }

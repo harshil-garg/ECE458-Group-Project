@@ -10,6 +10,7 @@ const FormulaRoute = require('../routes/formula');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
 const validator = require('../controllers/validator');
+const sku_validator = require('../controllers/sku_validator');
 const generator = require('../controllers/autogen');
 
 
@@ -66,8 +67,8 @@ router.post('/create', async (req, res) => {
         manufacturings_passed.push(manufacturing_passed);
         manufacturing_ids.push(manufacturing_passed[2]);
     }   
-    let case_passed = validator.isUPCStandard(case_upc);
-    let unit_passed = validator.isUPCStandard(unit_upc);
+    let case_passed = sku_validator.isUPCStandard(case_upc);
+    let unit_passed = sku_validator.isUPCStandard(unit_upc);
     let name_passed = validator.proper_name_length(name);
     let count_passed = validator.isPositive(count, 'Count');
     let scale_passed = validator.isPositive(formula_scale_factor, 'Scale factor');
@@ -157,7 +158,7 @@ router.post('/update', async (req, res) => {
         json["number"] = newnumber;
     }
     if (case_upc) {
-        let case_passed = validator.isUPCStandard(case_upc);
+        let case_passed = sku_validator.isUPCStandard(case_upc);
         if(!case_passed[0]){
             res.json({success: false, message: case_passed[1]});
             return;
@@ -165,7 +166,7 @@ router.post('/update', async (req, res) => {
         json["case_upc"] = case_upc;
     }
     if (unit_upc) {
-        let unit_passed = validator.isUPCStandard(unit_upc);
+        let unit_passed = sku_validator.isUPCStandard(unit_upc);
         if(!unit_passed[0]){
             res.json({success: false, message: unit_passed[1]});
             return;
@@ -176,7 +177,7 @@ router.post('/update', async (req, res) => {
         json["size"] = size;
     }
     if (count) {
-        let count_passed = validator.isUPCStandard(count);
+        let count_passed = validator.isPositive(count);
         if(!count_passed[0]){
             res.json({success: false, message: count_passed[1]});
             return;

@@ -1,19 +1,20 @@
 //Require mongoose package
 const mongoose = require('mongoose');
-const Ingredient = require('./ingredient_model');
-
-const utils = require( '../../utils/utils');
+const validator = require('../controllers/validator');
+const sku_validator = require('../controllers/sku_validator');
+const autogen = require('../controllers/autogen');
+const util = require('../../utils/utils');
 
 const Schema = mongoose.Schema;
 const SKUSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
     number: {
         type: Number,
         required: true,
         unique: true
+    },
+    name: {
+        type: String,
+        required: true
     },
     case_upc: {
         type: String,
@@ -78,40 +79,94 @@ module.exports.updateSKU = (sku_number, sku_update, cb) => {
     SKU.findOneAndUpdate(query, sku_update, cb);
 }
 
-module.exports.attemptImport = (skus, results) => {
-
+module.exports.attemptImport = async (skus, skus_csv, results) => {
+    let type = 'skus'
+    await syntaxValidation(skus, skus_csv, results, type);
+    await validator.duplicateCheck(SKU, skus, skus_csv, results, type);
+    await validator.conflictCheck(SKU, skus, skus_csv, results, type);
 }
 
-module.exports.commitImport = () => {
-    
+module.exports.commitImport = async (createlist, changelist) => {
+    if(createlist){
+        for(let row of createlist){
+            let result = await SKU.create(row);
+            if(!result){
+                return false;
+            }
+        }
+    }
+    if(changelist){
+        for(let row of createlist){
+            let result = await SKU.findOneAndUpdate({number: row.number}, row);
+            if(!result){
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
-module.exports.importFormulas = async (formulas) => {
-    var skuMap = new Map();
-    formulas.forEach((formula) => {
-        if (!skuMap.has(formula['SKU#'])) {
-            skuMap.set(formula['SKU#'], [formula]);
+async function syntaxValidation(skus, skus_csv, results, type) {
+    for(let [sku, sku_csv] of utils.zip(skus, skus_csv)){
+        if(sku.number){
+            let num_numeric = validator.isNumeric(sku.number);
+            if(!num_numeric[0]){
+                results[type].errorlist.push({
+                    message: num_numeric[1],
+                    data: sku_csv
+                });
+            }else{
+                let num_positive = validator.isPositive(sku.number, 'Number');
+                if(!num_positive[0]){
+                    results[type].errorlist.push({
+                        message: num_positive[1],
+                        data: sku_csv
+                    });
+                }
+            }
+            
+        }else{
+            sku.number = await autogen.autogen(SKU);
         }
-        else {
-            skuMap.get(formula['SKU#']).push(formula);
-        }
-    });
-    // in order to import a tuple, we need SKU#, we need ingr#, we need ingrname, and we need quantity
-    await utils.asyncForEach(Array.from(skuMap.keys()), async (key) => {
-        console.log(key);
-        var newArray = [];
-        // for each set of formulas for a sku, generate the ingredient names
-        await utils.asyncForEach(skuMap.get(key), async (formula) => {
-            var ingredient = await Ingredient.findOne({number: formula['Ingr#']}).exec();
-            newArray.push({
-                ingredient_name: ingredient.name,
-                ingredient_number: formula['Ingr#'],
-                quantity: formula['Quantity']
+        let name_passed = validator.proper_name_length(sku.name);
+        let case_passed = sku_validator.isUPCStandard(sku.case_upc);
+        let unit_passed = sku_validator.isUPCStandard(sku.unit_upc);
+
+        let count_numeric = validator.isNumeric(sku.count);
+        let scale_numeric = validator.isNumeric(sku.formula_scale_factor);
+        let rate_numeric = validator.isNumeric(sku.manufacturing_rate);
+        if(!count_numeric[0] || !scale_numeric[0] || !rate_numeric[0]){
+            results[type].errorlist.push({
+                message: [count_numeric[1], scale_numeric[1], rate_numeric[1]],
+                data: sku_csv
             });
-        });
-        await SKU.findOneAndUpdate({number: key}, {ingredients: newArray}).exec()
-        .catch((error) => {
-            console.log(error);
-        });
-    });
+        }else{
+            let count_positive = validator.isPositive(sku.count, 'Count');
+            let scale_positive = validator.isPositive(sku.formula_scale_factor, 'Scale factor');
+            let rate_positive = validator.isPositive(sku.manufacturing_rate, 'Manufacturing rate');
+            if(!count_positive[0] || !scale_positive[0] || !rate_positive){
+                results[type].errorlist.push({
+                    message: [count_positive[1], scale_positive[1], rate_positive[1]],
+                    data: sku_csv
+                });
+            }
+        }
+        let formula_passed = await validator.itemExists(Formula, sku.formula);
+        let product_passed = await validator.itemExists(ProductLine, sku.product_line);
+        let manufacturings_passed = [];
+        let manufacturing_ids = [];
+        for(let line of sku.manufacturing_lines){
+            let manufacturing_passed = await validator.itemExists(ManufacturingLine, line);
+            manufacturings_passed.push(manufacturing_passed);
+            manufacturing_ids.push(manufacturing_passed[2]);
+        }   
+
+        let errors = validator.compileErrors(name_passed, case_passed, unit_passed, formula_passed, product_passed, ...manufacturings_passed);
+        if(errors.length > 0){
+            results[type].errorlist.push({
+                message: errors,
+                data: sku_csv
+            });
+        }       
+    }
 }

@@ -1,7 +1,6 @@
-const Ingredient = require('../model/ingredient_model');
 const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
-const Units = require('../controllers/units');
+const util = require('../../utils/utils');
 
 module.exports.compileErrors = function(){
     let errors = [];
@@ -13,25 +12,6 @@ module.exports.compileErrors = function(){
         }
     }
     return errors;
-}
-
-module.exports.validIngredientTuple = async function(ingredient_name, unit){
-    let err_msg;
-
-    //check ingredients exist
-    let ingredient = await Ingredient.findOne({name: ingredient_name}).exec();
-    if(!ingredient){
-        err_msg = `Ingredient ${ingredient_name} doesn't exist`;
-        return [false, err_msg];
-    }
-
-    //check valid quantity units
-    else if(Units.category(ingredient.unit) != Units.category(unit)){
-        err_msg = `Unit of ${ingredient_name} must be of same type as ingredient`;
-        return [false, err_msg];
-    }else{
-        return [true, err_msg, ingredient._id];
-    }
 }
 
 module.exports.validActivity = async function(activity){
@@ -91,56 +71,6 @@ module.exports.objectFieldsExist = function(obj, requiredFields){
     return [errors.length == 0, errors];
 }
 
-const first_digit = new Set(['0', '1', '6', '7', '8', '9']);
-
-// Syntax checks
-module.exports.isUPCStandard = function(upc_num) {
-    let err_msg;
-    if(upc_num.length != 12){
-        //incorrect length
-        err_msg = 'Invalid UPC length';
-        return [false, err_msg];
-    }
-    let num = Number(upc_num);
-    if(isNaN(num)){
-        //not a number
-        err_msg = 'UPC# must be a number ';
-        return [false, err_msg];
-    }
-
-    if(!first_digit.has(upc_num[0])){
-        //invalid first digit
-        err_msg = 'Invalid UPC first digit';
-        return [false, err_msg];
-    }
-
-    //checksum
-    let sum = 0;
-    for(let i = 0; i < upc_num.length; i++){
-        if(i % 2 == 0){
-            sum += 3*Number(upc_num[i]);
-        }else{
-            sum += Number(upc_num[i]);
-        }
-    }
-
-    if(sum % 10 != 0){
-        //invalid sum
-        err_msg = 'Invalid UPC sum';
-        return [false, err_msg];
-    }
-
-    return [true, err_msg];
-
-}
-function generateUPCNumbers(){
-    for(let i = 100000000000; i < 200000000000; i++){
-        if(this.isUPCStandard(i.toString())[0]){
-            console.log(i)
-        }
-    }
-}
-
 
 module.exports.proper_name_length = function(name){
     let err_msg = 'Name must be 32 characters or fewer';
@@ -172,12 +102,6 @@ module.exports.productLineClear = async function(id) {
     return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
 };
 
-module.exports.formulaClear = async function(id) {
-    let err_msg = `Formula is in use`;
-    let result = await SKU.findOne({formula: id}).exec();
-    return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
-};
-
 module.exports.validDate = function(date){
     let err_msg = 'Invalid date';
     let dateobj = new Date(date);
@@ -190,8 +114,7 @@ module.exports.isNumeric = function(number){
     return [!isNaN(number), err_msg];
 }
 
-//Only for ingredients, skus, and product_lines
-module.exports.conflictCheck = async function(model, data, results, type){
+function getProperties(model){
     let unique_keys = {};
     let properties = [];
     for(let field of Object.keys(model.schema.obj)){
@@ -200,49 +123,52 @@ module.exports.conflictCheck = async function(model, data, results, type){
         }
         properties.push(field);
     }
+    return [unique_keys, properties]
+}
 
-    duplicateCheck(unique_keys, data, results, type);
+//Only for ingredients, skus, and product_lines
+module.exports.conflictCheck = async function(model, data, data_csv, results, type){
+    let [unique_keys, properties] = getProperties(model);
 
-    for(let row of data){
-        let key = getPrimaryKey(model)
-        let item = await model.findOne({[key]: row[key]}).exec();
+    for(let [row, row_csv] of utils.zip(data, data_csv)){
+        let primary_key = getPrimaryKey(model)
+        let primary_match = await model.findOne({[primary_key]: row[primary_key]}).exec();
 
-        if(item){
+        let matches = [];
+        for(let key in Object.keys(unique_keys)){
+            matches = matches.concat(await model.find({[key]: row[key]}));
+        }
+        
+        if(matches.length > 1){
+            results[type].errorlist.push({
+                message: 'Ambiguous record',
+                data: row_csv
+            });
+        }else if(matches.length == 1){
+            if(!matches[0].equals(primary_match)){
+                results[type].errorlist.push({
+                    message: 'Ambiguous record',
+                    data: row_csv
+                });
+            }
+        }else if(primary_match){
             //check identical
             let identical = true;
             for(let property of properties){
-                identical = identical && row[property] == item[property]
-            }
-            //check unique match
-            let unique_match = false;
-            for(let property of Object.keys(unique_keys)){
-                if(property != key && row[property] == item[property]){
-                    unique_match = true;
-                    break;
-                }
-            }
-
-
-            //If row is identical to something in db, ignore
-            if(identical){
-                results[type].ignorelist.push(row);
+                identical = identical && row[property] == primary_match[property]
             }
             
-            else if(unique_match){
-
+            //If row is identical to something in db, ignore
+            if(identical){
+                results[type].ignorelist.push(row_csv);
+            }else{
+                results[type].changelist.push(row_csv);
             }
+
+        }else{
+            results[type].createlist.push(row_csv);
         }
-
-        
     }
-    
-    if(unique_keys.length > 1){
-        // if()
-    }else{
-
-    }
-
-
 }
 
 function getPrimaryKey(model){
@@ -252,19 +178,20 @@ function getPrimaryKey(model){
     return 'number';
 }
 
-function duplicateCheck(unique_keys, data, results, type){
+module.exports.duplicateCheck = (model, data, data_csv, results, type) => {
     let unique_key_sets = {}
+    let [unique_keys, properties] = getProperties(model)
     //create a set for every unique key to check for duplicates
     for(let key of Object.keys(unique_keys)){
         unique_key_sets[key] = new Set();
     }
 
-    for(let row of data){
+    for(let [row, row_csv] of utils.zip(data, data_csv)){
         for(let field of Object.keys(unique_key_sets)){
             if(unique_key_sets[field].has(row[field])){
                 results[type].errorlist.push({
                     message: 'Duplicate row in SKUs',
-                    data: row
+                    data: row_csv
                 });
                 return;
             }else{
