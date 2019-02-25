@@ -57,6 +57,7 @@ function createNewFormula(number, name, ingredient_tuples, comment){
 
 module.exports.conflictCheck = async function(model, formulas, formulas_csv, results, type){
     let past_formulas = new Set();
+    let prev_number, prev_name, prev_comment;
     let current_number, current_name, current_comment;
     let ingredient_tuples = [];
     
@@ -65,21 +66,33 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
         let primary_match = await model.findOne({number: formula.number}).exec();
         let matches = await model.find({$or: [{number: formula.number}, {name: formula.name}]}).exec();
 
-
         //Check to autogen number
         if(!formula.number){
             formula.number = await autogen.autogen(model);
         } 
+        let atEnd = formula.number == formulas[formulas.length-1].number && formula.ingredient.equals(formulas[formulas.length-1].ingredient);
 
         //first line
         if(formula.number != current_number){
-            past_formulas.add(current_number)
-
-            //push to changelist
-            let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
+            let newObj;
+            //At the end 
+            if(atEnd){
+                let tuple = {
+                    ingredient: formula.ingredient,
+                    quantity: formula.quantity,
+                    unit: formula.unit
+                }
+                ingredient_tuples.push(tuple);
+                newObj = createNewFormula(formula.number, formula.name, ingredient_tuples, formula.comment);
+            }else{
+                newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment)
+            }
+            
             if(primary_match){
+                results[type].changelist.push(formula_csv);
                 results[type].changelist_model.push(newObj);
             }else{
+                results[type].createlist.push(formula_csv);
                 results[type].createlist_model.push(newObj);
             }
 
@@ -87,6 +100,7 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
             current_name = formula.name;
             current_comment = formula.comment;
         }else{ //consecutive lines
+            console.log('consecutive')
             if(formula.name != current_name){
                 results[type].errorlist.push({
                     message: `Name ${formula.name} does not match name ${current_name} for formula ${current_number}`,
@@ -128,8 +142,10 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                 if(formula.equals(formulas.pop())){
                     let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                     if(primary_match){
+                        results[type].changelist.push(formula_csv);
                         results[type].changelist_model.push(newObj);
                     }else{
+                        results[type].createlist.push(formula_csv);
                         results[type].createlist_model.push(newObj);
                     }
                 }               

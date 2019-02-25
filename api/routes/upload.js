@@ -273,7 +273,6 @@ async function handleCSV(file, results, reject, model, model_properties, csv_lis
     })
     .on('end', () => {
       fs.unlinkSync('tmp/csv/' + file);   // remove temp file
-      console.log('end')
       resolve2();
     })
     .on('data-invalid', (error) => {
