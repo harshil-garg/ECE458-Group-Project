@@ -12,7 +12,7 @@ import 'hammerjs';
 })
 
 export class AppComponent implements OnInit{
-	constructor (private authService: AuthenticationService, private router: Router, private titleService: Title) { }
+	constructor (public authService: AuthenticationService, private router: Router, private titleService: Title) { }
 	title = 'Hypo®Mea3s';
 
   ngOnInit() {

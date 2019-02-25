@@ -70,7 +70,7 @@ router.post('/all', async (req, res) => {
         return;
     }
 
-    let agg = ManufacturingGoal.aggregate({$match: {user: user}}).lookup({
+    let agg = ManufacturingGoal.aggregate([{$match: {user: user}}]).lookup({
         from: 'skus',
         localField: 'sku_tuples.sku',
         foreignField: '_id',

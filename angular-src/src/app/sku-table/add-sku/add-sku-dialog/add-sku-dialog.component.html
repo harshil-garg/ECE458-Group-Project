@@ -52,7 +52,7 @@
             <mat-card>
               <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
               <mat-chip-list>
-                <ng-container *ngFor="let ingredient of sku.ingredient_tuples; let ingr_id=index">
+                <ng-container *ngFor="let ingredient of sku.formula.ingredient_tuples; let ingr_id=index">
                   <div>
                     <mat-chip>{{ingredient.ingredient_name}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
                   </div>
