@@ -3,3 +3,5 @@ module.exports.asyncForEach = async (array, callback) => {
       await callback(array[index], index, array);
     }
 }
+
+module.exports.zip = (a,b) => a.map((x,i) => [x,b[i]]);
