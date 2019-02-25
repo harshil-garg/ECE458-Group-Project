@@ -20,6 +20,10 @@ services:
       - ./certificates:/app/certificates
     depends_on:
       - database
+  seeder:
+    build: ./seeder
+    depends_on:
+      - frontend-server
   database:
     image: mongo
     ports:
