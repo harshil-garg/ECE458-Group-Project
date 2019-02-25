@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { ManufacturingGoalService } from '../../manufacturing-goal-table/manufacturing-goal.service';
-import { ManufacturingActivity } from '../../model/manufacturing_activity';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
 import { Activity } from '../../model/activity';
 
@@ -84,6 +83,16 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     if(!confirm("Are you sure?")){
       event.preventDefault();
     }
+  }
+
+  getLists() {
+    var lists = [];
+    for(var i=0; i<30; i++){
+      for(var j=0; j<10; j++) {
+        lists.push("list-"+i+"-hour-"+j);
+      }
+    }
+    return lists;
   }
 
 }

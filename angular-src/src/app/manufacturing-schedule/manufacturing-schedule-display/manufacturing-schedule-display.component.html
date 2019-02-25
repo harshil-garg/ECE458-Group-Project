@@ -23,7 +23,7 @@
         cdkDropList
         #activities="cdkDropList"
         [cdkDropListData]="activityList"
-        [cdkDropListConnectedTo]="['list-1-hour-1', 'list-2-hour-1']"
+        [cdkDropListConnectedTo]="getLists()"
         id="manufacturing-activities"
         class="example-list"
         (cdkDropListDropped)="drop($event)">

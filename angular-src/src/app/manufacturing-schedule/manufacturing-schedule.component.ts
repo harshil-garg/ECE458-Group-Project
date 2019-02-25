@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
-import { ManufacturingActivity } from '../model/manufacturing_activity';
+import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
+import { Activity } from '../model/activity';
+import { Sku } from '../model/sku';
 import { MatSnackBar } from '@angular/material';
 
 @Component({
@@ -14,7 +16,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   starting_hours : Array<Array<string>> = [[]];
   days : Array<Array<string>> = [[]];
   months : Array<Array<string>> = [[]];
-  activities : Array<ManufacturingActivity> = [];
+  activities : Array<ManufacturingScheduleEvent> = [];
   hourHeaders : Array<string> = [];
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate();
@@ -22,22 +24,6 @@ export class ManufacturingScheduleComponent implements OnInit {
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    var newDate = this.zeroedDate();
-    newDate.setHours(12);
-    this.activities.push({
-      activity: "beats",
-      manufacturing_line: "big12",
-      start_date: newDate,
-      duration: 3
-    });
-    var newDate2 = this.zeroedDate();
-    newDate2.setHours(10);
-    this.activities.push({
-      activity: "as",
-      manufacturing_line: "small",
-      start_date: newDate2,
-      duration: 50
-    });
     this.populateManufLines();
   }
 
@@ -92,7 +78,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       if(this.sameDay(this.activities[i].start_date, this.currDate)){
         var hour = this.activities[i].start_date.getHours();
         if(hour>=8 && hour<18){
-          this.starting_hours[manufIndex][hour-8] = this.activities[i].activity;
+          this.starting_hours[manufIndex][hour-8] = this.activities[i].activity.sku.name;
         }
       }
       var endTime = this.calculateEndTime(this.activities[i].start_date, this.activities[i].duration).getTime();
@@ -101,7 +87,7 @@ export class ManufacturingScheduleComponent implements OnInit {
         var currTime = this.currDate.getTime();
         var startTime = this.activities[i].start_date.getTime();
         if(currTime>=startTime && currTime<endTime){
-          this.hours[manufIndex][j] = this.activities[i].activity;
+          this.hours[manufIndex][j] = this.activities[i].activity.sku.name;
         }
       }
     }
@@ -146,11 +132,26 @@ export class ManufacturingScheduleComponent implements OnInit {
     return millis + second*1000;
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    console.log(event);
+  drop(event: CdkDragDrop<Activity[]>) {
     if(event.previousContainer.id === "manufacturing-activities"){
       var currId  = event.container.id.split("-")[1];//still a string, need to convert to int with unary operator (+)
-      this.hours[+currId][event.currentIndex] = event.previousContainer.data[event.previousIndex];
+      var currHour = event.container.id.split("-")[3];
+      // this.hours[+currId][event.currentIndex] = event.previousContainer.data[event.previousIndex];
+      var droppedActivity : Activity = {
+        sku: event.previousContainer.data[event.previousIndex].sku,
+        duration: event.previousContainer.data[event.previousIndex].duration,
+        manufacturing_goal: event.previousContainer.data[event.previousIndex].manufacturing_goal
+      };
+      var startDate = new Date(this.currDate.getTime());
+      startDate.setHours(8+ (+currHour));
+      this.activities.push({
+        activity: droppedActivity,
+        manufacturing_line: this.manufLines[+currId],
+        start_date: startDate,
+        duration: droppedActivity.duration,
+        duration_override: false
+      });
+      this.refreshHours();
     }
     else {
       var prevId = event.previousContainer.id.split("-")[1];
@@ -162,7 +163,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       updatedDate.setHours(8+ (+currHour));
       if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId])){
         this.activities.forEach(activity=>{
-          if(activity.activity == initialValue){
+          if(activity.activity.sku.name == initialValue){
             activity.start_date = updatedDate;
             activity.manufacturing_line = this.manufLines[+currId];
           }
@@ -183,13 +184,13 @@ export class ManufacturingScheduleComponent implements OnInit {
     var duration = 0;
     var collision = false;
     this.activities.forEach(act=>{
-      if(act.activity == activity){
+      if(act.activity.sku.name == activity){
         duration = act.duration;
       }
     });
     var this_end = this.calculateEndTime(date, duration);
     this.activities.forEach(act=>{
-      if(act.activity != activity && act.manufacturing_line == manufLine){
+      if(act.activity.sku.name != activity && act.manufacturing_line == manufLine){
         var act_start = act.start_date;
         var act_end = this.calculateEndTime(act.start_date, act.duration);
         if(!(this_end.getTime() <= act_start.getTime() || this_start.getTime() >= act_end.getTime())){ //collision
