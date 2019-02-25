@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
@@ -21,12 +21,14 @@ export class ManufacturingScheduleComponent implements OnInit {
   hourHeaders : Array<string> = [];
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate();
+  @Input() remove: EventEmitter<any>;
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent) { }
 
   ngOnInit() {
     this.populateManufLines();
+    this.remove.subscribe(index=>this.removeActivity(index));
   }
 
   populateManufLines(){
@@ -176,6 +178,16 @@ export class ManufacturingScheduleComponent implements OnInit {
       }
       this.refreshHours();
     }
+  }
+
+  removeActivity(index){
+    var deletedActivity : Activity = this.hours[index[0]][index[1]];
+    for(var i=0; i<this.activities.length; i++){
+      if(this.activities[i].activity == deletedActivity){
+        this.activities.splice(i, 1);
+      }
+    }
+    this.refreshHours();
   }
 
   displayError(message){

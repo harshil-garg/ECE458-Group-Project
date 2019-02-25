@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { ManufacturingGoalService } from '../../manufacturing-goal-table/manufacturing-goal.service';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
@@ -12,6 +12,7 @@ import { Activity } from '../../model/activity';
 export class ManufacturingScheduleDisplayComponent implements OnInit{
   manufGoalList : Array<ManufacturingGoal> = [];
   activityList : Array<Activity> = [];
+  removeEvent: EventEmitter<any> = new EventEmitter();
 
   constructor(private manufacturingGoalService: ManufacturingGoalService){}
 
@@ -73,6 +74,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
       var manufLine = event.previousContainer.id.split("-")[1];
       var hour = event.previousContainer.id.split("-")[3];
       this.activityList.push(event.previousContainer.data[hour]);
+      this.removeEvent.emit([manufLine, hour]);
     }
     // if (event.previousContainer === event.container) {
     //   moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
