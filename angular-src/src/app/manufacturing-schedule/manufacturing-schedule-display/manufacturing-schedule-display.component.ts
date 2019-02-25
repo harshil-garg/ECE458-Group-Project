@@ -47,6 +47,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   handleManufGoalUpdate(response){
     this.manufGoalList = [];
     for(let manufGoal of response.data){
+      console.log(manufGoal.sku_tuples);
       this.manufGoalList.push({
           name: manufGoal.name,
           sku_tuples: manufGoal.sku_tuples,

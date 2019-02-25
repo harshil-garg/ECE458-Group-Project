@@ -95,7 +95,6 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       }
     }
-    console.log("REFRESHEDHOURS");
   }
 
   calculateEndTime(startTime: Date, duration: number){
@@ -166,9 +165,9 @@ export class ManufacturingScheduleComponent implements OnInit {
       var initialValue = this.hours[+prevId][prevHour];
       var updatedDate = this.zeroedDate();
       updatedDate.setHours(8+ (+currHour));
-      if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId])){
+      if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId]) && !this.wrongManufLine(initialValue, this.manufLines[+currId])){
         this.activities.forEach(activity=>{
-          if(activity.activity.sku.name == initialValue.sku.name){
+          if(activity.activity == initialValue){
             activity.start_date = updatedDate;
             activity.manufacturing_line = this.manufLines[+currId];
           }
@@ -214,6 +213,17 @@ export class ManufacturingScheduleComponent implements OnInit {
       }
     });
     return collision;
+  }
+
+  wrongManufLine(activity: Activity, manufLine: string){
+    // console.log(activity.sku);
+    // if(activity.sku.manufacturing_lines.indexOf(manufLine)>-1){
+    //   return false;
+    // }
+    // else {
+    //   return true;
+    // }
+    return false;
   }
 
   move(event) {
