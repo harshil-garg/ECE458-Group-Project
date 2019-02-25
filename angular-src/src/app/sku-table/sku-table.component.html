@@ -163,8 +163,8 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Lines</th>
     <td mat-cell *matCellDef="let element">
       <mat-list>
-        <ng-container *ngFor="let manufLine of element.manufacturing_lines">
-          <mat-divider></mat-divider>
+        <ng-container *ngFor="let manufLine of element.manufacturing_lines; let id=index">
+          <mat-divider *ngIf="id>0"></mat-divider>
           <mat-list-item>{{manufLine}}</mat-list-item>
         </ng-container>
       </mat-list>

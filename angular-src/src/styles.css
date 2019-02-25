@@ -1,9 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 @import url( 'https://fonts.googleapis.com/css?family=Roboto:400,700|Material+Icons');
+@import "../node_modules/dhtmlx-gantt/codebase/dhtmlxgantt.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
 .input-flex-width .mat-form-field-infix {
    min-width: 50px;
    max-width: 300px;
    width: auto;
+}
+
+/* LEFT align */
+.mat-list .mat-list-item.left .mat-list-item-content{
+      justify-content: flex-start;
+}
+
+/* RIGHT align */
+.mat-list .mat-list-item.right .mat-list-item-content{
+      justify-content: flex-end;
+}
+
+.mat-button-toggle.no-padding .mat-button-toggle-label-content{
+  line-height: 0px !important;
+  padding: 15px 0px 0px 0px !important
 }
