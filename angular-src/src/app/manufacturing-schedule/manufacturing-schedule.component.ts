@@ -194,18 +194,18 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.snackBar.open(message, "Close", {duration:3000});
   }
 
-  isCollision(date: Date, activity, manufLine){
+  isCollision(date: Date, activity: Activity, manufLine){
     var this_start = date;
     var duration = 0;
     var collision = false;
     this.activities.forEach(act=>{
-      if(act.activity.sku.name == activity){
+      if(act.activity == activity){
         duration = act.duration;
       }
     });
     var this_end = this.calculateEndTime(date, duration);
     this.activities.forEach(act=>{
-      if(act.activity.sku.name != activity && act.manufacturing_line == manufLine){
+      if(act.activity != activity && act.manufacturing_line == manufLine){
         var act_start = act.start_date;
         var act_end = this.calculateEndTime(act.start_date, act.duration);
         if(!(this_end.getTime() <= act_start.getTime() || this_start.getTime() >= act_end.getTime())){ //collision
