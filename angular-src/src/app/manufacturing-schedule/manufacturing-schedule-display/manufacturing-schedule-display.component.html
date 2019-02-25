@@ -11,8 +11,8 @@
         </mat-card-subtitle>
         <mat-card-content>
           <mat-list>
-            <mat-list-item class="right" *ngFor="let item of manufGoalList">
-              {{item.name}} <mat-icon (click)="onSelectionChange($event)">clear</mat-icon>
+            <mat-list-item class="right" *ngFor="let item of manufGoalList; let id=index">
+              {{item.name}} <mat-icon (click)="remove(id)">clear</mat-icon>
             </mat-list-item>
           </mat-list>
         </mat-card-content>

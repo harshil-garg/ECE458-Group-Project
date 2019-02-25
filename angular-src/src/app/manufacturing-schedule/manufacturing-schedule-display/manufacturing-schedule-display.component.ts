@@ -69,19 +69,24 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
+    if(event.previousContainer.id != "manufacturing-activities"){
+      var manufLine = event.previousContainer.id.split("-")[1];
+      var hour = event.previousContainer.id.split("-")[3];
+      this.activityList.push(event.previousContainer.data[hour]);
     }
+    // if (event.previousContainer === event.container) {
+    //   moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    // } else {
+    //   transferArrayItem(event.previousContainer.data,
+    //                     event.container.data,
+    //                     event.previousIndex,
+    //                     event.currentIndex);
+    // }
   }
 
-  onSelectionChange(event){
-    if(!confirm("Are you sure?")){
-      event.preventDefault();
+  remove(id){
+    if(confirm("Are you sure?")){
+      this.manufGoalList.splice(id, 1);
     }
   }
 
@@ -93,6 +98,10 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
       }
     }
     return lists;
+  }
+
+  removeActivity(id){
+    this.activityList.splice(id, 1);
   }
 
 }

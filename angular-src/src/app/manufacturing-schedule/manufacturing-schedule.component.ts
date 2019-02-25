@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
+import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule-display/manufacturing-schedule-display.component';
 import { Activity } from '../model/activity';
 import { Sku } from '../model/sku';
 import { MatSnackBar } from '@angular/material';
@@ -12,7 +13,7 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./manufacturing-schedule.component.css']
 })
 export class ManufacturingScheduleComponent implements OnInit {
-  hours : Array<Array<string>> = [[]];
+  hours : Array<Array<Activity>> = [[]];
   starting_hours : Array<Array<string>> = [[]];
   days : Array<Array<string>> = [[]];
   months : Array<Array<string>> = [[]];
@@ -21,7 +22,8 @@ export class ManufacturingScheduleComponent implements OnInit {
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate();
 
-  constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar) { }
+  constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
+    public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent) { }
 
   ngOnInit() {
     this.populateManufLines();
@@ -69,7 +71,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       this.hours[i] = [];
       this.starting_hours[i] = [];
       for(var j=0; j<10; j++){
-        this.hours[i].push("");
+        this.hours[i].push(null);
         this.starting_hours[i].push("");
       }
     }
@@ -87,7 +89,7 @@ export class ManufacturingScheduleComponent implements OnInit {
         var currTime = this.currDate.getTime();
         var startTime = this.activities[i].start_date.getTime();
         if(currTime>=startTime && currTime<endTime){
-          this.hours[manufIndex][j] = this.activities[i].activity.sku.name;
+          this.hours[manufIndex][j] = this.activities[i].activity;
         }
       }
     }
@@ -152,6 +154,7 @@ export class ManufacturingScheduleComponent implements OnInit {
         duration_override: false
       });
       this.refreshHours();
+      this.manufacturingScheduleDisplayComponent.removeActivity(event.previousIndex);
     }
     else {
       var prevId = event.previousContainer.id.split("-")[1];
@@ -163,7 +166,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       updatedDate.setHours(8+ (+currHour));
       if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId])){
         this.activities.forEach(activity=>{
-          if(activity.activity.sku.name == initialValue){
+          if(activity.activity.sku.name == initialValue.sku.name){
             activity.start_date = updatedDate;
             activity.manufacturing_line = this.manufLines[+currId];
           }
@@ -218,6 +221,7 @@ export class ManufacturingScheduleComponent implements OnInit {
         lists.push("list-"+i+"-hour-"+j);
       }
     }
+    lists.push("manufacturing-activities");
     return lists;
   }
 
