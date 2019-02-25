@@ -1,6 +1,6 @@
 const Units = require('../controllers/units');
 const autogen = require('../controllers/autogen');
-const utils = require('../../utils/utils');
+const utils = require('../utils/utils');
 
 
 module.exports.validIngredientTuple = async function(model, ingredient_id, unit){

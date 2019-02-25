@@ -6,7 +6,7 @@ const Formula = require('../model/formula_model');
 const ProductLine = require('../model/product_line_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
 const autogen = require('../controllers/autogen');
-const utils = require('../../utils/utils');
+const utils = require('../utils/utils');
 
 const Schema = mongoose.Schema;
 const SKUSchema = new Schema({

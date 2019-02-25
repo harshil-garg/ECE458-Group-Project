@@ -4,7 +4,7 @@ const validator = require('../controllers/validator');
 const Ingredient = require('../model/ingredient_model');
 const formula_validator = require('../controllers/formula_validator')
 const autogen = require('../controllers/autogen');
-const utils = require('../../utils/utils');
+const utils = require('../utils/utils');
 
 const Schema = mongoose.Schema;
 const Ingredient_Tuple = new Schema({
