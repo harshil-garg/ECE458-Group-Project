@@ -64,8 +64,8 @@ router.post('/calculator', async (req, res) => {
 // Get all
 router.post('/all', async (req, res) => {
     const { pageNum, sortBy, page_size } = req.body;
-
-    let user = getUser(req);
+    
+	let user = getUser(req);
     if(!user){
         res.json({success: false, message: 'No user logged in'});
         return;
@@ -84,6 +84,7 @@ router.post('/all', async (req, res) => {
         foreignField: '_id',
         as: 'manufacturing_lines'
     });
+
     let results = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
     for(let item of results.data){

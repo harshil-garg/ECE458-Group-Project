@@ -11,7 +11,7 @@ const Formula = require('../model/formula_model');
 const ProductLine = require('../model/product_line_model');
 var extract = require('extract-zip');
 
-const directoryPath = path.join(__dirname, '../../tmp/csv/');
+const directoryPath = path.join(__dirname, '../tmp/csv/');
 
 var storage = multer.diskStorage(
   {

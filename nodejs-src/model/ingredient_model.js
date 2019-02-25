@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const validator = require('../controllers/validator');
 const autogen = require('../controllers/autogen');
-const utils = require('../../utils/utils');
+const utils = require('../utils/utils');
 
 const Schema = mongoose.Schema;
 const IngredientSchema = new Schema({

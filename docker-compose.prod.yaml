@@ -1,0 +1,27 @@
+version: '2'
+services:
+  frontend-server:
+    image: harshilgarg98/ece458:angular-src
+    ports:
+      - "80:80" # HTTP nginx port (prod)
+      - "443:443" # HTTPS nginx port (prod)
+    depends_on:
+      - backend-server
+    volumes:
+      - ./certificates:/app/certificates
+  backend-server:
+    image: harshilgarg98/ece458:nodejs-src
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./certificates:/app/certificates
+    depends_on:
+      - database
+  database:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+volumes:
+  db-data:

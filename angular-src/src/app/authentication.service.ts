@@ -28,9 +28,24 @@ export class AuthenticationService {
 
   loginState = {loggedIn: false, isAdmin: false, user: ''};
 
-	constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
   login(credentials: LoginCredentials):Observable<LoginResponse> {
     return this.http.post<LoginResponse>('api/users/login', credentials, httpOptions);
+  }
+
+  getNetIDInfo(access_token: string) {
+    return this.http.get('https://api.colab.duke.edu/identity/v1/', {
+      headers: {
+        'x-api-key': "determined-jepsen",
+        'Authorization': `Bearer ${access_token}`
+      }
+    });
+  }
+  
+  login_NetID(netid: string, username: string):Observable<LoginResponse> {
+    console.log(username);
+    console.log(netid);
+    return this.http.post<LoginResponse>('api/users/netid', {name: username, email: netid}, httpOptions);
   }
 }
