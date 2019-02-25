@@ -2,8 +2,11 @@
 const mongoose = require('mongoose');
 const validator = require('../controllers/validator');
 const sku_validator = require('../controllers/sku_validator');
+const Formula = require('../model/formula_model');
+const ProductLine = require('../model/product_line_model');
+const ManufacturingLine = require('../model/manufacturing_line_model');
 const autogen = require('../controllers/autogen');
-const util = require('../../utils/utils');
+const utils = require('../../utils/utils');
 
 const Schema = mongoose.Schema;
 const SKUSchema = new Schema({
@@ -87,20 +90,14 @@ module.exports.attemptImport = async (skus, skus_csv, results) => {
 }
 
 module.exports.commitImport = async (createlist, changelist) => {
-    if(createlist){
+    if(createlist){       
         for(let row of createlist){
-            let result = await SKU.create(row);
-            if(!result){
-                return false;
-            }
+            await SKU.create(row).catch((err) => {throw err});
         }
     }
     if(changelist){
         for(let row of createlist){
-            let result = await SKU.findOneAndUpdate({number: row.number}, row);
-            if(!result){
-                return false;
-            }
+            await SKU.findOneAndUpdate({number: row.number}, row).catch((err) => {throw err});
         }
     }
     return true;
@@ -151,6 +148,11 @@ async function syntaxValidation(skus, skus_csv, results, type) {
                 });
             }
         }
+
+        //allow default to 1.0
+        if(sku.formula_scale_factor == ''){
+            delete sku.formula_scale_factor;
+        }
         let formula_passed = await validator.itemExists(Formula, sku.formula);
         let product_passed = await validator.itemExists(ProductLine, sku.product_line);
         let manufacturings_passed = [];
@@ -172,5 +174,6 @@ async function syntaxValidation(skus, skus_csv, results, type) {
         sku.formula = formula_passed[2];
         sku.product_line = product_passed[2];
         sku.manufacturing_lines = manufacturing_ids;
+        console.log(sku)
     }
 }

@@ -1,22 +1,21 @@
-const Formula = require('../model/formula_model');
-const Ingredient = require('../model/ingredient_model');
 const Units = require('../controllers/units');
 const autogen = require('../controllers/autogen');
+const utils = require('../../utils/utils');
 
 
-module.exports.validIngredientTuple = async function(ingredient_name, unit){
+module.exports.validIngredientTuple = async function(model, ingredient_id, unit){
     let err_msg;
 
     //check ingredients exist
-    let ingredient = await Ingredient.findOne({name: ingredient_name}).exec();
+    let ingredient = await model.findOne({$or: [{number: ingredient_id}, {name: ingredient_id}]}).exec();
     if(!ingredient){
-        err_msg = `Ingredient ${ingredient_name} doesn't exist`;
+        err_msg = `Ingredient ${ingredient_id} doesn't exist`;
         return [false, err_msg];
     }
 
     //check valid quantity units
     else if(Units.category(ingredient.unit) != Units.category(unit)){
-        err_msg = `Unit of ${ingredient_name} must be of same type as ingredient`;
+        err_msg = `Unit of ${ingredient_id} must be of same type as ingredient`;
         return [false, err_msg];
     }else{
         return [true, err_msg, ingredient._id];
@@ -32,14 +31,14 @@ function pairListHas(list, number, ingredient) {
     return false;
 }
 
-module.exports.duplicateCheck = function(formulas, results){
+module.exports.duplicateCheck = function(formulas, formulas_csv, results, type){
     let pairList = [];
 
-    for(let formula of formulas){
+    for(let [formula, formula_csv] of utils.zip(formulas, formulas_csv)){
         if(pairListHas(pairList, formula.number, formula.ingredient)){
-            results.formulas.errorlist.push({
+            results[type].errorlist.push({
                 message: 'Duplicate row in formulas',
-                data: row
+                data: formula_csv
             });
         }else{
             pairList.push({ number: formula.number, ingredient: formula.ingredient });
@@ -56,20 +55,20 @@ function createNewFormula(number, name, ingredient_tuples, comment){
     }
 }
 
-module.exports.conflictCheck = async function(formulas, results){
+module.exports.conflictCheck = async function(model, formulas, formulas_csv, results, type){
     let past_formulas = new Set();
     let current_number, current_name, current_comment;
     let ingredient_tuples = [];
     
   
-    for(let formula of formulas){
-        let primary_match = await Formula.findOne({number: formula.number}).exec();
-        let matches = await Formula.find({$or: [{number: formula.number}, {name: formula.name}]}).exec();
+    for(let [formula, formula_csv] of utils.zip(formulas, formulas_csv)){
+        let primary_match = await model.findOne({number: formula.number}).exec();
+        let matches = await model.find({$or: [{number: formula.number}, {name: formula.name}]}).exec();
 
 
         //Check to autogen number
         if(!formula.number){
-            formula.number = await autogen.autogen(Formula);
+            formula.number = await autogen.autogen(model);
         } 
 
         //first line
@@ -79,9 +78,9 @@ module.exports.conflictCheck = async function(formulas, results){
             //push to changelist
             let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
             if(primary_match){
-                results.formulas.changelist_model.push(newObj);
+                results[type].changelist_model.push(newObj);
             }else{
-                results.formulas.createlist_model.push(newObj);
+                results[type].createlist_model.push(newObj);
             }
 
             current_number = formula.number;
@@ -89,27 +88,27 @@ module.exports.conflictCheck = async function(formulas, results){
             current_comment = formula.comment;
         }else{ //consecutive lines
             if(formula.name != current_name){
-                results.formulas.errorlist.push({
+                results[type].errorlist.push({
                     message: `Name ${formula.name} does not match name ${current_name} for formula ${current_number}`,
-                    data: row
+                    data: formula_csv
                 });
             }
             if(past_formulas.has(current_number)){
-                results.formulas.errorlist.push({
+                results[type].errorlist.push({
                     message: `Formula ${current_number} not consecutive with other formulas of the same number`,
-                    data: row
+                    data: formula_csv
                 });
             }
             if(matches.length > 1){
-                results.formulas.errorlist.push({
+                results[type].errorlist.push({
                     message: 'Ambiguous record',
-                    data: row
+                    data: formula_csv
                 });
             }else if(matches.length == 1){
                 if(!matches[0].equals(primary_match)){
-                    results.formulas.errorlist.push({
+                    results[type].errorlist.push({
                         message: 'Ambiguous record',
-                        data: row
+                        data: formula_csv
                     });
                 } 
             }else{
@@ -120,21 +119,20 @@ module.exports.conflictCheck = async function(formulas, results){
                 }
                 ingredient_tuples.push(tuple);
                 if(primary_match){
-                    results.formulas.changelist.push(formula);
+                    results[type].changelist.push(formula);
                 }else{
-                    results.formulas.createlist.push(formula);
+                    results[type].createlist.push(formula);
                 }
 
                 //At the end 
                 if(formula.equals(formulas.pop())){
                     let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                     if(primary_match){
-                        results.formulas.changelist_model.push(newObj);
+                        results[type].changelist_model.push(newObj);
                     }else{
-                        results.formulas.createlist_model.push(newObj);
+                        results[type].createlist_model.push(newObj);
                     }
-                }
-                
+                }               
             } 
         }
     }

@@ -37,10 +37,7 @@ module.exports.attemptImport = async (product_lines, results) => {
 module.exports.commitImport = async (createlist) => {
     if(createlist){
         for(let row of createlist){
-            let result = await ProductLine.create(row);
-            if(!result){
-                return false;
-            }
+            await ProductLine.create(row).catch((err) => {throw err});
         }
     }
     return true;

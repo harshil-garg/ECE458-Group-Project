@@ -67,18 +67,12 @@ module.exports.attemptImport = async (ingredients, ingredients_csv, results) => 
 module.exports.commitImport = async (createlist, changelist) => {
     if(createlist){
         for(let row of createlist){
-            let result = await Ingredient.create(row);
-            if(!result){
-                return false;
-            }
+            await Ingredient.create(row).catch((err) => {throw err});
         }
     }
     if(changelist){
         for(let row of createlist){
-            let result = await Ingredient.findOneAndUpdate({number: row.number}, row);
-            if(!result){
-                return false;
-            }
+            await Ingredient.findOneAndUpdate({number: row.number}, row).catch((err) => {throw err});
         }
     }
     return true;

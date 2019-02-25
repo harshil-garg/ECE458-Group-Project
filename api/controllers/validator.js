@@ -1,6 +1,4 @@
-const SKU = require('../model/sku_model');
-const ManufacturingGoal = require('../model/manufacturing_goal_model');
-const util = require('../../utils/utils');
+const utils = require('../../utils/utils');
 
 module.exports.compileErrors = function(){
     let errors = [];
@@ -12,29 +10,6 @@ module.exports.compileErrors = function(){
         }
     }
     return errors;
-}
-
-module.exports.validActivity = async function(activity){
-    let err_msg;
-    let sku = await SKU.findOne({number: activity.sku}).exec();
-    let goal = await ManufacturingGoal.findOne({name: activity.manufacturing_goal}).exec();
-
-    if(!sku){
-        err_msg = `SKU ${activity.sku} doesn't exist`;
-        return [false, err_msg];
-    }
-    if(!goal){
-        err_msg = `Manufacturing goal ${activity.manufacturing_goal} doesn't exist`;
-        return [false, err_msg];
-    }
-    let valid = false;
-    err_msg = 'Invalid activity';
-    for(let tuple of goal.sku_tuples){
-        if(tuple.sku.equals(sku._id)){
-            valid = true;
-        }
-    }
-    return [valid, err_msg, sku._id, goal._id];
 }
 
 // Dependency checks
@@ -71,7 +46,6 @@ module.exports.objectFieldsExist = function(obj, requiredFields){
     return [errors.length == 0, errors];
 }
 
-
 module.exports.proper_name_length = function(name){
     let err_msg = 'Name must be 32 characters or fewer';
     return [name.length <= 32, err_msg];
@@ -95,13 +69,6 @@ module.exports.forceInteger = function(number){
     return parseInt(number);
 }
 
-//is product line in use by a sku
-module.exports.productLineClear = async function(id) {
-    let err_msg = `Product Line is in use`;
-    let result = await SKU.findOne({product_line: id}).exec();
-    return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
-};
-
 module.exports.validDate = function(date){
     let err_msg = 'Invalid date';
     let dateobj = new Date(date);
@@ -115,11 +82,11 @@ module.exports.isNumeric = function(number){
 }
 
 function getProperties(model){
-    let unique_keys = {};
+    let unique_keys = [];
     let properties = [];
     for(let field of Object.keys(model.schema.obj)){
-        if(field.unique){
-            unique_keys[field] = field;
+        if(model.schema.obj[field].unique){
+            unique_keys.push(field);
         }
         properties.push(field);
     }
@@ -135,10 +102,9 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
         let primary_match = await model.findOne({[primary_key]: row[primary_key]}).exec();
 
         let matches = [];
-        for(let key in Object.keys(unique_keys)){
+        for(let key of unique_keys){
             matches = matches.concat(await model.find({[key]: row[key]}));
         }
-        
         if(matches.length > 1){
             results[type].errorlist.push({
                 message: 'Ambiguous record',
@@ -184,7 +150,7 @@ module.exports.duplicateCheck = (model, data, data_csv, results, type) => {
     let unique_key_sets = {}
     let [unique_keys, properties] = getProperties(model)
     //create a set for every unique key to check for duplicates
-    for(let key of Object.keys(unique_keys)){
+    for(let key of unique_keys){
         unique_key_sets[key] = new Set();
     }
 

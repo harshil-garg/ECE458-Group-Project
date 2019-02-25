@@ -15,6 +15,11 @@ router.post('/autocomplete', async (req, res) => {
     res.json({success: true, data: results});
 });
 
+router.post('/filter', async (req, res) => {
+    const { input } = req.body;
+
+});
+
 //Add an mapping of an activity to a manufacturing line
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
