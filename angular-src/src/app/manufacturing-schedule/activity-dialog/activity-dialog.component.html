@@ -1,0 +1,13 @@
+<div class="container">
+    <h1>Add Manufacturing Goal</h1>
+    <form (ngSubmit)="submit()" #activityForm="ngForm">
+      <div class="form-group">
+        <label for="name">Activity Duration</label>
+        <input type="text" class="form-control" id="duration_input" required [(ngModel)]="duration" name="duration_input" #duration_input="ngModel">
+        <div [hidden]="duration_input.valid || duration_input.pristine" class="alert alert-danger">Duration is required</div>
+      </div>
+
+      <button type="submit" class="btn btn-success" [disabled]="!activityForm.form.valid" [mat-dialog-close]="duration">Update</button>
+
+    </form>
+</div>

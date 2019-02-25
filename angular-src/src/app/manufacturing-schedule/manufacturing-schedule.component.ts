@@ -3,9 +3,10 @@ import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@a
 import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
 import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule-display/manufacturing-schedule-display.component';
+import { ActivityDialogComponent } from './activity-dialog/activity-dialog.component';
 import { Activity } from '../model/activity';
 import { Sku } from '../model/sku';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-manufacturing-schedule',
@@ -13,7 +14,7 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./manufacturing-schedule.component.css']
 })
 export class ManufacturingScheduleComponent implements OnInit {
-  hours : Array<Array<Activity>> = [[]];
+  hours : Array<Array<number>> = [[]];
   starting_hours : Array<Array<string>> = [[]];
   days : Array<Array<string>> = [[]];
   months : Array<Array<string>> = [[]];
@@ -24,7 +25,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   @Input() remove: EventEmitter<any>;
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
-    public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent) { }
+    public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog) { }
 
   ngOnInit() {
     this.populateManufLines();
@@ -73,7 +74,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       this.hours[i] = [];
       this.starting_hours[i] = [];
       for(var j=0; j<10; j++){
-        this.hours[i].push(null);
+        this.hours[i].push(-1);
         this.starting_hours[i].push("");
       }
     }
@@ -91,7 +92,7 @@ export class ManufacturingScheduleComponent implements OnInit {
         var currTime = this.currDate.getTime();
         var startTime = this.activities[i].start_date.getTime();
         if(currTime>=startTime && currTime<endTime){
-          this.hours[manufIndex][j] = this.activities[i].activity;
+          this.hours[manufIndex][j] = i;
         }
       }
     }
@@ -162,7 +163,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       var prevHour = event.previousContainer.id.split("-")[3];
       var currId = event.container.id.split("-")[1];
       var currHour = event.container.id.split("-")[3];
-      var initialValue = this.hours[+prevId][prevHour];
+      var initialValue = this.activities[this.hours[+prevId][prevHour]].activity;
       var updatedDate = this.zeroedDate();
       updatedDate.setHours(8+ (+currHour));
       if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId]) && !this.wrongManufLine(initialValue, this.manufLines[+currId])){
@@ -180,7 +181,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   removeActivity(index){
-    var deletedActivity : Activity = this.hours[index[0]][index[1]];
+    var deletedActivity : Activity = this.activities[this.hours[index[0]][index[1]]].activity;
     for(var i=0; i<this.activities.length; i++){
       if(this.activities[i].activity == deletedActivity){
         this.activities.splice(i, 1);
@@ -226,11 +227,6 @@ export class ManufacturingScheduleComponent implements OnInit {
     return false;
   }
 
-  move(event) {
-    console.log(event);
-    this.hours[0][event.currentIndex] = this.hours[0][event.previousIndex];
-  }
-
   log(e) {
     console.log("LOGGED:");
     console.log(e);
@@ -247,4 +243,22 @@ export class ManufacturingScheduleComponent implements OnInit {
     return lists;
   }
 
+  openActivityDialog(id, hour_id){
+    var activity_id = this.hours[id][hour_id];
+    if(activity_id != -1){//there is an activity at this time
+      let dialogRef = this.dialog.open(ActivityDialogComponent, {
+        height: '400px',
+        width: '400px',
+        data: this.activities[activity_id].duration
+      });
+
+      dialogRef.afterClosed().subscribe(result =>{
+        if(result!=null){
+          this.activities[activity_id].duration = +result;
+          this.activities[activity_id].duration_override = true;
+          this.refreshHours();
+        }
+      });
+    }
+  }
 }

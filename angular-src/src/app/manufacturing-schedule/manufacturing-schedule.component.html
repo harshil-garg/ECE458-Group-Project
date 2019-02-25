@@ -27,13 +27,13 @@
         <div
           cdkDropList
           cdkDropListOrientation="horizontal"
-          [cdkDropListData]="hours[id]"
+          [cdkDropListData]="item == -1? null : activities[item].activity "
           [cdkDropListConnectedTo]="getLists()"
           class="example-list"
           [id]="'list-' + id + '-hour-' + hour_id"
           (cdkDropListDropped)="drop($event)"
           (cdkDropListEntered)="log($event)">
-          <div [ngClass]="{'example-box': item==null, 'selected-box': starting_hours[id][hour_id]=='' && item!=null, 'start-box': starting_hours[id][hour_id]!=''}" cdkDrag [cdkDragDisabled]="starting_hours[id][hour_id]==''" (cdkDragEntered)="log($event)" (dblclick)="log()">{{item==null ? '' : item.sku.name}} &nbsp; {{item == null? '' : '(' + item.manufacturing_goal + ')'}}
+          <div [ngClass]="{'example-box': item==-1, 'selected-box': starting_hours[id][hour_id]=='' && item>=0, 'start-box': starting_hours[id][hour_id]!=''}" cdkDrag [cdkDragDisabled]="starting_hours[id][hour_id]==''" (cdkDragEntered)="log($event)" (dblclick)="openActivityDialog(id, hour_id)">{{item==-1 ? '' : activities[item].activity.sku.name}} &nbsp; {{item == -1? '' : '(' + activities[item].activity.manufacturing_goal + ')'}}
             <mat-icon *cdkDragPreview></mat-icon>
           </div>
         </div>

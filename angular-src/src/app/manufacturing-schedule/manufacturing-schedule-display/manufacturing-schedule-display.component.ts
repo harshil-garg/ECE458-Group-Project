@@ -70,11 +70,11 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     }
   }
 
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<Activity>) {
     if(event.previousContainer.id != "manufacturing-activities"){
       var manufLine = event.previousContainer.id.split("-")[1];
       var hour = event.previousContainer.id.split("-")[3];
-      this.activityList.push(event.previousContainer.data[hour]);
+      this.activityList.push(event.previousContainer.data);
       this.removeEvent.emit([manufLine, hour]);
     }
     // if (event.previousContainer === event.container) {

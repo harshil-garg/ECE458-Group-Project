@@ -40,6 +40,7 @@ import { AddManufacturingLineModule } from './manufacturing-line-table/add-manuf
 import { ManufacturingScheduleComponent } from './manufacturing-schedule/manufacturing-schedule.component';
 import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule/manufacturing-schedule-display/manufacturing-schedule-display.component';
 import { SearchGoalsComponent } from './manufacturing-schedule/search-goals/search-goals.component';
+import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
 
 const routes: Routes = [
   {
@@ -85,7 +86,8 @@ const routes: Routes = [
     ManufacturingLineTableComponent,
     ManufacturingScheduleComponent,
     ManufacturingScheduleDisplayComponent,
-    SearchGoalsComponent
+    SearchGoalsComponent,
+    ActivityDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -132,6 +134,6 @@ const routes: Routes = [
   ],
   providers: [Title],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent]
 })
 export class AppModule { }
