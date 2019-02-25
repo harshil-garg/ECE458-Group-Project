@@ -88,6 +88,11 @@ router.post('/login',
 		
 	});
 
+router.post('/netid', (req, res) => {
+	console.log("fck");
+	res.json({success: true, message: "worked", admin: false});
+});
+
 //Logout Handle
 router.get('/logout', (req,res) => {
     req.logOut();
