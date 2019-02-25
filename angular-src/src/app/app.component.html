@@ -15,9 +15,9 @@
 			</mat-menu>
 			<button mat-button [matMenuTriggerFor]="manufacturingMenu">Manufacturing</button>
 			<mat-menu #manufacturingMenu="matMenu">
-				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-goals'])">Manufacturing Goals</button>
-				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-lines'])">Manufacturing Lines</button>
-				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-schedule'])">Manufacturing Schedule</button>
+				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-goals'])">Goals</button>
+				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-lines'])">Lines</button>
+				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-schedule'])">Schedule</button>
 			</mat-menu>
 			<button mat-button (click)="router.navigate(['dashboard/upload'])">Data Import</button>
 			<button mat-button (click)="router.navigate(['dashboard/accounts'])">Accounts</button>

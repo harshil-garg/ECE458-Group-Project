@@ -88,3 +88,7 @@
   min-width: 125px;
   max-width: 125px;
 }
+
+.mat-button-toggle-group {
+  left: 25%;
+}

@@ -1,29 +1,73 @@
 import { Component, OnInit } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { ManufacturingGoalService } from '../../manufacturing-goal-table/manufacturing-goal.service';
 import { ManufacturingActivity } from '../../model/manufacturing_activity';
+import { ManufacturingGoal } from '../../model/manufacturing-goal';
+import { Activity } from '../../model/activity';
 
 @Component({
   selector: 'app-manufacturing-schedule-display',
   templateUrl: './manufacturing-schedule-display.component.html',
   styleUrls: ['./manufacturing-schedule-display.component.css']
 })
-export class ManufacturingScheduleDisplayComponent{
-  todo = [
-    'Get to work',
-    'Pick up groceries',
-    'Go home',
-    'Fall asleep'
-  ];
+export class ManufacturingScheduleDisplayComponent implements OnInit{
+  manufGoalList : Array<ManufacturingGoal> = [];
+  activityList : Array<Activity> = [];
 
-  done = [
-    'Get up',
-    'Brush teeth',
-    'Take a shower',
-    'Check e-mail',
-    'Walk dog'
-  ];
+  constructor(private manufacturingGoalService: ManufacturingGoalService){}
 
-  selectedGoals : boolean[] = []; //[manufGoal]
+  ngOnInit(){
+    this.manufGoalList = [];
+    this.activityList = [];
+    this.populateManufGoalList();
+  }
+
+  populateManufGoalList(){
+    this.manufacturingGoalService.refresh({
+      pageNum: -1,
+      page_size: 0,
+      sortBy: "name"
+    }).subscribe(
+      response => {
+        if(response.success){
+          this.handleManufGoalUpdate(response);
+        }
+        else {
+
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
+  }
+
+  handleManufGoalUpdate(response){
+    this.manufGoalList = [];
+    for(let manufGoal of response.data){
+      this.manufGoalList.push({
+          name: manufGoal.name,
+          sku_tuples: manufGoal.sku_tuples,
+          deadline: manufGoal.deadline,
+          user: ""
+      });
+    }
+    this.populateActivityList();
+  }
+
+  populateActivityList(){
+    for(let manufGoal of this.manufGoalList){
+      manufGoal.sku_tuples.forEach(sku => {
+        this.activityList.push({
+          sku: sku.sku,
+          duration: sku.case_quantity * (+sku.sku.manufacturing_rate),
+          manufacturing_goal: manufGoal.name
+        });
+      });
+    }
+  }
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
