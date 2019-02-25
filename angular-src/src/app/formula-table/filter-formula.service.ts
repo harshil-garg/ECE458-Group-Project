@@ -8,6 +8,7 @@ import { Tuple } from '../model/ingredient';
 export class FilterMessage {
 	sortBy : string;
 	pageNum: string;
+	page_size: number;
 	keywords: Array<string>;
 	ingredients : Array<string>;
 }
@@ -48,6 +49,7 @@ export class FilterFormulaService {
 	constructor(private http: HttpClient) { }
 
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
+		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/formulas/filter', filterMessage, httpOptions);
   }
 

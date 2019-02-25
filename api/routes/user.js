@@ -2,21 +2,36 @@ const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../model/user_model');
+const autocomplete = require('../controllers/autocomplete');
 
 const router = express.Router();
 
 //Autcomplete
-router.post('/autocomplete', async (req, res) => {
-    const {input} = req.body;
-    const required_params = {input};
-    
-    let results = await autocomplete.email(User, input);
+router.post('/autocomplete', async (req, res) => {    
+    let results = await autocomplete.email(User, req.body.query);
     res.json({success: true, data: results});
 });
 
-//Register page
-router.get('/register', (req,res) => {
-    res.send('register');
+router.post('/make-admin', async (req, res) => {    
+    User.findOne({email: req.body.email}, (err, result) =>{
+        if (!result) {
+            res.json({success: false, message: 'User not found'});
+        }
+        else if (err) {
+            res.json({success: false, message: err});
+        }
+        else if (result.admin == true){
+            res.json({success: false, message: 'User is already admin'});
+        }
+        else {
+            User.findOneAndUpdate({email: req.body.email}, {admin: true}, (err, result) => {
+                if (err) {
+                    res.json({success: false, message: err});
+                }
+                else res.json({success: true, message: 'Gave user admin permissions succesfully'});
+            });
+        }
+    });
 });
 
 //Register handle

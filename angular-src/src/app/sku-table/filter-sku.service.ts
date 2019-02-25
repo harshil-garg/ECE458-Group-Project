@@ -6,9 +6,11 @@ import { catchError } from 'rxjs/operators';
 
 import { Ingredient } from '../model/ingredient'
 import { Formula } from '../model/formula'
+import { ManufacturingLine } from '../model/manufacturing-line'
 
 export class FilterMessage {
 	sortBy : string;
+	page_size: number;
 	pageNum: string;
 	keywords: Array<string>;
 	ingredients: Array<[Ingredient, number]>;
@@ -26,7 +28,7 @@ export class ResponseData {
   product_line: string;
 	formula: Formula;
 	formula_scale_factor: string;
-	manufacturing_lines: string[];
+	manufacturing_lines: ManufacturingLine[];
 	manufacturing_rate: string;
 	comment: string;
   __v: number;

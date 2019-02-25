@@ -6,6 +6,17 @@ import { catchError } from 'rxjs/operators';
 import { RegisterRequest } from './model/register-request';
 import { RegisterResponse } from './model/register-response';
 
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type':  'application/json',
+  })  
+};
+
+class AutocompleteResponse {
+  success: boolean;
+  data: Array<any>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -13,16 +24,24 @@ export class AccountsService {
 
   constructor(private http: HttpClient) { }
 
-  register(name: string, email: string, password: string, password2: string): Observable<RegisterResponse> {
+  register(name: string, email: string, password: string, password2: string, admin: boolean): Observable<RegisterResponse> {
 
-    let body: RegisterRequest = {name: name, email: email, password: password, password2: password2, admin: false};
+    let body: RegisterRequest = {name: name, email: email, password: password, password2: password2, admin: admin};
 
     return this.http.post<RegisterResponse>('api/users/register', body, httpOptions);
   }
-}
 
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type':  'application/json',
-  })  
-};
+  autocompleteUsers(query: string): Observable<AutocompleteResponse> {
+    let body = {
+      query: query
+    }
+    return this.http.post<AutocompleteResponse>('api/users/autocomplete', body, httpOptions);
+  }
+
+  makeAdmin(email: string): Observable<RegisterResponse> {
+    let body = {
+      email: email
+    };
+    return this.http.post<RegisterResponse>('api/users/make-admin', body, httpOptions);
+  }
+}

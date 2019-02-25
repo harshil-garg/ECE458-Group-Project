@@ -7,6 +7,7 @@ import { Tuple } from '../model/ingredient';
 
 export class FilterMessage {
 	sortBy : string;
+	page_size: number;
 	pageNum: string;
 	keywords: Array<string>;
 	skus : Array<string>;
@@ -81,7 +82,7 @@ export class FilterIngredientsService {
 		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
 	}
 
-	export(exportMessage: ExportMessage): Observable<ExportResponse>{
+	export(exportMessage: ExportMessage): Observable<ExportResponse> {
 		return this.http.post<ExportResponse>('api/export/ingredients', exportMessage, httpOptions);
 	}
 }

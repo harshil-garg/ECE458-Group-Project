@@ -43,7 +43,8 @@ export class FormulaTableComponent implements OnInit{
     expandedFormula;
 
     ngOnInit() {
-      this.paginator.pageIndex = 0
+      this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
       this.paginator.page.subscribe(x => this.refresh());
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
@@ -142,6 +143,7 @@ export class FormulaTableComponent implements OnInit{
       this.filterFormulaService.filter({
           sortBy : this.sortBy,
           pageNum: this.paginator.pageIndex.toString()+1,
+          page_size: this.paginator.pageSize,
           keywords: this.keywords,
           ingredients : this.ingredients
         }).subscribe(

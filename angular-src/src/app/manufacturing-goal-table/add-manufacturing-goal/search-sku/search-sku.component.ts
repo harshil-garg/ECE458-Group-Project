@@ -40,6 +40,7 @@ export class SearchSkuComponent implements OnInit {
    .switchMap((query) =>  this.filterSkuService.filter({
       sortBy : 'name',
      	pageNum: '1',
+      page_size: 10,
      	keywords: [query],
      	ingredients: [],
      	product_lines: this.productLine
