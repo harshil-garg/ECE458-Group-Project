@@ -3,13 +3,22 @@
   <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
     <div class="example-container">
       <h2>Goals</h2>
-      <mat-list>
-        <mat-list-item class="right" *ngFor="let item of todo">
-          {{item}} &nbsp; <mat-slide-toggle [(ngModel)]="selectedGoals[item]" (click)="onSelectionChange($event)"></mat-slide-toggle>
-        </mat-list-item>
-      </mat-list>
-      <h2>Palette</h2>
+      <app-search-goals></app-search-goals>
+      <br>
+      <mat-card class="mat-elevation-z2">
+        <mat-card-subtitle [style.color]="'black'">
+          Enabled Goals
+        </mat-card-subtitle>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item class="right" *ngFor="let item of todo">
+              {{item}} <mat-icon (click)="onSelectionChange($event)">clear</mat-icon>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
 
+      <h2>Palette</h2>
       <div
         cdkDropList
         #todoList1="cdkDropList"

@@ -36,7 +36,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       activity: "as",
       manufacturing_line: "small",
       start_date: newDate2,
-      duration: 10
+      duration: 50
     });
     this.populateManufLines();
   }

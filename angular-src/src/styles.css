@@ -19,3 +19,8 @@
 .mat-list .mat-list-item.right .mat-list-item-content{
       justify-content: flex-end;
 }
+
+.mat-button-toggle.no-padding .mat-button-toggle-label-content{
+  line-height: 0px !important;
+  padding: 15px 0px 0px 0px !important
+}

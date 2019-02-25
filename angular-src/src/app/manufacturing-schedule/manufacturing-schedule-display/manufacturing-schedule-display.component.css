@@ -31,3 +31,8 @@
   min-width: 125px;
   max-width: 125px;
 }
+
+mat-icon:hover {
+  cursor: pointer;
+  color: mediumaquamarine;
+}

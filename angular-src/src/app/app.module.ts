@@ -39,6 +39,7 @@ import { AddManufacturingLineDialogComponent } from './manufacturing-line-table/
 import { AddManufacturingLineModule } from './manufacturing-line-table/add-manufacturing-line/add-manufacturing-line.module';
 import { ManufacturingScheduleComponent } from './manufacturing-schedule/manufacturing-schedule.component';
 import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule/manufacturing-schedule-display/manufacturing-schedule-display.component';
+import { SearchGoalsComponent } from './manufacturing-schedule/search-goals/search-goals.component';
 
 const routes: Routes = [
   {
@@ -83,7 +84,8 @@ const routes: Routes = [
     FormulaTableComponent,
     ManufacturingLineTableComponent,
     ManufacturingScheduleComponent,
-    ManufacturingScheduleDisplayComponent
+    ManufacturingScheduleDisplayComponent,
+    SearchGoalsComponent
   ],
   imports: [
     BrowserModule,
