@@ -139,7 +139,7 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                 }
 
                 //At the end 
-                if(formula.equals(formulas.pop())){
+                if(atEnd){
                     let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                     if(primary_match){
                         results[type].changelist.push(formula_csv);

@@ -8,6 +8,7 @@ const Formula = require('../model/formula_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 const unit = require('../controllers/units');
+const utils = require('../../utils/utils');
 
 
 function getUser(req){
@@ -70,23 +71,47 @@ router.post('/all', async (req, res) => {
         return;
     }
 
-    let agg = ManufacturingGoal.aggregate({$match: {user: user}}).lookup({
+    let agg = ManufacturingGoal.aggregate([{$match: {user: user}}])
+    .lookup({
         from: 'skus',
         localField: 'sku_tuples.sku',
         foreignField: '_id',
         as: 'skus'
+    })
+    .lookup({
+        from: 'manufacturinglines',
+        localField: 'skus.manufacturing_lines',
+        foreignField: '_id',
+        as: 'manufacturing_lines'
     });
     let results = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
     for(let item of results.data){
-        for(let sku of item.skus){
-            for(let tuple of item.sku_tuples){
-                if(sku._id.equals(tuple.sku)){
-                    tuple.sku = sku;
+        for(let [sku, tuple] of utils.zip(item.skus, item.sku_tuples)){
+            let manufacturing_lines = [];
+            
+            for(let line of item.manufacturing_lines){
+                for(let id of sku.manufacturing_lines){
+                    if(line._id.equals(id)){
+                        manufacturing_lines.push(line)
+                    }
                 }
             }
+            sku.manufacturing_lines = manufacturing_lines
+
+            if(sku._id.equals(tuple.sku)){
+                tuple.sku = sku;
+            }
         }
+        // for(let sku of item.skus){
+        //     for(let tuple of item.sku_tuples){
+        //         if(sku._id.equals(tuple.sku)){
+        //             tuple.sku = sku;
+        //         }
+        //     }
+        // }
         delete item.skus;
+        delete item.manufacturing_lines;
     }
     res.json(results);
 });
