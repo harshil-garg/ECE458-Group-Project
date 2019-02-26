@@ -9,6 +9,7 @@ const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 const unit = require('../controllers/units');
 const utils = require('../utils/utils');
+const manufacturing_goal_filter = require('../controllers/manufacturing_goal_filter');
 
 
 function getUser(req){
@@ -61,6 +62,19 @@ router.post('/calculator', async (req, res) => {
     res.json({success: true, data: ingredientMap});
 });
 
+router.post('/get_enabled', async (req, res) => {
+
+    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size);
+    res.json(results);
+});
+
+router.post('/set_enabled', (req, res) => {
+    const {manufacturing_goal} = req.body;
+    ManufacturingGoal.findOneAndUpdate({name: manufacturing_goal.name}, {enabled: true}).exec((err) => {
+        
+    })
+})
+
 // Get all
 router.post('/all', async (req, res) => {
     const { pageNum, sortBy, page_size } = req.body;
@@ -71,46 +85,7 @@ router.post('/all', async (req, res) => {
         return;
     }
 
-    let agg = ManufacturingGoal.aggregate([{$match: {user: user}}])
-    .lookup({
-        from: 'skus',
-        localField: 'sku_tuples.sku',
-        foreignField: '_id',
-        as: 'skus'
-    })
-    .lookup({
-        from: 'manufacturinglines',
-        localField: 'skus.manufacturing_lines',
-        foreignField: '_id',
-        as: 'manufacturing_lines'
-    });
-
-    let results = await pagination.paginate(agg, pageNum, sortBy, page_size);
-
-    //fuckin garbage
-    for(let item of results.data){
-        for(let sku of item.skus){
-            let manufacturing_lines = [];
-            
-            for(let line of item.manufacturing_lines){
-                for(let id of sku.manufacturing_lines){
-                    if(line._id.equals(id)){
-                        manufacturing_lines.push(line.shortname)
-                    }
-                }
-            }
-            sku.manufacturing_lines = manufacturing_lines
-
-            for(let tuple of item.sku_tuples){
-                if(sku._id.equals(tuple.sku)){
-                    tuple.sku = sku;
-                }
-            }
-        }
-
-        delete item.skus;
-        delete item.manufacturing_lines;
-    }
+    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size, user);
     res.json(results);
 });
 
@@ -165,16 +140,7 @@ function createManufacturingGoal(name, sku_tuples, user, deadline, res){
     });
 }
 
-router.post('/read', (req, res) => {
-    const { name, user } = req.body;
 
-    ManufacturingGoal.findOne({name: name, user: user}, (error, goal) => {
-        if (error) {
-            res.send("Manufacturing goal not found " + error);
-        }
-        res.send(goal);
-    });
-});
 
 router.post('/delete', (req, res) => {
     const { name } = req.body;

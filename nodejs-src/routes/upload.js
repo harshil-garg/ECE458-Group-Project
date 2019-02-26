@@ -345,7 +345,7 @@ let sku_properties = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Coun
 let ingredient_properties = ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment'];
 let product_properties = ['Name'];
 let formula_properties = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
-
+let regex = new RegExp('^(\d*\.?\d+)\s*(\D.*|)$');
 
 function preprocess(model, properties, data){
   let obj = {};
@@ -353,6 +353,12 @@ function preprocess(model, properties, data){
   let j = 0;
   for(let i = 0; i < properties.length; i++){
     if(model.modelName == 'Ingredient' && properties[i] == 'Size'){
+      //TODO: cleaning size with given regex and add unit validation in validator
+      console.log(regex)
+      console.log(data[properties[i]])
+      console.log(data[properties[i]].match(regex))
+      
+
       let size = data[properties[i]].split(' ');
       obj['package_size'] = size[0];
       obj['unit'] = size[1];
