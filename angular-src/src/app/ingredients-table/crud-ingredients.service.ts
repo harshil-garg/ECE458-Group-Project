@@ -8,7 +8,8 @@ export class CreateMessage {
   name : string;
   number : string;
   vendor_info : string;
-  package_size: string;
+  package_size: number;
+  unit: string;
   cost : number;
   comment : string;
 }
@@ -22,7 +23,7 @@ export class EditMessage {
   newname: string;
   number : string;
   vendor_info : string;
-  package_size: string;
+  package_size: number;
   unit: string;
   cost : number;
   comment : string;

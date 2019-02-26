@@ -1,32 +1,3 @@
-<!-- <h1 mat-dialog-title>Add Ingredient</h1>
-<div mat-dialog-content>
-  <table class="table table-bordered table-responsive-md table-striped text-center">
-    <tr>
-      <th class="text-center">Ingredient Name</th>
-      <th class="text-center">Ingredient Number</th>
-      <th class="text-center">Vendor Information</th>
-      <th class="text-center">Package Size</th>
-      <th class="text-center">Cost Per Package (USD)</th>
-      <th class="text-center">Comment</th>
-    </tr>
-
-    <tr>
-
-      <td> <input class = "input" [(ngModel)]="ingredient.name"></td>
-      <td> <input class = "input" [(ngModel)]="ingredient.id"></td>
-      <td> <input class = "input" [(ngModel)]="ingredient.vendor_info"></td>
-      <td> <input class = "input" [(ngModel)]="ingredient.package_size"></td>
-      <td> <input class = "input" [(ngModel)]="ingredient.cost_per_package"></td>
-      <td> <input class = "input" [(ngModel)]="ingredient.comment"></td>
-
-    </tr>
-  </table>
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="ingredient" cdkFocusInitial>Ok</button>
-</div> -->
-
 <div class="container">
     <h1>Add Ingredient</h1>
     <form (ngSubmit)="submit()" #ingredientForm="ngForm">

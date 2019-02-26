@@ -42,3 +42,22 @@ border-left: 5px solid #a94442; /* red */
 button {
   margin: 5px;
 }
+
+/*mat-form-field {
+  font-size: 14px;
+  margin: -10px;
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}*/
