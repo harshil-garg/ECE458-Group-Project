@@ -6,6 +6,7 @@ import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule-
 import { ActivityDialogComponent } from './activity-dialog/activity-dialog.component';
 import { Activity } from '../model/activity';
 import { Sku } from '../model/sku';
+import { ManufacturingGoal } from '../model/manufacturing-goal';
 import { MatSnackBar, MatDialog } from '@angular/material';
 
 @Component({
@@ -23,6 +24,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate();
   @Input() remove: EventEmitter<any>;
+  @Input() manufGoals: Array<ManufacturingGoal>;
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog) { }
@@ -217,13 +219,13 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   wrongManufLine(activity: Activity, manufLine: string){
-    // console.log(activity.sku);
-    // if(activity.sku.manufacturing_lines.indexOf(manufLine)>-1){
-    //   return false;
-    // }
-    // else {
-    //   return true;
-    // }
+    // var returned: boolean = true;
+    // activity.sku.manufacturing_lines.forEach(line => {
+    //   if(line==manufLine){
+    //     returned = false;
+    //   };
+    // });
+    // return returned;
     return false;
   }
 
@@ -260,5 +262,37 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       });
     }
+  }
+
+  numDeadlines(id){
+    var num = 0;
+    if(id==9){
+      this.manufGoals.forEach(goal=>{
+        var deadline = goal.deadline;
+        if(typeof deadline == "string"){
+          deadline = new Date(deadline);
+        }
+        if(deadline.getFullYear() == this.currDate.getFullYear() && deadline.getMonth() == this.currDate.getMonth() && deadline.getDate() == this.currDate.getDate()){
+          num++;
+        }
+      });
+    }
+    return num;
+  }
+
+  getDeadlines(id){
+    var returned: string = "Deadline: ";
+    if(id==9){
+      this.manufGoals.forEach(goal=>{
+        var deadline = goal.deadline;
+        if(typeof deadline == "string"){
+          deadline = new Date(deadline);
+        }
+        if(deadline.getFullYear() == this.currDate.getFullYear() && deadline.getMonth() == this.currDate.getMonth() && deadline.getDate() == this.currDate.getDate()){
+          returned+=goal.name + " ,";
+        }
+      });
+    }
+    return returned.substring(0, returned.length - 1);
   }
 }

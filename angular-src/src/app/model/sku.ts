@@ -1,5 +1,6 @@
 import { Tuple } from './ingredient'
 import { Formula } from './formula'
+import { ManufacturingLine } from './manufacturing-line'
 
 export class Sku {
   id: number;

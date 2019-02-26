@@ -14,8 +14,13 @@
 <div class="example-container">
   <div class="header-list">
     <div class="header-box"></div>
-    <ng-container *ngFor="let item of hourHeaders">
-      <div class="header-box">{{item}}</div>
+    <ng-container *ngFor="let item of hourHeaders; let id=index">
+      <div class="header-box">
+        {{item}}
+        <mat-icon *ngIf="numDeadlines(id)>0" [matBadge]="numDeadlines(id)" [matTooltip]="getDeadlines(id)" aria-label="Hover to see deadlines" matBadgeColor="warn">
+          warning
+        </mat-icon>
+      </div>
     </ng-container>
   </div>
 
