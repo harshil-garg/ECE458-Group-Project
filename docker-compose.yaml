@@ -1,0 +1,35 @@
+version: '2'
+services:
+  frontend-server:
+    build: ./angular-src
+    ports:
+      - "4200:4200" # Client angular port (dev)
+      - "49153:49153" # Webpack port for hot reload (dev / prod)
+    depends_on:
+      - backend-server
+    volumes:
+      - ./angular-src:/app
+      - ./certificates:/app/certificates
+      - app/node_modules
+  backend-server:
+    build: ./nodejs-src
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nodejs-src:/app
+      - ./certificates:/app/certificates
+    depends_on:
+      - database
+  seeder:
+    build: ./seeder
+    depends_on:
+      - frontend-server
+  database:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+volumes:
+  db-data:
+

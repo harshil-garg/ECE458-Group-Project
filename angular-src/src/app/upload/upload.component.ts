@@ -1,9 +1,8 @@
-
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { forkJoin } from 'rxjs/observable/forkJoin';
 import {ValidationData } from '../model/validation-data';
 import { UploadService } from './upload.service';
+import {AuthenticationService} from '../authentication.service';
 import {UploadState} from './uploadStates';
 
 @Component({
@@ -16,7 +15,7 @@ export class UploadComponent {
 
   public files: Set<File> = new Set();
 
-  constructor(public uploadService: UploadService, public snackBar: MatSnackBar) {}
+  constructor(public uploadService: UploadService, public authService: AuthenticationService, public snackBar: MatSnackBar) {}
 
   ngOnInit() {}
 
@@ -33,13 +32,18 @@ export class UploadComponent {
   iChangeList = [];
   sChangeList = [];
   sdisplayedColumns: string[] = ['SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate','Comment'];
+  esdisplayedColumns: string[] = ['message', 'SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate','Comment'];
   idisplayedColumns: string[] = ['Ingr#','Name','Vendor Info','Size','Cost','Comment'];
+  eidisplayedColumns: string[] = ['message', 'Ingr#','Name','Vendor Info','Size','Cost','Comment'];
   fdisplayedColumns: string[] = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
+  efdisplayedColumns: string[] = ['message', 'Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
   pdisplayedColumns: string[] = ['Name'];
+  epdisplayedColumns: string[] = ['message', 'Name'];
   results;
 
-
+// TODO: FIX DELETING FILES
   onFilesAdded() {
+    console.log('called');
     const files: { [key: string]: File } = this.file.nativeElement.files;
     for (let key in files) {
       if (!isNaN(parseInt(key))) {
@@ -66,8 +70,8 @@ export class UploadComponent {
             this.changeState(UploadState.SUCCESS);
           }
           else {
-            this.snackBar.open(val.uploadErrorType, "close", {duration: 3000});
             this.changeState(UploadState.SELECTING);
+            this.snackBar.open(val.uploadErrorType, "close", {duration: 3000});
           }
         }
         else if (!on && !val.success){
@@ -91,10 +95,54 @@ export class UploadComponent {
         this.changeState(UploadState.SELECTING);
       }
       else if (val.skus.errorlist.length || val.ingredients.errorlist.length || val.product_lines.errorlist.length || val.formulas.errorlist.length) {
-        this.pErrorList = val.product_lines.errorlist;
-        this.iErrorList = val.ingredients.errorlist;
-        this.sErrorList = val.skus.errorlist;
-        this.fErrorList = val.formulas.errorlist;
+        this.pErrorList = [];
+        val.product_lines.errorlist.forEach((element) => {
+          this.pErrorList.push({
+            message: element['message'],
+            Name: element.data['Name']
+          })
+        });
+        this.iErrorList = [];
+        val.ingredients.errorlist.forEach((element) => {
+          this.iErrorList.push({
+            message: element['message'],
+            'Ingr#': element.data['Ingr#'],
+            'Vendor Info': element.data['Vendor Info'],
+            'Size' : element.data['Size'],
+            'Cost': element.data['Cost'],
+            'Comment' : element.data['Comment'],
+            'Name': element.data['Name']
+          })
+        });
+        this.sErrorList = [];
+        val.skus.errorlist.forEach((element) => {
+          this.sErrorList.push({
+            message: element['message'],
+            'SKU#': element.data['SKU#'],
+            'Case UPC': element.data['Case UPC'],
+            'Unit UPC': element.data['Unit UPC'],
+            'Unit size' : element.data['Unit size'],
+            'Count per case': element.data['Count per case'],
+            'Comment' : element.data['Comment'],
+            'Name': element.data['Name'],
+            'PL Name': element.data['PL Name'],
+            'Formula#': element.data['Formula#'],
+            'Formula factor': element.data['Formula factor'],
+            'ML Shortnames': element.data['ML Shortnames'],
+            'Rate': element.data['Rate'],
+          })
+        });
+        this.fErrorList = [];
+        val.formulas.errorlist.forEach((element) => {
+          this.fErrorList.push({
+            message: element['message'],
+            'Formula#': element.data['Formula#'],
+            'Ingr#': element.data['Ingr#'],
+            'Quantity' : element.data['Quantity'],
+            'Comment' : element.data['Comment'],
+            'Name': element.data['Name']
+          })
+        });
 
         this.changeState(UploadState.SHOWING_ERRORS);
       }
@@ -160,5 +208,9 @@ export class UploadComponent {
   }
   skusImported(): boolean {
     return  this.results.skus.createlist.length || this.results.skus.changelist.length || this.results.skus.ignorelist.length;
+  }
+
+  isAdmin(): boolean {
+    return this.authService.loginState.isAdmin;
   }
 }

@@ -1,5 +1,5 @@
 <input type="file" #file style="display: none" accept=".csv, .zip" (change)="onFilesAdded()" multiple />
-<div class="upload-content-container">
+<div *ngIf="isAdmin()" class="upload-content-container">
         <mat-card *ngIf="inSelectingState()" class="select-file-card">
                 <mat-card-header>
                   <mat-card-title>Import Utility</mat-card-title>
@@ -191,9 +191,61 @@
                 </button>
             </mat-card-actions>
     </mat-card>
-
+    <mat-card *ngIf="inErrorState()" class="success-card">
+            <mat-card-header>
+              <mat-card-title>Import Failed</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <p>
+                    The following errors caused your import to fail
+                </p>
+                <mat-tab-group>
+                        <mat-tab *ngIf="hasElements(results.skus.errorlist)" label="SKUs">
+                                <mat-table class="upload-table" [dataSource]="sErrorList">
+                                        <ng-container *ngFor="let column of esdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="esdisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: esdisplayedColumns;"></mat-row>
+                                </mat-table>                                
+                        </mat-tab>
+                        <mat-tab *ngIf="hasElements(results.ingredients.errorlist)" label="Ingredients">
+                                <mat-table class="upload-table" [dataSource]="iErrorList">
+                                        <ng-container *ngFor="let column of eidisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="eidisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: eidisplayedColumns;"></mat-row>
+                                </mat-table>                                
+                        </mat-tab>
+                        <mat-tab *ngIf="hasElements(results.formulas.errorlist)" label="Formulas">
+                                <mat-table class="upload-table" [dataSource]="fErrorList">
+                                        <ng-container *ngFor="let column of efdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                        </ng-container>
+                                        <mat-header-row *matHeaderRowDef="efdisplayedColumns"></mat-header-row>
+                                        <mat-row *matRowDef="let row; columns: efdisplayedColumns;"></mat-row>
+                                </mat-table>                                
+                        </mat-tab>
+                        <mat-tab *ngIf="hasElements(results.product_lines.errorlist)" label="Product Lines">
+                            <mat-table class="upload-table" [dataSource]="pErrorList">
+                                    <ng-container *ngFor="let column of epdisplayedColumns" [matColumnDef]="column">
+                                            <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                            <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                        </ng-container>
+                                        <mat-header-row *matHeaderRowDef="epdisplayedColumns"></mat-header-row>
+                                        <mat-row *matRowDef="let row; columns: epdisplayedColumns;"></mat-row>
+                            </mat-table>                                
+                        </mat-tab>
+                </mat-tab-group>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" class="submit-files-btn" (click)="restartUpload()">
+                        Restart
+                </button>
+            </mat-card-actions>
+    </mat-card>
 </div>
-<div class="uploading">
-
-</div>
-
