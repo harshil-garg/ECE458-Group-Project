@@ -37,8 +37,3 @@ mat-icon:hover {
   cursor: pointer;
   color: mediumaquamarine;
 }
-
-.fixed-container {
-  width: 1150px;
-  overflow: auto;
-}

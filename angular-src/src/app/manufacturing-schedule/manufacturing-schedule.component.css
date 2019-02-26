@@ -194,3 +194,8 @@
   min-width: 125px;
   max-width: 125px;
 }
+
+.fixed-container {
+  width: 1150px;
+  overflow: auto;
+}
