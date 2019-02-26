@@ -64,14 +64,18 @@ router.post('/calculator', async (req, res) => {
 
 router.post('/get_enabled', async (req, res) => {
 
-    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size);
+    let results = await manufacturing_goal_filter.filter(-1, 'name', 0);
     res.json(results);
 });
 
 router.post('/set_enabled', (req, res) => {
-    const {manufacturing_goal} = req.body;
-    ManufacturingGoal.findOneAndUpdate({name: manufacturing_goal.name}, {enabled: true}).exec((err) => {
-        
+    const {manufacturing_goal, enabled} = req.body;
+    ManufacturingGoal.findOneAndUpdate({name: manufacturing_goal.name}, {enabled: enabled}, (err) => {
+        if(err){
+            res.json({success: false, message: 'Set enabled failed: ' + err});
+        }else{
+            res.json({success: true, message: 'Set enabled successful'});
+        }
     })
 })
 
