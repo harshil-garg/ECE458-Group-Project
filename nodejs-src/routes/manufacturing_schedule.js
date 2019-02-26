@@ -15,6 +15,18 @@ router.post('/autocomplete', async (req, res) => {
     res.json({success: true, data: results});
 });
 
+router.post('/load',  async (req, res) => {
+    ManufacturingSchedule.aggregate([{$match: {}}])
+        .lookup({
+            from: 'skus',
+            localField: 'activity.sku',
+            foreignField: '_id',
+            as: 'sku'
+        })
+        .unwind('$sku')
+
+})
+
 //Add an mapping of an activity to a manufacturing line
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
@@ -59,7 +71,7 @@ router.post('/create', async (req, res) => {
 //Update a mapping
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
-    let { activity, manufacturing_line, start_date, new_start_date, duration } = req.body;
+    let { activity, manufacturing_line, start_date, duration } = req.body;
 
     let errors = await createValidation(activity, manufacturing_line, start_date);
     if(!('sku' in error)){
@@ -71,8 +83,8 @@ router.post('/update', async (req, res) => {
     if(manufacturing_line){
         json['manufacturing_line'] = errors.manufacturing_line;
     }
-    if(new_start_date){
-        json['start_date'] = new_start_date;
+    if(start_date){
+        json['start_date'] = start_date;
     }
     if(duration){
         json['duration'] = duration;
@@ -80,8 +92,7 @@ router.post('/update', async (req, res) => {
     }
 
     ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
-        'activity.manufacturing_goal': errors.manufacturing_goal, 
-        start_date: start_date}, json, (err) => {
+        'activity.manufacturing_goal': errors.manufacturing_goal}, json, (err) => {
             if (err) {
                 res.json({success: false, message: `Failed to update mapping. Error: ${err}`});
             } else{
