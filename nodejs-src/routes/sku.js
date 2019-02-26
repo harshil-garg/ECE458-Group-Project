@@ -39,14 +39,81 @@ router.post('/autocomplete_formulas', async (req, res) => {
 });
 
 //populate bulk edit
-router.post('/filter_bulk', async (req, res) => {
-    
+router.post('/populate_lines', async (req, res) => {
+    const {skus} = req.body;
+
+    let cursor = SKU.aggregate([{$match: {number: {$in: skus}}}])
+        .lookup({
+            from: 'manufacturinglines',
+            localField: 'manufacturing_lines',
+            foreignField: '_id',
+            as: 'manufacturing_lines'
+        }).cursor({}).exec();
+
+    let all = new Set();
+    let some = new Set();
+    let none = [];
+
+    let i = 0;
+    await cursor.eachAsync((res) => {
+        let lineSet = new Set();
+        
+        for(let line of res.manufacturing_lines){
+            some.add(line.shortname);
+            lineSet.add(line.shortname);   
+        }
+        if(i == 0){
+            //first time add all lines to the set
+            all = lineSet;
+        }else{
+            //otherwise take the intersection
+            all = new Set([...all].filter(x => lineSet.has(x)));
+        }
+        i++;
+    });
+    all = Array.from(all);
+    some = Array.from(some)
+
+    let lines = await ManufacturingLine.find({shortname: {$nin: some}}).exec();
+    for(let line of lines){
+        none.push(line.shortname)
+    }
+
+    let results = {
+        all: all,
+        some: some,
+        none: none
+    }
+    res.json({success: true, data: results});
 });
 
 //bulk edit
 router.post('/bulk_edit', async (req, res) => {
+    const {manufacturing_lines, skus, add} = req.body;
 
-})
+    let manufacturings_passed = []
+    let manufacturing_ids = [];
+    for(let line of manufacturing_lines){
+        let manufacturing_passed = await validator.itemExists(ManufacturingLine, line);
+        manufacturings_passed.push(manufacturing_passed);
+        manufacturing_ids.push(manufacturing_passed[2]);
+    }   
+    let errors = validator.compileErrors(...manufacturings_passed);
+    if(errors.length > 0){
+        res.json({success: false, message: errors});
+        return;
+    }
+
+    if(add){
+        //add lines
+        await SKU.updateMany({number: {$in: skus}}, {$push: {manufacturing_lines: {$in: manufacturing_ids}}}).exec()
+    }else{
+        //delete lines
+        await SKU.updateMany({number: {$in: skus}}, {$pull: {manufacturing_lines: {$in: manufacturing_ids}}}).exec()
+    }
+
+    res.json({success: true, message: 'Bulk edit successful'});
+});
 
 
 //Filter
@@ -267,7 +334,7 @@ router.post('/delete', (req, res) => {
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
             let sku = await SKU.findOne({number: number}).exec();
-            await ManufacturingGoal.update({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}, {multi: true}).exec();
+            await ManufacturingGoal.updateMany({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
     });
