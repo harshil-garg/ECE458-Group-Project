@@ -20,7 +20,7 @@ module.exports.nameOrEmail = async (model, goal, user) => {
     let regex_goal = new RegExp('^'+goal, 'i');
     let regex_user = new RegExp('^'+user, 'i');
     if(goal != '' && user != ''){
-        return await model.find({name: regex_goal}, {user: regex_user}).limit(limit).collation({locale: 'en'}).sort('name').lean().exec();
+        return await model.find({name: regex_goal, user: regex_user}).limit(limit).collation({locale: 'en'}).sort('name').lean().exec();
     }else{
         return await model.find({$or: [{name: regex_goal}, {user: regex_user}]}).limit(limit).collation({locale: 'en'}).sort('name').lean().exec();
     }

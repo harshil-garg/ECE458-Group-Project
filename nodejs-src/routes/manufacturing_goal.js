@@ -94,7 +94,7 @@ router.post('/all', async (req, res) => {
             for(let line of item.manufacturing_lines){
                 for(let id of sku.manufacturing_lines){
                     if(line._id.equals(id)){
-                        manufacturing_lines.push(line)
+                        manufacturing_lines.push(line.shortname)
                     }
                 }
             }

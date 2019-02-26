@@ -5,6 +5,7 @@ const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
 const validator = require('../controllers/validator');
+const schedule_validator = require('../controllers/schedule_validator');
 const autocomplete = require('../controllers/autocomplete');
 
 //Display manufacturing goals for admin to select, filter by name and username
@@ -16,15 +17,36 @@ router.post('/autocomplete', async (req, res) => {
 });
 
 router.post('/load',  async (req, res) => {
-    ManufacturingSchedule.aggregate([{$match: {}}])
+    let cursor = ManufacturingSchedule.aggregate([{$match: {}}])
         .lookup({
             from: 'skus',
             localField: 'activity.sku',
             foreignField: '_id',
-            as: 'sku'
+            as: 'activity.sku'
         })
-        .unwind('$sku')
+        .unwind('$activity.sku')
+        .lookup({
+            from: 'manufacturinggoals',
+            localField: 'activity.manufacturing_goal',
+            foreignField: '_id',
+            as: 'activity.manufacturing_goal'
+        })
+        .unwind('$activity.manufacturing_goal')
+        .lookup({
+            from: 'manufacturinglines',
+            localField: 'manufacturing_line',
+            foreignField: '_id',
+            as: 'manufacturing_line'
+        })
+        .unwind('$manufacturing_line')
+        .cursor({}).exec();
 
+    let results = [];
+    await cursor.eachAsync((res) => {
+        results.push(res);
+    });
+
+    res.json({success: true, data: results});
 })
 
 //Add an mapping of an activity to a manufacturing line
@@ -39,8 +61,8 @@ router.post('/create', async (req, res) => {
 
     //calculate duration
     if(!duration){
-        let sku = await SKU.findOne({_id: activity_passed[2]}).exec();
-        let goal = await ManufacturingGoal.findOne({_id: activity_passed[3]}).exec();
+        let sku = await SKU.findOne({_id: error.sku}).exec();
+        let goal = await ManufacturingGoal.findOne({_id: error.manufacturing_goal}).exec();
         let quantity;
         for(let tuple of goal.sku_tuples){
             if(tuple.sku.equals(sku._id)){
@@ -99,24 +121,33 @@ router.post('/update', async (req, res) => {
                 res.json({success: true, message: "Updated successfully."});
             }
         });
-
-
 });
 
 //Remove a mapping
 router.post('/delete', (req, res) => {
+    const { activity } = req.body;
 
+    ManufacturingSchedule.findOneandDelete({'activity.sku': activity.sku, 
+        'activity.manufacturing_goal': activity.manufacturing_goal}, (err, result) => {
+            if (err) {
+                res.json({success: false, message: `Failed to delete mapping. Error: ${err}`});
+            }else if(result.deletedCount == 0){
+                res.json({success: false, message: 'Mapping does not exist to delete'});
+            }else{
+                res.json({success: true, message: "Deleted successfully."});
+            }
+        });
 });
 
 async function createValidation(activity, manufacturing_line, start_date){
-    let required_params = { activity, manufacturing_line, start_date };
+    // let required_params = { activity, manufacturing_line, start_date };
     let required_activity_params = ['sku', 'manufacturing_goal'];
 
-    //Check that all inputs and fields are present
-    let inputs_passed = validator.inputsExist(required_params);
-    if(!inputs_passed[0]){
-        return inputs_passed[1];
-    }
+    // //Check that all inputs and fields are present
+    // let inputs_passed = validator.inputsExist(required_params);
+    // if(!inputs_passed[0]){
+    //     return inputs_passed[1];
+    // }
 
     let activity_inputs_passed = validator.objectFieldsExist(activity, required_activity_params);
     if(!activity_inputs_passed[0]){
@@ -129,8 +160,8 @@ async function createValidation(activity, manufacturing_line, start_date){
     }
 
     //Check that given objects exist
-    let activity_passed = await validator.validActivity(activity);
-    let line_passed = await validator.itemExists(ManufacturingLine, manufacturing_line);
+    let activity_passed = await schedule_validator.validActivity(activity);
+    let line_passed = await schedule_validator.validLine(activity.sku, manufacturing_line);
 
     //Check date
 
