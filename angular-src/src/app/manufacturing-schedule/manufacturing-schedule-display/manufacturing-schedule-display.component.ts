@@ -3,6 +3,7 @@ import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@a
 import { ManufacturingGoalService } from '../../manufacturing-goal-table/manufacturing-goal.service';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
 import { Activity } from '../../model/activity';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-manufacturing-schedule-display',
@@ -16,7 +17,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   goalsUpdated: EventEmitter<any> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
-  constructor(private manufacturingGoalService: ManufacturingGoalService){}
+  constructor(private manufacturingGoalService: ManufacturingGoalService, private snackBar: MatSnackBar){}
 
   ngOnInit(){
     this.manufGoalList = [];
@@ -105,7 +106,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   remove(id){
-    if(confirm("Are you sure?")){
+    if(confirm("Are you sure you would like to remove " + this.manufGoalList[id].name + "?")){
       this.manufGoalList.splice(id, 1);
       this.goalsUpdated.emit(true);
     }
@@ -123,6 +124,21 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   removeActivity(id){
     this.activityList.splice(id, 1);
+  }
+
+  enable(goal: ManufacturingGoal){
+    if(this.manufGoalList.indexOf(goal)!=-1){
+      if(confirm("Are you sure you would like to add " + goal.name + "?")){
+        this.manufGoalList.push(goal);
+      }
+    }
+    else {
+      this.displayError(goal.name + " is already enabled");
+    }
+  }
+
+  displayError(message){
+    this.snackBar.open(message, "Close", {duration:3000});
   }
 
 }

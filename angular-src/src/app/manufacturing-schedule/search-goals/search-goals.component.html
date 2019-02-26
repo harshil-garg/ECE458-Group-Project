@@ -5,15 +5,24 @@
   <mat-card-content>
     <div class="flex-row">
       <mat-form-field floatLabel="never">
-        <input #name matInput [placeholder]="selectedValue==='name'? 'Search by Goal Name' : 'Search by User'" [(ngModel)]="input" (ngModelChange)="updateValue()">
+        <input #name matInput [placeholder]="selectedValue==='name'? 'Search by Goal Name' : 'Search by User'" [matAutocomplete]="auto" [formControl]="inputField" [(ngModel)]="input" (ngModelChange)="updateValue()">
       </mat-form-field>
       <mat-button-toggle-group name="goal" #goal="matButtonToggleGroup" value="name" (change)="changeInputType(goal.value)">
         <mat-button-toggle class="no-padding" value="name">Name</mat-button-toggle>
         <mat-button-toggle class="no-padding" value="user">User</mat-button-toggle>
       </mat-button-toggle-group>
+
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+        <mat-option *ngFor="let goal of suggestedGoals" [value]="goal">{{goal.name}}
+           <font color="lightgray">{{goal.user}}</font> </mat-option>
+      </mat-autocomplete>
+
+    </div>
+    <div *ngIf="selectedGoal!=null">
+      Selected Goal : {{selectedGoal.name}}
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-raised-button color="accent" [disabled]="goalName==null || goalName.length==0 || user==null || user.length==0">Enable</button>
+    <button mat-raised-button color="accent" [disabled]="selectedGoal==null" (click)="enable()">Enable</button>
   </mat-card-actions>
 </mat-card>
