@@ -127,7 +127,13 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   enable(goal: ManufacturingGoal){
-    if(this.manufGoalList.indexOf(goal)!=-1){
+    var alreadyAdded : boolean = false;
+    this.manufGoalList.forEach(manufGoal =>{
+      if(manufGoal.name==goal.name){
+        alreadyAdded = true;
+      }
+    })
+    if(!alreadyAdded){
       if(confirm("Are you sure you would like to add " + goal.name + "?")){
         this.manufGoalList.push(goal);
       }

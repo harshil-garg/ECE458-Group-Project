@@ -152,7 +152,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  cursor: move;
+  cursor: pointer;
   background: tomato;
   font-size: 14px;
   flex-grow: 1;
@@ -186,7 +186,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  cursor: move;
+  cursor: pointer;
   background: lightgrey;
   font-size: 14px;
   flex-grow: 1;

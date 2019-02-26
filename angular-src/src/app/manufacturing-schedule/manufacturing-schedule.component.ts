@@ -319,7 +319,10 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(result!=null){
           this.activities[activity_id].duration = +result;
           this.activities[activity_id].duration_override = true;
-          this.warningList[2].push(this.activities[activity_id].activity);
+          if(this.warningList[2].indexOf(this.activities[activity_id].activity)==-1){
+            this.warningList[2].push(this.activities[activity_id].activity);
+            this.warnings.emit(this.warningList);
+          }
           this.warnings.emit(this.warningList);
           this.refreshHours();
         }
