@@ -46,6 +46,30 @@ export class Response {
   message: string;
 }
 
+export class BulkSkuPopulateMessage {
+  skus: Array<any>;
+}
+
+export class BulkSkuEditMessage {
+  manufacturing_lines: Array<String>;
+  skus: Array<any>;
+  add: boolean;
+}
+
+export class BulkSkuPopulateResponse {
+  success: boolean;
+  data: {
+    all: Array<any>,
+    some: Array<any>,
+    none: Array<any>
+  }
+}
+
+export class BulkSkuEditResponse {
+  success: boolean;
+  message: String;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -72,5 +96,12 @@ export class CrudSkuService {
   edit(requestedSku: EditMessage): Observable<Response>{
     console.log(requestedSku);
     return this.http.post<Response>('api/skus/update', requestedSku, httpOptions);
+  }
+
+  bulkSkuEdit(body: BulkSkuEditMessage): Observable<BulkSkuEditResponse> {
+    return this.http.post<BulkSkuEditResponse>('api/skus/bulk-edit', body, httpOptions);
+  }
+  bulkSkuPopulate(body: BulkSkuPopulateMessage): Observable<BulkSkuPopulateResponse> {
+    return this.http.post<BulkSkuPopulateResponse>('api/skus/populate-lines', body, httpOptions);
   }
 }
