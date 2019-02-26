@@ -38,6 +38,16 @@ router.post('/autocomplete_formulas', async (req, res) => {
     res.json({success: true, data: results});
 });
 
+//populate bulk edit
+router.post('/filter_bulk', async (req, res) => {
+    
+});
+
+//bulk edit
+router.post('/bulk_edit', async (req, res) => {
+
+})
+
 
 //Filter
 router.post('/filter', async (req, res) => {
