@@ -7,6 +7,7 @@ const ManufacturingLine = require('../model/manufacturing_line_model');
 const validator = require('../controllers/validator');
 const schedule_validator = require('../controllers/schedule_validator');
 const autocomplete = require('../controllers/autocomplete');
+const schedule_filter = require('../controllers/schedule_filter');
 
 //Display manufacturing goals for admin to select, filter by name and username
 router.post('/autocomplete', async (req, res) => {
@@ -16,35 +17,18 @@ router.post('/autocomplete', async (req, res) => {
     res.json({success: true, data: results});
 });
 
-router.post('/load',  async (req, res) => {
-    let cursor = ManufacturingSchedule.aggregate([{$match: {}}])
-        .lookup({
-            from: 'skus',
-            localField: 'activity.sku',
-            foreignField: '_id',
-            as: 'activity.sku'
-        })
-        .unwind('$activity.sku')
-        .lookup({
-            from: 'manufacturinggoals',
-            localField: 'activity.manufacturing_goal',
-            foreignField: '_id',
-            as: 'activity.manufacturing_goal'
-        })
-        .unwind('$activity.manufacturing_goal')
-        .lookup({
-            from: 'manufacturinglines',
-            localField: 'manufacturing_line',
-            foreignField: '_id',
-            as: 'manufacturing_line'
-        })
-        .unwind('$manufacturing_line')
-        .cursor({}).exec();
+//Create a report
+router.post('/report', async (req, res) => {
+    const { manufacturing_line, start, end } = req.body;
 
-    let results = [];
-    await cursor.eachAsync((res) => {
-        results.push(res);
-    });
+    let results = await schedule_filter.filter(manufacturing_line, start, end);
+
+    res.json({success: true, data: results});
+
+});
+
+router.post('/load',  async (req, res) => {
+    let results = await schedule_filter.filter();
 
     res.json({success: true, data: results});
 })
@@ -87,8 +71,6 @@ router.post('/create', async (req, res) => {
         }
     });
 });
-
-
 
 //Update a mapping
 router.post('/update', async (req, res) => {
