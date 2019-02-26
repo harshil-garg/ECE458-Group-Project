@@ -3,6 +3,7 @@ const router = express.Router();
 const ManufacturingLine = require('../model/manufacturing_line_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
+const autocomplete = require('../controllers/autocomplete');
 
 
 router.post('/autocomplete', async (req, res) => {
