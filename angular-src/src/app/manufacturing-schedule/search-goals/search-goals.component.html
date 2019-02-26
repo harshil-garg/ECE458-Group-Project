@@ -1,0 +1,19 @@
+<mat-card class="mat-elevation-z2">
+  <mat-card-subtitle [style.color]="'black'">
+    Enable Manufacturing Goal
+  </mat-card-subtitle>
+  <mat-card-content>
+    <div class="flex-row">
+      <mat-form-field floatLabel="never">
+        <input #name matInput [placeholder]="selectedValue==='name'? 'Search by Goal Name' : 'Search by User'" [(ngModel)]="input" (ngModelChange)="updateValue()">
+      </mat-form-field>
+      <mat-button-toggle-group name="goal" #goal="matButtonToggleGroup" value="name" (change)="changeInputType(goal.value)">
+        <mat-button-toggle class="no-padding" value="name">Name</mat-button-toggle>
+        <mat-button-toggle class="no-padding" value="user">User</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="accent" [disabled]="goalName==null || goalName.length==0 || user==null || user.length==0">Enable</button>
+  </mat-card-actions>
+</mat-card>

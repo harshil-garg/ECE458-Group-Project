@@ -17,6 +17,7 @@
 			<mat-menu #manufacturingMenu="matMenu">
 				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-goals'])">Manufacturing Goals</button>
 				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-lines'])">Manufacturing Lines</button>
+				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-schedule'])">Manufacturing Schedule</button>
 			</mat-menu>
 			<button mat-button  *ngIf="this.authService.loginState.isAdmin" (click)="router.navigate(['dashboard/upload'])">Data Import</button>
 			<button mat-button (click)="router.navigate(['dashboard/accounts'])">Accounts</button>

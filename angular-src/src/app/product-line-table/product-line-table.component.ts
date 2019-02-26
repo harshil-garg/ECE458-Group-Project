@@ -4,6 +4,7 @@ import { AuthenticationService } from '../authentication.service'
 import { CrudProductLineService, Response, ReadResponse } from './crud-product-line.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
+import { ExportService } from '../export.service';
 
 @Component({
   selector: 'app-product-line-table',
@@ -28,7 +29,7 @@ export class ProductLineTableComponent implements OnInit{
       this.refresh();
     }
 
-    constructor(private authenticationService: AuthenticationService, public crudProductLineService: CrudProductLineService, private snackBar: MatSnackBar){}
+    constructor(private authenticationService: AuthenticationService, public crudProductLineService: CrudProductLineService, private snackBar: MatSnackBar, private exportService: ExportService){}
 
     remove() {
       for(let selected of this.selection.selected){
@@ -142,23 +143,25 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     handleExportResponse(response){
-      var csvResponseData : Array<any>;
-      if(response.success){
-        csvResponseData = [];
-        for(let csv_data of response.data){
-          csvResponseData.push({
-            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"]
-          });
-        }
-        console.log(csvResponseData);
-        var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Name" + "\r\n";
-        csvResponseData.forEach(function(response) {
-          csvContent += response["Name"]+"\r\n";
-        });
-        var encodedUri = encodeURI(csvContent);
-        window.open(encodedUri);
-      }
+      // var csvResponseData : Array<any>;
+      // if(response.success){
+      //   csvResponseData = [];
+      //   for(let csv_data of response.data){
+      //     csvResponseData.push({
+      //       "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"]
+      //     });
+      //   }
+      //   console.log(csvResponseData);
+      //   var csvContent = "data:text/csv;charset=utf-8,";
+      //   csvContent += "Name" + "\r\n";
+      //   csvResponseData.forEach(function(response) {
+      //     csvContent += response["Name"]+"\r\n";
+      //   });
+      //   var encodedUri = encodeURI(csvContent);
+      //   window.open(encodedUri);
+      // }
+      const headers = ['Name'];
+      this.exportService.exportJSON(headers, response.data, 'product_lines');
     }
 
     isAllSelected() {

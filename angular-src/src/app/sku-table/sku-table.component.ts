@@ -7,6 +7,7 @@ import { CrudSkuService, Response } from './crud-sku.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
+import { ExportService } from '../export.service';
 
 @Component({
   selector: 'sku-table',
@@ -46,7 +47,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService,
-      public filterSkuService: FilterSkuService, private snackBar: MatSnackBar){}
+      public filterSkuService: FilterSkuService, private snackBar: MatSnackBar, private exportService: ExportService){}
 
     remove() {
       for(let selected of this.selection.selected){
@@ -311,32 +312,37 @@ export class SkuTableComponent implements OnInit{
     }
 
     handleExportSkusResponse(response){
-      var csvResponseData : Array<any>;
-      console.log(response);
-      if(response.success){
-        csvResponseData = [];
-        for(let csv_data of response.data){
-          csvResponseData.push({
-            "SKU#"​: csv_data["SKU#"]==undefined ? "" : csv_data["SKU#"],
-            "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"],
-            "Case UPC": csv_data["Case UPC"]==undefined ? "" : csv_data["Case UPC"],
-            "Unit UPC": csv_data["Unit UPC"]==undefined ? "" : csv_data["Unit UPC"],
-            "Unit size": csv_data["Unit size"]==undefined ? "" : csv_data["Unit size"],
-            "Count per case": csv_data["Count per case"]==undefined ? "" : csv_data["Count per case"],
-            "Product Line Name": csv_data["Product Line Name"]==undefined ? "" : csv_data["Product Line Name"],
-            "Comment": csv_data["Comment"]==undefined ? "" : csv_data["Comment"]
-          });
-        }
-        console.log(csvResponseData);
-        var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += ["SKU#", "Name", "Case UPC", "Unit UPC", "Unit size", "Count per case", "Product Line Name", "Comment"].join(",") + "\r\n";
-        csvResponseData.forEach(function(response) {
-          csvContent += response["SKU#"]+","+response["Name"]+","+response["Case UPC"]+","+response["Unit UPC"]+","+response["Unit size"]+","+response["Count per case"]+","+response["Product Line Name"]+","+response["Comment"]+"\r\n";
-        });
-        var encodedUri = encodeURI(csvContent);
-        window.open(encodedUri);
-      }
+      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
+      this.exportService.exportJSON(headers, response.data, 'skus');
     }
+
+    // handleExportSkusResponse(response){
+    //   var csvResponseData : Array<any>;
+    //   console.log(response);
+    //   if(response.success){
+    //     csvResponseData = [];
+    //     for(let csv_data of response.data){
+    //       csvResponseData.push({
+    //         "SKU#"​: csv_data["SKU#"]==undefined ? "" : csv_data["SKU#"],
+    //         "Name": csv_data["Name"]==undefined ? "" : csv_data["Name"],
+    //         "Case UPC": csv_data["Case UPC"]==undefined ? "" : csv_data["Case UPC"],
+    //         "Unit UPC": csv_data["Unit UPC"]==undefined ? "" : csv_data["Unit UPC"],
+    //         "Unit size": csv_data["Unit size"]==undefined ? "" : csv_data["Unit size"],
+    //         "Count per case": csv_data["Count per case"]==undefined ? "" : csv_data["Count per case"],
+    //         "Product Line Name": csv_data["Product Line Name"]==undefined ? "" : csv_data["Product Line Name"],
+    //         "Comment": csv_data["Comment"]==undefined ? "" : csv_data["Comment"]
+    //       });
+    //     }
+    //     console.log(csvResponseData);
+    //     var csvContent = "data:text/csv;charset=utf-8,";
+    //     csvContent += ["SKU#", "Name", "Case UPC", "Unit UPC", "Unit size", "Count per case", "Product Line Name", "Comment"].join(",") + "\r\n";
+    //     csvResponseData.forEach(function(response) {
+    //       csvContent += response["SKU#"]+","+response["Name"]+","+response["Case UPC"]+","+response["Unit UPC"]+","+response["Unit size"]+","+response["Count per case"]+","+response["Product Line Name"]+","+response["Comment"]+"\r\n";
+    //     });
+    //     var encodedUri = encodeURI(csvContent);
+    //     window.open(encodedUri);
+    //   }
+    // }
 
     exportFormulas(){
       this.filterSkuService.exportFormulas({
@@ -355,25 +361,8 @@ export class SkuTableComponent implements OnInit{
     }
 
     handleExportFormulasResponse(response){
-      var csvResponseData : Array<any>;
-      if(response.success){
-        csvResponseData = [];
-        for(let csv_data of response.data){
-          csvResponseData.push({
-            "SKU#": csv_data["SKU#"]==undefined ? "" : csv_data["SKU#"],
-            "Ingr#": csv_data["Ingr#"]==undefined ? "" : csv_data["Ingr#"],
-            "Quantity": csv_data["Quantity"]==undefined ? "" : csv_data["Quantity"],
-          });
-        }
-        console.log(csvResponseData);
-        var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += ["SKU#", "Ingr#", "Quantity"].join(",") + "\r\n";
-        csvResponseData.forEach(function(response) {
-          csvContent += response["SKU#"]+","+response["Ingr#"]+","+response["Quantity"]+"\r\n";
-        });
-        var encodedUri = encodeURI(csvContent);
-        window.open(encodedUri);
-      }
+      const headers = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
+      this.exportService.exportJSON(headers, response.data, 'formulas');
     }
 
     setIngredientInput(id, event){
