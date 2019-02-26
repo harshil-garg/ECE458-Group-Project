@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --host 0.0.0.0 --disableHostCheck --ssl true --ssl-cert ./certificates/server.cert --ssl-key ./certificates/server.key --proxy-config proxy.conf.json",
+    "start": "ng serve --host 0.0.0.0 --disableHostCheck --ssl true --ssl-cert ./certificates/server.cert --ssl-key ./certificates/server.key --proxy-config proxy.conf.json --aot=true",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -25,6 +25,7 @@
     "@angular/router": "~7.2.2",
     "angular-animate": "^1.7.6",
     "angular-touch": "^1.7.6",
+    "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
     "glyphicons": "^0.2.0",
     "hammerjs": "^2.0.8",
