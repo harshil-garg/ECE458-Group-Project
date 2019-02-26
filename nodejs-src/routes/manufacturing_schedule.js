@@ -5,19 +5,14 @@ const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
 const validator = require('../controllers/validator');
-const autocomplete  =require('../controllers/autocomplete');
+const autocomplete = require('../controllers/autocomplete');
 
 //Display manufacturing goals for admin to select, filter by name and username
 router.post('/autocomplete', async (req, res) => {
-    const { input } = req.body;
+    const { goal, user } = req.body;
 
-    let results = await autocomplete.nameOrEmail(ManufacturingGoal, input);
+    let results = await autocomplete.nameOrEmail(ManufacturingGoal, goal, user);
     res.json({success: true, data: results});
-});
-
-router.post('/filter', async (req, res) => {
-    const { input } = req.body;
-
 });
 
 //Add an mapping of an activity to a manufacturing line

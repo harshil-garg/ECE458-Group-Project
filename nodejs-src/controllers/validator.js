@@ -14,13 +14,17 @@ module.exports.compileErrors = function(){
 
 // Dependency checks
 module.exports.itemExists = async function(model, item) {
-    let result = await model.findOne({$or: [{name: item}, {number: item}, {shortname: item}]}).exec();    
+    let results = [];
+    let cursor = await model.aggregate([{$addFields: {num2str: {'$toLower' : '$number'}}}]).match({$or: [{num2str: item}, {name: item}, {shortname: item}]}).cursor({}).exec();
+    await cursor.eachAsync((row) => {
+        results.push(row);
+    }); 
     let err_msg = `${model.modelName} doesn't exist`;
 
-    if(!result){
-        return [!(!result), err_msg];
+    if(results.length == 0){
+        return [false, err_msg];
     }else{
-        return [!(!result), err_msg, result._id];
+        return [true, err_msg, results[0]._id];
     }   
 }
 

@@ -38,7 +38,7 @@ router.post('/create', async (req, res) => {
 
     if(number){
         try{
-            await createFormula(name, number, ingredient_tuples, comment, res);
+            await this.createFormula(name, number, ingredient_tuples, comment, res);
             res.json({success: true, message: 'Created successfuly'});
         }catch(err){
             res.json({success: false, message: err});
@@ -46,12 +46,14 @@ router.post('/create', async (req, res) => {
         
     }else{
         let gen_number = await generator.autogen(Formula);
-        try{
-            await createFormula(name, gen_number, ingredient_tuples, comment, res);
+        await this.createFormula(name, gen_number, ingredient_tuples, comment, res)
+        .then(() => {
             res.json({success: true, message: 'Created successfuly'});
-        }catch(err){
-            res.json({success: false, message: err});
-        }
+        })
+        .catch((err) => {
+            console.log(err)
+            res.json({success: false, message: err.toString()});
+        })
     }
 
 
@@ -123,7 +125,6 @@ router.post('/delete', async (req, res) => {
     });
 });
 
-
 module.exports.createFormula = async function(name, number, ingredient_tuples, comment, res){
     const required_params = { name, number, ingredient_tuples };
     let inputs_exist = validator.inputsExist(required_params);
@@ -132,7 +133,7 @@ module.exports.createFormula = async function(name, number, ingredient_tuples, c
     //Check if given ingredients exist and have valid units
     let valid_tuples = [];
     for(let tuple of ingredient_tuples){
-        valid_tuples.push(await formula_validator.validIngredientTuple(tuple.ingredient, tuple.unit));
+        valid_tuples.push(await formula_validator.validIngredientTuple(Ingredient, tuple.ingredient, tuple.unit));
     }
     let errors = validator.compileErrors(inputs_exist, name_passed, ...valid_tuples);
 
@@ -145,7 +146,7 @@ module.exports.createFormula = async function(name, number, ingredient_tuples, c
         ingredient_tuples[i]['ingredient'] = valid_tuples[i][2]; //id of ingredient
     }
     const formula = new Formula({name, number, ingredient_tuples, comment});
-    return Formula.create(formula);
+    await Formula.create(formula)
 }
 
 module.exports.router = router;

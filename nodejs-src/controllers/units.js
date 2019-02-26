@@ -1,9 +1,10 @@
 const math = require('mathjs')
-const weight_set = new Set(['oz.', 'lb.', 'ton', 'g', 'kg']);
-const volume_set = new Set(['fl. oz.', 'pt.', 'qt.', 'gal.', 'mL', 'L']);
-const count_set = new Set(['count']);
+const weight_set = new Set(['oz', 'ounce', 'lb', 'pound', 'ton', 'g', 'gram', 'kg', 'kilogram']);
+const volume_set = new Set(['floz', 'fluidounce', 'pt', 'pint', 'qt', 'quart', 'gal', 'gallon', 'ml', 'milliliter', 'l', 'liter']);
+const count_set = new Set(['ct', 'count']);
 
 //create units to go with our syntax
+math.createUnit('ct');
 math.createUnit('count');
 
 module.exports.validUnit = function(unit){

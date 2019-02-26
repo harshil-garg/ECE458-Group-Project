@@ -7,14 +7,20 @@ module.exports.validIngredientTuple = async function(model, ingredient_id, unit)
     let err_msg;
 
     //check ingredients exist
-    let ingredient = await model.findOne({$or: [{number: ingredient_id}, {name: ingredient_id}]}).exec();
-    if(!ingredient){
+    let results = [];
+    let cursor = await model.aggregate([{$addFields: {num2str: {'$toLower' : '$number'}}}]).match({$or: [{num2str: ingredient_id}, {name: ingredient_id}]}).cursor({}).exec();
+    await cursor.eachAsync((row) => {
+        results.push(row);
+    });
+
+    if(results.length == 0){
         err_msg = `Ingredient ${ingredient_id} doesn't exist`;
         return [false, err_msg];
     }
 
+    let ingredient = results[0];
     //check valid quantity units
-    else if(Units.category(ingredient.unit) != Units.category(unit)){
+    if(Units.category(ingredient.unit) != Units.category(unit)){
         err_msg = `Unit of ${ingredient_id} must be of same type as ingredient`;
         return [false, err_msg];
     }else{

@@ -19,7 +19,7 @@ const Ingredient_Tuple = new Schema({
     },
     unit: {
         type: String,
-        enum: ['oz.', 'lb.', 'ton', 'g', 'kg', 'fl. oz.', 'pt.', 'qt.', 'gal.', 'mL', 'L', 'count'],
+        enum: ['oz', 'ounce', 'lb', 'pound', 'ton', 'g', 'gram', 'kg', 'kilogram', 'floz', 'fluidounce', 'pt', 'pint', 'qt', 'quart', 'gal', 'gallon', 'ml', 'milliliter', 'l', 'liter', 'ct', 'count'],
         required: true
     }
 });

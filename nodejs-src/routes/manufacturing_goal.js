@@ -8,13 +8,13 @@ const Formula = require('../model/formula_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 const unit = require('../controllers/units');
-const utils = require('../../utils/utils');
+const utils = require('../utils/utils');
 
 
 function getUser(req){
     if(!req.user){
         return;
-    }else{
+    }else {
         return req.user.email;
     }
 }
@@ -87,8 +87,9 @@ router.post('/all', async (req, res) => {
 
     let results = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
+    //fuckin garbage
     for(let item of results.data){
-        for(let [sku, tuple] of utils.zip(item.skus, item.sku_tuples)){
+        for(let sku of item.skus){
             let manufacturing_lines = [];
             
             for(let line of item.manufacturing_lines){
@@ -100,17 +101,13 @@ router.post('/all', async (req, res) => {
             }
             sku.manufacturing_lines = manufacturing_lines
 
-            if(sku._id.equals(tuple.sku)){
-                tuple.sku = sku;
+            for(let tuple of item.sku_tuples){
+                if(sku._id.equals(tuple.sku)){
+                    tuple.sku = sku;
+                }
             }
         }
-        // for(let sku of item.skus){
-        //     for(let tuple of item.sku_tuples){
-        //         if(sku._id.equals(tuple.sku)){
-        //             tuple.sku = sku;
-        //         }
-        //     }
-        // }
+
         delete item.skus;
         delete item.manufacturing_lines;
     }
