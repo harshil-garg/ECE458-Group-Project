@@ -90,7 +90,7 @@ router.post('/update', (req, res) => {
         json["unit"] = unit;
     }
     if (cost) {
-        if(!validator.valid_cost(cost)){
+        if(!validator.isPositive(cost)){
             res.json({success: false, message: 'Input invalid'});
             return;
         }
