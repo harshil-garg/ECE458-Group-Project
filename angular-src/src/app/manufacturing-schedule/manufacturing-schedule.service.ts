@@ -15,6 +15,20 @@ export class AutocompleteResponse {
 	data : ManufacturingGoal[];
 }
 
+export class SetEnabledMessage {
+	manufacturing_goal: ManufacturingGoal;
+	enabled: boolean;
+}
+
+export class SetEnabledResponse {
+	success: boolean;
+}
+
+export class GetEnabledResponse {
+	success: boolean;
+	data: ManufacturingGoal[];
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -30,6 +44,16 @@ export class ManufacturingScheduleService {
 
 	autocomplete(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
 		return this.http.post<AutocompleteResponse>('api/manufacturing_schedule/autocomplete', autocompleteMessage, httpOptions);
+	}
+
+	setEnabled(setEnabledMessage: SetEnabledMessage): Observable<SetEnabledResponse>{
+		console.log(setEnabledMessage);
+		return this.http.post<SetEnabledResponse>('api/manufacturing_schedule/set_enabled', setEnabledMessage, httpOptions);
+	}
+
+	getEnabled(): Observable<GetEnabledResponse>{
+		console.log("GET ENABLED");
+		return this.http.post<GetEnabledResponse>('api/manufacturing_schedule/get_enabled', httpOptions);
 	}
 
 }

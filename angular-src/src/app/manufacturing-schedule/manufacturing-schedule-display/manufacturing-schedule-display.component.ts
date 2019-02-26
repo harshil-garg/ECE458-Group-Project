@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import { ManufacturingGoalService } from '../../manufacturing-goal-table/manufacturing-goal.service';
+import { ManufacturingScheduleService } from '../manufacturing-schedule.service';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
 import { Activity } from '../../model/activity';
 import { MatSnackBar } from '@angular/material';
@@ -17,7 +17,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   goalsUpdated: EventEmitter<any> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
-  constructor(private manufacturingGoalService: ManufacturingGoalService, private snackBar: MatSnackBar){}
+  constructor(private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar){}
 
   ngOnInit(){
     this.manufGoalList = [];
@@ -41,11 +41,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   populateManufGoalList(){
-    this.manufacturingGoalService.refresh({
-      pageNum: -1,
-      page_size: 0,
-      sortBy: "name"
-    }).subscribe(
+    this.manufacturingScheduleService.getEnabled().subscribe(
       response => {
         if(response.success){
           this.handleManufGoalUpdate(response);
@@ -126,7 +122,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     this.activityList.splice(id, 1);
   }
 
-  enable(goal: ManufacturingGoal){
+  confirmEnable(goal: ManufacturingGoal){
     var alreadyAdded : boolean = false;
     this.manufGoalList.forEach(manufGoal =>{
       if(manufGoal.name==goal.name){
@@ -135,12 +131,32 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     })
     if(!alreadyAdded){
       if(confirm("Are you sure you would like to add " + goal.name + "?")){
-        this.manufGoalList.push(goal);
+        this.enable(goal);
+        this.populateManufGoalList();
       }
     }
     else {
       this.displayError(goal.name + " is already enabled");
     }
+  }
+
+  enable(goal: ManufacturingGoal){
+    this.manufacturingScheduleService.setEnabled({
+      manufacturing_goal: goal,
+      enabled: true
+    }).subscribe(
+      response => {
+        console.log("ENABLED");
+        if(!response.success){
+          this.displayError("Error enabling goal");
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
   }
 
   displayError(message){

@@ -3,7 +3,7 @@
   <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
     <div class="example-container">
       <h2>Goals</h2>
-      <app-search-goals (enableGoal)="enable($event)"></app-search-goals>
+      <app-search-goals (enableGoal)="confirmEnable($event)"></app-search-goals>
       <br>
       <mat-card class="mat-elevation-z2">
         <mat-card-subtitle [style.color]="'black'">
