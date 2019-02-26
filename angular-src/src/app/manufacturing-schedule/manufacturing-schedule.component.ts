@@ -197,17 +197,25 @@ export class ManufacturingScheduleComponent implements OnInit {
         duration: event.previousContainer.data[event.previousIndex].duration,
         manufacturing_goal: event.previousContainer.data[event.previousIndex].manufacturing_goal
       };
-      var startDate = new Date(this.currDate.getTime());
+      var startDate = this.zeroedDate(this.currDate);
       startDate.setHours(8+ (+currHour));
-      this.activities.push({
-        activity: droppedActivity,
-        manufacturing_line: this.manufLines[+currId],
-        start_date: startDate,
-        duration: droppedActivity.duration,
-        duration_override: false
-      });
-      this.refreshHours();
-      this.manufacturingScheduleDisplayComponent.removeActivity(event.previousIndex);
+      if(!this.isCollision(startDate, droppedActivity, this.manufLines[+currId], droppedActivity.duration)){
+        if(!this.wrongManufLine(droppedActivity, this.manufLines[+currId])){
+          this.activities.push({
+            activity: droppedActivity,
+            manufacturing_line: this.manufLines[+currId],
+            start_date: startDate,
+            duration: droppedActivity.duration,
+            duration_override: false
+          });
+          this.refreshHours();
+          this.manufacturingScheduleDisplayComponent.removeActivity(event.previousIndex);
+        } else{
+          this.displayError("This add is not allowed : " + droppedActivity.sku.name + " cannot be produced on line " + this.manufLines[+currId]);
+        }
+      }else{
+        this.displayError("This add is not allowed : overlapping activities on " + this.manufLines[+currId]);
+      }
     }
     else {
       var prevId = event.previousContainer.id.split("-")[1];
@@ -217,15 +225,19 @@ export class ManufacturingScheduleComponent implements OnInit {
       var initialValue = this.activities[this.hours[+prevId][prevHour]].activity;
       var updatedDate = this.zeroedDate(this.currDate);
       updatedDate.setHours(8+ (+currHour));
-      if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId]) && !this.wrongManufLine(initialValue, this.manufLines[+currId])){
-        this.activities.forEach(activity=>{
-          if(activity.activity == initialValue){
-            activity.start_date = updatedDate;
-            activity.manufacturing_line = this.manufLines[+currId];
-          }
-        });
+      if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId], initialValue.duration)){
+        if(!this.wrongManufLine(initialValue, this.manufLines[+currId])){
+          this.activities.forEach(activity=>{
+            if(activity.activity == initialValue){
+              activity.start_date = updatedDate;
+              activity.manufacturing_line = this.manufLines[+currId];
+            }
+          });
+        }else{
+          this.displayError("This move is not allowed : " + initialValue.sku.name + " cannot be produced on line " + this.manufLines[+currId]);
+        }
       }else{
-        this.displayError("This move is now allowed : overlapping activities on " + this.manufLines[+currId]);
+        this.displayError("This move is not allowed : overlapping activities on " + this.manufLines[+currId]);
       }
       this.refreshHours();
     }
@@ -238,6 +250,13 @@ export class ManufacturingScheduleComponent implements OnInit {
         this.activities.splice(i, 1);
       }
     }
+    this.warningList.forEach(list=>{
+      var indexDeleted = list.indexOf(deletedActivity);
+      if(indexDeleted!=-1){
+        list.splice(indexDeleted, 1);
+        this.warnings.emit(this.warningList);
+      }
+    });
     this.refreshHours();
   }
 
@@ -245,15 +264,9 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.snackBar.open(message, "Close", {duration:3000});
   }
 
-  isCollision(date: Date, activity: Activity, manufLine){
+  isCollision(date: Date, activity: Activity, manufLine, duration: number){
     var this_start = date;
-    var duration = 0;
     var collision = false;
-    this.activities.forEach(act=>{
-      if(act.activity == activity){
-        duration = act.duration;
-      }
-    });
     var this_end = this.calculateEndTime(date, duration);
     this.activities.forEach(act=>{
       if(act.activity != activity && act.manufacturing_line == manufLine){
@@ -268,14 +281,13 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   wrongManufLine(activity: Activity, manufLine: string){
-    // var returned: boolean = true;
-    // activity.sku.manufacturing_lines.forEach(line => {
-    //   if(line==manufLine){
-    //     returned = false;
-    //   };
-    // });
-    // return returned;
-    return false;
+    var returned: boolean = true;
+    activity.sku.manufacturing_lines.forEach(line => {
+      if(line==manufLine){
+        returned = false;
+      };
+    });
+    return returned;
   }
 
   log(e) {
