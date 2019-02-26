@@ -57,6 +57,11 @@ export class ExportResponse {
   data: Array<ManufacturingLineCsvData>;
 }
 
+export class AutocompleteResponse {
+  success: boolean;
+  data: Array<any>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -86,5 +91,12 @@ export class CrudManufacturingLineService {
   read(requestedManufacturingLine: ReadMessage): Observable<ReadResponse>{
     console.log(requestedManufacturingLine);
     return this.http.post<ReadResponse>('api/manufacturing_lines/all', requestedManufacturingLine, httpOptions);
+  }
+
+  autocompleteLines(query: string): Observable<AutocompleteResponse> {
+    let body = {
+      query: query
+    }
+    return this.http.post<AutocompleteResponse>('api/manufacturing_lines/autocomplete', body, httpOptions);
   }
 }

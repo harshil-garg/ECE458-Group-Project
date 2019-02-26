@@ -1,8 +1,10 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { ManufacturingGoalService } from '../../manufacturing-goal-table/manufacturing-goal.service';
+import { CrudManufacturingLineService } from '../../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
 import { Activity } from '../../model/activity';
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'app-manufacturing-schedule-display',
@@ -10,16 +12,27 @@ import { Activity } from '../../model/activity';
   styleUrls: ['./manufacturing-schedule-display.component.css']
 })
 export class ManufacturingScheduleDisplayComponent implements OnInit{
+  suggestedManufacturingLines = [];
   manufGoalList : Array<ManufacturingGoal> = [];
+  reportingFormControl = new FormControl();
   activityList : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
 
-  constructor(private manufacturingGoalService: ManufacturingGoalService){}
+  constructor(private manufacturingGoalService: ManufacturingGoalService, private crudManufacturingLineService: CrudManufacturingLineService) {}
 
-  ngOnInit(){
+  ngOnInit() {
     this.manufGoalList = [];
     this.activityList = [];
     this.populateManufGoalList();
+
+    this.reportingFormControl.valueChanges.debounceTime(200)
+		.distinctUntilChanged()
+		.switchMap((query) =>  this.crudManufacturingLineService.autocompleteLines(query))
+		.subscribe( result => {
+			if(result!=null && result.data!=null){
+					 this.suggestedManufacturingLines = result.data.slice();
+			 }
+		 });
   }
 
   populateManufGoalList(){
@@ -105,6 +118,10 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   removeActivity(id){
     this.activityList.splice(id, 1);
+  }
+
+  makeReport(value) {
+    console.log("hi");
   }
 
 }

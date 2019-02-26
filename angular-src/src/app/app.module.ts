@@ -41,6 +41,7 @@ import { ManufacturingScheduleComponent } from './manufacturing-schedule/manufac
 import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule/manufacturing-schedule-display/manufacturing-schedule-display.component';
 import { SearchGoalsComponent } from './manufacturing-schedule/search-goals/search-goals.component';
 import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
+import { ManufacturingScheduleReportComponent } from './manufacturing-schedule/manufacturing-schedule-report/manufacturing-schedule-report.component';
 
 const routes: Routes = [
   {
@@ -87,7 +88,8 @@ const routes: Routes = [
     ManufacturingScheduleComponent,
     ManufacturingScheduleDisplayComponent,
     SearchGoalsComponent,
-    ActivityDialogComponent
+    ActivityDialogComponent,
+    ManufacturingScheduleReportComponent
   ],
   imports: [
     BrowserModule,

@@ -84,6 +84,46 @@
         </mat-accordion>
       </mat-card-content>
     </mat-card>
+
+    <h2>Reports</h2>
+    <mat-card style="width:100%" class="mat-elevation-z2">
+      <mat-card-subtitle [style.color]="'black'">
+        Warning Conditions
+      </mat-card-subtitle>
+      <mat-card-content>
+        <form>
+          <mat-form-field style="width:100%" appearance="fill">
+            <input matInput [matDatepicker]="picker" [(ngModel)]="currDate" (ngModelChange)="refreshHours()" placeholder="Choose a date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field style="width:100%" appearance="fill">
+            <mat-label>Duration</mat-label>
+            <input type="number" matInput placeholder="Duration" id="dur" required [(ngModel)]="curr" name="dur">
+          </mat-form-field>
+          <mat-form-field style="width:100%">
+            <input type="text" placeholder="Manufacturing Line" aria-label="Manufacturing Line" matInput [formControl]="reportingFormControl" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let option of suggestedManufacturingLines" [value]="option.shortname">
+                {{option.shortname}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </form>
+        <!--<mat-form-field style="width:100%" appearance="outline">
+          <mat-label>Unit</mat-label>
+          <mat-select placeholder="Unit" [(ngModel)]="ingredient.unit" name="unit">
+              <mat-option *ngFor="let unit of units" [value]="unit.value">
+                {{unit.value}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>-->
+      </mat-card-content>
+      <mat-card-actions>
+          <button mat-raised-button (click)="makeReport(reportingFormControl.value)" color="primary">Make Report</button>
+        </mat-card-actions>
+    </mat-card>
+
   </mat-sidenav>
 
   <mat-sidenav-content>
