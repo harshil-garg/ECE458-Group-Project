@@ -14,6 +14,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   activityList : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
   goalsUpdated: EventEmitter<any> = new EventEmitter();
+  warnings: Array<Array<string>> = [[],[],[],[]];
 
   constructor(private manufacturingGoalService: ManufacturingGoalService){}
 
@@ -21,6 +22,21 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     this.manufGoalList = [];
     this.activityList = [];
     this.populateManufGoalList();
+  }
+
+  updateWarnings(event: Array<Array<Activity>>){
+    this.warnings[1] = [];
+    event[0].forEach(activity => {
+      this.warnings[1].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
+    });
+    this.warnings[2] = [];
+    event[1].forEach(activity => {
+      this.warnings[2].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
+    });
+    this.warnings[3] = [];
+    event[2].forEach(activity => {
+      this.warnings[3].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
+    });
   }
 
   populateManufGoalList(){

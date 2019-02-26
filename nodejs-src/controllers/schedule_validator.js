@@ -1,5 +1,6 @@
 const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
+const ManufacturingLine = require('../model/manufacturing_line_model');
 module.exports.validActivity = async function(activity){
     let err_msg;
     let sku = await SKU.findOne({number: activity.sku}).exec();
@@ -21,4 +22,29 @@ module.exports.validActivity = async function(activity){
         }
     }
     return [valid, err_msg, sku._id, goal._id];
+}
+
+module.exports.validLine = async function(sku_num, manufacturing_line){
+    let err_msg;
+    let sku = await SKU.findOne({number: sku_num}).exec();
+    let line = await ManufacturingLine.findOne({shortname: manufacturing_line}).exec();
+
+    if(!sku){
+        err_msg = 'SKU does not exist'
+        return [false, err_msg]
+    }
+    if(!line){
+        err_msg = 'Manufacturing line doesn not exist'
+        return [false, err_msg]
+    }
+
+    err_msg = 'SKU cannot be placed on this manufacturing line';
+    let valid = false;
+    for(let shortname of sku.manufacturing_lines){
+        if(manufacturing_line == shortname){
+            valid = true;
+        }
+    }
+
+    return [valid, err_msg, line._id]
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
@@ -23,9 +23,11 @@ export class ManufacturingScheduleComponent implements OnInit {
   hourHeaders : Array<string> = [];
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate(new Date());
+  warningList: Array<Array<Activity>> = [[],[],[]];
   @Input() remove: EventEmitter<any>;
   @Input() goalsUpdated: EventEmitter<any>;
   @Input() manufGoals: Array<ManufacturingGoal>;
+  @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog) { }
@@ -108,8 +110,16 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       });
       if(endDate.getFullYear() > deadline.getFullYear() || endDate.getMonth() > deadline.getMonth() || endDate.getDate() > deadline.getDate()){
+        if(this.warningList[0].indexOf(this.activities[i].activity)==-1){
+          this.warningList[0].push(this.activities[i].activity);
+          this.warnings.emit(this.warningList);
+        }
         this.activities[i].past_deadline = true;
       } else {
+        if(this.warningList[0].indexOf(this.activities[i].activity)!=-1){
+          this.warningList[0].splice(this.warningList[1].indexOf(this.activities[i].activity), 1);
+          this.warnings.emit(this.warningList);
+        }
         this.activities[i].past_deadline = false;
       }
     }
@@ -125,7 +135,15 @@ export class ManufacturingScheduleComponent implements OnInit {
       });
       if(!inGoals){
         act.orphaned = true;
+        if(this.warningList[1].indexOf(act.activity)==-1){
+          this.warningList[1].push(act.activity);
+          this.warnings.emit(this.warningList);
+        }
       } else {
+        if(this.warningList[1].indexOf(act.activity)!=-1){
+          this.warningList[1].splice(this.warningList[1].indexOf(act.activity), 1);
+          this.warnings.emit(this.warningList);
+        }
         act.orphaned = false;
       }
     });
@@ -289,6 +307,8 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(result!=null){
           this.activities[activity_id].duration = +result;
           this.activities[activity_id].duration_override = true;
+          this.warningList[2].push(this.activities[activity_id].activity);
+          this.warnings.emit(this.warningList);
           this.refreshHours();
         }
       });
@@ -347,19 +367,6 @@ export class ManufacturingScheduleComponent implements OnInit {
       } else {
         return prefix+"start-box";
       }
-      // if(activity.past_deadline){
-      //   return 'past-deadline-start-box';
-      // }
-      // else if(activity.duration_override){
-      //   return 'duration-override-start-box';
-      // } else if(activity.orphaned){
-      //   return 'orphaned-start-box';
-      // }
-      // else if(starting_item=='' && item>=0){
-      //   return "selected-box";
-      // } else if(starting_item!=''){
-      //   return "start-box";
-      // }
     }
   }
 
