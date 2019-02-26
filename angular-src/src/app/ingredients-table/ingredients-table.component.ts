@@ -126,7 +126,7 @@ export class IngredientsTableComponent implements OnInit{
           number : editedIngredient.id,
           vendor_info : editedIngredient.vendor_info,
           unit: editedIngredient.unit,
-          package_size: editedIngredient.package_size,
+          package_size: Number(editedIngredient.package_size),
           cost : editedIngredient.cost_per_package*1,
           comment : editedIngredient.comment
         }).subscribe(
