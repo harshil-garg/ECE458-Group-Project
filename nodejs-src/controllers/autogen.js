@@ -1,5 +1,5 @@
 module.exports.autogen = async function (model) {
-    let items = await model.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec()
+    let items = await model.find().sort({number: 1}).collation({locale: "en_US", numericOrdering: true}).exec().catch((err) => {console.log(err.toString())})
     return smallest_missing_number(items, 0, items.length - 1);
 }
 

@@ -29,15 +29,16 @@ module.exports.updateProductLine = (product_line_name, product_line_update, cb) 
     ProductLine.findOneAndUpdate(query, product_line_update, cb);
 }
 
-module.exports.attemptImport = async (product_lines, results) => {
+module.exports.attemptImport = async (product_lines, product_lines_csv, results) => {
     let type = 'product_lines'
-    await validator.conflictCheck(ProductLine, product_lines, results, type);
+    await validator.duplicateCheck(ProductLine, product_lines, product_lines_csv, results, type)
+    await validator.conflictCheck(ProductLine, product_lines, product_lines_csv, results, type);
 }
 
 module.exports.commitImport = async (createlist) => {
     if(createlist){
         for(let row of createlist){
-            await ProductLine.create(row).catch((err) => {throw err});
+            await ProductLine.create(row)//.catch((err) => {throw err});
         }
     }
     return true;

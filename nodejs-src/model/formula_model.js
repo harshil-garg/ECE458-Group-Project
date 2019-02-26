@@ -108,7 +108,6 @@ async function syntaxValidation(formulas, formulas_csv, results, type) {
 
         let name_passed = validator.proper_name_length(formula.name);
         let ingredient_tuple_passed = await formula_validator.validIngredientTuple(Ingredient, formula.ingredient, formula.unit);
-
         let errors = validator.compileErrors(name_passed, ingredient_tuple_passed);
         if(errors.length > 0){
             results[type].errorlist.push({

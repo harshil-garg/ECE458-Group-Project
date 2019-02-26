@@ -71,82 +71,64 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
     for(let [formula, formula_csv] of utils.zip(formulas, formulas_csv)){
         let primary_match = await model.findOne({number: formula.number}).exec();
         let matches = await model.find({$or: [{number: formula.number}, {name: formula.name}]}).exec();
+        if(!formula.ingredient){
+            return;
+        }
 
         //Check to autogen number
         if(!formula.number){
             formula.number = await autogen.autogen(model);
         } 
         let atEnd = formula.number == formulas[formulas.length-1].number && formula.ingredient.equals(formulas[formulas.length-1].ingredient);
-
-        //first line
-        if(formula.number != current_number){
-            let newObj;
-            //At the end 
-            if(atEnd){
-                let tuple = {
-                    ingredient: formula.ingredient,
-                    quantity: formula.quantity,
-                    unit: formula.unit
-                }
-                ingredient_tuples.push(tuple);
-                newObj = createNewFormula(formula.number, formula.name, ingredient_tuples, formula.comment);
-            }else{
-                newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment)
-            }
-            
-            if(primary_match){
-                results[type].changelist.push(formula_csv);
-                results[type].changelist_model.push(newObj);
-            }else{
-                results[type].createlist.push(formula_csv);
-                results[type].createlist_model.push(newObj);
-            }
-
-            current_number = formula.number;
-            current_name = formula.name;
-            current_comment = formula.comment;
-        }else{ //consecutive lines
-            console.log('consecutive')
-            if(formula.name != current_name){
-                results[type].errorlist.push({
-                    message: `Name ${formula.name} does not match name ${current_name} for formula ${current_number}`,
-                    data: formula_csv
-                });
-            }
-            if(past_formulas.has(current_number)){
-                results[type].errorlist.push({
-                    message: `Formula ${current_number} not consecutive with other formulas of the same number`,
-                    data: formula_csv
-                });
-            }
-            if(matches.length > 1){
+        
+        if(matches.length > 1){
+            results[type].errorlist.push({
+                message: 'Ambiguous record',
+                data: formula_csv
+            });
+        }else if(matches.length == 1){
+            if(!matches[0].equals(primary_match)){
                 results[type].errorlist.push({
                     message: 'Ambiguous record',
                     data: formula_csv
                 });
-            }else if(matches.length == 1){
-                if(!matches[0].equals(primary_match)){
-                    results[type].errorlist.push({
-                        message: 'Ambiguous record',
-                        data: formula_csv
-                    });
-                } 
-            }else{
-                let tuple = {
-                    ingredient: formula.ingredient,
-                    quantity: formula.quantity,
-                    unit: formula.unit
-                }
-                ingredient_tuples.push(tuple);
-                if(primary_match){
-                    results[type].changelist.push(formula);
+            } 
+        }else{
+            let tuple = {
+                ingredient: formula.ingredient,
+                quantity: formula.quantity,
+                unit: formula.unit
+            }
+            ingredient_tuples.push(tuple);
+            if(atEnd){             
+                if(formula.number != current_number) {
+                    newObj = createNewFormula(formula.number, formula.name, ingredient_tuples, formula.comment);
                 }else{
-                    results[type].createlist.push(formula);
+                    if(formula.name != current_name){
+                        results[type].errorlist.push({
+                            message: `Name ${formula.name} does not match name ${current_name} for formula ${current_number}`,
+                            data: formula_csv
+                        });
+                    }
+                    if(past_formulas.has(current_number)){
+                        results[type].errorlist.push({
+                            message: `Formula ${current_number} not consecutive with other formulas of the same number`,
+                            data: formula_csv
+                        });
+                    }
+                    newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                 }
-
-                //At the end 
-                if(atEnd){
-                    let newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
+                
+                if(primary_match){
+                    results[type].changelist.push(formula_csv);
+                    results[type].changelist_model.push(newObj);
+                }else{
+                    results[type].createlist.push(formula_csv);
+                    results[type].createlist_model.push(newObj);
+                }
+            }else{
+                if(formula.number != current_number){
+                    newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                     if(primary_match){
                         results[type].changelist.push(formula_csv);
                         results[type].changelist_model.push(newObj);
@@ -154,8 +136,26 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                         results[type].createlist.push(formula_csv);
                         results[type].createlist_model.push(newObj);
                     }
-                }               
-            } 
+                }else{
+                    if(formula.name != current_name){
+                        results[type].errorlist.push({
+                            message: `Name ${formula.name} does not match name ${current_name} for formula ${current_number}`,
+                            data: formula_csv
+                        });
+                    }
+                    if(past_formulas.has(current_number)){
+                        results[type].errorlist.push({
+                            message: `Formula ${current_number} not consecutive with other formulas of the same number`,
+                            data: formula_csv
+                        });
+                    }
+                    if(primary_match){
+                        results[type].changelist.push(formula_csv);
+                    }else{
+                        results[type].createlist.push(formula_csv);
+                    }
+                }
+            }
         }
     }
 }

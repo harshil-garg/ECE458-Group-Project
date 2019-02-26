@@ -104,7 +104,7 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
     for(let [row, row_csv] of utils.zip(data, data_csv)){
         let primary_key = getPrimaryKey(model)
         let primary_match = await model.findOne({[primary_key]: row[primary_key]}).exec();
-
+        console.log(primary_match)
         let matches = [];
         for(let key of unique_keys){
             matches = matches.concat(await model.find({[key]: row[key]}));
@@ -114,14 +114,16 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
                 message: 'Ambiguous record',
                 data: row_csv
             });
-        }else if(matches.length == 1){
+        }
+        if(matches.length == 1){
             if(!matches[0].equals(primary_match)){
                 results[type].errorlist.push({
                     message: 'Ambiguous record',
                     data: row_csv
                 });
             }
-        }else if(primary_match){
+        }
+        if(primary_match){
             //check identical
             let identical = true;
             for(let property of properties){
@@ -144,7 +146,7 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
 }
 
 function getPrimaryKey(model){
-    if(model.name == 'ProductLine'){
+    if(model.modelName == 'ProductLine'){
         return 'name';
     }
     return 'number';

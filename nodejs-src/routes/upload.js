@@ -56,10 +56,10 @@ router.post('/', upload.array('file[]', 4), async (req, res) => {
 
   uploadSessionStarted = true;
   if (req.files.length == 1 && req.files[0].filename.includes('.zip')) {
-    await handleZip(req.files[0], res).catch((err) => {return});
+    await handleZip(req.files[0], res)//.catch((err) => {return});
   }
   else {
-    await handleFiles(res).catch((err) => {return});
+    await handleFiles(res)//.catch((err) => {return});
   }
 });
 
@@ -67,13 +67,14 @@ router.post('/commit', async (req, res) => {
   if (uploadSessionStarted && uploadHalfComplete) {
     if (req.body.commit) {
       let failed = false;
-      await commitImport().catch((err) => {
-        res.json({success: false, message: err});
-        failed = true;
-      });
-      if(failed){
-        return;
-      }
+      await commitImport()
+      // .catch((err) => {
+      //   res.json({success: false, message: err});
+      //   failed = true;
+      // });
+      // if(failed){
+      //   return;
+      // }
     }
     else {
       resetSession();
@@ -152,7 +153,7 @@ async function handleFiles(res) {
             await handleCSV(file, results, reject, SKU, sku_properties, csvSkus, jsonSkus);
           }
           else if (file.substring(0, 11) == 'ingredients') {
-            await handleCSV(file, results, reject, Ingredient, ingredient_properties, jsonIngredients, csvIngredients);
+            await handleCSV(file, results, reject, Ingredient, ingredient_properties, csvIngredients, jsonIngredients);
           }
           else if (file.substring(0, 8) == 'formulas') {
             await handleCSV(file, results, reject, Formula, formula_properties, csvFormulas, jsonFormulas);
@@ -185,6 +186,7 @@ async function handleFiles(res) {
     }
   
     if (jsonIngredients.length > 0) {
+      console.log('trying')
       await Ingredient.attemptImport(jsonIngredients, csvIngredients, results);
     }
   
@@ -210,10 +212,16 @@ async function handleFiles(res) {
   
       //if there's no errors and no potential changes, commit the changes
       if (!(results.ingredients.changelist.length || results.skus.changelist.length)) {
-        await commitImport().then(() => {
+        await commitImport()
+        .then(() => {
           results.success = true;
-        }).catch((err) =>{
-          results.success = false;
+        })
+        .catch((err) =>{
+          results = {
+            success: false,
+            uploadErrorType: 'MongoDB error:' + err.toString()
+          };
+
         });
       }
       //if theres no errors, but there are changes, continue the session
@@ -285,8 +293,8 @@ async function handleCSV(file, results, reject, model, model_properties, csv_lis
 }
 
 async function commitImport() {
-  if(toBeCommitted.ingredients.createlist.length > 0){
-    await ProductLine.commitImport(toBeCommitted.ingredients.createlist).catch((err) => {throw err});
+  if(toBeCommitted.product_lines.createlist.length > 0){
+    await ProductLine.commitImport(toBeCommitted.product_lines.createlist).catch((err) => {throw err});
   }
   if(toBeCommitted.ingredients.createlist.length > 0 || toBeCommitted.ingredients.changelist.length > 0){
     await Ingredient.commitImport(toBeCommitted.ingredients.createlist, toBeCommitted.ingredients.changelist).catch((err) => {throw err});
@@ -344,10 +352,10 @@ function preprocess(model, properties, data){
   let model_keys = Object.keys(model.schema.obj);
   let j = 0;
   for(let i = 0; i < properties.length; i++){
-    if(model.modelName == 'Ingredient' && properties[i] == 'Unit size'){
+    if(model.modelName == 'Ingredient' && properties[i] == 'Size'){
       let size = data[properties[i]].split(' ');
       obj['package_size'] = size[0];
-      obj['unit'] = size[0];
+      obj['unit'] = size[1];
       j++;     
     }else if(model.modelName == 'Formula' && properties[i] == 'Ingr#'){
       obj['ingredient'] = data[properties[i]];
@@ -363,7 +371,7 @@ function preprocess(model, properties, data){
     }
     j++;
   }
-
+  console.log(obj)
   return obj;
 }
 

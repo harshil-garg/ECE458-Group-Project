@@ -41,44 +41,43 @@ const IngredientSchema = new Schema({
     }
 });
 
-let Ingredients = mongoose.model('Ingredient', IngredientSchema);
-module.exports = Ingredients;
+let Ingredient = mongoose.model('Ingredient', IngredientSchema);
+module.exports = Ingredient;
 
 module.exports.createIngredient = (ingredient, callback) => {
-    Ingredients.create(ingredient, callback);
+    Ingredient.create(ingredient, callback);
 }
 
 module.exports.deleteIngredient = (ingredient_name, callback) => {
     var query = {name: ingredient_name};
-    Ingredients.deleteOne(query, callback);
+    Ingredient.deleteOne(query, callback);
 }
 
 module.exports.updateIngredient = (ingredient_name, ingredient_update, cb) => {
     var query = {name: ingredient_name};
-    Ingredients.findOneAndUpdate(query, ingredient_update, cb);
+    Ingredient.findOneAndUpdate(query, ingredient_update, cb);
 }
 
 module.exports.attemptImport = async (ingredients, ingredients_csv, results) => {
     let type = 'ingredients'
     await syntaxValidation(ingredients, ingredients_csv, results, type);
-    await validator.conflictCheck(Ingredient, ingredients, results, type);
+    await validator.duplicateCheck(Ingredient, ingredients, ingredients_csv, results, type);
+    await validator.conflictCheck(Ingredient, ingredients, ingredients_csv, results, type);
 }
 
 module.exports.commitImport = async (createlist, changelist) => {
     if(createlist){
         for(let row of createlist){
-            await Ingredient.create(row).catch((err) => {throw err});
+            await Ingredient.create(row).catch((err) => {console.log(err);throw err});
         }
     }
     if(changelist){
         for(let row of createlist){
-            await Ingredient.findOneAndUpdate({number: row.number}, row).catch((err) => {throw err});
+            await Ingredient.findOneAndUpdate({number: row.number}, row).catch((err) => {console.log(err);throw err});
         }
     }
     return true;
 }
-
-
 
 async function syntaxValidation(ingredients, ingredients_csv, results, type) {
     for(let [ingredient, ingredient_csv] of utils.zip(ingredients, ingredients_csv)){
@@ -99,9 +98,8 @@ async function syntaxValidation(ingredients, ingredients_csv, results, type) {
                 }
             }
         }else{
-            ingredient.number = await autogen.autogen(Ingredient);
+            ingredient.number = await autogen.autogen(Ingredient)//.catch((err) => {console.log(err.toString())});
         }
-
         let cost_numeric = validator.isNumeric(ingredient.cost);
         if(!cost_numeric[0]){
             results[type].errorlist.push({
@@ -116,8 +114,7 @@ async function syntaxValidation(ingredients, ingredients_csv, results, type) {
                     data: ingredient_csv
                 });
             }
-            ingredient.cost = validator.roundCost(cost);
+            ingredient.cost = validator.roundCost(ingredient.cost);
         }
-
     }
 }
