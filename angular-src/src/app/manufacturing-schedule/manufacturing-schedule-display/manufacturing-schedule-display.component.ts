@@ -13,6 +13,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   manufGoalList : Array<ManufacturingGoal> = [];
   activityList : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
+  goalsUpdated: EventEmitter<any> = new EventEmitter();
 
   constructor(private manufacturingGoalService: ManufacturingGoalService){}
 
@@ -90,6 +91,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   remove(id){
     if(confirm("Are you sure?")){
       this.manufGoalList.splice(id, 1);
+      this.goalsUpdated.emit(true);
     }
   }
 

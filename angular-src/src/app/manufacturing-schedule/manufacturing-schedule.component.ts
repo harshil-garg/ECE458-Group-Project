@@ -22,8 +22,9 @@ export class ManufacturingScheduleComponent implements OnInit {
   activities : Array<ManufacturingScheduleEvent> = [];
   hourHeaders : Array<string> = [];
   manufLines : Array<string> = [];
-  currDate : Date = this.zeroedDate();
+  currDate : Date = this.zeroedDate(new Date());
   @Input() remove: EventEmitter<any>;
+  @Input() goalsUpdated: EventEmitter<any>;
   @Input() manufGoals: Array<ManufacturingGoal>;
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
@@ -32,6 +33,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   ngOnInit() {
     this.populateManufLines();
     this.remove.subscribe(index=>this.removeActivity(index));
+    this.goalsUpdated.subscribe(ev => this.updateOrphaned());
   }
 
   populateManufLines(){
@@ -88,7 +90,8 @@ export class ManufacturingScheduleComponent implements OnInit {
           this.starting_hours[manufIndex][hour-8] = this.activities[i].activity.sku.name;
         }
       }
-      var endTime = this.calculateEndTime(this.activities[i].start_date, this.activities[i].duration).getTime();
+      var endDate = this.calculateEndTime(this.activities[i].start_date, this.activities[i].duration);
+      var endTime = endDate.getTime();
       for(var j=0; j<10; j++){//iterate over hours
         this.currDate.setHours(j+8);
         var currTime = this.currDate.getTime();
@@ -97,13 +100,41 @@ export class ManufacturingScheduleComponent implements OnInit {
           this.hours[manufIndex][j] = i;
         }
       }
+      var manufGoal = this.activities[i].activity.manufacturing_goal;
+      var deadline = new Date();
+      this.manufGoals.forEach(goal => {
+        if(goal.name == manufGoal){
+          deadline = new Date(goal.deadline);
+        }
+      });
+      if(endDate.getFullYear() > deadline.getFullYear() || endDate.getMonth() > deadline.getMonth() || endDate.getDate() > deadline.getDate()){
+        this.activities[i].past_deadline = true;
+      } else {
+        this.activities[i].past_deadline = false;
+      }
     }
+  }
+
+  updateOrphaned(){
+    this.activities.forEach(act => {
+      var inGoals : boolean = false;
+      this.manufGoals.forEach(goal => {
+        if(goal.name == act.activity.manufacturing_goal){
+          inGoals = true;
+        }
+      });
+      if(!inGoals){
+        act.orphaned = true;
+      } else {
+        act.orphaned = false;
+      }
+    });
   }
 
   calculateEndTime(startTime: Date, duration: number){
     var timeTil6 = 18 - startTime.getHours();
     var date = new Date(startTime.getTime());
-    if(timeTil6 > duration){
+    if(timeTil6 >= duration){
       date.setHours(date.getHours() + duration);
       console.log(date);
     }
@@ -119,8 +150,8 @@ export class ManufacturingScheduleComponent implements OnInit {
     return date;
   }
 
-  zeroedDate(){
-    var currDate = new Date();
+  zeroedDate(givenDate: Date){
+    var currDate = new Date(givenDate.getTime());
     currDate.setHours(0);
     currDate.setMinutes(0);
     currDate.setSeconds(0);
@@ -166,7 +197,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       var currId = event.container.id.split("-")[1];
       var currHour = event.container.id.split("-")[3];
       var initialValue = this.activities[this.hours[+prevId][prevHour]].activity;
-      var updatedDate = this.zeroedDate();
+      var updatedDate = this.zeroedDate(this.currDate);
       updatedDate.setHours(8+ (+currHour));
       if(!this.isCollision(updatedDate, initialValue, this.manufLines[+currId]) && !this.wrongManufLine(initialValue, this.manufLines[+currId])){
         this.activities.forEach(activity=>{
@@ -295,4 +326,41 @@ export class ManufacturingScheduleComponent implements OnInit {
     }
     return returned.substring(0, returned.length - 1);
   }
+
+  getClass(id, hour_id){
+    var item = this.hours[id][hour_id];
+    var starting_item = this.starting_hours[id][hour_id];
+    if(item==-1){
+      return "example-box";
+    } else {
+      var activity = this.activities[item];
+      var prefix : string = "";
+      if(activity.past_deadline){
+        prefix += "past-deadline-";
+      } else if(activity.duration_override){
+        prefix += "duration-override-";
+      } else if(activity.orphaned){
+        prefix += "orphaned-";
+      }
+      if(starting_item==''){
+        return prefix+"selected-box";
+      } else {
+        return prefix+"start-box";
+      }
+      // if(activity.past_deadline){
+      //   return 'past-deadline-start-box';
+      // }
+      // else if(activity.duration_override){
+      //   return 'duration-override-start-box';
+      // } else if(activity.orphaned){
+      //   return 'orphaned-start-box';
+      // }
+      // else if(starting_item=='' && item>=0){
+      //   return "selected-box";
+      // } else if(starting_item!=''){
+      //   return "start-box";
+      // }
+    }
+  }
+
 }

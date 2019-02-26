@@ -6,4 +6,6 @@ export class ManufacturingScheduleEvent {
   start_date: Date;
   duration: number;
   duration_override: boolean;
+  orphaned?: boolean;
+  past_deadline?: boolean;
 }
