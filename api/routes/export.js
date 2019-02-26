@@ -28,8 +28,7 @@ router.post('/skus', async (req, res) => {
     });
 
     let results = await sku_filter.filter(pageNum, sortBy, 0, key_exps, ingredients, product_lines);
-    format_skus(results.data);
-    res.json(results);
+    res.json({success: true, data: format_skus(results.data)});
 });
 
 router.post('/product_lines', async (req, res) => {
@@ -70,38 +69,50 @@ function format_ingredients(ingredients) {
 }
 
 function format_skus(skus) {
-    for(let sku of skus){
-        sku['SKU#'] = sku.number;
-        delete sku.number;
-        sku['Name'] = sku.name;
-        delete sku.name;
-        sku['Case UPC'] = sku.case_upc;
-        delete sku.case_upc;
-        sku['Unit UPC'] = sku.unit_upc;
-        delete sku.unit_upc;
-        sku['Unit size'] = sku.size;
-        delete sku.size;
-        sku['Count per case'] = sku.count;
-        delete sku.count;
-        sku['PL Name'] = sku.product_line;
-        delete sku.product_line;
-        sku['Formula#'] = sku.formula.number;
-        delete sku.formula;
-        sku['Formula Factor'] = sku.formula_scale_factor;
-        delete sku.formula_scale_factor;
+    result = [];
+    newsku = {};
+    newsku['SKU#'] = '1';
+    newsku['Name'] = 'skuname';
+    newsku['Case UPC'] = '005102218476';
+    newsku['Unit UPC'] = '364802618604';
+    newsku['Unit size'] = '28 oz';
+    newsku['Count per case'] = '24';
+    newsku['PL Name'] = 'prod line';
+    newsku['Formula#'] = '1';
+    newsku['Formula factor'] = '1.0';
 
-        let mls = [];
-        for(let ml of sku.manufacturing_lines){
-            mls.push(ml.shortname);
-        }
-        sku['ML Shortnames'] = mls;
-        delete sku.manufacturing_lines;
-        sku['Rate'] = sku.manufacturing_rate;
-        delete sku.manufacturing_rate;
-        sku['Comment'] = sku.comment;
-        delete sku.comment;
-        delete sku.ingredients;
-    }
+    newsku['ML Shortnames'] = 'name1name2'
+    newsku['Rate'] = '1.0';
+    newsku['Comment'] = 'testcomment';
+    result.push(newsku);
+
+
+
+    // for(let sku of skus){
+    //     newsku = {};
+    //     newsku['SKU#'] = sku.number;
+    //     newsku['Name'] = sku.name;
+    //     newsku['Case UPC'] = sku.case_upc;
+    //     newsku['Unit UPC'] = sku.unit_upc;
+    //     newsku['Unit size'] = sku.size;
+    //     newsku['Count per case'] = sku.count;
+    //     newsku['PL Name'] = sku.product_line;
+    //     newsku['Formula#'] = sku.formula.number;
+    //     newsku['Formula factor'] = sku.formula_scale_factor;
+
+    //     let mls = [];
+    //     for(let ml of sku.manufacturing_lines){
+    //         mls.push(ml.shortname);
+    //     }
+    //     newsku['ML Shortnames'] = mls;
+    //     newsku['Rate'] = sku.manufacturing_rate;
+    //     newsku['Comment'] = sku.comment;
+    //     console.log('here');
+    //     console.log(sku.ingredients);
+    //     delete sku.ingredients;
+    //     result.push(newsku);
+    // }
+    return result;
 }
 
 function format_product_lines(product_lines) {

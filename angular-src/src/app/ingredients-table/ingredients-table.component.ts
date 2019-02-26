@@ -243,20 +243,28 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     handleExportResponse(response){
-        // var url = window.URL.createObjectURL(response);
-        // var a = document.createElement('a');
-        // document.body.appendChild(a);
-        // a.setAttribute('style', 'display: none');
-        // a.href = url;
-        // a.download = 'ingredients.csv';
-        // a.click();
-        // window.URL.revokeObjectURL(url);
-        // a.remove();
       const options = {
         showLabels: true,
         headers: ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment']
       }
-      new AngularCsv(response.data, 'ingredients', options);
+      let blob = new Blob([this.stringifyToCSV(response.data)], { "type": "text/csv;charset=utf8;" });
+      let url = window.URL.createObjectURL(blob);
+      let a = document.createElement('a');
+      document.body.appendChild(a);
+      a.setAttribute('style', 'display: none');
+      a.href = url;
+      a.download = 'ingredients.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    }
+
+    stringifyToCSV(body) {
+      let output = 'Ingr#,Name,Vendor Info,Size,Cost,Comment\n';
+      for (let row of body) {
+        output += (row['Ingr#'] + ',' + row['Name'] + ',' + row['Vendor Info'] + ',' + row['Size'] + ',' + row['Cost'] + ',' + row['Comment'] + '\n');
+      }
+      return output;
     }
 
     isAllSelected() {
