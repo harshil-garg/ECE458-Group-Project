@@ -68,8 +68,8 @@ export class GenericResponse {
 }
 
 export class ReportData {
-  start: Date;
-  end: Date; 
+  start: string;
+  end: string; 
   manufacturing_line: string;
 }
 

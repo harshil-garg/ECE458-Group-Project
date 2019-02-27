@@ -226,8 +226,8 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     console.log(this.reportingFormControl.value + " " + typeof this.reportingFormControl.value);
 
     this.crudManufacturingLineService.getManufacturingScheduleReport({
-      start: this.startDate.value,
-      end: this.endDate.value,
+      start: this.startDate.value.toISOString(),
+      end: this.endDate.value.toISOString(),
       manufacturing_line: this.reportingFormControl.value
     }).subscribe(response => {
       console.log(response);
