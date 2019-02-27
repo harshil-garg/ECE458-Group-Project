@@ -28,16 +28,14 @@ router.post('/skus', async (req, res) => {
     });
 
     let results = await sku_filter.filter(pageNum, sortBy, 0, key_exps, ingredients, product_lines);
-    format_skus(results.data);
-    res.json(results);
+    res.json({success: true, data: format_skus(results.data)});
 });
 
 router.post('/product_lines', async (req, res) => {
     let agg = ProductLine.aggregate([{$match: {}}]);
 
     let results = await pagination.paginate(agg, pageNum, 'name', 0);
-    format_product_lines(results.data);
-    res.json(results);
+    res.json({success: true, data: format_product_lines(results.data)});
 });
 
 router.post('/formulas', async (req, res) => {
@@ -49,8 +47,7 @@ router.post('/formulas', async (req, res) => {
     });
 
     let results = await formula_filter.filter(pageNum, sortBy, 0, key_exps, ingredients);
-    format_formulas(results.data);
-    res.json(results);
+    res.json({success: true, data: format_formulas(results.data)});
 });
 
 
@@ -70,66 +67,63 @@ function format_ingredients(ingredients) {
 }
 
 function format_skus(skus) {
+    result = [];
     for(let sku of skus){
-        sku['SKU#'] = sku.number;
-        delete sku.number;
-        sku['Name'] = sku.name;
-        delete sku.name;
-        sku['Case UPC'] = sku.case_upc;
-        delete sku.case_upc;
-        sku['Unit UPC'] = sku.unit_upc;
-        delete sku.unit_upc;
-        sku['Unit size'] = sku.size;
-        delete sku.size;
-        sku['Count per case'] = sku.count;
-        delete sku.count;
-        sku['PL Name'] = sku.product_line;
-        delete sku.product_line;
-        sku['Formula#'] = sku.formula.number;
-        delete sku.formula;
-        sku['Formula Factor'] = sku.formula_scale_factor;
-        delete sku.formula_scale_factor;
+        newsku = {};
+        newsku['SKU#'] = sku.number;
+        newsku['Name'] = sku.name;
+        newsku['Case UPC'] = sku.case_upc;
+        newsku['Unit UPC'] = sku.unit_upc;
+        newsku['Unit size'] = sku.size;
+        newsku['Count per case'] = sku.count;
+        newsku['PL Name'] = sku.product_line;
+        newsku['Formula#'] = sku.formula.number;
+        newsku['Formula factor'] = sku.formula_scale_factor;
 
-        let mls = [];
+        let mls = `"`;
+        let counter = 0;
         for(let ml of sku.manufacturing_lines){
-            mls.push(ml.shortname);
+            mls += `${ml.shortname}${counter == sku.manufacturing_lines.length-1 ? '"' : ','}`;
+            counter++;
         }
-        sku['ML Shortnames'] = mls;
-        delete sku.manufacturing_lines;
-        sku['Rate'] = sku.manufacturing_rate;
-        delete sku.manufacturing_rate;
-        sku['Comment'] = sku.comment;
-        delete sku.comment;
-        delete sku.ingredients;
+        mls += `${counter > 0 ? '' : '"'}`;
+        newsku['ML Shortnames'] = mls;
+        newsku['Rate'] = sku.manufacturing_rate;
+        newsku['Comment'] = sku.comment;
+        result.push(newsku);
     }
+    console.log(result);
+    return result;
 }
 
 function format_product_lines(product_lines) {
+    let result = [];
     for(let line of product_lines){
-        line['Name'] = line.name;
-        delete line.name;
+        let newline = {};
+        newline['Name'] = line.name;
+        result.push(newline);
     }
+    return result;
 }
 
 function format_formulas(formulas){
+    let result = [];
     for(let formula of formulas){
-        formula['Formula#'] = formula.number;
-        delete formula.number;
-        formula['Name'] = formula.name;
-        delete formula.name;
-
-        let ingredients = [];
-        let quantities = [];
+        // let ingredients = [];
+        // let quantities = [];
+        let first = true;
         for(let tuple of formula.ingredient_tuples){
-            ingredients.push(tuple.ingredient.number);
-            let unit = tuple.unit.replace(/\W/g, '');
-            quantities.push(`${tuple.quantity} ${unit}`);
+            newformula = {};
+            newformula['Formula#'] = formula.number;
+            newformula['Name'] = formula.name;
+            newFormula['Ingr#'] = tuple.ingredient.number;
+            newformula['Quantity'] = `${tuple.quantity} ${tuple.unit}`;
+            newformula['Comment'] = first ? formula.comment : '';
+            first = false;
+            result.push(newformula);
         }
-
-        formula['Ingr#'] = ingredients;
-        formula['Quantity'] = quantities;
-        formula['Comment'] = comment;
     }
+    return result;
 }
 
 

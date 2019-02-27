@@ -14,7 +14,8 @@
     margin: auto;
   }
   
-.confirm-card {
+.confirm-card, .success-card {
+    height: 100%;
     width: 95%;
     margin: auto;
 }
@@ -29,4 +30,8 @@
 
 .upload-table {
     width: 100%;
+}
+
+.button-container {
+  height: 50px;
 }

@@ -9,7 +9,7 @@ import { FilterIngredientsService, FilterResponse, IngredientCsvData } from './f
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { AngularCsv } from 'angular7-csv/dist/Angular-csv'
+import { ExportService } from '../export.service';
 
 @Component({
   selector: 'ingredients-table',
@@ -58,7 +58,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     constructor(private authenticationService: AuthenticationService, public crudIngredientsService: CrudIngredientsService,
-      public filterIngredientsService: FilterIngredientsService, private snackBar: MatSnackBar){}
+      public filterIngredientsService: FilterIngredientsService, private snackBar: MatSnackBar, public exportService: ExportService){}
 
     remove() {
       for(let selected of this.selection.selected){
@@ -243,20 +243,8 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     handleExportResponse(response){
-        // var url = window.URL.createObjectURL(response);
-        // var a = document.createElement('a');
-        // document.body.appendChild(a);
-        // a.setAttribute('style', 'display: none');
-        // a.href = url;
-        // a.download = 'ingredients.csv';
-        // a.click();
-        // window.URL.revokeObjectURL(url);
-        // a.remove();
-      const options = {
-        showLabels: true,
-        headers: ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment']
-      }
-      new AngularCsv(response.data, 'ingredients', options);
+      const headers = ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment'];
+      this.exportService.exportJSON(headers, response.data, 'ingredients');
     }
 
     isAllSelected() {

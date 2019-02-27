@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>Bulk Sku Edit</h2>
+<mat-dialog-content>
+  <mat-tab-group style="height:630px;">
+    <mat-tab *ngIf="data.all.length>0" label="All">
+      <p>All SKUs can be produced on these lines</p>
+      <mat-selection-list #allskus (selectionChange)="onAllSelection($event, allskus.selectedOptions.selected)">
+        <mat-list-option *ngFor="let name of data.all" [value]="name">
+          {{name}}
+        </mat-list-option>
+      </mat-selection-list>      
+    </mat-tab>
+    <mat-tab *ngIf="data.some.length>0" label="Some">
+      <p>Some SKUs can be produced on these lines</p>
+      <mat-selection-list #someskus (selectionChange)="onSomeSelection($event, someskus.selectedOptions.selected)">
+        <mat-list-option *ngFor="let name of data.some" [value]="name">
+          {{name}}
+        </mat-list-option>
+      </mat-selection-list>      
+    </mat-tab>
+    <mat-tab *ngIf="data.none.length>0" label="None">
+        <p>No SKUs can be produced on these lines</p>
+      <mat-selection-list #noskus  (selectionChange)="onNoneSelection($event, noskus.selectedOptions.selected)">
+        <mat-list-option *ngFor="let name of data.none" [value]="name">
+          {{name}}
+        </mat-list-option>
+      </mat-selection-list>      
+    </mat-tab>
+</mat-tab-group>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button color="primary"  [disabled]="nothingSelected()" (click)="bulkEdit(true)">Add</button>
+  <button mat-button color="primary" [disabled]="nothingSelected()" (click)="bulkEdit(false)">Remove</button>
+  <!-- <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button> -->
+</mat-dialog-actions>

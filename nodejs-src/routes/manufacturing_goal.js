@@ -46,7 +46,6 @@ router.post('/calculator', async (req, res) => {
 
             let unit_value = sku_tuple.case_quantity * sku.formula_scale_factor * ingr_tuple.quantity * unit.convert(ingr_tuple.unit, ingredient.unit); // goal case quantity * sku scale factor * formula quantity * conversion
 
-
             // If ingredient already in map, update values
             if(key in ingredientMap){
                 ingredientMap[key]['unit_value'] += unit_value;
@@ -56,7 +55,8 @@ router.post('/calculator', async (req, res) => {
                 ingredientMap[key]['unit_value'] = unit_value;
                 ingredientMap[key]['unit'] = ingredient.unit;
                 ingredientMap[key]['package_value'] = unit_value / ingredient.package_size;
-            }          
+                ingredientMap[key]['number'] = ingredient.number;
+            }
         }
     }
 

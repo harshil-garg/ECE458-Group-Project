@@ -10,7 +10,7 @@ services:
     volumes:
       - ./angular-src:/app
       - ./certificates:/app/certificates
-      - app/node_modules
+      - /app/node_modules
   backend-server:
     build: ./nodejs-src
     ports:
