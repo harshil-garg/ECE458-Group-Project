@@ -29,6 +29,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   @Input() goalsUpdated: EventEmitter<any>;
   @Input() manufGoals: Array<ManufacturingGoal>;
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
+  @Output() activitiesUpdated: EventEmitter<Array<ManufacturingScheduleEvent>> = new EventEmitter();
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog,
@@ -59,6 +60,7 @@ export class ManufacturingScheduleComponent implements OnInit {
             duration_override: data.duration_override
           })});
           this.populateManufLines();
+          this.activitiesUpdated.emit(this.activities);
         } else {
           this.displayError("Failed to setup Activities!");
         }

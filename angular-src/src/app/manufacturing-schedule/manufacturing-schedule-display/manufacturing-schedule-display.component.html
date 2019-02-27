@@ -22,12 +22,12 @@
       <div
         cdkDropList
         #activities="cdkDropList"
-        [cdkDropListData]="activityList"
+        [cdkDropListData]="palette"
         [cdkDropListConnectedTo]="getLists()"
         id="manufacturing-activities"
         class="example-list"
         (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of activityList" cdkDrag>{{item.sku.name}} &nbsp; ({{item.manufacturing_goal}})
+        <div class="example-box" *ngFor="let item of palette" cdkDrag>{{item.sku.name}} &nbsp; ({{item.manufacturing_goal}})
           <mat-icon *cdkDragPreview></mat-icon>
         </div>
       </div>
@@ -107,7 +107,7 @@
     <div class="fixed-container">
       <h2>Manufacturing Schedule</h2>
       <div class="content">
-        <app-manufacturing-schedule [remove]="removeEvent" [manufGoals]="manufGoalList" [goalsUpdated]="goalsUpdated" (warnings)="updateWarnings($event)"></app-manufacturing-schedule>
+        <app-manufacturing-schedule [remove]="removeEvent" [manufGoals]="manufGoalList" [goalsUpdated]="goalsUpdated" (warnings)="updateWarnings($event)" (activitiesUpdated)="updateActivities($event)"></app-manufacturing-schedule>
       </div>
     </div>
   </mat-sidenav-content>

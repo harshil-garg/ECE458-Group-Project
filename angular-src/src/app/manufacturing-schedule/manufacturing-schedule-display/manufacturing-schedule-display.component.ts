@@ -2,6 +2,7 @@ import { Component, OnInit, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { ManufacturingScheduleService } from '../manufacturing-schedule.service';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
+import { ManufacturingScheduleEvent } from '../../model/manufacturing-schedule-event';
 import { Activity } from '../../model/activity';
 import { MatSnackBar } from '@angular/material';
 
@@ -12,7 +13,8 @@ import { MatSnackBar } from '@angular/material';
 })
 export class ManufacturingScheduleDisplayComponent implements OnInit{
   manufGoalList : Array<ManufacturingGoal> = [];
-  activityList : Array<Activity> = [];
+  palette : Array<Activity> = [];
+  addedActivities : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
   goalsUpdated: EventEmitter<any> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
@@ -21,7 +23,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   ngOnInit(){
     this.manufGoalList = [];
-    this.activityList = [];
+    this.palette = [];
     this.populateManufGoalList();
   }
 
@@ -71,18 +73,26 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     }
     console.log("MANUF GOALS");
     console.log(this.manufGoalList);
-    this.populateActivityList();
+    this.refreshPalette();
   }
 
-  populateActivityList(){
-    this.activityList = [];
+  refreshPalette(){
+    this.palette = [];
     for(let manufGoal of this.manufGoalList){
       manufGoal.sku_tuples.forEach(sku => {
-        this.activityList.push({
-          sku: sku.sku,
-          duration: sku.case_quantity * (+sku.sku.manufacturing_rate),
-          manufacturing_goal: manufGoal.name
+        var alreadyAdded : boolean = false;
+        this.addedActivities.forEach(act=>{
+          if(act.sku["number"] == sku.sku["number"] && act.manufacturing_goal == manufGoal.name){
+            alreadyAdded = true;
+          }
         });
+        if(!alreadyAdded){
+          this.palette.push({
+            sku: sku.sku,
+            duration: sku.case_quantity * (+sku.sku.manufacturing_rate),
+            manufacturing_goal: manufGoal.name
+          });
+        }
       });
     }
   }
@@ -91,7 +101,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     if(event.previousContainer.id != "manufacturing-activities"){
       var manufLine = event.previousContainer.id.split("-")[1];
       var hour = event.previousContainer.id.split("-")[3];
-      this.activityList.push(event.previousContainer.data);
+      this.palette.push(event.previousContainer.data);
       this.removeEvent.emit([manufLine, hour]);
     }
     // if (event.previousContainer === event.container) {
@@ -122,7 +132,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   removeActivity(id){
-    this.activityList.splice(id, 1);
+    this.palette.splice(id, 1);
   }
 
   confirmEnable(goal: ManufacturingGoal){
@@ -164,6 +174,14 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   displayError(message){
     this.snackBar.open(message, "Close", {duration:3000});
+  }
+
+  updateActivities(event: Array<ManufacturingScheduleEvent>){
+    this.addedActivities = [];
+    event.forEach(event => {
+      this.addedActivities.push(event.activity);
+    });
+    this.refreshPalette();
   }
 
 }
