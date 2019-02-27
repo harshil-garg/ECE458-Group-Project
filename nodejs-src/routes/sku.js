@@ -56,20 +56,13 @@ router.post('/populate_lines', async (req, res) => {
         }
         i++;
     });
-
     all = Array.from(all);
-
-    some = Array.from(some);
+    some = Array.from(some)
 
     let lines = await ManufacturingLine.find({shortname: {$nin: some}}).exec();
     for(let line of lines){
         none.push(line.shortname)
     }
-    some = new Set(some)
-    for(let line of all){
-        some.delete(line);
-    }
-    some = Array.from(some);
 
     let results = {
         all: all,
@@ -276,7 +269,7 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: product_passed[1]});
             return;
         }
-        json["product_line"] = product_line;
+        json["product_line"] = product_passed[2];
     }
     if (formula) {
         let formula_id = await formulaHandler(formula, res);
