@@ -128,6 +128,7 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
         }
         if(primary_match){
             //check identical
+            //TODO: fix
             let identical = true;
             for(let property of properties){
                 identical = identical && row[property] == primary_match[property]

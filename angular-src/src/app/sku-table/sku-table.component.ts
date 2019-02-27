@@ -312,7 +312,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     handleExportSkusResponse(response){
-      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
+      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
       this.exportService.exportJSON(headers, response.data, 'skus');
     }
 
