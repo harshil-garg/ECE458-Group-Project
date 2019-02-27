@@ -378,7 +378,7 @@ function preprocess(model, properties, data){
       let unit = (match != null) ? match[2] : data[properties[i]];
       unit = cleanUnit(unit);
       obj['quantity'] = quantity;
-      obj['unit'] = quantity[1];
+      obj['unit'] = unit;
       j--;
     }else if(properties[i] == 'ML Shortnames'){
       obj[model_keys[j]] = data[properties[i]].split(',');
@@ -387,7 +387,7 @@ function preprocess(model, properties, data){
     }
     j++;
   }
-  console.log(obj)
+  // console.log(obj)
   return obj;
 }
 

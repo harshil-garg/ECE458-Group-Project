@@ -79,6 +79,7 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
         if(!formula.number){
             formula.number = await autogen.autogen(model);
         } 
+        let atStart = formula.number == formulas[0].number && formula.ingredient.equals(formulas[0].ingredient);
         let atEnd = formula.number == formulas[formulas.length-1].number && formula.ingredient.equals(formulas[formulas.length-1].ingredient);
         
         if(matches.length > 1){
@@ -103,6 +104,7 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
             if(atEnd){             
                 if(formula.number != current_number) {
                     newObj = createNewFormula(formula.number, formula.name, ingredient_tuples, formula.comment);
+                    // console.log('first: '+newObj)
                 }else{
                     if(formula.name != current_name){
                         results[type].errorlist.push({
@@ -117,6 +119,7 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                         });
                     }
                     newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
+                    // console.log('end: '+newObj)
                 }
                 
                 if(primary_match){
@@ -127,7 +130,9 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                     results[type].createlist_model.push(newObj);
                 }
             }else{
-                if(formula.number != current_number){
+                //error
+
+                if(formula.number != current_number && !atStart){ //make sure not first
                     newObj = createNewFormula(current_number, current_name, ingredient_tuples, current_comment);
                     if(primary_match){
                         results[type].changelist.push(formula_csv);
@@ -136,8 +141,9 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                         results[type].createlist.push(formula_csv);
                         results[type].createlist_model.push(newObj);
                     }
-                }else{
-                    if(formula.name != current_name){
+                }
+                else{
+                    if(formula.name != current_name && !atStart){
                         results[type].errorlist.push({
                             message: `Name ${formula.name} does not match name ${current_name} for formula ${current_number}`,
                             data: formula_csv
@@ -157,6 +163,9 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
                 }
             }
         }
+        current_number = formula.number;
+        current_name = formula.name;
+        current_comment = formula.comment;
     }
 }
 

@@ -5,6 +5,7 @@ const SKU = require('../model/sku_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 const product_line_validator = require('../controllers/product_line_validator');
+const autocomplete = require('../controllers/autocomplete');
 
 //Autocomplete
 router.post('/autocomplete', async (req, res) => {
