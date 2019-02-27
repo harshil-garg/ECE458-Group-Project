@@ -60,7 +60,7 @@ router.post('/create', async (req, res) => {
                 quantity = tuple.case_quantity;
             }
         }
-        duration = Math.round(quantity / sku.manufacturing_rate);
+        duration = Math.ceil(quantity / sku.manufacturing_rate);
         console.log(duration)
         
     }else{
@@ -110,7 +110,7 @@ router.post('/update', async (req, res) => {
             }
         }
         
-        calculated_duration = Math.round(quantity / sku.manufacturing_rate);
+        calculated_duration = Math.ceil(quantity / sku.manufacturing_rate);
         console.log(calculated_duration)
         console.log(duration)
 
