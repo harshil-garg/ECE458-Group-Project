@@ -1,3 +1,83 @@
-<p>
-  manufacturing-schedule-report works!
-</p>
+<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
+<h1 mat-dialog-title>Manufacturing Schedule Report</h1>
+<div mat-dialog-content>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center">Activity ID</th>
+          <th class="text-center">SKU Display</th>
+          <th class="text-center">SKU ID</th>
+          <th class="text-center">SKU Case Quantity</th>
+          <th class="text-center">Formula ID</th>
+          <th class="text-center">Formula Name</th>
+          <th class="text-center">Formula / Ingredients</th>
+          <th class="text-center">Start</th>
+          <th class="text-center">End</th>
+          <th class="text-center">Duration</th>
+        </tr>
+
+       <ng-container *ngFor="let activity of activities; let id=index">
+            <tr>
+              <td contenteditable="false">{{id}}</td>
+              <td contenteditable="false">{{activity.sku_display_name}}</td>
+              <td contenteditable="false">{{activity.sku_id}}</td>
+              <td contenteditable="false">{{activity.sku_case_quantity}}</td>
+              <td contenteditable="false">{{activity.formula_id}}</td>
+              <td contenteditable="false">{{activity.formula_name}}</td>
+              <td>
+                  <table class="table table-bordered">
+                      <tr>
+                          <th class="text-center">Name</th>
+                          <th class="text-center">ID</th>
+                          <th class="text-center">Quantity/Units</th>
+                        </tr>
+                      <ng-container *ngFor="let tuple of activity.formula_ingredient_tuples; let id2=index">
+                          <tr>
+                              <td>{{tuple.ingredient.name}}</td>
+                              <td>{{tuple.ingredient.number}}</td>
+                              <td>{{tuple.quantity}}{{tuple.unit}}</td>
+                            </tr>
+                      </ng-container>
+                    </table>
+              </td>
+              <td contenteditable="false">{{activity.start_date}}</td>
+              <td contenteditable="false">{{activity.end_date}}</td>
+              <td contenteditable="false">{{activity.duration}}</td>
+            </tr>
+
+            <!-- <tr class="blankcell" *ngFor = "let sku of ingredient.skus; let id2=index">
+              <td class="blankcell"></td>
+              <td colspan = "6" contenteditable="false">{{sku.name}} : {{sku.size}} * {{sku.count}}</td>
+            </tr> -->
+        </ng-container>
+
+      </table>
+    </div>
+  </div>
+  <div class="card-body">
+      <div id="table2" class="table-editable">
+          <table class="table table-bordered table-responsive-md table-striped text-center">
+              <tr>
+                  <th class="text-center">Ingredient Name</th>
+                  <th class="text-center">Required Amount</th>
+                  <th class="text-center">Unit</th>
+                  <th class="text-center">Required Num Packages</th>
+                </tr>
+                <ng-container *ngFor="let ing of summationData; let id3=index">
+                  <tr>
+                    <td contenteditable="false">{{ing.name}}</td>
+                    <td contenteditable="false">{{ing.unit_value}}</td>
+                    <td contenteditable="false">{{ing.unit}}</td>
+                    <td contenteditable="false">{{ing.package_value}}</td>
+                  </tr>
+                </ng-container>
+          </table>
+      </div>
+  </div>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="onNoClick()">Ok</button>
+  <button mat-raised-button color="primary" (click)="exportCSV()">Export CSV</button>
+</div>

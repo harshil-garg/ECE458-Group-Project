@@ -197,10 +197,66 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   public makeReport(value) {
-    console.log("hi"+value+""+this.startDate.value);
-    let dialogRef = this.dialog.open(ManufacturingScheduleReportComponent, {
-      height: '800px',
-      width: '400px'
+    //console.log("hi"+value+""+this.startDate.value);
+    console.log(this.startDate.value + " " + typeof this.startDate.value);
+    console.log(this.endDate.value + " " + typeof this.endDate.value);
+    console.log(this.reportingFormControl.value + " " + typeof this.reportingFormControl.value);
+
+    this.crudManufacturingLineService.getManufacturingScheduleReport({
+      start: this.startDate.value,
+      end: this.endDate.value,
+      manufacturing_line: this.reportingFormControl.value
+    }).subscribe(response => {
+      console.log(response);
+      console.log("poopycakes");
+      if (response.success) {
+
+        console.log("The respone data is " + response.data);
+        var activities : Array<any> = [];
+        for(let manufacturing_task of response.data) {
+          var start_date = new Date(manufacturing_task.start_date);
+          var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          var duration = manufacturing_task.duration;
+
+          let sku_info = manufacturing_task.activity.sku;
+          var sku_display_name = sku_info.name + " : " + sku_info.size + " * " + sku_info.count;
+          var sku_id = sku_info.number;
+          var sku_case_quantity;
+          for (var sku_tuple of manufacturing_task.activity.manufacturing_goal.sku_tuples) {
+            if (sku_tuple.sku === sku_info._id) {
+              sku_case_quantity = sku_tuple.case_quantity;
+            }
+          }
+
+          let formula_info = sku_info.formula;
+          var formula_id = formula_info.number;
+          var formula_name = formula_info.name;
+          var formula_ingredient_tuples = formula_info.ingredient_tuples;
+          
+          activities.push({
+              id: manufacturing_task._id,
+              start_date: start_date,
+              end_date: end_date,
+              duration: duration,
+              sku_display_name: sku_display_name, 
+              sku_id: sku_id,
+              sku_case_quantity: sku_case_quantity,
+              formula_id: formula_id,
+              formula_name: formula_name, 
+              formula_ingredient_tuples: formula_ingredient_tuples
+          });
+        }
+
+        let dialogRef = this.dialog.open(ManufacturingScheduleReportComponent, {
+          height: '800px',
+          width: '1300px',
+          data: activities
+        });
+        console.log(activities);
+      }
+    }, err => {
+      console.log(err);
+      
     });
 
     /*dialogRef.afterClosed().subscribe(result =>{

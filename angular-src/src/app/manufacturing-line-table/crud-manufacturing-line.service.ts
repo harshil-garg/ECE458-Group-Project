@@ -62,6 +62,21 @@ export class AutocompleteResponse {
   data: Array<any>;
 }
 
+export class GenericResponse {
+  success: boolean;
+  data: Array<any>;
+}
+
+export class ReportData {
+  start: Date;
+  end: Date; 
+  manufacturing_line: string;
+}
+
+export class ActivityData {
+  manufacturing_tasks: Array<string>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -95,5 +110,15 @@ export class CrudManufacturingLineService {
 
   autocompleteLines(query: string): Observable<AutocompleteResponse> {
     return this.http.post<AutocompleteResponse>('api/manufacturing_lines/autocomplete', {input: query}, httpOptions);
+  }
+
+  getManufacturingScheduleReport(query: ReportData): Observable<GenericResponse> {
+    console.log(query);
+    return this.http.post<GenericResponse>('api/manufacturing_schedule/report', query, httpOptions);
+  }
+
+  getManufacturingScheduleSummation(query: ActivityData): Observable<GenericResponse> {
+    console.log(query);
+    return this.http.post<GenericResponse>('api/manufacturing_schedule/report_calculate', query, httpOptions);
   }
 }
