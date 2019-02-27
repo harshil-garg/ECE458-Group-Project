@@ -3,6 +3,7 @@ import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@a
 import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
 import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule-display/manufacturing-schedule-display.component';
+import { ManufacturingScheduleService } from './manufacturing-schedule.service';
 import { ActivityDialogComponent } from './activity-dialog/activity-dialog.component';
 import { Activity } from '../model/activity';
 import { Sku } from '../model/sku';
@@ -30,12 +31,33 @@ export class ManufacturingScheduleComponent implements OnInit {
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
-    public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog) { }
+    public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog,
+    private manufacturingScheduleService: ManufacturingScheduleService) { }
 
   ngOnInit() {
-    this.populateManufLines();
+    this.refresh();
     this.remove.subscribe(index=>this.removeActivity(index));
     this.goalsUpdated.subscribe(ev => this.updateOrphaned());
+  }
+
+  refresh() {
+    this.manufacturingScheduleService.load().subscribe(
+      response => {
+        if(response.success){
+          console.log("REFRREEESSHHHHHEDDDD");
+          console.log(response);
+          response.data.forEach(data => this.activities.push(data));
+          this.populateManufLines();
+        } else {
+          this.displayError("Failed to setup Activities!");
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
   }
 
   populateManufLines(){
@@ -197,17 +219,27 @@ export class ManufacturingScheduleComponent implements OnInit {
         duration: event.previousContainer.data[event.previousIndex].duration,
         manufacturing_goal: event.previousContainer.data[event.previousIndex].manufacturing_goal
       };
+      console.log("DROPPEEEDDDDD");
+      console.log(droppedActivity);
       var startDate = this.zeroedDate(this.currDate);
       startDate.setHours(8+ (+currHour));
       if(!this.isCollision(startDate, droppedActivity, this.manufLines[+currId], droppedActivity.duration)){
         if(!this.wrongManufLine(droppedActivity, this.manufLines[+currId])){
-          this.activities.push({
+          var newManufEvent = {
             activity: droppedActivity,
-            manufacturing_line: this.manufLines[+currId],
-            start_date: startDate,
-            duration: droppedActivity.duration,
-            duration_override: false
-          });
+              manufacturing_line: this.manufLines[+currId],
+              start_date: startDate,
+              duration: droppedActivity.duration,
+              duration_override: false
+          }
+          // this.activities.push({
+          //   activity: droppedActivity,
+          //   manufacturing_line: this.manufLines[+currId],
+          //   start_date: startDate,
+          //   duration: droppedActivity.duration,
+          //   duration_override: false
+          // });
+          this.createActivity(newManufEvent);
           this.refreshHours();
           this.manufacturingScheduleDisplayComponent.removeActivity(event.previousIndex);
         } else{
@@ -328,6 +360,34 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       });
     }
+  }
+
+  createActivity(manufacturingScheduleEvent: ManufacturingScheduleEvent){
+    this.manufacturingScheduleService.create({
+      activity: {
+        manufacturing_goal: manufacturingScheduleEvent.activity.manufacturing_goal,
+      	sku: manufacturingScheduleEvent.activity.sku["number"]
+      },
+      manufacturing_line: manufacturingScheduleEvent.manufacturing_line,
+      start_date: manufacturingScheduleEvent.start_date,
+      duration: manufacturingScheduleEvent.duration,
+      duration_override: false
+    }).subscribe(
+      response => {
+        console.log(response);
+        if(response.success){
+          console.log("SUCCESSFULLY ADDEDDDDDD");
+          this.refresh();
+        } else {
+          this.displayError("Failed to create Activity!");
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
   }
 
   numDeadlines(id){

@@ -69,10 +69,13 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
           user: ""
       });
     }
+    console.log("MANUF GOALS");
+    console.log(this.manufGoalList);
     this.populateActivityList();
   }
 
   populateActivityList(){
+    this.activityList = [];
     for(let manufGoal of this.manufGoalList){
       manufGoal.sku_tuples.forEach(sku => {
         this.activityList.push({
@@ -103,7 +106,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   remove(id){
     if(confirm("Are you sure you would like to remove " + this.manufGoalList[id].name + "?")){
-      this.manufGoalList.splice(id, 1);
+      this.enable(this.manufGoalList[id], false);
       this.goalsUpdated.emit(true);
     }
   }
@@ -131,8 +134,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     })
     if(!alreadyAdded){
       if(confirm("Are you sure you would like to add " + goal.name + "?")){
-        this.enable(goal);
-        this.populateManufGoalList();
+        this.enable(goal, true);
       }
     }
     else {
@@ -140,15 +142,16 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     }
   }
 
-  enable(goal: ManufacturingGoal){
+  enable(goal: ManufacturingGoal, enabled: boolean){
     this.manufacturingScheduleService.setEnabled({
       manufacturing_goal: goal,
-      enabled: true
+      enabled: enabled
     }).subscribe(
       response => {
-        console.log("ENABLED");
         if(!response.success){
           this.displayError("Error enabling goal");
+        } else {
+          this.populateManufGoalList();
         }
       },
       err => {
