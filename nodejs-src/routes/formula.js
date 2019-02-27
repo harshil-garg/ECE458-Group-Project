@@ -6,6 +6,7 @@ const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
 const formula_validator = require('../controllers/formula_validator');
 const formula_filter = require('../controllers/formula_filter');
+const autocomplete = require('../controllers/autocomplete');
 
 //Autocomplete 
 router.post('/autocomplete', async (req, res) => {
