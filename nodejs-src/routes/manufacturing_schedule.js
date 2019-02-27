@@ -82,13 +82,18 @@ router.post('/create', async (req, res) => {
 //Update a mapping
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
-    let { activity, manufacturing_line, start_date, duration } = req.body; 
+    let { activity, manufacturing_line, start_date, duration, duration_override } = req.body; 
+
+    
 
     let errors = await createValidation(activity, manufacturing_line, start_date);
     if(!('sku' in errors)){
         res.json({success: false, message: errors});
         return;
     }
+
+    let mapping = await ManufacturingSchedule.findOne({'activity.sku': errors.sku, 
+        'activity.manufacturing_goal': errors.manufacturing_goal}).exec();
 
     let json = {};
     if(manufacturing_line){
@@ -99,7 +104,13 @@ router.post('/update', async (req, res) => {
     }
     if(duration){
         json['duration'] = duration;
-        json['duration_override'] = true;
+        if(mapping != null){
+            if(mapping.duration != duration){
+                json['duration_override'] = true;
+            }else{
+                json['duration_override'] = false;
+            }
+        }   
     }
 
     ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
