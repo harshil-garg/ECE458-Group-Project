@@ -84,16 +84,11 @@ router.post('/update', async (req, res) => {
     //can change line, start date, and duration
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body; 
 
-    
-
     let errors = await createValidation(activity, manufacturing_line, start_date);
     if(!('sku' in errors)){
         res.json({success: false, message: errors});
         return;
-    }
-
-    let mapping = await ManufacturingSchedule.findOne({'activity.sku': errors.sku, 
-        'activity.manufacturing_goal': errors.manufacturing_goal}).exec();
+    }   
 
     let json = {};
     if(manufacturing_line){
@@ -103,14 +98,27 @@ router.post('/update', async (req, res) => {
         json['start_date'] = start_date;
     }
     if(duration){
-        json['duration'] = duration;
-        if(mapping != null){
-            if(mapping.duration != duration){
-                json['duration_override'] = true;
-            }else{
-                json['duration_override'] = false;
+        let sku = await SKU.findOne({_id: errors.sku}).exec();
+        let goal = await ManufacturingGoal.findOne({_id: errors.manufacturing_goal}).exec();
+        let quantity;
+        if(sku != null && goal != null){
+            for(let tuple of goal.sku_tuples){
+                if(tuple.sku.equals(sku._id)){
+                    quantity = tuple.case_quantity;
+                }
             }
-        }   
+        }
+        
+        calculated_duration = quantity / sku.manufacturing_rate;
+
+        json['duration'] = duration;
+
+        if(duration == calculated_duration){
+            json['duration_override'] = false;
+        }else{
+            json['duration_override'] = true;
+        }
+        
     }
 
     ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
