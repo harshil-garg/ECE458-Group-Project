@@ -11,7 +11,7 @@ mongoose.connect(mongo_config.uri, { useNewUrlParser: true }, function(err) {
 	let user = new User({
           name: 'Seeder Admin',
           email: 'admin458',
-          password: 'hello',
+          password: 'BletchisCool1904u52u589u',
           admin : true
         });
 	
