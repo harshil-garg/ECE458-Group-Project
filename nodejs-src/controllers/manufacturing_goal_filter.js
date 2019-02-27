@@ -29,7 +29,7 @@ module.exports.filter = async function(pageNum, sortBy, page_size, user){
 
     let result = await pagination.paginate(agg, pageNum, sortBy, page_size);
 
-    // populateSKUs(result);
+    populateSKUs(result);
     return result;
 }
 
