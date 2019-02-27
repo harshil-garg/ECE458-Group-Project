@@ -7,6 +7,7 @@ const ingredient_filter = require('../controllers/ingredient_filter');
 const autocomplete = require('../controllers/autocomplete');
 const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
+const units = require('../controllers/units');
 
 //Autocomplete
 router.post('/autocomplete', async (req, res) => {
@@ -63,7 +64,7 @@ function create_ingredient(res, name, number, vendor_info, package_size, unit, c
 }
 
 // UPDATE
-router.post('/update', (req, res) => {
+router.post('/update', async (req, res) => {
     const { name, newname, number, vendor_info, package_size, unit, cost, comment } = req.body;
     const required_params = { name };
 
@@ -86,7 +87,19 @@ router.post('/update', (req, res) => {
         json["package_size"] = package_size;
     }
     if (unit) {
-        //check that new unit is of saame type
+        //check that new unit is of same type
+        let unit_passed = units.validUnit(unit);
+        if(!unit_passed){
+            res.json({success: false, message: 'Invalid unit'});
+            return;
+        }
+        let ingredient = await Ingredient.findOne({name: name}).exec();
+        let old_category = units.category(ingredient.unit);
+        let new_category = units.category(unit);
+        if(old_category != new_category){
+            res.json({success: false, message: 'Unit must be of same category as before'});
+            return;
+        }
         json["unit"] = unit;
     }
     if (cost) {
@@ -111,16 +124,17 @@ router.post('/update', (req, res) => {
 });
 
 // DELETE
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const {name} = req.body;
+    let ingredient = await Ingredient.findOne({name: name}).exec();
 
     Ingredient.deleteIngredient(name, async (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
-        } else if(result.deletedCount == 0){
+        } else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
-            let ingredient = await Ingredient.findOne({name: name}).exec();
+            
             await Formula.update({'ingredient_tuples.ingredient': ingredient._id}, {$pull: {ingredient_tuples: {ingredient: ingredient._id}}}, {multi: true}).exec();
             res.json({success: true, message: "Removed successfully."});
         }

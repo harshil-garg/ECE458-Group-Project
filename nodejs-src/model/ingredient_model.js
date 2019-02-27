@@ -73,7 +73,7 @@ module.exports.commitImport = async (createlist, changelist) => {
         }
     }
     if(changelist){
-        for(let row of createlist){
+        for(let row of changelist){
             await Ingredient.findOneAndUpdate({number: row.number}, row).catch((err) => {console.log(err);throw err});
         }
     }

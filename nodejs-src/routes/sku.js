@@ -7,6 +7,7 @@ const ProductLine = require('../model/product_line_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const Formula = require('../model/formula_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
+const ManufacturingSchedule = require('../model/manufacturing_schedule_model');
 const FormulaRoute = require('../routes/formula');
 const sku_filter = require('../controllers/sku_filter');
 const autocomplete = require('../controllers/autocomplete');
@@ -216,6 +217,13 @@ function create_SKU(name, number, case_upc, unit_upc, size, count, product_line,
 router.post('/update', async (req, res) => {
     const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
 
+    let sku = await SKU.findOne({number: number}).exec();
+    if(sku == null){
+        res.json({success: false, message: 'SKU does not exist to update'});
+        return;
+    }
+    let deleted_lines = []
+
     var json = {};
     if (name) {
         name_passed = validator.proper_name_length(name);
@@ -293,9 +301,27 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: errors[0]});
             return;
         }
+        //check for deleted lines
+        for(let old_line of sku.manufacturing_lines){
+            let deleted = true;
+            for(let new_line of ids){
+                //check if old line is in any of the new lines
+                deleted = deleted && !oldline.equals(new_line); 
+            }
+            if(deleted){
+                deleted_lines.push(old_line)
+            }
+        }
+
         json["manufacturing_lines"] = ids;
     }
-    if (manufacturing_rate) {
+    if (manufacturing_rate) {       
+        let map = await ManufacturingSchedule.findOne({'activity.sku': sku._id}).exec();
+        if(map != null && manufacturing_rate != sku.manufacturing_rate){
+            res.json({success: false, message: 'Cannot edit rate of a SKU that has been mapped to the Manufacturing Schedule'});
+            return;
+        }
+
         let rate_passed = validator.isPositive(manufacturing_rate);
         if(!rate_passed[0]){
             res.json({success: false, message: rate_passed[1]});
@@ -307,29 +333,33 @@ router.post('/update', async (req, res) => {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(number, json, (err) => {
+    SKU.updateSKU(number, json, async(err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
-        } else if(manufacturing_rate){
-            //TODO: propagate
         }else {
+            //delete any mappings if the line has been removed from the sku
+            await ManufacturingSchedule.delete({'activity.sku': sku._id, 'manufacturing_line': {$in: deleted_lines}}).exec()
             res.json({success: true, message: "Updated successfully."});
         }
     })
 })
 
 //Delete
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const { number } = req.body;
+    let sku = await SKU.findOne({number: number}).exec();
 
     SKU.deleteSKU(number, async (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete SKU. Error: ${err}`});
 
-        }else if(result.deletedCount == 0){
+        }else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
-            let sku = await SKU.findOne({number: number}).exec();
+            //delete mappings with this sku as well
+            await ManufacturingSchedule.delete({'activity.sku': sku._id}).exec();
+            
+            //remove the sku from goals containing it
             await ManufacturingGoal.updateMany({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }

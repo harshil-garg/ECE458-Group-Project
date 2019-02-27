@@ -4,6 +4,7 @@ const ProductLine = require('../model/product_line_model');
 const SKU = require('../model/sku_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
+const product_line_validator = require('../controllers/product_line_validator');
 
 //Autocomplete
 router.post('/autocomplete', async (req, res) => {
@@ -65,7 +66,7 @@ router.post('/delete', async (req, res) => {
     const {name} = req.body;
 
     let line = await ProductLine.findOne({name: name}).exec();
-    let line_passed = await validator.productLineClear(line._id);
+    let line_passed = await product_line_validator.productLineClear(line._id);
 
     if(!line_passed[0]){
         res.json({success: false, message: line_passed[1]});
@@ -75,7 +76,7 @@ router.post('/delete', async (req, res) => {
     ProductLine.deleteProductLine(name, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete product line. Error: ${err}`});
-        }else if(result.deletedCount == 0){
+        }else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'Product Line does not exist to delete'});
         }else{
             res.json({success: true, message: "Deleted successfully."});

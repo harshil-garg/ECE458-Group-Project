@@ -84,9 +84,10 @@ router.post('/delete', (req, res) => {
     ManufacturingGoal.deleteOne({shortname: shortname}, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete manufacutring line. Error: ${err}`});
-        }else if(result.deletedCount == 0){
+        }else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'Manufacturing line does not exist to delete'});
         }else{
+            //delete from skus
             res.json({success: true, message: "Deleted successfully."});
         }
     });
