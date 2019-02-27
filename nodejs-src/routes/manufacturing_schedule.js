@@ -112,8 +112,6 @@ router.post('/update', async (req, res) => {
         }
         
         calculated_duration = Math.ceil(quantity / sku.manufacturing_rate);
-        console.log(calculated_duration)
-        console.log(duration)
 
         json['duration'] = duration;
 

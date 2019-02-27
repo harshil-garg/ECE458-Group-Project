@@ -222,6 +222,7 @@ router.post('/update', async (req, res) => {
         res.json({success: false, message: 'SKU does not exist to update'});
         return;
     }
+    let deleted_lines = []
 
     var json = {};
     if (name) {
@@ -300,13 +301,24 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: errors[0]});
             return;
         }
+        //check for deleted lines
+        for(let old_line of sku.manufacturing_lines){
+            let deleted = true;
+            for(let new_line of ids){
+                //check if old line is in any of the new lines
+                deleted = deleted && !oldline.equals(new_line); 
+            }
+            if(deleted){
+                deleted_lines.push(old_line)
+            }
+        }
+
         json["manufacturing_lines"] = ids;
     }
-    if (manufacturing_rate) {
-        
+    if (manufacturing_rate) {       
         let map = await ManufacturingSchedule.findOne({'activity.sku': sku._id}).exec();
-        if(map != null){
-            res.json({success: false, message: 'Cannot edit rate of a SKU that has been mapped to the Mannufacturing Schedule'});
+        if(map != null && manufacturing_rate != sku.manufacturing_rate){
+            res.json({success: false, message: 'Cannot edit rate of a SKU that has been mapped to the Manufacturing Schedule'});
             return;
         }
 
@@ -321,10 +333,12 @@ router.post('/update', async (req, res) => {
         json["comment"] = comment;
     }
 
-    SKU.updateSKU(number, json, (err) => {
+    SKU.updateSKU(number, json, async(err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         }else {
+            //delete any mappings if the line has been removed from the sku
+            await ManufacturingSchedule.delete({'activity.sku': sku._id, 'manufacturing_line': {$in: deleted_lines}}).exec()
             res.json({success: true, message: "Updated successfully."});
         }
     })
@@ -342,8 +356,10 @@ router.post('/delete', async (req, res) => {
         }else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
-            console.log(result)
+            //delete mappings with this sku as well
+            await ManufacturingSchedule.delete({'activity.sku': sku._id}).exec();
             
+            //remove the sku from goals containing it
             await ManufacturingGoal.updateMany({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
