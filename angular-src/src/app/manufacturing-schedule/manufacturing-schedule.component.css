@@ -88,3 +88,114 @@
   min-width: 125px;
   max-width: 125px;
 }
+
+.mat-button-toggle-group {
+  left: 25%;
+}
+
+.duration-override-start-box{
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  background: orange;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.duration-override-selected-box{
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  background: #FECF6A;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.past-deadline-start-box{
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  background: orangered;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.past-deadline-selected-box{
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background: tomato;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.orphaned-start-box{
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  background: grey;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.orphaned-selected-box{
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background: lightgrey;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.fixed-container {
+  width: 1150px;
+  overflow: auto;
+}

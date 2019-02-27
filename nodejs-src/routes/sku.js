@@ -14,29 +14,11 @@ const validator = require('../controllers/validator');
 const sku_validator = require('../controllers/sku_validator');
 const generator = require('../controllers/autogen');
 
-
-
-//Autocomplete ingredients
-router.post('/autocomplete_ingredients', async (req, res) => {
+//Autocomplete
+router.post('/autocomplete', async (req, res) => {
     const {input} = req.body;
 
-    let results = await autocomplete.nameOrNumber(Ingredient, input);
-    res.json({success: true, data: results});
-});
-
-//Autocomplete product lines
-router.post('/autocomplete_product_lines', async (req, res) => {
-    const {input} = req.body;
-
-    let results = await autocomplete.nameOrNumber(ProductLine, input);
-    res.json({success: true, data: results});
-});
-
-//Autocomplete formulas
-router.post('/autocomplete_formulas', async (req, res) => {
-    const {input} = req.body;
-
-    let results = await autocomplete.nameOrNumber(Formula, input);
+    let results = await autocomplete.nameOrNumber(SKU, input);
     res.json({success: true, data: results});
 });
 
@@ -185,7 +167,7 @@ router.post('/create', async (req, res) => {
 
 async function formulaHandler(formula, res){
     if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
-        let formula_passed = await validator.itemExists(Formula, formula.number);
+        let formula_passed = await validator.itemExists(Formula, formula.number.toString());
         if(!formula_passed[0]){
             res.json({success: false, message: formula_passed[1]});
             return;
@@ -328,7 +310,9 @@ router.post('/update', async (req, res) => {
     SKU.updateSKU(number, json, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
-        } else {
+        } else if(manufacturing_rate){
+            //TODO: propagate
+        }else {
             res.json({success: true, message: "Updated successfully."});
         }
     })

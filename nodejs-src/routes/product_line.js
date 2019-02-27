@@ -5,6 +5,13 @@ const SKU = require('../model/sku_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 
+//Autocomplete
+router.post('/autocomplete', async (req, res) => {
+    const {input} = req.body;
+
+    let results = await autocomplete.nameOrNumber(ProductLine, input);
+    res.json({success: true, data: results});
+});
 
 //Create
 router.post('/create', (req, res) => {

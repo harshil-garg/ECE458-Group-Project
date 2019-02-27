@@ -28,7 +28,7 @@ import { IngredientAutocompleteComponent } from './sku-table/ingredient-autocomp
 import { IngredientAutocompleteModule } from './sku-table/ingredient-autocomplete/ingredient-autocomplete.module';
 import { SearchSkuComponent } from './sku-table/search-sku/search-sku.component';
 import { ManufacturingGoalTableComponent } from './manufacturing-goal-table/manufacturing-goal-table.component';
-import { MatAutocompleteModule, MatFormFieldModule, MatTabsModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule, MatGridListModule, MatSidenavModule, MatDatepickerModule, MatButtonToggleModule, MatSlideToggleModule } from '@angular/material';
+import { MatAutocompleteModule, MatFormFieldModule, MatTabsModule, MatInputModule, MatButtonModule, MatRippleModule, MatDialogModule, MatListModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatMenuModule, MatToolbarModule, MatSnackBarModule, MatTableModule, MatCheckboxModule, MatPaginatorModule, MatSortModule, MatChipsModule, MatSelectModule, MatExpansionModule, MatGridListModule, MatSidenavModule, MatDatepickerModule, MatButtonToggleModule, MatSlideToggleModule, MatBadgeModule, MatTooltipModule } from '@angular/material';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CreateDependencyReportComponent } from './ingredients-table/create-dependency-report/create-dependency-report.component';
 import { DependencyReportDialogComponent } from './ingredients-table/create-dependency-report/dependency-report-dialog/dependency-report-dialog.component';
@@ -42,6 +42,7 @@ import { ManufacturingScheduleDisplayComponent } from './manufacturing-schedule/
 import { SearchGoalsComponent } from './manufacturing-schedule/search-goals/search-goals.component';
 import { BulkSkuEditComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit.component';
 import { BulkSkuEditDialogComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit-dialog/bulk-sku-edit-dialog.component';
+import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
 
 const routes: Routes = [
   {
@@ -89,7 +90,8 @@ const routes: Routes = [
     ManufacturingScheduleDisplayComponent,
     SearchGoalsComponent,
     BulkSkuEditComponent,
-    BulkSkuEditDialogComponent
+    BulkSkuEditDialogComponent,
+    ActivityDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -133,10 +135,12 @@ const routes: Routes = [
     MatSidenavModule,
     MatDatepickerModule,
     MatButtonToggleModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatBadgeModule,
+    MatTooltipModule
   ],
   providers: [Title],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, BulkSkuEditDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, BulkSkuEditDialogComponent]
 })
 export class AppModule { }

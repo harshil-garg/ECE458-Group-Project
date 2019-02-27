@@ -118,11 +118,11 @@ export class FilterSkuService {
 
 	autocompleteIngredients(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
 		console.log(autocompleteMessage);
-    return this.http.post<AutocompleteResponse>('api/skus/autocomplete_ingredients', autocompleteMessage, httpOptions);
+    return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
   }
 
 	autocompleteProductLines(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
 		console.log(autocompleteMessage);
-		return this.http.post<AutocompleteResponse>('api/skus/autocomplete_product_lines', autocompleteMessage, httpOptions);
+		return this.http.post<AutocompleteResponse>('api/product_lines/autocomplete', autocompleteMessage, httpOptions);
 	}
 }

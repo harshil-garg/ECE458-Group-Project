@@ -12,7 +12,7 @@ const validator = require('../controllers/validator');
 router.post('/autocomplete', async (req, res) => {
     const {input} = req.body;
 
-    let results = await autocomplete.nameOrNumber(SKU, input);
+    let results = await autocomplete.nameOrNumber(Ingredient, input);
     res.json({success: true, data: results});
 });
 
