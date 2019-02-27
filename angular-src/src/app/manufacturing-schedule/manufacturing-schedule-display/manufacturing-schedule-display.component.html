@@ -103,23 +103,25 @@
     </mat-card>
 
     <h2>Reports</h2>
-    <mat-card style="width:100%" class="mat-elevation-z2">
+    <mat-card class="mat-elevation-z2">
       <mat-card-subtitle [style.color]="'black'">
         Warning Conditions
       </mat-card-subtitle>
       <mat-card-content>
         <form>
-          <mat-form-field style="width:100%" appearance="fill">
+          <mat-form-field appearance="fill">
             <input matInput [matDatepicker]="picker_start" [formControl]="startDate" placeholder="Choose a start date" required>
             <mat-datepicker-toggle matSuffix [for]="picker_start"></mat-datepicker-toggle>
             <mat-datepicker #picker_start></mat-datepicker>
           </mat-form-field>
-          <mat-form-field style="width:100%" appearance="fill">
+          <br>
+          <mat-form-field appearance="fill">
             <input matInput [matDatepicker]="picker_end" [formControl]="endDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
             <mat-datepicker-toggle matSuffix [for]="picker_end"></mat-datepicker-toggle>
             <mat-datepicker #picker_end></mat-datepicker>
           </mat-form-field>
-          <mat-form-field style="width:100%">
+          <br>
+          <mat-form-field>
             <input type="text" placeholder="Manufacturing Line" aria-label="Manufacturing Line" matInput [formControl]="reportingFormControl" id="autx" name="autx" [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
               <mat-option *ngFor="let option of suggestedManufacturingLines" [value]="option.shortname">
