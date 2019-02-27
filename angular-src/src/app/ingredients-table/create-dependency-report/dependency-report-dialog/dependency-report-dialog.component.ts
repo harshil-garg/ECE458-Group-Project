@@ -31,7 +31,7 @@ export class DependencyReportDialogComponent {
         let myIng = this.ingredientList[ing];
         console.log(myIng);
         myIng.skus.forEach(function(sku) {
-          let t = sku.name + "(" + sku.id + ") : " + sku.size + " * " + sku.count;
+          let t = sku.name + "(" + sku.number + ") : " + sku.size + " * " + sku.count;
           csvContent += myIng.name + "," + t + "\r\n";
         });
       }
