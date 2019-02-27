@@ -53,7 +53,8 @@ export class FilterFormulaService {
     return this.http.post<FilterResponse>('api/formulas/filter', filterMessage, httpOptions);
   }
 
+	//Autocomplete ingredients
 	autocomplete(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
-		return this.http.post<AutocompleteResponse>('api/formulas/autocomplete', autocompleteMessage, httpOptions);
+		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
 	}
 }

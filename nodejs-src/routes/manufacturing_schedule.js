@@ -19,7 +19,9 @@ router.post('/autocomplete', async (req, res) => {
 
 //Create a report
 router.post('/report', async (req, res) => {
+    console.log("hello")
     const { manufacturing_line, start, end } = req.body;
+    
 
     let results = await schedule_filter.filter(manufacturing_line, start, end);
 
@@ -28,6 +30,7 @@ router.post('/report', async (req, res) => {
 });
 
 router.post('/load',  async (req, res) => {
+    console.log("hi")
     let results = await schedule_filter.filter();
 
     res.json({success: true, data: results});
@@ -75,11 +78,11 @@ router.post('/create', async (req, res) => {
 //Update a mapping
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
-    let { activity, manufacturing_line, start_date, duration } = req.body;
+    let { activity, manufacturing_line, start_date, duration } = req.body; 
 
     let errors = await createValidation(activity, manufacturing_line, start_date);
-    if(!('sku' in error)){
-        res.json({success: false, message: error});
+    if(!('sku' in errors)){
+        res.json({success: false, message: errors});
         return;
     }
 
@@ -106,14 +109,19 @@ router.post('/update', async (req, res) => {
 });
 
 //Remove a mapping
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const { activity } = req.body;
 
-    ManufacturingSchedule.findOneandDelete({'activity.sku': activity.sku, 
-        'activity.manufacturing_goal': activity.manufacturing_goal}, (err, result) => {
+    let activity_passed = await schedule_validator.validActivity(activity);
+    if(!activity_passed[0]){
+        res.json({success: false, message: activity_passed[1]})
+    }
+
+    ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2], 
+        'activity.manufacturing_goal': activity_passed[3]}, (err, result) => {
             if (err) {
                 res.json({success: false, message: `Failed to delete mapping. Error: ${err}`});
-            }else if(result.deletedCount == 0){
+            }else if(!result || result.deletedCount == 0){
                 res.json({success: false, message: 'Mapping does not exist to delete'});
             }else{
                 res.json({success: true, message: "Deleted successfully."});

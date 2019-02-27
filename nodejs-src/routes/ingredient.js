@@ -111,8 +111,9 @@ router.post('/update', (req, res) => {
 });
 
 // DELETE
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const {name} = req.body;
+    let ingredient = await Ingredient.findOne({name: name}).exec();
 
     Ingredient.deleteIngredient(name, async (error, result) => {
         if (error) {
@@ -120,7 +121,7 @@ router.post('/delete', (req, res) => {
         } else if(result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
-            let ingredient = await Ingredient.findOne({name: name}).exec();
+            
             await Formula.update({'ingredient_tuples.ingredient': ingredient._id}, {$pull: {ingredient_tuples: {ingredient: ingredient._id}}}, {multi: true}).exec();
             res.json({success: true, message: "Removed successfully."});
         }
