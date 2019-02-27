@@ -1,12 +1,6 @@
 <h1 mat-dialog-title>Ingredient Dependency Report</h1>
 <mat-dialog-content>
-    <mat-list>
-      <mat-list-item *ngFor="let ingredient of ingredientList">
-        <p matLine>{{ingredient.name}}</p>
-        <p matLine *ngFor="let sku of ingredient.skus">{{sku.name}} : {{sku.size}} * {{sku.count}}</p>
-      </mat-list-item>
-    </mat-list>
-  <!-- <div class="card-body">
+  <div class="card-body">
     <div id="table" class="table-editable">
       <table class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
@@ -36,7 +30,7 @@
 
       </table>
     </div>
-  </div> -->
+  </div>
 </mat-dialog-content>
 
 <div mat-dialog-actions>

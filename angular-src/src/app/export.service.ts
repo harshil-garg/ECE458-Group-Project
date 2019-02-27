@@ -24,13 +24,13 @@ export class ExportService {
     let output = ``;
     let counter = 0;
     headers.forEach((header) => {
-        output += `${header}${counter == headers.length-1 ? '\n' : ','}`;
+        output += `${header}${counter == headers.length-1 ? '\r\n' : ','}`;
         counter++;
     });
     data.forEach((row) => {
         counter = 0;
         headers.forEach((header) => {
-            output += `${row[`${header}`]}${counter == headers.length-1 ? '\n' : ','}`;
+            output += `${row[`${header}`]}${counter == headers.length-1 ? '\r\n' : ','}`;
             counter++;
         });
     });

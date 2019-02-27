@@ -25,18 +25,27 @@ export class DependencyReportDialogComponent {
       //window.open(encodedUri);
     //}
     exportCSV() {
-      var csvContent = "data:text/csv;charset=utf-8,";
+      var csvContent = "";
       csvContent += "Name,SKU" + "\r\n";
-      for (var ing = 0; ing < this.ingredientList.length; ing++) {
+      for (let ing = 0; ing < this.ingredientList.length; ing++) {
         let myIng = this.ingredientList[ing];
+        console.log(myIng);
         myIng.skus.forEach(function(sku) {
-          let t = sku.name + " : " + sku.size + " * " + sku.count;
+          let t = sku.name + "(" + sku.id + ") : " + sku.size + " * " + sku.count;
           csvContent += myIng.name + "," + t + "\r\n";
         });
       }
-      var encodedUri = encodeURI(csvContent);
-      window.open(encodedUri);
       console.log(this.ingredientList);
+      let blob = new Blob([csvContent], { "type": "text/csv;charset=utf8;" });
+      let url = window.URL.createObjectURL(blob);
+      let a = document.createElement('a');
+      document.body.appendChild(a);
+      a.setAttribute('style', 'display: none');
+      a.href = url;
+      a.download = `ingredient_dependencies.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
     }
 
 }

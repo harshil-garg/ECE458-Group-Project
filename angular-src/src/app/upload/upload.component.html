@@ -1,4 +1,4 @@
-<input type="file" #file style="display: none" accept=".csv, .zip" (change)="onFilesAdded()" multiple />
+<input type="file" #file style="display: none" accept=".csv, .zip" (change)="onFilesAdded()"/>
 <div *ngIf="isAdmin()" class="upload-content-container">
         <mat-card *ngIf="inSelectingState()" class="select-file-card">
                 <mat-card-header>
@@ -6,7 +6,7 @@
                 </mat-card-header>
                 <mat-card-content>
                     <p>
-                        You may import your files either by selecting up to four CSV files or by selecting one ZIP file.
+                        You may import your files either by selecting one CSV file at a time.
                     </p>
                     <mat-list>
                         <mat-list-item *ngFor="let file of files">
