@@ -147,7 +147,7 @@ module.exports.createFormula = async function(name, number, ingredient_tuples, c
         ingredient_tuples[i]['ingredient'] = valid_tuples[i][2]; //id of ingredient
     }
     const formula = new Formula({name, number, ingredient_tuples, comment});
-    await Formula.create(formula)
+    return await Formula.create(formula)
 }
 
 module.exports.router = router;

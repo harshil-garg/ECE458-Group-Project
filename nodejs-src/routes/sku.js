@@ -156,8 +156,10 @@ router.post('/create', async (req, res) => {
 
     let formula_id = await formulaHandler(formula, res);
     if(!formula_id){
+        res.json({success: false, message: 'Formula creation unsuccessful'});
         return;
     }
+
     if(number){
         create_SKU(name, number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
     }else{
