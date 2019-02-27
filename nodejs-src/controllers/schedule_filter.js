@@ -42,7 +42,7 @@ module.exports.filter = async function(manufacturing_line, start, end){
     if(manufacturing_line && start && end){
         pipeline.push({$match: {'manufacturing_line.shortname': manufacturing_line}},
         {$addFields: {end_date: {$add: ['$start_date', '$duration']}}},
-        {$match: {$or: [{start_date: {$lt: new Date(end)}}, {end_date: {$gt: new Date(start)}}]}},
+        {$match: {$and: [{start_date: {$lt: new Date(end)}}, {end_date: {$gt: new Date(start)}}]}},
         {
             $lookup: {
                 from: 'formulas',
