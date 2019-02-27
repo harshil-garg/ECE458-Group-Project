@@ -367,7 +367,7 @@ export class ManufacturingScheduleComponent implements OnInit {
 
   updateDurationWarning(){
     this.activities.forEach(activity => {
-      if(this.warningList[2].indexOf(activity.activity)==-1){
+      if(activity.duration_override && this.warningList[2].indexOf(activity.activity)==-1){
         this.warningList[2].push(activity.activity);
       }
     });

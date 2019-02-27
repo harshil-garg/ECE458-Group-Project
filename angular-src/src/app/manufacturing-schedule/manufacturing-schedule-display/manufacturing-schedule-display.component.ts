@@ -28,6 +28,10 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   updateWarnings(event: Array<Array<Activity>>){
+    this.warnings[0] = [];
+    this.palette.forEach(activity => {
+      this.warnings[0].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
+    });
     this.warnings[1] = [];
     event[0].forEach(activity => {
       this.warnings[1].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
@@ -117,7 +121,6 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   remove(id){
     if(confirm("Are you sure you would like to remove " + this.manufGoalList[id].name + "?")){
       this.enable(this.manufGoalList[id], false);
-      this.goalsUpdated.emit(this.manufGoalList);
     }
   }
 
@@ -162,6 +165,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
           this.displayError("Error enabling goal");
         } else {
           this.populateManufGoalList();
+          this.goalsUpdated.emit(this.manufGoalList);
         }
       },
       err => {

@@ -37,8 +37,7 @@
             [cdkDropListConnectedTo]="getLists()"
             class="example-list"
             [id]="'list-' + id + '-hour-' + hour_id"
-            (cdkDropListDropped)="drop($event)"
-            (cdkDropListEntered)="log($event)">
+            (cdkDropListDropped)="drop($event)">
             <div [ngClass]="getClass(id, hour_id)" cdkDrag [cdkDragDisabled]="starting_hours[id][hour_id]==''" (dblclick)="openActivityDialog(id, hour_id)">{{item==-1 || activities[item]==null || activities[item].activity==null ? '' : activities[item].activity.sku.name}} <br> {{item==-1 || activities[item]==null || activities[item].activity==null ? '' : '(' + activities[item].activity.manufacturing_goal + ')'}}
               <mat-icon *cdkDragPreview></mat-icon>
             </div>
