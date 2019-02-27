@@ -5,6 +5,7 @@ const sku_validator = require('../controllers/sku_validator');
 const Formula = require('../model/formula_model');
 const ProductLine = require('../model/product_line_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
+const ManufacturingSchedule = require('../model/manufacturing_schedule_model');
 const autogen = require('../controllers/autogen');
 const utils = require('../utils/utils');
 
@@ -96,8 +97,16 @@ module.exports.commitImport = async (createlist, changelist) => {
         }
     }
     if(changelist){
-        for(let row of createlist){
-            await SKU.findOneAndUpdate({number: row.number}, row).catch((err) => {throw err});
+        for(let row of changelist){
+            let deleted_lines = row.deleted_lines;
+            delete row.deleted_lines
+            await SKU.findOneAndUpdate({number: row.number}, row).then(async () => {
+                console.log('deleted lines: '+deleted_lines)
+                await ManufacturingSchedule.deleteMany({'activity.sku': row._id, 'manufacturing_line': {$in: deleted_lines}}, (err, result)=>{
+                    console.log(result.deletedCount)
+                    console.log(err)
+                })
+            }).catch((err) => {console.log(err);throw err});
         }
     }
     return true;
@@ -162,6 +171,36 @@ async function syntaxValidation(skus, skus_csv, results, type) {
             manufacturings_passed.push(manufacturing_passed);
             manufacturing_ids.push(manufacturing_passed[2]);
         }   
+
+        let existing_sku = await SKU.findOne({number: sku.number}).exec();
+
+        let deleted_lines = []
+
+        //SPECIAL SCHEDULE CHECKS
+        if(existing_sku != null){
+            //Prevent edit of manufacturing rate
+            let map = await ManufacturingSchedule.findOne({'activity.sku': sku._id}).exec();
+            if(map != null && sku.manufacturing_rate != existing_sku.manufacturing_rate){
+                results[type].errorlist.push({
+                    message: 'Cannot edit rate of a SKU that has been mapped to the Manufacturing Schedule',
+                    data: sku_csv
+                });
+            }
+            //check for deleted lines
+            for(let old_line of existing_sku.manufacturing_lines){
+                let deleted = true;
+                for(let new_line of manufacturing_ids){
+                    //check if old line is in any of the new lines
+                    deleted = deleted && !old_line.equals(new_line); 
+                }
+                if(deleted){
+                    deleted_lines.push(old_line)
+                }
+            }
+        }
+
+        //add field of deleted lines
+        sku['deleted_lines'] = deleted_lines;
 
         let errors = validator.compileErrors(name_passed, case_passed, unit_passed, formula_passed, product_passed, ...manufacturings_passed);
         if(errors.length > 0){

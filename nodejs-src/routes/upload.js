@@ -61,7 +61,6 @@ router.post('/', upload.array('file[]', 4), async (req, res) => {
   else {
     await handleFiles(res)//.catch((err) => {return});
   }
-  resetSession();
 });
 
 router.post('/commit', async (req, res) => {
@@ -81,7 +80,6 @@ router.post('/commit', async (req, res) => {
       resetSession();
     }
     res.json({ success: true });
-    resetSession()
   }
   else {
     res.json({
@@ -188,7 +186,6 @@ async function handleFiles(res) {
     }
   
     if (jsonIngredients.length > 0) {
-      console.log('trying')
       await Ingredient.attemptImport(jsonIngredients, csvIngredients, results);
     }
   
@@ -214,6 +211,7 @@ async function handleFiles(res) {
   
       //if there's no errors and no potential changes, commit the changes
       if (!(results.ingredients.changelist.length || results.skus.changelist.length || results.formulas.changelist.length)) {
+        console.log('trying to commit')
         await commitImport()
         .then(() => {
           results.success = true;
@@ -231,14 +229,14 @@ async function handleFiles(res) {
         // end the session if the user doesn't submit consent or cancel after 2 mins
         setTimeout(() => { resetSession() }, 120000);
         results.success = false;
-        uploadHalfComplete = true;
+        uploadHalfComplete = true;       
       }
     }
   }else{
     // if there was an upload error, reset the session
     uploadSessionStarted = false;
   }
-  
+  console.log(uploadSessionStarted)
   res.json(results);
 }
 
