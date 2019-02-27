@@ -82,7 +82,7 @@ function format_skus(skus) {
         newsku['Name'] = sku.name;
         newsku['Case UPC'] = sku.case_upc;
         newsku['Unit UPC'] = sku.unit_upc;
-        newsku['Unit size'] = sku.package_size+ ' '+sku.unit;
+        newsku['Unit size'] = sku.size;
         newsku['Count per case'] = sku.count;
         newsku['PL Name'] = sku.product_line;
         newsku['Formula#'] = sku.formula.number;
