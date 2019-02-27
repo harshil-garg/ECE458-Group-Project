@@ -51,20 +51,21 @@ router.post('/create', async (req, res) => {
     }
 
     //calculate duration
-    if(!duration){
-        let sku = await SKU.findOne({_id: error.sku}).exec();
-        let goal = await ManufacturingGoal.findOne({_id: error.manufacturing_goal}).exec();
-        let quantity;
-        for(let tuple of goal.sku_tuples){
-            if(tuple.sku.equals(sku._id)){
-                quantity = tuple.case_quantity;
-            }
+    let sku = await SKU.findOne({_id: error.sku}).exec();
+    let goal = await ManufacturingGoal.findOne({_id: error.manufacturing_goal}).exec();
+    let quantity;
+    for(let tuple of goal.sku_tuples){
+        if(tuple.sku.equals(sku._id)){
+            quantity = tuple.case_quantity;
         }
-        duration = Math.ceil(quantity / sku.manufacturing_rate);
-        console.log(duration)
-        
+    }
+    calculated_duration = Math.ceil(quantity / sku.manufacturing_rate);
+    if(duration){
+        if(duration != calculated_duration){
+            duration_override = true;
+        }        
     }else{
-        duration_override = true;
+        duration = calculated_duration
     }
 
     activity.sku = error.sku;
