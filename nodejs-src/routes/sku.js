@@ -14,29 +14,11 @@ const validator = require('../controllers/validator');
 const sku_validator = require('../controllers/sku_validator');
 const generator = require('../controllers/autogen');
 
-
-
-//Autocomplete ingredients
-router.post('/autocomplete_ingredients', async (req, res) => {
+//Autocomplete
+router.post('/autocomplete', async (req, res) => {
     const {input} = req.body;
 
-    let results = await autocomplete.nameOrNumber(Ingredient, input);
-    res.json({success: true, data: results});
-});
-
-//Autocomplete product lines
-router.post('/autocomplete_product_lines', async (req, res) => {
-    const {input} = req.body;
-
-    let results = await autocomplete.nameOrNumber(ProductLine, input);
-    res.json({success: true, data: results});
-});
-
-//Autocomplete formulas
-router.post('/autocomplete_formulas', async (req, res) => {
-    const {input} = req.body;
-
-    let results = await autocomplete.nameOrNumber(Formula, input);
+    let results = await autocomplete.nameOrNumber(SKU, input);
     res.json({success: true, data: results});
 });
 
