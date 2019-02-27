@@ -131,7 +131,7 @@ router.post('/delete', async (req, res) => {
     Ingredient.deleteIngredient(name, async (error, result) => {
         if (error) {
             res.json({success: false, message: `Failed to delete ingredient. Error: ${error}`});
-        } else if(result.deletedCount == 0){
+        } else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'Ingredient does not exist to delete'});
         } else {
             
