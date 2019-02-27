@@ -46,6 +46,12 @@ router.post('/create', async (req, res) => {
         return;
     }
 
+    let isUnique = await schedule_validator.uniqueActivity(activity);
+    if(!isUnique[0]){
+        res.json({success: false, message: isUnique[1]});
+        return;
+    }
+
     //calculate duration
     if(!duration){
         let sku = await SKU.findOne({_id: error.sku}).exec();

@@ -1,6 +1,7 @@
 const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
+const ManufacturingSchedule = require('../model/manufacturing_schedule_model');
 module.exports.validActivity = async function(activity){
     let err_msg;
     let sku = await SKU.findOne({number: activity.sku}).exec();
@@ -22,6 +23,18 @@ module.exports.validActivity = async function(activity){
         }
     }
     return [valid, err_msg, sku._id, goal._id];
+}
+
+module.exports.uniqueActivity = async function(activity){
+    let err_msg = 'Activity already exists';
+    let sku = await SKU.findOne({number: activity.sku}).exec();
+    let goal = await ManufacturingGoal.findOne({name: activity.manufacturing_goal}).exec();
+
+    console.log(sku)
+    console.log(goal)
+    let mapping = await ManufacturingSchedule.findOne({'activity.sku': sku._id, 'activity.manufacturing_goal': goal._id}).exec();
+    console.log(mapping)
+    return [!mapping, err_msg]
 }
 
 module.exports.validLine = async function(sku_num, manufacturing_line){
