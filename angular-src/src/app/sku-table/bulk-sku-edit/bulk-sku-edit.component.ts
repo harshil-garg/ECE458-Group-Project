@@ -23,7 +23,7 @@ export class BulkSkuEditComponent implements OnInit {
 
     this.matDialog.open(BulkSkuEditDialogComponent, {
       height: '800px',
-      width: '400px',
+      width: '800px',
       data: data
     })
   }
