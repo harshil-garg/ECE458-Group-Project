@@ -376,7 +376,7 @@ function preprocess(model, properties, data){
       let match = data[properties[i]].match(regex);
       let quantity = (match != null) ? match[1] : data[properties[i]];
       let unit = (match != null) ? match[2] : data[properties[i]];
-      unit = unit.cleanUnit(unit);
+      unit = cleanUnit(unit);
       obj['quantity'] = quantity;
       obj['unit'] = quantity[1];
       j--;
