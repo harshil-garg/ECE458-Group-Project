@@ -312,6 +312,7 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         } else if(manufacturing_rate){
             //TODO: propagate
+            
         }else {
             res.json({success: true, message: "Updated successfully."});
         }
@@ -319,8 +320,9 @@ router.post('/update', async (req, res) => {
 })
 
 //Delete
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const { number } = req.body;
+    let sku = await SKU.findOne({number: number}).exec();
 
     SKU.deleteSKU(number, async (err, result) => {
         if(err) {
@@ -329,7 +331,8 @@ router.post('/delete', (req, res) => {
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
-            let sku = await SKU.findOne({number: number}).exec();
+            console.log(result)
+            
             await ManufacturingGoal.updateMany({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }

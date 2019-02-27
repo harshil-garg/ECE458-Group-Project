@@ -20,6 +20,7 @@ router.post('/autocomplete', async (req, res) => {
 //Create a report
 router.post('/report', async (req, res) => {
     const { manufacturing_line, start, end } = req.body;
+    
 
     let results = await schedule_filter.filter(manufacturing_line, start, end);
 
@@ -40,6 +41,12 @@ router.post('/create', async (req, res) => {
     let error = await createValidation(activity, manufacturing_line, start_date, duration, duration_override);
     if(!('sku' in error)){
         res.json({success: false, message: error});
+        return;
+    }
+
+    let isUnique = await schedule_validator.uniqueActivity(activity);
+    if(!isUnique[0]){
+        res.json({success: false, message: isUnique[1]});
         return;
     }
 
@@ -75,13 +82,13 @@ router.post('/create', async (req, res) => {
 //Update a mapping
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
-    let { activity, manufacturing_line, start_date, duration } = req.body;
+    let { activity, manufacturing_line, start_date, duration, duration_override } = req.body; 
 
     let errors = await createValidation(activity, manufacturing_line, start_date);
-    if(!('sku' in error)){
-        res.json({success: false, message: error});
+    if(!('sku' in errors)){
+        res.json({success: false, message: errors});
         return;
-    }
+    }   
 
     let json = {};
     if(manufacturing_line){
@@ -91,8 +98,27 @@ router.post('/update', async (req, res) => {
         json['start_date'] = start_date;
     }
     if(duration){
+        let sku = await SKU.findOne({_id: errors.sku}).exec();
+        let goal = await ManufacturingGoal.findOne({_id: errors.manufacturing_goal}).exec();
+        let quantity;
+        if(sku != null && goal != null){
+            for(let tuple of goal.sku_tuples){
+                if(tuple.sku.equals(sku._id)){
+                    quantity = tuple.case_quantity;
+                }
+            }
+        }
+        
+        calculated_duration = quantity / sku.manufacturing_rate;
+
         json['duration'] = duration;
-        json['duration_override'] = true;
+
+        if(duration == calculated_duration){
+            json['duration_override'] = false;
+        }else{
+            json['duration_override'] = true;
+        }
+        
     }
 
     ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
@@ -106,14 +132,19 @@ router.post('/update', async (req, res) => {
 });
 
 //Remove a mapping
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const { activity } = req.body;
 
-    ManufacturingSchedule.findOneandDelete({'activity.sku': activity.sku, 
-        'activity.manufacturing_goal': activity.manufacturing_goal}, (err, result) => {
+    let activity_passed = await schedule_validator.validActivity(activity);
+    if(!activity_passed[0]){
+        res.json({success: false, message: activity_passed[1]})
+    }
+
+    ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2], 
+        'activity.manufacturing_goal': activity_passed[3]}, (err, result) => {
             if (err) {
                 res.json({success: false, message: `Failed to delete mapping. Error: ${err}`});
-            }else if(result.deletedCount == 0){
+            }else if(!result || result.deletedCount == 0){
                 res.json({success: false, message: 'Mapping does not exist to delete'});
             }else{
                 res.json({success: true, message: "Deleted successfully."});

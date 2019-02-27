@@ -88,6 +88,7 @@ router.post('/delete', (req, res) => {
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'Manufacturing line does not exist to delete'});
         }else{
+            //delete from skus
             res.json({success: true, message: "Deleted successfully."});
         }
     });
