@@ -86,11 +86,13 @@ function format_skus(skus) {
             mls += `${ml.shortname}${counter == headers.length-1 ? '"' : ','}`;
             counter++;
         }
+        mls += `${counter > 0 ? '' : '"'}`;
         newsku['ML Shortnames'] = mls;
         newsku['Rate'] = sku.manufacturing_rate;
         newsku['Comment'] = sku.comment;
         result.push(newsku);
     }
+    console.log(result);
     return result;
 }
 
