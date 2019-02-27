@@ -4,6 +4,7 @@ import { CrudManufacturingLineService } from '../../manufacturing-line-table/cru
 import { ManufacturingScheduleService } from '../manufacturing-schedule.service';
 import { ManufacturingGoal } from '../../model/manufacturing-goal';
 import {FormControl, NG_VALIDATORS, Validator, ValidatorFn, AbstractControl} from '@angular/forms';
+import { ManufacturingScheduleEvent } from '../../model/manufacturing-schedule-event';
 import { Activity } from '../../model/activity';
 import { MatSnackBar } from '@angular/material';
 import {ManufacturingScheduleReportComponent} from '../manufacturing-schedule-report/manufacturing-schedule-report.component';
@@ -21,8 +22,10 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   manufGoalList : Array<ManufacturingGoal> = [];
   reportingFormControl = new FormControl();
   activityList : Array<Activity> = [];
+  palette : Array<Activity> = [];
+  addedActivities : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
-  goalsUpdated: EventEmitter<any> = new EventEmitter();
+  goalsUpdated: EventEmitter<Array<ManufacturingGoal>> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
   constructor(private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar, private crudManufacturingLineService: CrudManufacturingLineService,
@@ -30,7 +33,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   ngOnInit() {
     this.manufGoalList = [];
-    this.activityList = [];
+    this.palette = [];
     this.populateManufGoalList();
 
     this.reportingFormControl.valueChanges.debounceTime(200)
@@ -56,6 +59,10 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   updateWarnings(event: Array<Array<Activity>>){
+    this.warnings[0] = [];
+    this.palette.forEach(activity => {
+      this.warnings[0].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
+    });
     this.warnings[1] = [];
     event[0].forEach(activity => {
       this.warnings[1].push(activity.sku.name + " (" + activity.manufacturing_goal + ")");
@@ -101,18 +108,26 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     }
     console.log("MANUF GOALS");
     console.log(this.manufGoalList);
-    this.populateActivityList();
+    this.refreshPalette();
   }
 
-  populateActivityList(){
-    this.activityList = [];
+  refreshPalette(){
+    this.palette = [];
     for(let manufGoal of this.manufGoalList){
       manufGoal.sku_tuples.forEach(sku => {
-        this.activityList.push({
-          sku: sku.sku,
-          duration: sku.case_quantity * (+sku.sku.manufacturing_rate),
-          manufacturing_goal: manufGoal.name
+        var alreadyAdded : boolean = false;
+        this.addedActivities.forEach(act=>{
+          if(act.sku["number"] == sku.sku["number"] && act.manufacturing_goal == manufGoal.name){
+            alreadyAdded = true;
+          }
         });
+        if(!alreadyAdded){
+          this.palette.push({
+            sku: sku.sku,
+            duration: Math.ceil(sku.case_quantity / (+sku.sku.manufacturing_rate)),
+            manufacturing_goal: manufGoal.name
+          });
+        }
       });
     }
   }
@@ -121,7 +136,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     if(event.previousContainer.id != "manufacturing-activities"){
       var manufLine = event.previousContainer.id.split("-")[1];
       var hour = event.previousContainer.id.split("-")[3];
-      this.activityList.push(event.previousContainer.data);
+      this.palette.push(event.previousContainer.data);
       this.removeEvent.emit([manufLine, hour]);
     }
     // if (event.previousContainer === event.container) {
@@ -137,7 +152,6 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   remove(id){
     if(confirm("Are you sure you would like to remove " + this.manufGoalList[id].name + "?")){
       this.enable(this.manufGoalList[id], false);
-      this.goalsUpdated.emit(true);
     }
   }
 
@@ -152,7 +166,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   removeActivity(id){
-    this.activityList.splice(id, 1);
+    this.palette.splice(id, 1);
   }
 
   confirmEnable(goal: ManufacturingGoal){
@@ -182,6 +196,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
           this.displayError("Error enabling goal");
         } else {
           this.populateManufGoalList();
+          this.goalsUpdated.emit(this.manufGoalList);
         }
       },
       err => {
@@ -194,6 +209,14 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   displayError(message){
     this.snackBar.open(message, "Close", {duration:3000});
+  }
+
+  updateActivities(event: Array<ManufacturingScheduleEvent>){
+    this.addedActivities = [];
+    event.forEach(event => {
+      this.addedActivities.push(event.activity);
+    });
+    this.refreshPalette();
   }
 
   public makeReport(value) {
