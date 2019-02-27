@@ -33,6 +33,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 mat-icon:hover {

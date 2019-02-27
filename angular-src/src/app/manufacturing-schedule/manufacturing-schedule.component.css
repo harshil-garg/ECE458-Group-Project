@@ -30,6 +30,7 @@
   min-width: 125px;
   max-width: 125px;
   overflow: hidden;
+  text-align: center;
 }
 
 .selected-box {
@@ -47,6 +48,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .start-box {
@@ -64,6 +66,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .header-list {
@@ -108,6 +111,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .duration-override-selected-box{
@@ -118,13 +122,14 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  cursor: move;
+  cursor: pointer;
   background: #FECF6A;
   font-size: 14px;
   flex-grow: 1;
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .past-deadline-start-box{
@@ -142,6 +147,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .past-deadline-selected-box{
@@ -159,6 +165,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .orphaned-start-box{
@@ -176,6 +183,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .orphaned-selected-box{
@@ -193,6 +201,7 @@
   flex-basis: 0;
   min-width: 125px;
   max-width: 125px;
+  text-align: center;
 }
 
 .fixed-container {

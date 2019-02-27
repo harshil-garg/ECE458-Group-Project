@@ -27,7 +27,7 @@
         id="manufacturing-activities"
         class="example-list"
         (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of palette" cdkDrag>{{item.sku.name}} &nbsp; ({{item.manufacturing_goal}})
+        <div class="example-box" *ngFor="let item of palette" cdkDrag>{{item.sku.name}} <br> ({{item.manufacturing_goal}})
           <mat-icon *cdkDragPreview></mat-icon>
         </div>
       </div>
