@@ -41,6 +41,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   refresh() {
+    this.activities = [];
     this.manufacturingScheduleService.load().subscribe(
       response => {
         if(response.success){
@@ -329,6 +330,8 @@ export class ManufacturingScheduleComponent implements OnInit {
 
   wrongManufLine(activity: Activity, manufLine: string){
     var returned: boolean = true;
+    console.log("MANUF LINES");
+    console.log(activity.sku.manufacturing_lines);
     activity.sku.manufacturing_lines.forEach(line => {
       if(line==manufLine){
         returned = false;
@@ -490,7 +493,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   getClass(id, hour_id){
     var item = this.hours[id][hour_id];
     var starting_item = this.starting_hours[id][hour_id];
-    if(item==-1){
+    if(item==-1 || this.activities[item]==undefined){
       return "example-box";
     } else {
       var activity = this.activities[item];
