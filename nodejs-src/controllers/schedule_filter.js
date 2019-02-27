@@ -72,7 +72,7 @@ module.exports.filter = async function(manufacturing_line, start, end){
 
 
     if(manufacturing_line && start && end){
-        // populateIngredients(results)
+        populateIngredients(results)
     }
 
     convertToShortnames(results)
