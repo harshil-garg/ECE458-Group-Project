@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('../controllers/validator');
 const autogen = require('../controllers/autogen');
 const utils = require('../utils/utils');
+const unit = require('../controllers/units');
 
 const Schema = mongoose.Schema;
 const IngredientSchema = new Schema({
@@ -98,23 +99,36 @@ async function syntaxValidation(ingredients, ingredients_csv, results, type) {
                 }
             }
         }else{
-            ingredient.number = await autogen.autogen(Ingredient)//.catch((err) => {console.log(err.toString())});
+            ingredient.number = await autogen.autogen(Ingredient)
         }
         let cost_numeric = validator.isNumeric(ingredient.cost);
-        if(!cost_numeric[0]){
+        let size_numeric = validator.isNumeric(ingredient.package_size);
+        let errors = validator.compileErrors(cost_numeric, size_numeric);
+        if(errors.length > 0){
             results[type].errorlist.push({
-                message: cost_numeric[1],
+                message: errors,
                 data: ingredient_csv
             });
         }else{
             let cost_positive = validator.isPositive(ingredient.cost, 'Cost');
-            if(!cost_positive[0]){
+            let size_positive = validator.isPositive(ingredient.package_size, 'Package size')
+            let pos_errors = validator.compileErrors(cost_positive, size_positive);
+            if(errors.length > 0){
                 results[type].errorlist.push({
-                    message: cost_positive[1],
+                    message: pos_errors,
                     data: ingredient_csv
                 });
             }
+
             ingredient.cost = validator.roundCost(ingredient.cost);
+        }            
+
+        let unit_passed = unit.validUnit(ingredient.unit);
+        if(!unit_passed){
+            results[type].errorlist.push({
+                message: 'Invalid unit',
+                data: ingredient_csv
+            });
         }
     }
 }

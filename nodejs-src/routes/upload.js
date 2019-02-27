@@ -61,6 +61,7 @@ router.post('/', upload.array('file[]', 4), async (req, res) => {
   else {
     await handleFiles(res)//.catch((err) => {return});
   }
+  resetSession();
 });
 
 router.post('/commit', async (req, res) => {
@@ -80,6 +81,7 @@ router.post('/commit', async (req, res) => {
       resetSession();
     }
     res.json({ success: true });
+    resetSession()
   }
   else {
     res.json({
@@ -211,7 +213,7 @@ async function handleFiles(res) {
       toBeCommitted.product_lines.createlist = results.product_lines.createlist_model;
   
       //if there's no errors and no potential changes, commit the changes
-      if (!(results.ingredients.changelist.length || results.skus.changelist.length)) {
+      if (!(results.ingredients.changelist.length || results.skus.changelist.length || results.formulas.changelist.length)) {
         await commitImport()
         .then(() => {
           results.success = true;
@@ -346,10 +348,10 @@ let ingredient_properties = ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Co
 let product_properties = ['Name'];
 let formula_properties = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
 
-let unit_regex = new RegExp('\s|\.')
-let trailing_s = new RegExp('s+$')
+let unit_regex = /\s|\./g
+let trailing_s = /s+$/
+let regex = /^(\d*\.?\d+)\s*(\D.*|)$/;
 function cleanUnit(unit){
-  console.log(unit)
   unit = unit.replace(unit_regex, '');
   unit = unit.toLowerCase();
   unit = unit.replace(trailing_s, '');
@@ -362,17 +364,22 @@ function preprocess(model, properties, data){
   let j = 0;
   for(let i = 0; i < properties.length; i++){
     if(model.modelName == 'Ingredient' && properties[i] == 'Size'){
-      let size = data[properties[i]].split(/\s+/);
-      let unit = cleanUnit(size[1]);
-      console.log(unit)
-      obj['package_size'] = size[0];
+      let match = data[properties[i]].match(regex);
+      let size = (match != null) ? match[1] : data[properties[i]];
+      let unit = (match != null) ? match[2] : data[properties[i]];
+
+      unit = cleanUnit(unit);
+      obj['package_size'] = size;
       obj['unit'] = unit;
       j++;     
     }else if(model.modelName == 'Formula' && properties[i] == 'Ingr#'){
       obj['ingredient'] = data[properties[i]];
     }else if(model.modelName == 'Formula' && properties[i] == 'Quantity'){
-      let quantity = data[properties[i]].split(' ');
-      obj['quantity'] = quantity[0];
+      let match = data[properties[i]].match(regex);
+      let quantity = (match != null) ? match[1] : data[properties[i]];
+      let unit = (match != null) ? match[2] : data[properties[i]];
+      unit = unit.cleanUnit(unit);
+      obj['quantity'] = quantity;
       obj['unit'] = quantity[1];
       j--;
     }else if(properties[i] == 'ML Shortnames'){
