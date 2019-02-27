@@ -89,7 +89,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         if(!alreadyAdded){
           this.palette.push({
             sku: sku.sku,
-            duration: sku.case_quantity * (+sku.sku.manufacturing_rate),
+            duration: Math.ceil(sku.case_quantity / (+sku.sku.manufacturing_rate)),
             manufacturing_goal: manufGoal.name
           });
         }

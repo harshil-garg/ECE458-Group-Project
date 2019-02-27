@@ -117,7 +117,7 @@ router.post('/delete', async (req, res) => {
     Formula.deleteOne({number: number}, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete formula. Error: ${err}`});
-        }else if(result.deletedCount == 0){
+        }else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'Formula does not exist to delete'});
         }else{
             res.json({success: true, message: "Deleted successfully."});
