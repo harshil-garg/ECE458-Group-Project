@@ -28,18 +28,21 @@ module.exports.filter = async function(manufacturing_line, start, end){
             as: 'manufacturing_line'
         }
     },
-    {$unwind: '$manufacturing_line'});
-    console.log(manufacturing_line)
-    console.log(start)
-    console.log(end)
-    console.log("hi")
+    {$unwind: '$manufacturing_line'},
+    {
+        $lookup: {
+            from: 'manufacturinglines',
+            localField: 'activity.sku.manufacturing_lines',
+            foreignField: '_id',
+            as: 'activity.sku.manufacturing_lines'
+        }
+    });
+
     if(manufacturing_line && start && end){
-        console.log(manufacturing_line)
-        console.log(start)
-        console.log(end)
-        pipeline.push({$match: {'manufacturing_line.shortname': manufacturing_line}},
-        {$addFields: {end_date: {$add: ['$start_date', '$duration']}}},
-        {$match: {$or: [{start_date: {$lt: end}}, {end_date: {$gt: start}}]}})
+        pipeline.push({$match: {'manufacturing_line.shortname': manufacturing_line}}//,
+        // {$addFields: {end_date: {$add: ['$start_date', '$duration']}}},
+        // {$match: {$or: [{start_date: {$lt: end}}, {end_date: {$gt: start}}]}}
+        )
     }
 
     let cursor = ManufacturingSchedule.aggregate(pipeline).cursor({}).exec();
@@ -49,5 +52,20 @@ module.exports.filter = async function(manufacturing_line, start, end){
         results.push(res);
     });
 
+    convertToShortnames(results)
+
     return results;
+}
+
+
+function convertToShortnames(results){
+    
+    for(let map of results){
+        let shortnames = [];
+        for(let line of map.activity.sku.manufacturing_lines){
+            shortnames.push(line.shortname);
+        }
+        map.activity.sku.manufacturing_lines = shortnames;
+    }
+    
 }

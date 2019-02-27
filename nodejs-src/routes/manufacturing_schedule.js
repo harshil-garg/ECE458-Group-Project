@@ -19,7 +19,6 @@ router.post('/autocomplete', async (req, res) => {
 
 //Create a report
 router.post('/report', async (req, res) => {
-    console.log("hello")
     const { manufacturing_line, start, end } = req.body;
     
 
@@ -30,7 +29,6 @@ router.post('/report', async (req, res) => {
 });
 
 router.post('/load',  async (req, res) => {
-    console.log("hi")
     let results = await schedule_filter.filter();
 
     res.json({success: true, data: results});
@@ -43,6 +41,12 @@ router.post('/create', async (req, res) => {
     let error = await createValidation(activity, manufacturing_line, start_date, duration, duration_override);
     if(!('sku' in error)){
         res.json({success: false, message: error});
+        return;
+    }
+
+    let isUnique = await schedule_validator.uniqueActivity(activity);
+    if(!isUnique[0]){
+        res.json({success: false, message: isUnique[1]});
         return;
     }
 
