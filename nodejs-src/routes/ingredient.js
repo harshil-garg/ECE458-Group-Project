@@ -107,7 +107,7 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: 'Input invalid'});
             return;
         }
-        let rounded_cost = validator.round_cost(cost);
+        let rounded_cost = validator.roundCost(cost);
         json["cost"] = rounded_cost;
     }
     if (comment) {

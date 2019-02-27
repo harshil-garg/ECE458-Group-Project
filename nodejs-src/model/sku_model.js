@@ -100,12 +100,11 @@ module.exports.commitImport = async (createlist, changelist) => {
         for(let row of changelist){
             let deleted_lines = row.deleted_lines;
             delete row.deleted_lines
+            let sku = await SKU.findOne({number: row.number}).exec();
+
             await SKU.findOneAndUpdate({number: row.number}, row).then(async () => {
-                console.log('deleted lines: '+deleted_lines)
-                await ManufacturingSchedule.deleteMany({'activity.sku': row._id, 'manufacturing_line': {$in: deleted_lines}}, (err, result)=>{
-                    console.log(result.deletedCount)
-                    console.log(err)
-                })
+                let result = await ManufacturingSchedule.find({'activity.sku': sku._id, 'manufacturing_line': {$in: deleted_lines}}).exec();
+                await ManufacturingSchedule.deleteMany({'activity.sku': sku._id, 'manufacturing_line': {$in: deleted_lines}}).exec();
             }).catch((err) => {console.log(err);throw err});
         }
     }
