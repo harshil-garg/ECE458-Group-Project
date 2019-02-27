@@ -40,8 +40,8 @@ module.exports.validLine = async function(sku_num, manufacturing_line){
 
     err_msg = 'SKU cannot be placed on this manufacturing line';
     let valid = false;
-    for(let shortname of sku.manufacturing_lines){
-        if(manufacturing_line == shortname){
+    for(let id of sku.manufacturing_lines){
+        if(line._id.equals(id)){
             valid = true;
         }
     }
