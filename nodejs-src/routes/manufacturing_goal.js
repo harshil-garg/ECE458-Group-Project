@@ -100,7 +100,7 @@ router.post('/create', async (req, res) => {
     // Check that SKUS exist
     let valid_tuples = [];
     for(let tuple of sku_tuples){
-        valid_tuples.push(await validator.itemExists(SKU, tuple.sku));
+        valid_tuples.push(await validator.itemExists(SKU, tuple.sku.toString()));
     }
 
     let errors = validator.compileErrors(...valid_tuples);

@@ -5,6 +5,7 @@ const Ingredient = require('../model/ingredient_model');
 const formula_validator = require('../controllers/formula_validator')
 const autogen = require('../controllers/autogen');
 const utils = require('../utils/utils');
+const unit = require('../controllers/units');
 
 const Schema = mongoose.Schema;
 const Ingredient_Tuple = new Schema({
@@ -106,6 +107,13 @@ async function syntaxValidation(formulas, formulas_csv, results, type) {
             }
         }
 
+        let unit_passed = unit.validUnit(formula.unit);
+        if(!unit_passed){
+            results[type].errorlist.push({
+                message: 'Invalid unit',
+                data: formula_csv
+            });
+        }
         let name_passed = validator.proper_name_length(formula.name);
         let ingredient_tuple_passed = await formula_validator.validIngredientTuple(Ingredient, formula.ingredient, formula.unit);
         let errors = validator.compileErrors(name_passed, ingredient_tuple_passed);
