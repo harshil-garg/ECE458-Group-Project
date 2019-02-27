@@ -2,12 +2,23 @@ const express = require('express');
 const router = express.Router();
 const ManufacturingSchedule = require('../model/manufacturing_schedule_model')
 const SKU = require('../model/sku_model');
+const Formula = require('../model/formula_model.js');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
+const Ingredient = require('../model/ingredient_model')
 const validator = require('../controllers/validator');
 const schedule_validator = require('../controllers/schedule_validator');
 const autocomplete = require('../controllers/autocomplete');
 const schedule_filter = require('../controllers/schedule_filter');
+const unit = require('../controllers/units');
+
+function getUser(req){
+    if(!req.user){
+        return;
+    }else {
+        return req.user.email;
+    }
+}
 
 //Display manufacturing goals for admin to select, filter by name and username
 router.post('/autocomplete', async (req, res) => {
@@ -20,13 +31,58 @@ router.post('/autocomplete', async (req, res) => {
 //Create a report
 router.post('/report', async (req, res) => {
     const { manufacturing_line, start, end } = req.body;
-    
+
 
     let results = await schedule_filter.filter(manufacturing_line, start, end);
 
     res.json({success: true, data: results});
 
 });
+
+// Given a list of activities
+router.post('/report_calculate', async (req, res) => {
+    const { manufacturing_tasks } = req.body;
+
+    let user = getUser(req);
+    if(!user){
+        res.json({success: false, message: 'No user logged in'});
+        return;
+    }  
+
+    let ingredientMap = {};
+
+    for (let task of manufacturing_tasks) {
+        let myTask = await ManufacturingSchedule.findOne({_id: task}).exec();
+        let mySKU = await SKU.findOne({_id: myTask.activity.sku}).exec();
+        let myFormula = await Formula.findOne({_id: mySKU.formula}).exec();
+        let myManufacturingGoal = await ManufacturingGoal.findOne({_id: myTask.activity.manufacturing_goal}).exec();
+        var case_quantity;
+        for (let sku_tuple of myManufacturingGoal.sku_tuples) {
+            if (String(sku_tuple.sku) == String(myTask.activity.sku)) {
+                case_quantity = sku_tuple.case_quantity;
+            }
+        }
+
+        for (let ingr_tuple of myFormula.ingredient_tuples) {
+            let ingredient = await Ingredient.findOne({_id: ingr_tuple.ingredient}).exec();
+            let key = ingredient.name;
+
+            let unit_value = case_quantity * mySKU.formula_scale_factor * ingr_tuple.quantity * unit.convert(ingr_tuple.unit, ingredient.unit);
+
+             if(key in ingredientMap){
+                ingredientMap[key]['unit_value'] += unit_value;
+                ingredientMap[key]['package_value'] = ingredientMap[key]['unit_value'] / ingredient.package_size;
+            }else{
+                ingredientMap[key] = {};
+                ingredientMap[key]['unit_value'] = unit_value;
+                ingredientMap[key]['unit'] = ingredient.unit;
+                ingredientMap[key]['package_value'] = unit_value / ingredient.package_size;
+            }
+
+        }
+    }
+    res.json({success: true, data: ingredientMap});
+})
 
 router.post('/load',  async (req, res) => {
     let results = await schedule_filter.filter();
@@ -37,7 +93,7 @@ router.post('/load',  async (req, res) => {
 //Add an mapping of an activity to a manufacturing line
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
-    
+
     let error = await createValidation(activity, manufacturing_line, start_date, duration, duration_override);
     if(!('sku' in error)){
         res.json({success: false, message: error});
@@ -63,7 +119,7 @@ router.post('/create', async (req, res) => {
     if(duration){
         if(duration != calculated_duration){
             duration_override = true;
-        }        
+        }
     }else{
         duration = calculated_duration
     }
@@ -84,13 +140,13 @@ router.post('/create', async (req, res) => {
 //Update a mapping
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
-    let { activity, manufacturing_line, start_date, duration, duration_override } = req.body; 
+    let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
 
     let errors = await createValidation(activity, manufacturing_line, start_date);
     if(!('sku' in errors)){
         res.json({success: false, message: errors});
         return;
-    }   
+    }
 
     let json = {};
     if(manufacturing_line){
@@ -110,7 +166,6 @@ router.post('/update', async (req, res) => {
                 }
             }
         }
-        
         calculated_duration = Math.ceil(quantity / sku.manufacturing_rate);
 
         json['duration'] = duration;
@@ -120,10 +175,10 @@ router.post('/update', async (req, res) => {
         }else{
             json['duration_override'] = true;
         }
-        
+
     }
 
-    ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
+    ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku,
         'activity.manufacturing_goal': errors.manufacturing_goal}, json, (err) => {
             if (err) {
                 res.json({success: false, message: `Failed to update mapping. Error: ${err}`});
@@ -142,7 +197,7 @@ router.post('/delete', async (req, res) => {
         res.json({success: false, message: activity_passed[1]})
     }
 
-    ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2], 
+    ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2],
         'activity.manufacturing_goal': activity_passed[3]}, (err, result) => {
             if (err) {
                 res.json({success: false, message: `Failed to delete mapping. Error: ${err}`});

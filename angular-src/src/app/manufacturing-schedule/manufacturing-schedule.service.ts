@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { Tuple } from '../model/ingredient';
 import { ManufacturingGoal } from '../model/manufacturing-goal';
 import { Activity } from '../model/activity';
+import { Sku } from '../model/sku';
 import { ManufacturingLine } from '../model/manufacturing-line';
 import { ManufacturingScheduleEvent } from '../model/manufacturing-schedule-event';
 
@@ -32,9 +33,20 @@ export class GetEnabledResponse {
 	data: ManufacturingGoal[];
 }
 
+export class ResponseData {
+	activity : {
+		manufacturing_goal: ManufacturingGoal;
+		sku: Sku;
+	};
+	manufacturing_line: ManufacturingLine;
+	start_date: Date;
+	duration: number;
+	duration_override: boolean;
+}
+
 export class LoadResponse {
 	success: boolean;
-	data: Array<ManufacturingScheduleEvent>;
+	data: Array<ResponseData>;
 }
 
 export class CreateActivity {
@@ -56,8 +68,11 @@ export class CreateResponse {
 }
 
 export class UpdateMessage {
-	activity: Activity;
-	manufacturing_line: ManufacturingLine;
+	activity: {
+		sku: number;
+		manufacturing_goal: string;
+	};
+	manufacturing_line: string;
 	start_date: Date;
 	duration: number;
 }
@@ -68,7 +83,10 @@ export class UpdateResponse {
 }
 
 export class DeleteMessage {
-	activity: Activity;
+	activity: {
+		sku: number;
+		manufacturing_goal: string;
+	};
 }
 
 export class DeleteResponse {
@@ -112,10 +130,14 @@ export class ManufacturingScheduleService {
 	}
 
 	update(updateMessage: UpdateMessage): Observable<UpdateResponse>{
+		console.log("UPDATINGGGG");
+		console.log(updateMessage);
 		return this.http.post<UpdateResponse>('api/manufacturing_schedule/update', updateMessage, httpOptions);
 	}
 
 	delete(deleteMessage: DeleteMessage): Observable<DeleteResponse>{
+		console.log("DELETEINGGG");
+		console.log(deleteMessage);
 		return this.http.post<DeleteResponse>('api/manufacturing_schedule/delete', deleteMessage, httpOptions);
 	}
 

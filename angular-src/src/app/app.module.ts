@@ -43,6 +43,7 @@ import { SearchGoalsComponent } from './manufacturing-schedule/search-goals/sear
 import { BulkSkuEditComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit.component';
 import { BulkSkuEditDialogComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit-dialog/bulk-sku-edit-dialog.component';
 import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
+import { ManufacturingScheduleReportComponent } from './manufacturing-schedule/manufacturing-schedule-report/manufacturing-schedule-report.component';
 
 const routes: Routes = [
   {
@@ -89,6 +90,7 @@ const routes: Routes = [
     ManufacturingScheduleComponent,
     ManufacturingScheduleDisplayComponent,
     SearchGoalsComponent,
+    ManufacturingScheduleReportComponent,
     BulkSkuEditComponent,
     BulkSkuEditDialogComponent,
     ActivityDialogComponent
@@ -141,6 +143,6 @@ const routes: Routes = [
   ],
   providers: [Title],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, BulkSkuEditDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent]
 })
 export class AppModule { }

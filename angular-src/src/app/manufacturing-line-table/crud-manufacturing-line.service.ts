@@ -57,6 +57,26 @@ export class ExportResponse {
   data: Array<ManufacturingLineCsvData>;
 }
 
+export class AutocompleteResponse {
+  success: boolean;
+  data: Array<any>;
+}
+
+export class GenericResponse {
+  success: boolean;
+  data: Array<any>;
+}
+
+export class ReportData {
+  start: string;
+  end: string; 
+  manufacturing_line: string;
+}
+
+export class ActivityData {
+  manufacturing_tasks: Array<string>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -86,5 +106,19 @@ export class CrudManufacturingLineService {
   read(requestedManufacturingLine: ReadMessage): Observable<ReadResponse>{
     console.log(requestedManufacturingLine);
     return this.http.post<ReadResponse>('api/manufacturing_lines/all', requestedManufacturingLine, httpOptions);
+  }
+
+  autocompleteLines(query: string): Observable<AutocompleteResponse> {
+    return this.http.post<AutocompleteResponse>('api/manufacturing_lines/autocomplete', {input: query}, httpOptions);
+  }
+
+  getManufacturingScheduleReport(query: ReportData): Observable<GenericResponse> {
+    console.log(query);
+    return this.http.post<GenericResponse>('api/manufacturing_schedule/report', query, httpOptions);
+  }
+
+  getManufacturingScheduleSummation(query: ActivityData): Observable<GenericResponse> {
+    console.log(query);
+    return this.http.post<GenericResponse>('api/manufacturing_schedule/report_calculate', query, httpOptions);
   }
 }

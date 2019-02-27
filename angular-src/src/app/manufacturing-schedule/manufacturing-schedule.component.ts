@@ -25,10 +25,11 @@ export class ManufacturingScheduleComponent implements OnInit {
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate(new Date());
   warningList: Array<Array<Activity>> = [[],[],[]];
+  @Input() manufGoals : Array<ManufacturingGoal> = [];
   @Input() remove: EventEmitter<any>;
-  @Input() goalsUpdated: EventEmitter<any>;
-  @Input() manufGoals: Array<ManufacturingGoal>;
+  @Input() goalsUpdated: EventEmitter<Array<ManufacturingGoal>>;
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
+  @Output() activitiesUpdated: EventEmitter<Array<ManufacturingScheduleEvent>> = new EventEmitter();
 
   constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog,
@@ -37,17 +38,31 @@ export class ManufacturingScheduleComponent implements OnInit {
   ngOnInit() {
     this.refresh();
     this.remove.subscribe(index=>this.removeActivity(index));
-    this.goalsUpdated.subscribe(ev => this.updateOrphaned());
+    this.goalsUpdated.subscribe(goals => {
+      this.manufGoals = goals;
+      this.refresh();
+    });
   }
 
   refresh() {
+    this.activities = [];
+    this.warningList = [[],[],[]];
     this.manufacturingScheduleService.load().subscribe(
       response => {
         if(response.success){
-          console.log("REFRREEESSHHHHHEDDDD");
-          console.log(response);
-          response.data.forEach(data => this.activities.push(data));
+          response.data.forEach(data => {this.activities.push({
+            activity: {
+              sku: data.activity.sku,
+              manufacturing_goal: data.activity.manufacturing_goal.name,
+              duration: data.duration
+            },
+            manufacturing_line: data.manufacturing_line.shortname,
+            start_date: new Date(data.start_date),
+            duration: data.duration,
+            duration_override: data.duration_override
+          })});
           this.populateManufLines();
+          this.activitiesUpdated.emit(this.activities);
         } else {
           this.displayError("Failed to setup Activities!");
         }
@@ -68,9 +83,11 @@ export class ManufacturingScheduleComponent implements OnInit {
       }).subscribe(
       response => {
         if(response.success){
+          this.manufLines = [];
           response.data.forEach(data=> this.manufLines.push(data.shortname));
           this.setupHourHeaders();
           this.refreshHours();
+          this.checkWarnings();
         } else {
           this.displayError("Failed to populate Manufacturing Lines");
         }
@@ -81,6 +98,12 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       }
     );
+  }
+
+  checkWarnings(){
+    this.updateOrphaned();
+    this.updateDurationWarning();
+    this.warnings.emit(this.warningList);
   }
 
   setupHourHeaders(){
@@ -98,6 +121,8 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   refreshHours(){
+    this.hours = [[]];
+    this.starting_hours = [[]];
     for(var i=0; i<this.manufLines.length; i++){
       this.hours[i] = [];
       this.starting_hours[i] = [];
@@ -134,13 +159,11 @@ export class ManufacturingScheduleComponent implements OnInit {
       if(endDate.getFullYear() > deadline.getFullYear() || endDate.getMonth() > deadline.getMonth() || endDate.getDate() > deadline.getDate()){
         if(this.warningList[0].indexOf(this.activities[i].activity)==-1){
           this.warningList[0].push(this.activities[i].activity);
-          this.warnings.emit(this.warningList);
         }
         this.activities[i].past_deadline = true;
       } else {
         if(this.warningList[0].indexOf(this.activities[i].activity)!=-1){
           this.warningList[0].splice(this.warningList[1].indexOf(this.activities[i].activity), 1);
-          this.warnings.emit(this.warningList);
         }
         this.activities[i].past_deadline = false;
       }
@@ -159,12 +182,10 @@ export class ManufacturingScheduleComponent implements OnInit {
         act.orphaned = true;
         if(this.warningList[1].indexOf(act.activity)==-1){
           this.warningList[1].push(act.activity);
-          this.warnings.emit(this.warningList);
         }
       } else {
         if(this.warningList[1].indexOf(act.activity)!=-1){
           this.warningList[1].splice(this.warningList[1].indexOf(act.activity), 1);
-          this.warnings.emit(this.warningList);
         }
         act.orphaned = false;
       }
@@ -172,11 +193,10 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   calculateEndTime(startTime: Date, duration: number){
-    var timeTil6 = 18 - startTime.getHours();
-    var date = new Date(startTime.getTime());
+    var date = new Date(startTime);
+    var timeTil6 = 18 - date.getHours();
     if(timeTil6 >= duration){
       date.setHours(date.getHours() + duration);
-      console.log(date);
     }
     else{
       duration -= timeTil6;
@@ -191,7 +211,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   zeroedDate(givenDate: Date){
-    var currDate = new Date(givenDate.getTime());
+    var currDate = new Date(givenDate);
     currDate.setHours(0);
     currDate.setMinutes(0);
     currDate.setSeconds(0);
@@ -199,8 +219,10 @@ export class ManufacturingScheduleComponent implements OnInit {
     return currDate;
   }
 
-  sameDay(day1, day2){
-    return (day1.getYear() == day2.getYear() && day1.getMonth() == day2.getMonth() && day1.getDate() == day2.getDate());
+  sameDay(day1: Date, day2: Date){
+    var d1: Date = new Date(day1);
+    var d2: Date = new Date(day2);
+    return (d1.getFullYear() == d2.getFullYear() && d1.getMonth() == d2.getMonth() && d1.getDate() == d2.getDate());
   }
 
   convertToMillis(hour,minute,second,millis){
@@ -219,8 +241,6 @@ export class ManufacturingScheduleComponent implements OnInit {
         duration: event.previousContainer.data[event.previousIndex].duration,
         manufacturing_goal: event.previousContainer.data[event.previousIndex].manufacturing_goal
       };
-      console.log("DROPPEEEDDDDD");
-      console.log(droppedActivity);
       var startDate = this.zeroedDate(this.currDate);
       startDate.setHours(8+ (+currHour));
       if(!this.isCollision(startDate, droppedActivity, this.manufLines[+currId], droppedActivity.duration)){
@@ -240,7 +260,6 @@ export class ManufacturingScheduleComponent implements OnInit {
           //   duration_override: false
           // });
           this.createActivity(newManufEvent);
-          this.refreshHours();
           this.manufacturingScheduleDisplayComponent.removeActivity(event.previousIndex);
         } else{
           this.displayError("This add is not allowed : " + droppedActivity.sku.name + " cannot be produced on line " + this.manufLines[+currId]);
@@ -263,6 +282,7 @@ export class ManufacturingScheduleComponent implements OnInit {
             if(activity.activity == initialValue){
               activity.start_date = updatedDate;
               activity.manufacturing_line = this.manufLines[+currId];
+              this.updateActivity(activity);
             }
           });
         }else{
@@ -271,25 +291,18 @@ export class ManufacturingScheduleComponent implements OnInit {
       }else{
         this.displayError("This move is not allowed : overlapping activities on " + this.manufLines[+currId]);
       }
-      this.refreshHours();
+      this.refresh();
     }
   }
 
   removeActivity(index){
     var deletedActivity : Activity = this.activities[this.hours[index[0]][index[1]]].activity;
-    for(var i=0; i<this.activities.length; i++){
-      if(this.activities[i].activity == deletedActivity){
-        this.activities.splice(i, 1);
-      }
-    }
-    this.warningList.forEach(list=>{
-      var indexDeleted = list.indexOf(deletedActivity);
-      if(indexDeleted!=-1){
-        list.splice(indexDeleted, 1);
-        this.warnings.emit(this.warningList);
-      }
-    });
-    this.refreshHours();
+    this.deleteActivity(deletedActivity);
+    // for(var i=0; i<this.activities.length; i++){
+    //   if(this.activities[i].activity == deletedActivity){
+    //     this.activities.splice(i, 1);
+    //   }
+    // }
   }
 
   displayError(message){
@@ -322,11 +335,6 @@ export class ManufacturingScheduleComponent implements OnInit {
     return returned;
   }
 
-  log(e) {
-    console.log("LOGGED:");
-    console.log(e);
-  }
-
   getLists() {
     var lists = [];
     for(var i=0; i<this.manufLines.length; i++){
@@ -351,15 +359,18 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(result!=null){
           this.activities[activity_id].duration = +result;
           this.activities[activity_id].duration_override = true;
-          if(this.warningList[2].indexOf(this.activities[activity_id].activity)==-1){
-            this.warningList[2].push(this.activities[activity_id].activity);
-            this.warnings.emit(this.warningList);
-          }
-          this.warnings.emit(this.warningList);
-          this.refreshHours();
+          this.updateActivity(this.activities[activity_id]);
         }
       });
     }
+  }
+
+  updateDurationWarning(){
+    this.activities.forEach(activity => {
+      if(activity.duration_override && this.warningList[2].indexOf(activity.activity)==-1){
+        this.warningList[2].push(activity.activity);
+      }
+    });
   }
 
   createActivity(manufacturingScheduleEvent: ManufacturingScheduleEvent){
@@ -374,9 +385,54 @@ export class ManufacturingScheduleComponent implements OnInit {
       duration_override: false
     }).subscribe(
       response => {
-        console.log(response);
         if(response.success){
-          console.log("SUCCESSFULLY ADDEDDDDDD");
+          this.refresh();
+        } else {
+          this.displayError("Failed to create Activity!");
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
+  }
+
+  deleteActivity(activity: Activity){
+    this.manufacturingScheduleService.delete({
+      activity: {
+        sku: activity.sku["number"],
+        manufacturing_goal: activity.manufacturing_goal
+      }
+    }).subscribe(
+      response => {
+        if(response.success){
+          this.refresh();
+        } else {
+          this.displayError("Failed to create Activity!");
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
+  }
+
+  updateActivity(activity: ManufacturingScheduleEvent){
+    this.manufacturingScheduleService.update({
+      activity: {
+        sku: activity.activity.sku["number"],
+        manufacturing_goal: activity.activity.manufacturing_goal
+      },
+      manufacturing_line: activity.manufacturing_line,
+      start_date: activity.start_date,
+      duration: activity.duration
+    }).subscribe(
+      response => {
+        if(response.success){
           this.refresh();
         } else {
           this.displayError("Failed to create Activity!");
@@ -425,7 +481,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   getClass(id, hour_id){
     var item = this.hours[id][hour_id];
     var starting_item = this.starting_hours[id][hour_id];
-    if(item==-1){
+    if(item==-1 || this.activities[item]==undefined){
       return "example-box";
     } else {
       var activity = this.activities[item];
