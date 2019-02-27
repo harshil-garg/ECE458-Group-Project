@@ -137,6 +137,6 @@ const routes: Routes = [
   ],
   providers: [Title],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, BulkSkuEditDialogComponent]
 })
 export class AppModule { }

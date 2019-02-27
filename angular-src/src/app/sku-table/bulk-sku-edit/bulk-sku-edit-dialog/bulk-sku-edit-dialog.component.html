@@ -1,21 +1,24 @@
 <h1 mat-dialog-title>Bulk Sku Edit</h1>
 <div mat-dialog-content>
   <mat-tab-group>
-    <mat-tab *ngIf="data.all.length>0" label="All SKUs can be produced on these lines">
+    <mat-tab *ngIf="data.all.length>0" label="All">
+      <p>All SKUs can be produced on these lines</p>
       <mat-selection-list #allskus>
         <mat-list-option *ngFor="let name of data.all">
           {{name}}
         </mat-list-option>
       </mat-selection-list>      
     </mat-tab>
-    <mat-tab *ngIf="data.some.length>0" label="Some SKUs can be produced on these lines">
+    <mat-tab *ngIf="data.some.length>0" label="Some">
+      <p>Some SKUs can be produced on these lines</p>
       <mat-selection-list #someskus>
         <mat-list-option *ngFor="let name of data.some">
           {{name}}
         </mat-list-option>
       </mat-selection-list>      
     </mat-tab>
-    <mat-tab *ngIf="data.none.length>0" label="No SKUs can be produced on these lines">
+    <mat-tab *ngIf="data.none.length>0" label="None">
+        <p>No SKUs can be produced on these lines</p>
       <mat-selection-list #noskus>
         <mat-list-option *ngFor="let name of data.some">
           {{name}}

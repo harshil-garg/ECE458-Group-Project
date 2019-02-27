@@ -99,9 +99,9 @@ export class CrudSkuService {
   }
 
   bulkSkuEdit(body: BulkSkuEditMessage): Observable<BulkSkuEditResponse> {
-    return this.http.post<BulkSkuEditResponse>('api/skus/bulk-edit', body, httpOptions);
+    return this.http.post<BulkSkuEditResponse>('api/skus/bulk_edit', body, httpOptions);
   }
   bulkSkuPopulate(body: BulkSkuPopulateMessage): Observable<BulkSkuPopulateResponse> {
-    return this.http.post<BulkSkuPopulateResponse>('api/skus/populate-lines', body, httpOptions);
+    return this.http.post<BulkSkuPopulateResponse>('api/skus/populate_lines', body, httpOptions);
   }
 }

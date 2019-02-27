@@ -24,6 +24,7 @@ export class BulkSkuEditDialogComponent implements OnInit {
   refreshPopulate() {
     this.crudSkuService.bulkSkuPopulate({skus: this.selectedSkus}).subscribe((response) => {
       if (response.success) {
+        console.log(this.selectedSkus);
         this.data = response.data;
       }
     });

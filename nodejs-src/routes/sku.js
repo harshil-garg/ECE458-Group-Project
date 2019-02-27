@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const SKU = require('../model/sku_model');
 const Ingredient = require('../model/ingredient_model');
 const ProductLine = require('../model/product_line_model');
@@ -12,6 +13,7 @@ const autocomplete = require('../controllers/autocomplete');
 const validator = require('../controllers/validator');
 const sku_validator = require('../controllers/sku_validator');
 const generator = require('../controllers/autogen');
+
 
 
 //Autocomplete ingredients
@@ -106,13 +108,23 @@ router.post('/bulk_edit', async (req, res) => {
 
     if(add){
         //add lines
-        await SKU.updateMany({number: {$in: skus}}, {$push: {manufacturing_lines: {$in: manufacturing_ids}}}).exec()
+        SKU.updateMany({number: {$in: skus}}, {$push: {manufacturing_lines: {$each: manufacturing_ids}}}, (err) => {
+            if(err){
+                res.json({success: false, message: 'Bulk edit failed: ' + err});
+            }else{
+                res.json({success: true, message: 'Bulk edit successful'});
+            }
+        })
     }else{
         //delete lines
-        await SKU.updateMany({number: {$in: skus}}, {$pull: {manufacturing_lines: {$in: manufacturing_ids}}}).exec()
-    }
-
-    res.json({success: true, message: 'Bulk edit successful'});
+        SKU.updateMany({number: {$in: skus}}, {$pull: {manufacturing_lines: {$in: manufacturing_ids}}}, (err) => {
+            if(err){
+                res.json({success: false, message: 'Bulk edit failed: '+err});
+            }else{
+                res.json({success: true, message: 'Bulk edit successful'});
+            }
+        })
+    }  
 });
 
 
