@@ -19,7 +19,6 @@ router.post('/autocomplete', async (req, res) => {
 
 //Create a report
 router.post('/report', async (req, res) => {
-    console.log("hello")
     const { manufacturing_line, start, end } = req.body;
     
 
@@ -30,7 +29,6 @@ router.post('/report', async (req, res) => {
 });
 
 router.post('/load',  async (req, res) => {
-    console.log("hi")
     let results = await schedule_filter.filter();
 
     res.json({success: true, data: results});

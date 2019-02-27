@@ -30,10 +30,7 @@ module.exports.uniqueActivity = async function(activity){
     let sku = await SKU.findOne({number: activity.sku}).exec();
     let goal = await ManufacturingGoal.findOne({name: activity.manufacturing_goal}).exec();
 
-    console.log(sku)
-    console.log(goal)
     let mapping = await ManufacturingSchedule.findOne({'activity.sku': sku._id, 'activity.manufacturing_goal': goal._id}).exec();
-    console.log(mapping)
     return [!mapping, err_msg]
 }
 
