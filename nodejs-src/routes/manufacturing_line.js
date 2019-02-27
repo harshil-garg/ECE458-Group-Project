@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ManufacturingLine = require('../model/manufacturing_line_model');
+const SKU = require('../model/sku_model');
 const pagination = require('../controllers/paginate');
 const validator = require('../controllers/validator');
 const autocomplete = require('../controllers/autocomplete');
@@ -85,13 +86,15 @@ router.post('/delete', async (req, res) => {
 
     let line = await ManufacturingLine.findOne({shortname: shortname}).exec();
 
-    ManufacturingGoal.deleteOne({shortname: shortname}, async (err, result) => {
+    ManufacturingLine.deleteOne({shortname: shortname}, async (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete manufacutring line. Error: ${err}`});
         }else if(!result || result.deletedCount == 0){
             res.json({success: false, message: 'Manufacturing line does not exist to delete'});
         }else{
             //delete from skus
+            await SKU.updateMany({manufacturing_lines: line._id}, {$pull: {manufacturing_lines: line._id}}).exec();
+            //delete schedule mapping
             await ManufacturingSchedule.deleteMany({manufacturing_line: line._id}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }

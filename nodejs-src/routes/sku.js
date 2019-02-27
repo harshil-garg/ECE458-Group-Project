@@ -56,13 +56,20 @@ router.post('/populate_lines', async (req, res) => {
         }
         i++;
     });
+
     all = Array.from(all);
-    some = Array.from(some)
+
+    some = Array.from(some);
 
     let lines = await ManufacturingLine.find({shortname: {$nin: some}}).exec();
     for(let line of lines){
         none.push(line.shortname)
     }
+    some = new Set(some)
+    for(let line of all){
+        some.delete(line);
+    }
+    some = Array.from(some);
 
     let results = {
         all: all,
