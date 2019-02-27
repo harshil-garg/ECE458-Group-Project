@@ -42,24 +42,24 @@ module.exports.filter = async function(manufacturing_line, start, end){
     if(manufacturing_line && start && end){
         pipeline.push({$match: {'manufacturing_line.shortname': manufacturing_line}},
         {$addFields: {end_date: {$add: ['$start_date', '$duration']}}},
-        // {$match: {$or: [{start_date: {$lt: end}}, {end_date: {$gt: start}}]}},
-        // {
-        //     $lookup: {
-        //         from: 'formulas',
-        //         localField: 'activity.sku.formula',
-        //         foreignField: '_id',
-        //         as: 'activity.sku.formula'
-        //     }
-        // },
-        // {$unwind: '$activity.sku.formula'},
-        // {
-        //     $lookup: {
-        //         from: 'ingredients',
-        //         localField: 'activity.sku.formula.ingredient_tuples.ingredient',
-        //         foreignField: '_id',
-        //         as: 'ingredients'
-        //     }
-        // }
+        {$match: {$or: [{start_date: {$lt: new Date(end)}}, {end_date: {$gt: new Date(start)}}]}},
+        {
+            $lookup: {
+                from: 'formulas',
+                localField: 'activity.sku.formula',
+                foreignField: '_id',
+                as: 'activity.sku.formula'
+            }
+        },
+        {$unwind: '$activity.sku.formula'},
+        {
+            $lookup: {
+                from: 'ingredients',
+                localField: 'activity.sku.formula.ingredient_tuples.ingredient',
+                foreignField: '_id',
+                as: 'ingredients'
+            }
+        }
         )
     }
 
@@ -70,10 +70,9 @@ module.exports.filter = async function(manufacturing_line, start, end){
         results.push(res);
     });
 
-    console.log(results)
 
     if(manufacturing_line && start && end){
-        // populateIngredients(results)
+        populateIngredients(results)
     }
 
     convertToShortnames(results)

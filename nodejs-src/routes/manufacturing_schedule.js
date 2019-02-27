@@ -62,7 +62,6 @@ router.post('/create', async (req, res) => {
         }
         duration = quantity / sku.manufacturing_rate;
         console.log(duration)
-
     }else{
         duration_override = true;
     }
