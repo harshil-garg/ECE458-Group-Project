@@ -1,0 +1,114 @@
+
+<mat-sidenav-container class="example-container">
+  <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
+    <div class="example-container">
+      <h2>Goals</h2>
+      <app-search-goals (enableGoal)="confirmEnable($event)"></app-search-goals>
+      <br>
+      <mat-card class="mat-elevation-z2">
+        <mat-card-subtitle [style.color]="'black'">
+          Enabled Goals
+        </mat-card-subtitle>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item class="right" *ngFor="let item of manufGoalList; let id=index">
+              {{item.name}} <mat-icon (click)="remove(id)">clear</mat-icon>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <h2>Palette</h2>
+      <div
+        cdkDropList
+        #activities="cdkDropList"
+        [cdkDropListData]="activityList"
+        [cdkDropListConnectedTo]="getLists()"
+        id="manufacturing-activities"
+        class="example-list"
+        (cdkDropListDropped)="drop($event)">
+        <div class="example-box" *ngFor="let item of activityList" cdkDrag>{{item.sku.name}} &nbsp; ({{item.manufacturing_goal}})
+          <mat-icon *cdkDragPreview></mat-icon>
+        </div>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" position="end" opened>
+    <h2>Warnings</h2>
+    <mat-card class="mat-elevation-z2">
+      <mat-card-subtitle [style.color]="'black'">
+        Warning Conditions
+      </mat-card-subtitle>
+      <mat-card-content>
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title [style.color]="warnings[0].length>0? 'red' : 'black'">
+                Activities Enabled but Not Scheduled
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-panel-description>
+              <ul>
+                <li *ngFor="let warning of warnings[0]">
+                  {{warning}}
+                </li>
+              </ul>
+            </mat-panel-description>
+          </mat-expansion-panel>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title [style.color]="warnings[1].length>0? 'red' : 'black'">
+                Activities Scheduled After Deadline
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-panel-description>
+              <ul>
+                <li *ngFor="let warning of warnings[1]">
+                  {{warning}}
+                </li>
+              </ul>
+            </mat-panel-description>
+          </mat-expansion-panel>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title [style.color]="warnings[2].length>0? 'red' : 'black'">
+                Orphaned Manufacturing Activities
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-panel-description>
+              <ul>
+                <li *ngFor="let warning of warnings[2]">
+                  {{warning}}
+                </li>
+              </ul>
+            </mat-panel-description>
+          </mat-expansion-panel>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title [style.color]="warnings[3].length>0? 'red' : 'black'">
+                Overridden Durations
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-panel-description>
+              <ul>
+                <li *ngFor="let warning of warnings[3]">
+                  {{warning}}
+                </li>
+              </ul>
+            </mat-panel-description>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="fixed-container">
+      <h2>Manufacturing Schedule</h2>
+      <div class="content">
+        <app-manufacturing-schedule [remove]="removeEvent" [manufGoals]="manufGoalList" [goalsUpdated]="goalsUpdated" (warnings)="updateWarnings($event)"></app-manufacturing-schedule>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

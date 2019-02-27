@@ -1,0 +1,51 @@
+<div>
+  <mat-form-field>
+    <input matInput [matDatepicker]="picker" [(ngModel)]="currDate" (ngModelChange)="refreshHours()" placeholder="Choose a date">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <mat-button-toggle-group class="centered" value="day" name="timespan" aria-label="Timespan">
+    <mat-button-toggle value="day">Day</mat-button-toggle>
+    <mat-button-toggle value="month">Month</mat-button-toggle>
+    <mat-button-toggle value="year">Year</mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+
+<div class="fixed-container">
+  <div class="example-container">
+    <div class="header-list">
+      <div class="header-box"></div>
+      <ng-container *ngFor="let item of hourHeaders; let id=index">
+        <div class="header-box">
+          {{item}}
+          <mat-icon *ngIf="numDeadlines(id)>0" [matBadge]="numDeadlines(id)" [matTooltip]="getDeadlines(id)" aria-label="Hover to see deadlines" matBadgeColor="warn">
+            warning
+          </mat-icon>
+        </div>
+      </ng-container>
+    </div>
+
+    <ng-container *ngFor="let manufLine of manufLines; let id = index">
+      <div
+        class="example-list">
+        <div class="header-box">{{manufLine}}</div>
+        <ng-container *ngFor="let item of hours[id]; let hour_id = index">
+          <div
+            cdkDropList
+            cdkDropListOrientation="horizontal"
+            [cdkDropListData]="item == -1? null : activities[item].activity "
+            [cdkDropListConnectedTo]="getLists()"
+            class="example-list"
+            [id]="'list-' + id + '-hour-' + hour_id"
+            (cdkDropListDropped)="drop($event)"
+            (cdkDropListEntered)="log($event)">
+            <div [ngClass]="getClass(id, hour_id)" cdkDrag [cdkDragDisabled]="starting_hours[id][hour_id]==''" (cdkDragEntered)="log($event)" (dblclick)="openActivityDialog(id, hour_id)">{{item==-1 ? '' : activities[item].activity.sku.name}} &nbsp; {{item == -1? '' : '(' + activities[item].activity.manufacturing_goal + ')'}}
+              <mat-icon *cdkDragPreview></mat-icon>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+
+  </div>
+</div>

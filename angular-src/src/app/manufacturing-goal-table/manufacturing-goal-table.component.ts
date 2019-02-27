@@ -35,8 +35,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
       this.manufacturingService.refresh({
           sortBy : "name",
           page_size: this.paginator.pageSize,
-          pageNum: this.paginator.pageIndex+1,
-          user : this.authenticationService.loginState.user
+          pageNum: this.paginator.pageIndex+1
         }).subscribe(
         response => {
           if(response.success){

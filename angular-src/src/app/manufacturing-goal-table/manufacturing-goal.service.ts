@@ -20,7 +20,6 @@ export class RefreshMessage {
   pageNum: number;
   page_size: number;
   sortBy: string;
-  user: string;
 }
 
 export class ResponseData {

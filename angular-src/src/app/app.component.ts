@@ -3,6 +3,7 @@ import { LoginState } from './model/loginstate';
 import { AuthenticationService } from './authentication.service';
 import { Router } from '@angular/router';
 import { Title }     from '@angular/platform-browser';
+import 'hammerjs';
 
 @Component({
   selector: 'app-root',

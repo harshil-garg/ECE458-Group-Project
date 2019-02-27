@@ -84,6 +84,7 @@ export class CrudManufacturingLineService {
   }
 
   read(requestedManufacturingLine: ReadMessage): Observable<ReadResponse>{
+    console.log(requestedManufacturingLine);
     return this.http.post<ReadResponse>('api/manufacturing_lines/all', requestedManufacturingLine, httpOptions);
   }
 }
