@@ -94,9 +94,6 @@ export class CrudManufacturingLineService {
   }
 
   autocompleteLines(query: string): Observable<AutocompleteResponse> {
-    let body = {
-      query: query
-    }
-    return this.http.post<AutocompleteResponse>('api/manufacturing_lines/autocomplete', body, httpOptions);
+    return this.http.post<AutocompleteResponse>('api/manufacturing_lines/autocomplete', {input: query}, httpOptions);
   }
 }

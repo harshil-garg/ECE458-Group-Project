@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 
 @Component({
   selector: 'app-manufacturing-schedule-report',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ManufacturingScheduleReportComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public dialogRef: MatDialogRef<ManufacturingScheduleReportComponent>){}
 
   ngOnInit() {
   }
+
+    onNoClick(): void {
+      this.dialogRef.close();
+    }
+
+    submit(): void {
+      this.dialogRef.close();
+    }
 
 }
