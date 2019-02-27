@@ -50,6 +50,14 @@ router.post('/formulas', async (req, res) => {
     res.json({success: true, data: format_formulas(results.data)});
 });
 
+function processComment(comment){
+    if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
+        return '"'+comment+'"';
+    }else{
+        return comment
+    }
+}
+
 
 function format_ingredients(ingredients) {
     result = [];
@@ -60,7 +68,7 @@ function format_ingredients(ingredients) {
         new_ingredient['Vendor Info'] = ingredient.vendor_info;
         new_ingredient['Size'] = `${ingredient.package_size} ${ingredient.unit}`;
         new_ingredient['Cost'] = ingredient.cost;
-        new_ingredient["Comment"] = ingredient.comment;
+        new_ingredient["Comment"] = processComment(ingredient.comment);
         result.push(new_ingredient);
     }
     return result;
@@ -89,7 +97,7 @@ function format_skus(skus) {
         mls += `${counter > 0 ? '' : '"'}`;
         newsku['ML Shortnames'] = mls;
         newsku['Rate'] = sku.manufacturing_rate;
-        newsku['Comment'] = sku.comment;
+        newsku['Comment'] = processComment(sku.comment);
         result.push(newsku);
     }
     console.log(result);
@@ -118,7 +126,7 @@ function format_formulas(formulas){
             newformula['Name'] = formula.name;
             newFormula['Ingr#'] = tuple.ingredient.number;
             newformula['Quantity'] = `${tuple.quantity} ${tuple.unit}`;
-            newformula['Comment'] = first ? formula.comment : '';
+            newformula['Comment'] = first ? processComment(formula.comment) : '';
             first = false;
             result.push(newformula);
         }
