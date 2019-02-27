@@ -8,8 +8,8 @@ export enum MeasurementUnit {
   pint = "pt",
   quart = "qt",
   gallon = "gal",
-  milliliter = "mL",
-  liter = "L",
+  milliliter = "ml",
+  liter = "l",
   count = "count"
 }
 
