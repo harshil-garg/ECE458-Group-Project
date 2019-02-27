@@ -83,7 +83,7 @@ function format_skus(skus) {
         let mls = `"`;
         let counter = 0;
         for(let ml of sku.manufacturing_lines){
-            mls += `${ml.shortname}${counter == headers.length-1 ? '"' : ','}`;
+            mls += `${ml.shortname}${counter == sku.manufacturing_lines.length-1 ? '"' : ','}`;
             counter++;
         }
         mls += `${counter > 0 ? '' : '"'}`;

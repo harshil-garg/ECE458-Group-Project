@@ -1,22 +1,34 @@
-<table class="table table-bordered table-responsive-md table-striped text-center">
-  <tr>
-    <th>#</th>
-    <th>Name</th>
-    <th>Package Size</th>
-    <th>Cost</th>
-    <th>Quantity</th>
-  </tr>
-
- <ng-container *ngFor="let calculatedVal of calculateList; let id=index">
+<h1 mat-dialog-title>Manufacturing Goal Calculator</h1>
+<mat-dialog-content style="height:450px">
+  <!-- <table id="calculate-table" class="table table-bordered table-responsive-md table-striped text-center">
     <tr>
-      <td>{{calculatedVal.number}}</td>
-      <td>{{calculatedVal.name}}</td>
-      <td>{{calculatedVal.package_size}}</td>
-      <td>{{calculatedVal.cost}}</td>
-      <td>{{calculatedVal.calculated_quantity}}</td>
+      <th>Ingr#</th>
+      <th>Name</th>
+      <th>Measured Quantity</th>
+      <th>Package Quantity</th>
     </tr>
- </ng-container>
-</table>
+  
+   <ng-container *ngFor="let calculatedVal of calculateList; let id=index">
+      <tr>
+        <td>{{calculatedVal['Ingr#']}}</td>
+        <td>{{calculatedVal['Name']}}</td>
+        <td>{{calculatedVal['Measured Quantity']}}</td>
+        <td>{{calculatedVal['Package Quantity']}}</td>
+      </tr>
+   </ng-container>
 
-<button type="button" (click)="export()">Export</button>
-<button type="button" (click)="exportcsv()">Export CSV</button>
+  </table> -->
+  <mat-table *ngIf="calculateList.length > 0" class="calculator-table" [dataSource]="calculateList">
+    <ng-container *ngFor="let column of calculateColumns" [matColumnDef]="column">
+        <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="calculateColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: calculateColumns;"></mat-row>
+  </mat-table>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button class="calculator-button" (click)="print()">View printable page</button>
+  <button mat-raised-button class="calculator-button" (click)="exportcsv()">Export CSV</button>
+</mat-dialog-actions>
+

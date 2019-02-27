@@ -16,7 +16,7 @@ export class CalculatorComponent {
 
       public openDialog() {
         let dialogRef = this.dialog.open(CalculatorDialogComponent, {
-          height: '400px',
+          height: '600px',
           width: '1400px',
           data: this.manufGoal
         });
