@@ -25,9 +25,9 @@ export class ManufacturingScheduleComponent implements OnInit {
   manufLines : Array<string> = [];
   currDate : Date = this.zeroedDate(new Date());
   warningList: Array<Array<Activity>> = [[],[],[]];
+  @Input() manufGoals : Array<ManufacturingGoal> = [];
   @Input() remove: EventEmitter<any>;
-  @Input() goalsUpdated: EventEmitter<any>;
-  @Input() manufGoals: Array<ManufacturingGoal>;
+  @Input() goalsUpdated: EventEmitter<Array<ManufacturingGoal>>;
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
   @Output() activitiesUpdated: EventEmitter<Array<ManufacturingScheduleEvent>> = new EventEmitter();
 
@@ -38,16 +38,18 @@ export class ManufacturingScheduleComponent implements OnInit {
   ngOnInit() {
     this.refresh();
     this.remove.subscribe(index=>this.removeActivity(index));
-    this.goalsUpdated.subscribe(ev => this.updateOrphaned());
+    this.goalsUpdated.subscribe(goals => {
+      this.manufGoals = goals;
+      this.refresh();
+    });
   }
 
   refresh() {
     this.activities = [];
+    this.warningList = [[],[],[]];
     this.manufacturingScheduleService.load().subscribe(
       response => {
         if(response.success){
-          console.log("REFRREEESSHHHHHEDDDD");
-          console.log(response);
           response.data.forEach(data => {this.activities.push({
             activity: {
               sku: data.activity.sku,
@@ -85,6 +87,7 @@ export class ManufacturingScheduleComponent implements OnInit {
           response.data.forEach(data=> this.manufLines.push(data.shortname));
           this.setupHourHeaders();
           this.refreshHours();
+          this.checkWarnings();
         } else {
           this.displayError("Failed to populate Manufacturing Lines");
         }
@@ -95,6 +98,12 @@ export class ManufacturingScheduleComponent implements OnInit {
         }
       }
     );
+  }
+
+  checkWarnings(){
+    this.updateOrphaned();
+    this.updateDurationWarning();
+    this.warnings.emit(this.warningList);
   }
 
   setupHourHeaders(){
@@ -150,13 +159,11 @@ export class ManufacturingScheduleComponent implements OnInit {
       if(endDate.getFullYear() > deadline.getFullYear() || endDate.getMonth() > deadline.getMonth() || endDate.getDate() > deadline.getDate()){
         if(this.warningList[0].indexOf(this.activities[i].activity)==-1){
           this.warningList[0].push(this.activities[i].activity);
-          this.warnings.emit(this.warningList);
         }
         this.activities[i].past_deadline = true;
       } else {
         if(this.warningList[0].indexOf(this.activities[i].activity)!=-1){
           this.warningList[0].splice(this.warningList[1].indexOf(this.activities[i].activity), 1);
-          this.warnings.emit(this.warningList);
         }
         this.activities[i].past_deadline = false;
       }
@@ -175,12 +182,10 @@ export class ManufacturingScheduleComponent implements OnInit {
         act.orphaned = true;
         if(this.warningList[1].indexOf(act.activity)==-1){
           this.warningList[1].push(act.activity);
-          this.warnings.emit(this.warningList);
         }
       } else {
         if(this.warningList[1].indexOf(act.activity)!=-1){
           this.warningList[1].splice(this.warningList[1].indexOf(act.activity), 1);
-          this.warnings.emit(this.warningList);
         }
         act.orphaned = false;
       }
@@ -192,7 +197,6 @@ export class ManufacturingScheduleComponent implements OnInit {
     var timeTil6 = 18 - date.getHours();
     if(timeTil6 >= duration){
       date.setHours(date.getHours() + duration);
-      console.log(date);
     }
     else{
       duration -= timeTil6;
@@ -237,8 +241,6 @@ export class ManufacturingScheduleComponent implements OnInit {
         duration: event.previousContainer.data[event.previousIndex].duration,
         manufacturing_goal: event.previousContainer.data[event.previousIndex].manufacturing_goal
       };
-      console.log("DROPPEEEDDDDD");
-      console.log(droppedActivity);
       var startDate = this.zeroedDate(this.currDate);
       startDate.setHours(8+ (+currHour));
       if(!this.isCollision(startDate, droppedActivity, this.manufLines[+currId], droppedActivity.duration)){
@@ -301,13 +303,6 @@ export class ManufacturingScheduleComponent implements OnInit {
     //     this.activities.splice(i, 1);
     //   }
     // }
-    this.warningList.forEach(list=>{
-      var indexDeleted = list.indexOf(deletedActivity);
-      if(indexDeleted!=-1){
-        list.splice(indexDeleted, 1);
-        this.warnings.emit(this.warningList);
-      }
-    });
   }
 
   displayError(message){
@@ -332,19 +327,12 @@ export class ManufacturingScheduleComponent implements OnInit {
 
   wrongManufLine(activity: Activity, manufLine: string){
     var returned: boolean = true;
-    console.log("MANUF LINES");
-    console.log(activity.sku.manufacturing_lines);
     activity.sku.manufacturing_lines.forEach(line => {
       if(line==manufLine){
         returned = false;
       };
     });
     return returned;
-  }
-
-  log(e) {
-    console.log("LOGGED:");
-    console.log(e);
   }
 
   getLists() {
@@ -371,14 +359,18 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(result!=null){
           this.activities[activity_id].duration = +result;
           this.activities[activity_id].duration_override = true;
-          if(this.warningList[2].indexOf(this.activities[activity_id].activity)==-1){
-            this.warningList[2].push(this.activities[activity_id].activity);
-            this.warnings.emit(this.warningList);
-          }
           this.updateActivity(this.activities[activity_id]);
         }
       });
     }
+  }
+
+  updateDurationWarning(){
+    this.activities.forEach(activity => {
+      if(this.warningList[2].indexOf(activity.activity)==-1){
+        this.warningList[2].push(activity.activity);
+      }
+    });
   }
 
   createActivity(manufacturingScheduleEvent: ManufacturingScheduleEvent){
@@ -393,9 +385,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       duration_override: false
     }).subscribe(
       response => {
-        console.log(response);
         if(response.success){
-          console.log("SUCCESSFULLY ADDEDDDDDD");
           this.refresh();
         } else {
           this.displayError("Failed to create Activity!");
@@ -417,9 +407,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       }
     }).subscribe(
       response => {
-        console.log(response);
         if(response.success){
-          console.log("SUCCESSFULLY DELETEEEDDD");
           this.refresh();
         } else {
           this.displayError("Failed to create Activity!");
@@ -444,9 +432,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       duration: activity.duration
     }).subscribe(
       response => {
-        console.log(response);
         if(response.success){
-          console.log("SUCCESSFULLY UPDATEDDDDD");
           this.refresh();
         } else {
           this.displayError("Failed to create Activity!");

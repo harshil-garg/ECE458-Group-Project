@@ -20,7 +20,7 @@ router.post('/autocomplete', async (req, res) => {
 //Create a report
 router.post('/report', async (req, res) => {
     const { manufacturing_line, start, end } = req.body;
-    
+
 
     let results = await schedule_filter.filter(manufacturing_line, start, end);
 
@@ -37,7 +37,7 @@ router.post('/load',  async (req, res) => {
 //Add an mapping of an activity to a manufacturing line
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
-    
+
     let error = await createValidation(activity, manufacturing_line, start_date, duration, duration_override);
     if(!('sku' in error)){
         res.json({success: false, message: error});
@@ -61,7 +61,8 @@ router.post('/create', async (req, res) => {
             }
         }
         duration = quantity / sku.manufacturing_rate;
-        
+        console.log(duration)
+
     }else{
         duration_override = true;
     }
@@ -82,13 +83,13 @@ router.post('/create', async (req, res) => {
 //Update a mapping
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
-    let { activity, manufacturing_line, start_date, duration, duration_override } = req.body; 
+    let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
 
     let errors = await createValidation(activity, manufacturing_line, start_date);
     if(!('sku' in errors)){
         res.json({success: false, message: errors});
         return;
-    }   
+    }
 
     let json = {};
     if(manufacturing_line){
@@ -108,8 +109,10 @@ router.post('/update', async (req, res) => {
                 }
             }
         }
-        
+
         calculated_duration = quantity / sku.manufacturing_rate;
+        console.log(calculated_duration)
+        console.log(duration)
 
         json['duration'] = duration;
 
@@ -118,10 +121,10 @@ router.post('/update', async (req, res) => {
         }else{
             json['duration_override'] = true;
         }
-        
+
     }
 
-    ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku, 
+    ManufacturingSchedule.findOneAndUpdate({'activity.sku': errors.sku,
         'activity.manufacturing_goal': errors.manufacturing_goal}, json, (err) => {
             if (err) {
                 res.json({success: false, message: `Failed to update mapping. Error: ${err}`});
@@ -140,7 +143,7 @@ router.post('/delete', async (req, res) => {
         res.json({success: false, message: activity_passed[1]})
     }
 
-    ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2], 
+    ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2],
         'activity.manufacturing_goal': activity_passed[3]}, (err, result) => {
             if (err) {
                 res.json({success: false, message: `Failed to delete mapping. Error: ${err}`});

@@ -16,7 +16,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   palette : Array<Activity> = [];
   addedActivities : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
-  goalsUpdated: EventEmitter<any> = new EventEmitter();
+  goalsUpdated: EventEmitter<Array<ManufacturingGoal>> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
   constructor(private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar){}
@@ -117,7 +117,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   remove(id){
     if(confirm("Are you sure you would like to remove " + this.manufGoalList[id].name + "?")){
       this.enable(this.manufGoalList[id], false);
-      this.goalsUpdated.emit(true);
+      this.goalsUpdated.emit(this.manufGoalList);
     }
   }
 
