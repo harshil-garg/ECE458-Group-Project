@@ -80,8 +80,7 @@ export class CalculatorDialogComponent implements OnInit {
             <td>${calculatedVal['Name']}</td>
             <td>${calculatedVal['Measured Quantity']}</td>
             <td>${calculatedVal['Package Quantity']}</td>
-          </tr>
-          `;
+          </tr>`;
         }
 
         htmlString += `</table>`;
