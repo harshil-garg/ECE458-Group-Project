@@ -3,6 +3,7 @@ const router = express.Router();
 
 const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
+const ManufacturingSchedule = require('../model/manufacturing_schedule_model');
 const Ingredient = require('../model/ingredient_model');
 const Formula = require('../model/formula_model');
 const pagination = require('../controllers/paginate');
@@ -146,15 +147,18 @@ function createManufacturingGoal(name, sku_tuples, user, deadline, res){
 
 
 
-router.post('/delete', (req, res) => {
+router.post('/delete', async (req, res) => {
     const { name } = req.body;
+    let goal = await ManufacturingGoal.findOne({name: name}).exec();
     
-    ManufacturingGoal.deleteOne({name: name}, (err, result) => {
+    ManufacturingGoal.deleteOne({name: name}, async (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete manufacturing goal. Error: ${err}`});
         }else if(result.deletedCount == 0){
             res.json({success: false, message: 'Manufacturing goal does not exist to delete'});
         }else{
+            //delete mappings with this sku as well
+            await ManufacturingSchedule.deleteMany({'activity.manufacturing_goal': goal._id}).exec();
             res.json({success: true, message: "Deleted successfully."});
         }
     });

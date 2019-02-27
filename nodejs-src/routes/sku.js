@@ -338,7 +338,7 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: `Failed to update SKU. Error: ${err}`});
         }else {
             //delete any mappings if the line has been removed from the sku
-            await ManufacturingSchedule.delete({'activity.sku': sku._id, 'manufacturing_line': {$in: deleted_lines}}).exec()
+            await ManufacturingSchedule.deleteMany({'activity.sku': sku._id, 'manufacturing_line': {$in: deleted_lines}}).exec()
             res.json({success: true, message: "Updated successfully."});
         }
     })
@@ -357,7 +357,7 @@ router.post('/delete', async (req, res) => {
             res.json({success: false, message: 'SKU does not exist to delete'});
         }else{
             //delete mappings with this sku as well
-            await ManufacturingSchedule.delete({'activity.sku': sku._id}).exec();
+            await ManufacturingSchedule.deleteMany({'activity.sku': sku._id}).exec();
             
             //remove the sku from goals containing it
             await ManufacturingGoal.updateMany({'sku_tuples.sku': sku._id}, {$pull: {sku_tuples: {sku: sku._id}}}).exec();
