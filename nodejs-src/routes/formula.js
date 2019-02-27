@@ -7,12 +7,12 @@ const validator = require('../controllers/validator');
 const formula_validator = require('../controllers/formula_validator');
 const formula_filter = require('../controllers/formula_filter');
 
-//Autocomplete Ingredients
+//Autocomplete 
 router.post('/autocomplete', async (req, res) => {
     const {input} = req.body;
     const required_params = {input};
     
-    let results = await autocomplete.nameOrNumber(Ingredient, input);
+    let results = await autocomplete.nameOrNumber(Formula, input);
     res.json({success: true, data: results});
 });
 
