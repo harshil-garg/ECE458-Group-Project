@@ -89,7 +89,7 @@ function populateIngredients(results){
                 }
             }
         }
-        
+        delete map.ingredientss
     }
 }
 
