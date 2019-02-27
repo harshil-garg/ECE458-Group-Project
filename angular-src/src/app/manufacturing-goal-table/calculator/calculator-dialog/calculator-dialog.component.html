@@ -1,23 +1,6 @@
 <h1 mat-dialog-title>Manufacturing Goal Calculator</h1>
 <mat-dialog-content style="height:450px">
-  <!-- <table id="calculate-table" class="table table-bordered table-responsive-md table-striped text-center">
-    <tr>
-      <th>Ingr#</th>
-      <th>Name</th>
-      <th>Measured Quantity</th>
-      <th>Package Quantity</th>
-    </tr>
-  
-   <ng-container *ngFor="let calculatedVal of calculateList; let id=index">
-      <tr>
-        <td>{{calculatedVal['Ingr#']}}</td>
-        <td>{{calculatedVal['Name']}}</td>
-        <td>{{calculatedVal['Measured Quantity']}}</td>
-        <td>{{calculatedVal['Package Quantity']}}</td>
-      </tr>
-   </ng-container>
-
-  </table> -->
+  <p>{{manufGoal}}</p>
   <mat-table *ngIf="calculateList.length > 0" class="calculator-table" [dataSource]="calculateList">
     <ng-container *ngFor="let column of calculateColumns" [matColumnDef]="column">
         <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>

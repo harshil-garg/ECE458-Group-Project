@@ -63,7 +63,8 @@ export class CalculatorDialogComponent implements OnInit {
       w.document.head.innerHTML += '<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>';
       w.document.head.innerHTML += '<style>th {text-align: center}</style>'
       let htmlString = `
-      <h1>Manufacturing Calculator</h1>
+      <h2>Manufacturing Calculator</h2>
+      <h3>${this.manufGoal}</h3>
       <table id="calculate-table" class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
           <th>Ingr#</th>
