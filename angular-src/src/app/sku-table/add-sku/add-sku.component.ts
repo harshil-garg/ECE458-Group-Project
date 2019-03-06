@@ -44,7 +44,7 @@ export class AddSkuComponent {
         size: sku.unit_size,
         count: sku.count_per_case,
         product_line: sku.product_line,
-        formula: sku.formula.number.toString(),
+        formula: sku.formula,
         formula_scale_factor: sku.formula_scale_factor,
         manufacturing_lines: sku.manufacturing_lines,
         manufacturing_rate: sku.manufacturing_rate,
