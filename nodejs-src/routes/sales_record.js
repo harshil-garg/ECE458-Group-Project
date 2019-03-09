@@ -28,6 +28,30 @@ var cache = new LRUCache(10);
  * ROUTES / APIs
  ****************************************************************************************************/
 
+ /**
+  * API to serve the summary view that returns a JSON object. The JSON object returned will have
+  * fields corresponding to each of the product lines requested. There will be an array associated
+  * with each product line with each entry corresponding to a SKU in that product line. For each
+  * SKU, information about the SKU (name, number, manufacturing rate, etc), yearly summary data of
+  * all SalesRecord(s) for the SKU (revenue in 2017, sales in 2014, etc), and a ten-year-summary of
+  * certain metrics will be returned.
+  *
+  * Product lines and customers must be provided, since we only want information on a select set of
+  * product lines and SalesRecord(s) filtered by a group of customers. For each product line, we
+  * will calculate all the aforementioned statistics and metrics. Thus, we find all SKUs in the
+  * product line, and for each SKU we add its info, get the SalesRecords for the last 10 years,
+  * filter by customer names, map the relevant information out of the SalesRecord(s), and push the
+  * yearly data into an array. If the data for a given year is not available, we do not do any
+  * metric analysis at all, even if other years do exist. We simply queue the records to be
+  * retrieved from Prof. Bletsch's server and gracefully add a message stating that the records for
+  * the SKU are not available yet and move on to the next SKU. If all ten years of records are
+  * available, we do the basic calculations and then continue with the ten-year-summary report. We
+  * add the information for the SKU and move on to the next SKU in the product line. Once all SKUs
+  * in all product lines are processed, we return the JSON object.
+  *
+  * @param {JSON} req Request from client, filter by product lines and customers
+  * @param {JSON} res Response to send, all data
+  */
 router.post('/summary', async function(req, res) {
     const { product_lines, customers } = req.body;
     
@@ -48,15 +72,19 @@ router.post('/summary', async function(req, res) {
 
             var sku_yearly_data = [];
             for (year = new Date().getFullYear() - 10; year <= new Date().getFullYear(); year++) {
-                let records = [];
                 let response = await getSalesRecords(sku.number, year);
                 if (response.success) {
-                    for (let record of response.data) {
-                        if (customers.includes(record.customer_name)) {
-                            records.push(record);
+                    const filteredRecords = response.data.filter(record => (
+                        customers.includes(record.customer_name)
+                    ));
+                    const mappedRecords = filteredRecords.map(record => (
+                        {
+                            sales: record.sales,
+                            price: record.price,
+                            revenue: record.sales*record.price
                         }
-                    }
-                    sku_yearly_data.push(getYearlySummaryData(records));
+                    ));
+                    sku_yearly_data.push(getYearlySummaryData(mappedRecords));
                 }
             }
             sku_summary_data["sku_yearly_data"] = sku_yearly_data;
@@ -132,9 +160,9 @@ router.post('/drilldown', async function(req, res) {
 });
 
 /**
- * API to flush the cache and delete the entire SalesRecord database to trigger re-retrieval from Prof.
- * Bletsch's server upon next request of any SalesRecord related information.
- * 
+ * API to flush the cache and delete the entire SalesRecord database to trigger re-retrieval from
+ * Prof. Bletsch's server upon next request of any SalesRecord related information.
+ *
  * @since Evolution 3, 7.1.4
  */
 router.post("/flush", async function(req, res) {
@@ -152,10 +180,10 @@ router.post("/flush", async function(req, res) {
  ****************************************************************************************************/
 
 /**
- * Function called by the summary view which passes in a set of SalesRecord(s) for a given year
- * and wants basic summary information such as revenue, sales, and revenue per case. Much more
- * basic version of {@link getTotalSummaryData}.
- * 
+ * Function called by the summary view which passes in a set of SalesRecord(s) for a given year and
+ * wants basic summary information such as revenue, sales, and revenue per case. Much more basic
+ * version of {@link getTotalSummaryData}.
+ *
  * @param {array} records Array of SalesRecord(s) for the year
  * @since Evolution 3, Requirement 5.3.3.2
  */
@@ -187,7 +215,7 @@ function getYearlySummaryData(records) {
  * @param {reference} sku SKU object from MongoDB database
  * @param {array} records Array of SalesRecord(s)
  * @param {string} start String representation of start date to restrict manufacturing activities to
- * 
+ *
  * @since Evolution 3, Requirement 5.3.3.3 and 5.3.4.4
  */
 async function getTotalSummaryData(sku, records, start) {
