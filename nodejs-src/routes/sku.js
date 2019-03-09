@@ -64,6 +64,12 @@ router.post('/populate_lines', async (req, res) => {
         none.push(line.shortname)
     }
 
+    some = new Set(some)
+    for(let line of all){
+        some.delete(line);
+    }
+    some = Array.from(some);
+
     let results = {
         all: all,
         some: some,
@@ -131,28 +137,29 @@ router.post('/filter', async (req, res) => {
 router.post('/create', async (req, res) => {
     const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
 
-    let product_passed = await validator.itemExists(ProductLine, product_line);
-    let manufacturings_passed = []
-    let manufacturing_ids = [];
-    for(let line of manufacturing_lines){
-        let manufacturing_passed = await validator.itemExists(ManufacturingLine, line);
-        manufacturings_passed.push(manufacturing_passed);
-        manufacturing_ids.push(manufacturing_passed[2]);
-    }   
-    let case_passed = sku_validator.isUPCStandard(case_upc);
-    let unit_passed = sku_validator.isUPCStandard(unit_upc);
-    let name_passed = validator.proper_name_length(name);
-    let count_passed = validator.isPositive(count, 'Count');
-    let scale_passed = validator.isPositive(formula_scale_factor, 'Scale factor');
-    let rate_passed = validator.isPositive(manufacturing_rate, 'Manufacturing Rate');
-    
-    let errors = validator.compileErrors(product_passed, ...manufacturings_passed, case_passed, unit_passed, name_passed, count_passed, scale_passed, rate_passed);
-    if(errors.length > 0){
-        res.json({success: false, message: errors});
+    let sku = {
+        name: name,
+        number: number,
+        case_upc: case_upc,
+        unit_upc: unit_upc,
+        size: size,
+        count: count,
+        product_line: product_line,
+        formula: formula.number,
+        formula_scale_factor: formula_scale_factor,
+        manufacturing_lines: manufacturing_lines,
+        manufacturing_rate: manufacturing_rate,
+        comment: comment
+    }
+
+    let error = await SKU.syntaxValidation(sku);
+    if(error != null){
+        console.log(error)
+        res.json({success: false, message: error});
         return;
     }
+    
     let int_count = validator.forceInteger(count);
-    let product_line_id = product_passed[2];
 
     let formula_id = await formulaHandler(formula, res);
     if(!formula_id){
@@ -161,15 +168,18 @@ router.post('/create', async (req, res) => {
     }
 
     if(number){
-        create_SKU(name, number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
+        create_SKU(name, number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, comment, res);
+        return;
     }else{
         let gen_number = await generator.autogen(SKU);
-        create_SKU(name, gen_number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);        
+        create_SKU(name, gen_number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, comment, res);
+        return;
     }    
 });
 
 async function formulaHandler(formula, res){
-    if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
+    let formula_exists = await Formula.findOne({name: formula.name});
+    if(formula_exists != null){    //existing formula
         let formula_passed = await validator.itemExists(Formula, formula.number.toString());
         if(!formula_passed[0]){
             res.json({success: false, message: formula_passed[1]});
@@ -206,11 +216,16 @@ async function formulaHandler(formula, res){
 
 function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
     let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment});
+    console.log('bout to')
     SKU.createSKU(sku, (err) => {
+        console.log('creating')
         if(err){
+            console.log(err)
             res.json({success: false, message: `Failed to create SKU. Error: ${err}`});
+            return;
         }else{
             res.json({success: true, message: "Created successfully"});
+            return;
         }
     });
 }
