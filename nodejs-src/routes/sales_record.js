@@ -22,7 +22,7 @@ const Unit = require('../controllers/units');
 
 // Variables (explained more in depth in functions)
 var queue = new Queue();
-var cache = new LRUCache(10);
+var cache = new LRUCache(100);
 
 /****************************************************************************************************
  * ROUTES / APIs
@@ -51,6 +51,8 @@ var cache = new LRUCache(10);
   *
   * @param {JSON} req Request from client, filter by product lines and customers
   * @param {JSON} res Response to send, all data
+  * 
+  * @since Evolution 3, Requirement 5.3.3
   */
 router.post('/summary', async function(req, res) {
     const { product_lines, customers } = req.body;
@@ -71,9 +73,11 @@ router.post('/summary', async function(req, res) {
             };
 
             var sku_yearly_data = [];
-            for (year = new Date().getFullYear() - 10; year <= new Date().getFullYear(); year++) {
+            let start = new Date().getFullYear() - 10; let end = new Date().getFullYear();
+            for (year = start; year <= end; year++) {
                 let response = await getSalesRecords(sku.number, year);
                 if (response.success) {
+                    console.log(response.source);
                     const filteredRecords = response.data.filter(record => (
                         customers.includes(record.customer_name)
                     ));
@@ -92,18 +96,35 @@ router.post('/summary', async function(req, res) {
             if (sku_yearly_data.length < 11) {
                 sku_summary_data["success"] = false;
                 sku_summary_data["sku_ten_year_data"] = {};
+                product_line_summary_data.push(sku_summary_data);
                 continue;
             }
             
-            sku_summary_data["sku_ten_year_data"] = getTotalSummaryData(sku, sku_yearly_data, new Date(start, 0, 1).toISOString());
+            let xd = await getTotalSummaryData(sku, sku_yearly_data, new Date(start, 0, 1).toISOString());
+            sku_summary_data["sku_ten_year_data"] = xd;
             product_line_summary_data.push(sku_summary_data);
         }
         data[product_line_name] = product_line_summary_data;
     }
-    
+    console.log(data);
     res.send(data);
 });
 
+/**
+ * API to serve the drilldown view that returns a JSON object. The JSON object will have information about the SKU,
+ * a success indicator (true / false), a list of all the SalesRecord(s) in the given time frame, and a set of certain summary
+ * metrics for all the records (total revenue, manufacturing run size, profit margin, etc).
+ * 
+ * The API requires the SKU number, a list of customers to filter by, and start & end dates. The SKU is first retrieved from
+ * the database. For each full year that is part of the given timeframe, SalesRecord(s) are sent for. If SalesRecord(s) do not exist,
+ * we return an error message and the API finishes. If records do exist, they are filtered and mapped into a well-defined schema.
+ * Then, the advanced metric suite is applied, and the finished JSON object is sent back.
+ * 
+ *  @param {JSON} req Request from client, includes SKU number, filter by customers, start, and end date
+  * @param {JSON} res Response to send, all data
+  * 
+  * @since Evolution 3, Requirement 5.3.4
+ */
 router.post('/drilldown', async function(req, res) {
     const { sku_number, customers, start, end } = req.body;
     
@@ -286,7 +307,7 @@ function getTotalSales(records) {
  *
  * @since Evolution 3, Requirement 5.3.3.3 and 5.3.4.4
  */
-function getManufacturingRunSize(sku, start) {
+async function getManufacturingRunSize(sku, start) {
     let activities = await ManufacturingSchedule.find({
         "activity.sku": sku._id,
         start_date: {
@@ -596,7 +617,7 @@ var job = new CronJob({
     },
     start: true,
     timeZone: 'America/New_York',
-    runOnInit: true
+    runOnInit: false
 });
 
 /**

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+const Schema = mongoose.Schema;
 /**
  * SalesRecord schema which standardizes a representation for all SalesRecord(s) in our system. A SalesRecord
  * consists of a SKU reference, date, customer number, customer name, sales (# of cases sold), and price (of each
@@ -7,7 +8,7 @@ const mongoose = require('mongoose');
  * 
  * @since Evolution 3, Requirement 7.2
  */
-const SalesRecordSchema = new mongoose.Schema({
+const SalesRecordSchema = new Schema({
     sku: {
         type: Schema.ObjectId,
         required: true,
