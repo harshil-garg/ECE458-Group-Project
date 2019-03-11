@@ -134,8 +134,7 @@ module.exports.syntaxValidation = async (sku, sku_csv, results, type) => {
                 });
             }else{
                 return num_numeric[1];
-            }
-            
+            }            
         }else{
             let num_positive = validator.isPositive(sku.number, 'Number');
             if(!num_positive[0]){
@@ -257,5 +256,4 @@ module.exports.syntaxValidation = async (sku, sku_csv, results, type) => {
     sku.product_line = product_passed[2];
     sku.manufacturing_lines = manufacturing_ids;
     console.log(sku)
-
 }

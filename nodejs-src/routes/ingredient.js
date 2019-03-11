@@ -33,23 +33,25 @@ router.post('/filter', async (req, res) => {
 
 //CREATE
 router.post('/create', async (req, res) => {
-    //TODO: add unit
     const { name, number, vendor_info, package_size, unit, cost, comment } = req.body;
+    let ingredient = {
+        name: name,
+        number: number,
+        vendor_info: vendor_info,
+        package_size: package_size,
+        unit: unit,
+        cost: cost,
+        comment: comment
+    }
 
-    let cost_passed = validator.isPositive(cost);
-    if(!cost_passed[0]){
-        res.json({success: false, message: cost_passed[1]});
+    let error = await Ingredient.syntaxValidation(ingredient);
+    if(error != null){
+        console.log(error)
+        res.json({success: false, message: error});
         return;
     }
 
-    let rounded_cost = validator.roundCost(cost);
-    //Autogen number logic
-    if (number) {
-        create_ingredient(res, name, number, vendor_info, package_size, unit, rounded_cost, comment);
-    } else {
-        let gen_number = await generator.autogen(Ingredient);
-        create_ingredient(res, name, gen_number, vendor_info, package_size, unit, rounded_cost, comment);
-    }
+    create_ingredient(res, name, sku.number, vendor_info, package_size, unit, sku.cost, comment);
 });
 
 function create_ingredient(res, name, number, vendor_info, package_size, unit, cost, comment) {
@@ -66,11 +68,6 @@ function create_ingredient(res, name, number, vendor_info, package_size, unit, c
 // UPDATE
 router.post('/update', async (req, res) => {
     const { name, newname, number, vendor_info, package_size, unit, cost, comment } = req.body;
-    const required_params = { name };
-
-    if(!validator.inputsExist(required_params, res)){
-        return;
-    }
 
     var json = {};
 
@@ -78,12 +75,34 @@ router.post('/update', async (req, res) => {
         json["name"] = newname;
     }
     if (number) {
+        let num_numeric = validator.isNumeric(number);
+        if(!num_numeric[0]){
+            res.json({success: false, message: num_numeric[1]});
+            return;
+        }else{
+            let num_positive = validator.isPositive(number, 'Number');
+            if(!num_positive[0]){
+                res.json({success: false, message: num_positive[1]});
+                return;
+            }
+        }
         json["number"] = number;
     }
     if (vendor_info) {
         json["vendor_info"] = vendor_info;
     }
     if (package_size) {
+        let size_numeric = validator.isNumeric(package_size);
+        if(!size_numeric[0]){
+            res.json({success: false, message: size_numeric[1]});
+            return;
+        }else{
+            let size_positive = validator.isPositive(package_size, 'Package size');
+            if(!size_positive[0]){
+                res.json({success: false, message: size_positive[1]});
+                return;
+            }
+        }
         json["package_size"] = package_size;
     }
     if (unit) {
@@ -103,9 +122,16 @@ router.post('/update', async (req, res) => {
         json["unit"] = unit;
     }
     if (cost) {
-        if(!validator.isPositive(cost)){
-            res.json({success: false, message: 'Input invalid'});
+        let cost_numeric = validator.isNumeric(cost);
+        if(!cost_numeric[0]){
+            res.json({success: false, message: cost_numeric[1]});
             return;
+        }else{
+            let cost_positive = validator.isPositive(cost, 'Cost');
+            if(!cost_positive[0]){
+                res.json({success: false, message: cost_positive[1]});
+                return;
+            }
         }
         let rounded_cost = validator.roundCost(cost);
         json["cost"] = rounded_cost;

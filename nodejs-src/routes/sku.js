@@ -167,14 +167,7 @@ router.post('/create', async (req, res) => {
         return;
     }
 
-    if(number){
-        create_SKU(name, number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, comment, res);
-        return;
-    }else{
-        let gen_number = await generator.autogen(SKU);
-        create_SKU(name, gen_number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, comment, res);
-        return;
-    }    
+    create_SKU(name, sku.number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, comment, res);
 });
 
 async function formulaHandler(formula, res){
@@ -216,9 +209,7 @@ async function formulaHandler(formula, res){
 
 function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
     let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment});
-    console.log('bout to')
     SKU.createSKU(sku, (err) => {
-        console.log('creating')
         if(err){
             console.log(err)
             res.json({success: false, message: `Failed to create SKU. Error: ${err}`});
