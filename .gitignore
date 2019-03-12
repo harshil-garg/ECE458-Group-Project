@@ -1,3 +1,5 @@
 node_modules/
 public/
 certificates/
+angular-src/proxy.conf.json
+nodejs-src/config/database.js

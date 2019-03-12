@@ -17,6 +17,10 @@ services:
       - ./certificates:/app/certificates
     depends_on:
       - database
+  seeder:
+    image: harshilgarg98/ece458:seeder
+    depends_on:
+      - frontend-server
   database:
     image: mongo
     ports:
