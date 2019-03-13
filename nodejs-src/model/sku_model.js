@@ -158,7 +158,9 @@ module.exports.syntaxValidation = async (sku, sku_csv, results, type) => {
     let count_numeric = validator.isNumeric(sku.count);
     let scale_numeric = validator.isNumeric(sku.formula_scale_factor);
     let rate_numeric = validator.isNumeric(sku.manufacturing_rate);
-    let numeric_errors = validator.compileErrors(count_numeric, scale_numeric, rate_numeric);
+    let setup_numeric = validator.isNumeric(sku.setup_cost);
+    let run_numeric = validator.isNumeric(sku.run_cost);
+    let numeric_errors = validator.compileErrors(count_numeric, scale_numeric, rate_numeric, setup_numeric, run_numeric);
     if(numeric_errors.length > 0){
         if(results){
             results[type].errorlist.push({
@@ -172,7 +174,9 @@ module.exports.syntaxValidation = async (sku, sku_csv, results, type) => {
         let count_positive = validator.isPositive(sku.count, 'Count');
         let scale_positive = validator.isPositive(sku.formula_scale_factor, 'Scale factor');
         let rate_positive = validator.isPositive(sku.manufacturing_rate, 'Manufacturing rate');
-        let positive_errors = validator.compileErrors(count_positive, scale_positive, rate_positive);
+        let setup_positive = validator.isPositive(sku.setup_cost, 'Setup cost');
+        let run_positive = validator.isPositive(sku.run_cost, 'Run cost');
+        let positive_errors = validator.compileErrors(count_positive, scale_positive, rate_positive, setup_positive, run_positive);
         if(positive_errors.length > 0){
             if(results){
                 results[type].errorlist.push({

@@ -341,7 +341,7 @@ async function asyncForEach(array, callback) {
   }
 }
 
-let sku_properties = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#', 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
+let sku_properties = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#', 'Formula factor', 'ML Shortnames', 'Rate', 'Mfg setup cost', 'Mfg run cost', 'Comment'];
 let ingredient_properties = ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment'];
 let product_properties = ['Name'];
 let formula_properties = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];

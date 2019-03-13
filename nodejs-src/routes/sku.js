@@ -135,7 +135,7 @@ router.post('/filter', async (req, res) => {
 
 //Create
 router.post('/create', async (req, res) => {
-    const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
+    const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment } = req.body;
 
     let sku = {
         name: name,
@@ -149,6 +149,8 @@ router.post('/create', async (req, res) => {
         formula_scale_factor: formula_scale_factor,
         manufacturing_lines: manufacturing_lines,
         manufacturing_rate: manufacturing_rate,
+        setup_cost: setup_cost,
+        run_cost: run_cost,
         comment: comment
     }
 
@@ -167,7 +169,7 @@ router.post('/create', async (req, res) => {
         return;
     }
 
-    create_SKU(name, sku.number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, comment, res);
+    create_SKU(name, sku.number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment, res);
 });
 
 async function formulaHandler(formula, res){
@@ -207,8 +209,8 @@ async function formulaHandler(formula, res){
     }
 }
 
-function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
-    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment});
+function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment, res){
+    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment});
     SKU.createSKU(sku, (err) => {
         if(err){
             console.log(err)
@@ -223,7 +225,7 @@ function create_SKU(name, number, case_upc, unit_upc, size, count, product_line,
 
 //Update
 router.post('/update', async (req, res) => {
-    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
+    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment } = req.body;
 
     let sku = await SKU.findOne({number: number}).exec();
     if(sku == null){
@@ -242,6 +244,17 @@ router.post('/update', async (req, res) => {
         json["name"] = name;
     }
     if (newnumber) {
+        let num_numeric = validator.isNumeric(newnumber);
+        if(!num_numeric[0]){
+            res.json({success: false, message: num_numeric[1]});
+            return;
+        }else{
+            let num_positive = validator.isPositive(newnumber, 'Number');
+            if(!num_positive[0]){
+                res.json({success: false, message: num_positive[1]});
+                return;     
+            }
+        }   
         json["number"] = newnumber;
     }
     if (case_upc) {
@@ -264,11 +277,17 @@ router.post('/update', async (req, res) => {
         json["size"] = size;
     }
     if (count) {
-        let count_passed = validator.isPositive(count);
-        if(!count_passed[0]){
-            res.json({success: false, message: count_passed[1]});
+        let count_numeric = validator.isNumeric(count);
+        if(!count_numeric[0]){
+            res.json({success: false, message: count_numeric[1]});
             return;
-        }
+        }else{
+            let count_positive = validator.isPositive(count, 'Count');
+            if(!count_positive[0]){
+                res.json({success: false, message: count_positive[1]});
+                return;     
+            }
+        }  
         json["count"] = count;
     }
     if (product_line) {
@@ -288,11 +307,17 @@ router.post('/update', async (req, res) => {
         json["formula"] = formula_id;
     }
     if (formula_scale_factor) {
-        let scale_passed = validator.isPositive(formula_scale_factor);
-        if(!scale_passed[0]){
-            res.json({success: false, message: scale_passed[1]});
+        let factor_numeric = validator.isNumeric(formula_scale_factor);
+        if(!factor_numeric[0]){
+            res.json({success: false, message: factor_numeric[1]});
             return;
-        }
+        }else{
+            let factor_positive = validator.isPositive(formula_scale_factor, 'Count');
+            if(!count_positive[0]){
+                res.json({success: false, message: count_positive[1]});
+                return;     
+            }
+        }  
         json["formula_scale_factor"] = formula_scale_factor;
     }
     if (manufacturing_lines) {
@@ -336,6 +361,34 @@ router.post('/update', async (req, res) => {
             return;
         }
         json["manufacturing_rate"] = manufacturing_rate;
+    }
+    if(setup_cost){
+        let setup_numeric = validator.isNumeric(setup_cost);
+        if(!setup_numeric[0]){
+            res.json({success: false, message: setup_numeric[1]});
+            return;
+        }else{
+            let setup_positive = validator.isPositive(setup_cost, 'Count');
+            if(!setup_positive[0]){
+                res.json({success: false, message: setup_positive[1]});
+                return;     
+            }
+        }  
+        json["setup_cost"] = setup_cost;
+    }
+    if(run_cost){
+        let run_numeric = validator.isNumeric(run_cost);
+        if(!run_numeric[0]){
+            res.json({success: false, message: run_numeric[1]});
+            return;
+        }else{
+            let run_positive = validator.isPositive(run_cost, 'Count');
+            if(!run_positive[0]){
+                res.json({success: false, message: run_positive[1]});
+                return;     
+            }
+        }  
+        json["run_cost"] = run_cost;
     }
     if (comment) {
         json["comment"] = comment;
