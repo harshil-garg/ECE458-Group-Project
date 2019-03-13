@@ -23,6 +23,7 @@ const formulas = require('./routes/formula');
 const manufacturing_lines = require('./routes/manufacturing_line');
 const manufacturing_schedule = require('./routes/manufacturing_schedule');
 const sales_record = require('./routes/sales_record');
+const customers = require('./routes/customer');
 
 //Connect mongoose to our database
 mongoose.connect(mongo_config.uri, { useNewUrlParser: true }, function(err) {
@@ -76,6 +77,7 @@ app.use('/api/formulas', formulas.router);
 app.use('/api/manufacturing_lines', manufacturing_lines);
 app.use('/api/manufacturing_schedule', manufacturing_schedule);
 app.use('/api/sales_record', sales_record);
+app.use('/api/customers', customers);
 
 //Create https server
 let httpsServer = https.createServer({
