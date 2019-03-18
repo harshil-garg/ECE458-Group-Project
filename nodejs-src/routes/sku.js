@@ -175,12 +175,7 @@ router.post('/create', async (req, res) => {
 async function formulaHandler(formula, res){
     let formula_exists = await Formula.findOne({name: formula.name});
     if(formula_exists != null){    //existing formula
-        let formula_passed = await validator.itemExists(Formula, formula.number.toString());
-        if(!formula_passed[0]){
-            res.json({success: false, message: formula_passed[1]});
-            return;
-        }
-        return formula_passed[2];
+        return formula_exists._id;
     }else{  //create new formula
         if(formula.number){
             try{
