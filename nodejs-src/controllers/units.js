@@ -25,6 +25,10 @@ module.exports.category = function(unit){
 
 // Convert the value from unit before to unit after
 module.exports.convert = function(unit_before, unit_after){
+    if (unit_before == "pound")
+        unit_before = "poundmass";
+    if (unit_after == "pound")
+        unit_after = "poundmass";
     // Strip units of non alphanumeric characters
     unit_before = unit_before.replace(/\W/g, '');
     unit_after = unit_after.replace(/\W/g, '');

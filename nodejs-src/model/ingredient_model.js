@@ -61,7 +61,10 @@ module.exports.updateIngredient = (ingredient_name, ingredient_update, cb) => {
 
 module.exports.attemptImport = async (ingredients, ingredients_csv, results) => {
     let type = 'ingredients'
-    await syntaxValidation(ingredients, ingredients_csv, results, type);
+    for(let [ingredient, ingredient_csv] of utils.zip(ingredients, ingredients_csv)){
+        await syntaxValidation(ingredient, ingredient_csv, results, type);
+    }
+    
     await validator.duplicateCheck(Ingredient, ingredients, ingredients_csv, results, type);
     await validator.conflictCheck(Ingredient, ingredients, ingredients_csv, results, type);
 }
@@ -80,55 +83,74 @@ module.exports.commitImport = async (createlist, changelist) => {
     return true;
 }
 
-async function syntaxValidation(ingredients, ingredients_csv, results, type) {
-    for(let [ingredient, ingredient_csv] of utils.zip(ingredients, ingredients_csv)){
-        if(ingredient.number){
-            let num_numeric = validator.isNumeric(ingredient.number);
-            if(!num_numeric[0]){
+module.exports.syntaxValidation = async (ingredient, ingredient_csv, results, type) => {
+    if(ingredient.number){
+        let num_numeric = validator.isNumeric(ingredient.number);
+        if(!num_numeric[0]){
+            if(results){
                 results[type].errorlist.push({
                     message: num_numeric[1],
                     data: ingredient_csv
                 });
             }else{
-                let num_positive = validator.isPositive(ingredient.number, 'Number');
-                if(!num_positive[0]){
+                return num_numeric[1]
+            }            
+        }else{
+            let num_positive = validator.isPositive(ingredient.number, 'Number');
+            if(!num_positive[0]){
+                if(results){
                     results[type].errorlist.push({
-                        message: num_positive[1],
-                        data: ingredient_csv
+                    message: num_positive[1],
+                    data: ingredient_csv
                     });
+                }else{
+                    return num_positive[1]
                 }
             }
-        }else{
-            ingredient.number = await autogen.autogen(Ingredient)
         }
-        let cost_numeric = validator.isNumeric(ingredient.cost);
-        let size_numeric = validator.isNumeric(ingredient.package_size);
-        let errors = validator.compileErrors(cost_numeric, size_numeric);
-        if(errors.length > 0){
+    }else{
+        ingredient.number = await autogen.autogen(Ingredient)
+    }
+    let cost_numeric = validator.isNumeric(ingredient.cost);
+    let size_numeric = validator.isNumeric(ingredient.package_size);
+    let errors = validator.compileErrors(cost_numeric, size_numeric);
+    if(errors.length > 0){
+        if(results){
             results[type].errorlist.push({
                 message: errors,
                 data: ingredient_csv
             });
         }else{
-            let cost_positive = validator.isPositive(ingredient.cost, 'Cost');
-            let size_positive = validator.isPositive(ingredient.package_size, 'Package size')
-            let pos_errors = validator.compileErrors(cost_positive, size_positive);
-            if(errors.length > 0){
+            return errors;
+        }       
+    }else{
+        let cost_positive = validator.isPositive(ingredient.cost, 'Cost');
+        let size_positive = validator.isPositive(ingredient.package_size, 'Package size')
+        let pos_errors = validator.compileErrors(cost_positive, size_positive);
+        if(errors.length > 0){
+            if(results){
                 results[type].errorlist.push({
                     message: pos_errors,
                     data: ingredient_csv
                 });
-            }
+            }else{
+                return pos_errors;
+            }           
+        }
 
-            ingredient.cost = validator.roundCost(ingredient.cost);
-        }            
+        ingredient.cost = validator.roundCost(ingredient.cost);
+    }            
 
-        let unit_passed = unit.validUnit(ingredient.unit);
-        if(!unit_passed){
+    let unit_passed = unit.validUnit(ingredient.unit);
+    if(!unit_passed){
+        if(results){
             results[type].errorlist.push({
                 message: 'Invalid unit',
                 data: ingredient_csv
             });
-        }
+        }else{
+            return 'Invalid unit';
+        }       
     }
+
 }

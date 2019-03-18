@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
+import {Formula} from '../model/formula'
 import { Tuple } from '../model/ingredient'
 
 export class CreateMessage {
@@ -14,7 +14,7 @@ export class CreateMessage {
   size: string;
   count: number;
   product_line: string;
-  formula: string;
+  formula: Formula;
   formula_scale_factor: string;
   manufacturing_lines: string[];
   manufacturing_rate: string;
