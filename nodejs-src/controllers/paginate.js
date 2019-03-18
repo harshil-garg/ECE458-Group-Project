@@ -19,7 +19,7 @@ module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
         results.push(res);
     });
     console.log(results)
-    
+
     let pages = Math.ceil(results.length/limit) + (pageNum-1);
     let slice = (pageNum == -1) ? results.length : Math.min(limit, results.length);
 
@@ -30,7 +30,5 @@ module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
         pages: pages,
         total_docs: (pageNum == -1) ? results.length : results.length + (pageNum-1)*limit
     }
-    
+
 }
-
-

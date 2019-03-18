@@ -246,9 +246,10 @@ export class SkuTableComponent implements OnInit{
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1;
       this.filterSkuService.filter({
           sortBy : this.sortBy,
-          pageNum: this.paginator.pageIndex.toString()+1,
+          pageNum: pageIndex.toString(),
           page_size: this.paginator.pageSize,
           keywords: this.keywords,
           ingredients: this.ingredients,

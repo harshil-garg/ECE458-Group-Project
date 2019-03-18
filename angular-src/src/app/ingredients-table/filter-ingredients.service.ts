@@ -75,6 +75,8 @@ export class FilterIngredientsService {
 	constructor(private http: HttpClient) { }
 
   filter(filterMessage: FilterMessage): Observable<FilterResponse>{
+		console.log("REFRESHSHHESHS");
+		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/ingredients/filter', filterMessage, httpOptions);
   }
 
