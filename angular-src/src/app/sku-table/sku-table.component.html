@@ -108,44 +108,7 @@
   <ng-container matColumnDef="formula">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula</th>
     <td mat-cell *matCellDef="let element">
-
-      <mat-accordion>
-        <mat-expansion-panel class="mat-elevation-z0">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <input type="text" class="form-control" maxlength="32" id="formula_name" (click)="stopPropagation($event)" placeholder="Formula Name" required [(ngModel)]="element.formula.name" name="formula_name" #formula_name>
-            </mat-panel-title>
-            <mat-panel-description>
-              Edit Formula
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <div>
-            <mat-form-field>
-              <input matInput type="text" class="form-control" id="number" required [(ngModel)]="element.formula.number" placeholder="Formula Number" name="number" #number="ngModel">
-            </mat-form-field>
-            <br>
-            <mat-form-field>
-              <textarea matInput type="text" class="form-control" id="comment" required [(ngModel)]="element.formula.comment" placeholder="Comment" name="comment" #comment="ngModel"></textarea>
-            </mat-form-field>
-          </div>
-          <mat-card>
-            <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
-            <mat-chip-list>
-              <ng-container *ngFor="let ingredient of element.formula.ingredient_tuples; let ingr_id=index">
-                <div>
-                  <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
-                </div>
-              </ng-container>
-            </mat-chip-list>
-            <app-ingredient-autocomplete (messageEvent)="setIngredientInput(id, $event)"></app-ingredient-autocomplete>
-            <mat-form-field style="width: 200px;">
-              <input matInput [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" name="quantity" type="text" placeholder="Quantity"/><br>
-            </mat-form-field>
-            <button mat-raised-button type="button" (click)="addIngredientQuantity(id, $event)" color="accent">Add Ingr-Quant</button>
-          </mat-card>
-        </mat-expansion-panel>
-      </mat-accordion>
-
+      <app-formula-editor (formulaOutput)="updateFormula(element.id, $event)" [initFormula]="element.formula"></app-formula-editor> 
     </td>
   </ng-container>
 

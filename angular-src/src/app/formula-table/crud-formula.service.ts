@@ -8,7 +8,7 @@ import { Tuple } from '../model/ingredient';
 export class CreateMessage {
   name : string;
   number : string;
-  ingredient_tuples : [Tuple];
+  ingredient_tuples : Tuple[];
   comment : string;
 }
 
@@ -20,7 +20,7 @@ export class EditMessage {
   name : string;
   number : string;
   newnumber: string;
-  ingredient_tuples : [Tuple];
+  ingredient_tuples : Tuple[];
   comment : string;
 }
 

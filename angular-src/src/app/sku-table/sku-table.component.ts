@@ -4,6 +4,7 @@ import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { Formula } from '../model/formula'
 import { CrudSkuService, Response } from './crud-sku.service';
+import { CrudFormulaService } from '../formula-table/crud-formula.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -21,9 +22,6 @@ export class SkuTableComponent implements OnInit{
     keywords: Array<any> = [];
     ingredients: Array<any> = [];
     productLines: Array<any> = [];
-
-    ingredientInputs: Array<any> = [];
-    quantityInputs: Array<any> = [];
 
     displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'comment'];
     selection = new SelectionModel<Sku>(true, []);
@@ -46,7 +44,7 @@ export class SkuTableComponent implements OnInit{
       this.refresh();
     }
 
-    constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService,
+    constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService, public crudFormulaService: CrudFormulaService,
       public filterSkuService: FilterSkuService, private snackBar: MatSnackBar, private exportService: ExportService){}
 
     remove() {
@@ -109,6 +107,10 @@ export class SkuTableComponent implements OnInit{
           editedSku.product_line = updated_value;
           break;
         }
+        case 'formula':{
+          editedSku.formula = updated_value;
+          break;
+        }
         case 'ingredient_quantity':{
           //editedSku.ingredient_quantity = updated_value;
           break;
@@ -135,6 +137,31 @@ export class SkuTableComponent implements OnInit{
         }).subscribe(
         response => {
           if(response.success){
+            this.handleResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        });
+    }
+
+    updateFormula(id:number, updated_value:Formula) {
+      var editedFormula : Formula = updated_value;
+      this.crudFormulaService.edit({
+          name : editedFormula.name,
+          number : editedFormula.number.toString(),
+          newnumber: editedFormula.number.toString(),
+          ingredient_tuples: editedFormula.ingredient_tuples,
+          comment : editedFormula.comment
+        }).subscribe(
+        response => {
+          if(response.success){
+            console.log("FOMRULA SUCCESS");
             this.handleResponse(response);
           }
           else{
@@ -280,21 +307,6 @@ export class SkuTableComponent implements OnInit{
       }
     }
 
-    keyPressed(sku_num, id, event){
-      if(event.keyCode == 13){ //enter pressed
-        if(this.ingredientInputs[id]!=null && this.ingredientInputs[id].length>0 && this.quantityInputs[id]!=null && this.quantityInputs[id].length>0){
-          var added_ingr_quant: Tuple = {
-            ingredient: this.ingredientInputs[id],
-            quantity: this.quantityInputs[id]
-          }
-          this.addIngredientQuantity(sku_num, id, added_ingr_quant);
-          this.refresh();
-          this.ingredientInputs[id] = '';
-          this.quantityInputs[id] = '';
-        }
-      }
-    }
-
     exportSkus(){
       this.filterSkuService.exportSkus({
         sortBy : this.sortBy,
@@ -365,10 +377,6 @@ export class SkuTableComponent implements OnInit{
       this.exportService.exportJSON(headers, response.data, 'formulas');
     }
 
-    setIngredientInput(id, event){
-      this.ingredientInputs[id] = event;
-    }
-
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
       this.refresh();
@@ -397,9 +405,6 @@ export class SkuTableComponent implements OnInit{
           this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
-    stopPropagation(ev) {
-      ev.stopPropagation();
-    }
 
 }
 //

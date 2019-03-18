@@ -44,6 +44,7 @@ import { BulkSkuEditComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit.co
 import { BulkSkuEditDialogComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit-dialog/bulk-sku-edit-dialog.component';
 import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
 import { ManufacturingScheduleReportComponent } from './manufacturing-schedule/manufacturing-schedule-report/manufacturing-schedule-report.component';
+import { FormulaEditorComponent } from './sku-table/formula-editor/formula-editor.component';
 
 const routes: Routes = [
   {
@@ -93,7 +94,8 @@ const routes: Routes = [
     ManufacturingScheduleReportComponent,
     BulkSkuEditComponent,
     BulkSkuEditDialogComponent,
-    ActivityDialogComponent
+    ActivityDialogComponent,
+    FormulaEditorComponent
   ],
   imports: [
     BrowserModule,

@@ -94,7 +94,6 @@ export class CrudSkuService {
   }
 
   edit(requestedSku: EditMessage): Observable<Response>{
-    console.log(requestedSku);
     return this.http.post<Response>('api/skus/update', requestedSku, httpOptions);
   }
 
