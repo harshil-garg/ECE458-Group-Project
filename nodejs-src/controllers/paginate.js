@@ -2,14 +2,15 @@ const appender = require('./append_skus');
 
 module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
     let pipeline = [];
+
+    aggregate.sort(sortBy);
+    aggregate.options = {collation: {locale: 'en'}}
+
     //don't skip if pagenum == -1
     if(pageNum != -1){
         pipeline.push({$skip: (pageNum-1)*limit});
     }
-
     aggregate.append(pipeline);
-    aggregate.sort(sortBy)
-    aggregate.options = {collation: {locale: 'en'}}
 
     let cursor = aggregate.cursor({}).exec();
 
@@ -17,6 +18,7 @@ module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
     await cursor.eachAsync((res) => {
         results.push(res);
     });
+    console.log(results)
     
     let pages = Math.ceil(results.length/limit) + (pageNum-1);
     let slice = (pageNum == -1) ? results.length : Math.min(limit, results.length);
