@@ -101,8 +101,9 @@ export class ProductLineTableComponent implements OnInit{
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1
       this.crudProductLineService.read({
-          pageNum: this.paginator.pageIndex+1,
+          pageNum: pageIndex,
           page_size: this.paginator.pageSize
         }).subscribe(
         response => this.handleRefreshResponse(response),

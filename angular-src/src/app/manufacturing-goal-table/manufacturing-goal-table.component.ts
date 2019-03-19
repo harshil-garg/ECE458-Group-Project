@@ -32,25 +32,26 @@ export class ManufacturingGoalTableComponent implements OnInit {
 
   refresh() {
     this.loadingResults = true;
-      this.manufacturingService.refresh({
-          sortBy : "name",
-          page_size: this.paginator.pageSize,
-          pageNum: this.paginator.pageIndex+1
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleRefreshResponse(response);
-          }
-          else{
-            this.handleError(response);
-          }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
-          }
+    var pageIndex : number = this.paginator.pageIndex+1;
+    this.manufacturingService.refresh({
+        sortBy : "name",
+        page_size: this.paginator.pageSize,
+        pageNum: pageIndex
+      }).subscribe(
+      response => {
+        if(response.success){
+          this.handleRefreshResponse(response);
         }
-      );
+        else{
+          this.handleError(response);
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
   }
 
   delete() {

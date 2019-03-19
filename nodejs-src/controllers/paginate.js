@@ -18,7 +18,6 @@ module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
     await cursor.eachAsync((res) => {
         results.push(res);
     });
-    
     let pages = Math.ceil(results.length/limit) + (pageNum-1);
     let slice = (pageNum == -1) ? results.length : Math.min(limit, results.length);
 
@@ -29,7 +28,5 @@ module.exports.paginate = async function (aggregate, pageNum, sortBy, limit){
         pages: pages,
         total_docs: (pageNum == -1) ? results.length : results.length + (pageNum-1)*limit
     }
-    
+
 }
-
-

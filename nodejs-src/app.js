@@ -31,6 +31,7 @@ mongoose.connect(mongo_config.uri, { useNewUrlParser: true }, function(err) {
         console.log("Not connected to database: "+err);
     } else {
         console.log("Successfully connected to MongoDB")
+	console.log(mongo_config.uri)
     }
 });
 

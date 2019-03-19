@@ -174,9 +174,12 @@ export class IngredientsTableComponent implements OnInit{
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1
+      console.log("REFRESH");
+      console.log(this.paginator.pageIndex.toString());
       this.filterIngredientsService.filter({
           sortBy : this.sortBy,
-          pageNum: this.paginator.pageIndex.toString()+1,
+          pageNum: pageIndex.toString(),
           page_size: this.paginator.pageSize,
           keywords: this.keywords,
           skus : this.skus
@@ -191,6 +194,8 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     handleRefreshResponse(response: FilterResponse){
+      console.log("REFRESH RESPONSEEEE");
+      console.log(response);
       if(response.success){
         this.ingredientList = [];
         for(let ingredient of response.data){
