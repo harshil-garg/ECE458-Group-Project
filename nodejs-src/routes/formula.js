@@ -28,7 +28,6 @@ router.post('/filter', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
     
-    console.log(Formula.schema.obj)
     let result = await formula_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients);
     
     res.json(result);
