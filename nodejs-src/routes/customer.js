@@ -37,7 +37,7 @@ async function process(response){
     }
 
     await Customer.insertMany(customers).catch((err) => {
-        console.log(`Failed with error: ${err}`);
+        console.log(`Duplicate customer, ignore: ${err}`);
     })
 }
 
