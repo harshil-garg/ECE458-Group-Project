@@ -7,11 +7,13 @@ const Schema = mongoose.Schema;
 const CustomerSchema = new Schema({
     number: {
         type: Number,
-        required: true
+        required: true,
+        unique: true
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     }
 });
 
