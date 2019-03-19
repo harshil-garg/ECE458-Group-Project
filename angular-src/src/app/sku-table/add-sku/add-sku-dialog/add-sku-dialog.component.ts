@@ -80,7 +80,8 @@ export class AddSkuDialogComponent implements OnInit{
       if(this.ingredientInput!=null && this.ingredientInput.length>0 && this.quantityInput!=null && this.quantityInput.length>0){
         var added_ingr_quant: Tuple = {
           ingredient: this.ingredientInput,
-          quantity: this.quantityInput
+          quantity: this.quantityInput,
+          unit: "" //TODO: update this with formula editor
         }
         this.formula.ingredient_tuples.push(added_ingr_quant);
         this.ingredientInput = '';

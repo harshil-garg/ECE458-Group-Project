@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { Formula } from '../../model/formula';
 import { Tuple } from '../../model/ingredient';
+import { MeasurementUnit } from '../../model/measurement-unit'
 
 @Component({
   selector: 'app-formula-editor',
@@ -11,9 +12,11 @@ export class FormulaEditorComponent implements OnInit {
 
   @Input() initFormula : Formula;
   @Output() formulaOutput = new EventEmitter<Formula>();
+  measUnits : Array<string>;
   formula : Formula = new Formula();
   quantityInput : string = "";
   ingredientInput : string = "";
+  unitInput : string = "";
 
 
   constructor() { }
@@ -21,6 +24,7 @@ export class FormulaEditorComponent implements OnInit {
   ngOnInit() {
     this.formula.ingredient_tuples = [];
     this.formula = this.initFormula;
+    this.measUnits = MeasurementUnit.values();
   }
 
   stopPropagation(ev) {
@@ -44,7 +48,8 @@ export class FormulaEditorComponent implements OnInit {
   addIngredientQuantity(){
     var added_ingr_quant: Tuple = {
       ingredient: this.ingredientInput,
-      quantity: +this.quantityInput
+      quantity: +this.quantityInput,
+      unit: this.unitInput
     }
     this.formula.ingredient_tuples.push(added_ingr_quant);
     this.ingredientInput = '';
@@ -61,6 +66,10 @@ export class FormulaEditorComponent implements OnInit {
 
   updateFormula(){
     this.formulaOutput.emit(this.formula);
+  }
+
+  updateUnit(ev){
+    this.unitInput = ev;
   }
 
 }
