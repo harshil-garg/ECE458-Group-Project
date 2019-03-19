@@ -113,6 +113,10 @@ router.post('/update', async (req, res) => {
                 return;
             }
         }
+        //change from ingredient name to id
+        for(let i = 0; i < valid_tuples.length; i++){
+            ingredient_tuples[i]['ingredient'] = valid_tuples[i][2]; //id of ingredient
+        }
         json["ingredient_tuples"] = ingredient_tuples;
     }
     if(comment){
