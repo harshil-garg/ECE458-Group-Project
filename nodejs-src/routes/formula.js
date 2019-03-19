@@ -94,7 +94,12 @@ router.post('/update', async (req, res) => {
         let valid_quantities = [];
         let positive_quantities = [];
         let valid_units = [];
+        let ingredient_set = new Set();
         for(let tuple of ingredient_tuples){
+            if(ingredient_set.has(tuple.ingredient)){
+                continue;
+            }
+            ingredient_set.add(tuple.ingredient)
             valid_tuples.push(await formula_validator.validIngredientTuple(Ingredient, tuple.ingredient, tuple.unit));
             valid_quantities.push(validator.isNumeric(tuple.quantity));
             positive_quantities.push(validator.isPositive(tuple.quantity));
@@ -164,7 +169,12 @@ module.exports.createFormula = async function(name, number, ingredient_tuples, c
     let valid_quantities = [];
     let positive_quantities = [];
     let valid_units = [];
+    let ingredient_set = new Set();
     for(let tuple of ingredient_tuples){
+        if(ingredient_set.has(tuple.ingredient)){
+            continue;
+        }
+        ingredient_set.add(tuple.ingredient)
         valid_tuples.push(await formula_validator.validIngredientTuple(Ingredient, tuple.ingredient, tuple.unit));
         valid_quantities.push(validator.isNumeric(tuple.quantity));
         positive_quantities.push(validator.isPositive(tuple.quantity));

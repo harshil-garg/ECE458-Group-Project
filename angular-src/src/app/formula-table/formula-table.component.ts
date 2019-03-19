@@ -96,6 +96,10 @@ export class FormulaTableComponent implements OnInit{
           newnumber = updated_value;
           break;
         }
+        case 'tuple':{
+          editedFormula.ingredient_tuples = updated_value;
+          break;
+        }
         case 'comment':{
           editedFormula.comment = updated_value;
           break;
@@ -105,7 +109,7 @@ export class FormulaTableComponent implements OnInit{
           name : editedFormula.name,
           number : editedFormula.number.toString(),
           newnumber: newnumber,
-          ingredient_tuples: undefined,
+          ingredient_tuples: editedFormula.ingredient_tuples,
           comment : editedFormula.comment
         }).subscribe(
         response => {
@@ -194,6 +198,12 @@ export class FormulaTableComponent implements OnInit{
       const numSelected = this.selection.selected.length;
       const numRows = this.dataSource.data.length;
       return numSelected === numRows;
+    }
+
+    removeIngrQuant(ingr_id:number, formula_id:number){
+      var ingredient_tuples = this.formulaList[formula_id].ingredient_tuples;
+      ingredient_tuples.splice(ingr_id, 1);
+      this.edit(formula_id, 'tuple', ingredient_tuples);
     }
 
 /** Selects all rows if they are not all selected; otherwise clear selection. */
