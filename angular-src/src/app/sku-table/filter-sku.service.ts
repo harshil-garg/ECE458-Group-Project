@@ -30,6 +30,8 @@ export class ResponseData {
 	formula_scale_factor: string;
 	manufacturing_lines: ManufacturingLine[];
 	manufacturing_rate: string;
+	setup_cost: number;
+  run_cost: number;
 	comment: string;
   __v: number;
 }
