@@ -81,7 +81,6 @@ tr.example-element-row:not(.example-expanded-row):active {
   opacity: 0.5;
 }
 
-
 mat-icon:hover{
   cursor: pointer;
 }
@@ -101,4 +100,16 @@ mat-icon:hover{
 
 button {
   margin: 5px;
+}
+
+.mat-cell {
+  padding: 8px 8px 8px 0;
+}
+
+.main-centered {
+  text-align: center;
+}
+
+.centered {
+  display:inline-block;
 }
