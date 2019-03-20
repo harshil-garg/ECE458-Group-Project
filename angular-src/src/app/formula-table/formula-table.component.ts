@@ -170,6 +170,7 @@ export class FormulaTableComponent implements OnInit{
           this.formulaList.push({
               id: formula.number,
               name: formula.name,
+              ingredient_tuples: formula.ingredient_tuples,
               comment: formula.comment
           });
         }

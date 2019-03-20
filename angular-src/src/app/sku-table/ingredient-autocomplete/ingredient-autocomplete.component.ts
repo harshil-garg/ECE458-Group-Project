@@ -51,5 +51,9 @@ export class IngredientAutocompleteComponent implements OnInit {
       this.selectIngredient(event.option.value);
     }
 
+    hasError(){
+      return this.inputField.value != null && this.inputField.value.length > 0;
+    }
+
 
 }
