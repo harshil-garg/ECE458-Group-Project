@@ -45,6 +45,8 @@ import { BulkSkuEditDialogComponent } from './sku-table/bulk-sku-edit/bulk-sku-e
 import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
 import { ManufacturingScheduleReportComponent } from './manufacturing-schedule/manufacturing-schedule-report/manufacturing-schedule-report.component';
 import { FormulaEditorComponent } from './sku-table/formula-editor/formula-editor.component';
+import { AddFormulaComponent } from './formula-table/add-formula/add-formula.component';
+import { AddFormulaDialogComponent } from './formula-table/add-formula/add-formula-dialog/add-formula-dialog.component';
 
 const routes: Routes = [
   {
@@ -95,7 +97,9 @@ const routes: Routes = [
     BulkSkuEditComponent,
     BulkSkuEditDialogComponent,
     ActivityDialogComponent,
-    FormulaEditorComponent
+    FormulaEditorComponent,
+    AddFormulaComponent,
+    AddFormulaDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -145,6 +149,6 @@ const routes: Routes = [
   ],
   providers: [Title],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent]
 })
 export class AppModule { }

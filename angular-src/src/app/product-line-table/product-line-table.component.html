@@ -1,5 +1,5 @@
 <!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
-<h2 class="mat-display-2">Product Lines</h2>
+<h1 class="mat-display-3" align="center">Product Lines</h1>
 <div id="search-div">
   <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
   <app-add-product-line class="add" *ngIf="isAdmin()"></app-add-product-line>

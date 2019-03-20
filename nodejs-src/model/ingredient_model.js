@@ -62,7 +62,7 @@ module.exports.updateIngredient = (ingredient_name, ingredient_update, cb) => {
 module.exports.attemptImport = async (ingredients, ingredients_csv, results) => {
     let type = 'ingredients'
     for(let [ingredient, ingredient_csv] of utils.zip(ingredients, ingredients_csv)){
-        await syntaxValidation(ingredient, ingredient_csv, results, type);
+        await module.exports.syntaxValidation(ingredient, ingredient_csv, results, type);
     }
     
     await validator.duplicateCheck(Ingredient, ingredients, ingredients_csv, results, type);

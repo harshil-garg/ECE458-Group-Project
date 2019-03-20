@@ -51,7 +51,7 @@ router.post('/create', async (req, res) => {
         return;
     }
 
-    create_ingredient(res, name, sku.number, vendor_info, package_size, unit, sku.cost, comment);
+    create_ingredient(res, name, ingredient.number, vendor_info, package_size, unit, ingredient.cost, comment);
 });
 
 function create_ingredient(res, name, number, vendor_info, package_size, unit, cost, comment) {

@@ -380,16 +380,19 @@ export class SkuTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
     setSearchedIngredients(newIngredients : Array<any>){
       this.ingredients = newIngredients;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
     setSearchedProductLines(newProductLines : Array<any>){
       this.productLines = newProductLines;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 

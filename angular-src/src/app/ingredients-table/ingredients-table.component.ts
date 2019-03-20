@@ -224,11 +224,13 @@ export class IngredientsTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
     setSearchedSkus(newSkus : Array<any>){
       this.skus = newSkus;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 

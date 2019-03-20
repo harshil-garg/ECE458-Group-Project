@@ -327,6 +327,7 @@ function resetSession() {
       createlist: [],
     },
     formulas: {
+      changelist: [],
       createlist: [],
     }
   };

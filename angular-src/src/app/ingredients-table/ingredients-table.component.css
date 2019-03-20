@@ -9,6 +9,7 @@ mat-header-cell {
 
 .remove {
   float:left;
+  margin-left: 20px;
 }
 
 .add {
@@ -101,4 +102,10 @@ mat-icon:hover{
 
 button {
   margin: 5px;
+  margin-top: 20px;
+}
+
+h1 {
+  padding-top: 20px;
+  margin-bottom: 5px;
 }

@@ -1,5 +1,6 @@
 <mat-form-field style="width: 200px;">
   <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Ingredient" (keydown)="keyPressed($event)">
+  <mat-error *ngIf="hasError()">Ingredient is required</mat-error>
 </mat-form-field>
 
 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">

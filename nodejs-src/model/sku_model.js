@@ -94,7 +94,7 @@ module.exports.updateSKU = (sku_number, sku_update, cb) => {
 module.exports.attemptImport = async (skus, skus_csv, results) => {
     let type = 'skus';
     for(let [sku, sku_csv] of utils.zip(skus, skus_csv)){
-        await this.syntaxValidation(sku, sku_csv, results, type);
+        await module.exports.syntaxValidation(sku, sku_csv, results, type);
     }
     
     await validator.duplicateCheck(SKU, skus, skus_csv, results, type);

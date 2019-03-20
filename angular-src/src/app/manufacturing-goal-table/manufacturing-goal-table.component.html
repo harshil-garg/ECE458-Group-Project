@@ -1,7 +1,7 @@
-<h2 class="mat-display-2">Manufacturing Goals</h2>
+<h1 class="mat-display-3" align="center">Manufacturing Goals</h1>
 <div class="button-div">
   <button class="remove" mat-raised-button type="button" (click)="delete()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
-  <button class="remove" mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
+  <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
   <app-calculator [disabled]="selection.selected.length!=1" [manufGoal]="selection.selected[0]!=null ? selection.selected[0].name : null"></app-calculator>
   <app-add-manufacturing-goal class="add"></app-add-manufacturing-goal>
 </div>
