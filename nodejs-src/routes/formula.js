@@ -67,7 +67,7 @@ router.post('/update', async (req, res) => {
 
     let json = {};
 
-    if (name) {
+    if (name != undefined && name != NaN) {
         name_passed = validator.proper_name_length(name);
         if(!name_passed[0]){
             res.json({success: false, message: name_passed[1]});
@@ -75,7 +75,7 @@ router.post('/update', async (req, res) => {
         }
         json["name"] = name;
     }
-    if(newnumber){
+    if(newnumber != undefined && newnumber != NaN){
         let num_numeric = validator.isNumeric(newnumber);
         if(!num_numeric[0]){
             res.json({success: false, message: num_numeric[1]});
@@ -89,7 +89,7 @@ router.post('/update', async (req, res) => {
         }
         json["number"] = newnumber;
     }
-    if(ingredient_tuples){
+    if(ingredient_tuples != undefined && ingredient_tuples != NaN){
         let valid_tuples = [];
         let valid_quantities = [];
         let positive_quantities = [];
@@ -123,7 +123,7 @@ router.post('/update', async (req, res) => {
         }
         json["ingredient_tuples"] = ingredient_tuples;
     }
-    if(comment){
+    if(comment != undefined && comment != NaN){
         json["comment"] = comment;
     }
 

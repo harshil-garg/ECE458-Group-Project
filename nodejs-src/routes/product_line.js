@@ -46,7 +46,7 @@ router.post('/update', (req, res) => {
 
     var json = {};
 
-    if (newname) {
+    if (newname != undefined && newname != NaN) {
         json["name"] = newname;
     }
 

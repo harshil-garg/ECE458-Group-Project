@@ -230,7 +230,7 @@ router.post('/update', async (req, res) => {
     let deleted_lines = []
 
     var json = {};
-    if (name) {
+    if (name != undefined && name != NaN) {
         name_passed = validator.proper_name_length(name);
         if(!name_passed[0]){
             res.json({success: false, message: name_passed[1]});
@@ -238,7 +238,7 @@ router.post('/update', async (req, res) => {
         }
         json["name"] = name;
     }
-    if (newnumber) {
+    if (newnumber != undefined && newnumber != NaN) {
         let num_numeric = validator.isNumeric(newnumber);
         if(!num_numeric[0]){
             res.json({success: false, message: num_numeric[1]});
@@ -252,7 +252,7 @@ router.post('/update', async (req, res) => {
         }   
         json["number"] = newnumber;
     }
-    if (case_upc) {
+    if (case_upc != undefined && case_upc != NaN) {
         let case_passed = sku_validator.isUPCStandard(case_upc);
         if(!case_passed[0]){
             res.json({success: false, message: case_passed[1]});
@@ -260,7 +260,7 @@ router.post('/update', async (req, res) => {
         }
         json["case_upc"] = case_upc;
     }
-    if (unit_upc) {
+    if (unit_upc != undefined && unit_upc != NaN) {
         let unit_passed = sku_validator.isUPCStandard(unit_upc);
         if(!unit_passed[0]){
             res.json({success: false, message: unit_passed[1]});
@@ -268,10 +268,10 @@ router.post('/update', async (req, res) => {
         }
         json["unit_upc"] = unit_upc;
     }
-    if (size) {
+    if (size != undefined && size != NaN) {
         json["size"] = size;
     }
-    if (count) {
+    if (count != undefined && count != NaN) {
         let count_numeric = validator.isNumeric(count);
         if(!count_numeric[0]){
             res.json({success: false, message: count_numeric[1]});
@@ -285,7 +285,7 @@ router.post('/update', async (req, res) => {
         }  
         json["count"] = count;
     }
-    if (product_line) {
+    if (product_line != undefined && product_line != NaN) {
         let product_passed = await validator.itemExists(ProductLine, product_line);
         if(!product_passed[0]){
             res.json({success: false, message: product_passed[1]});
@@ -293,7 +293,7 @@ router.post('/update', async (req, res) => {
         }
         json["product_line"] = product_passed[2];
     }
-    if (formula) {
+    if (formula != undefined && formula != NaN) {
         let formula_id = await formulaHandler(formula, res);
         if(!formula_id){
             return;
@@ -301,7 +301,7 @@ router.post('/update', async (req, res) => {
 
         json["formula"] = formula_id;
     }
-    if (formula_scale_factor) {
+    if (formula_scale_factor != undefined && formula_scale_factor != NaN) {
         let factor_numeric = validator.isNumeric(formula_scale_factor);
         if(!factor_numeric[0]){
             res.json({success: false, message: factor_numeric[1]});
@@ -315,7 +315,7 @@ router.post('/update', async (req, res) => {
         }  
         json["formula_scale_factor"] = formula_scale_factor;
     }
-    if (manufacturing_lines) {
+    if (manufacturing_lines != undefined && manufacturing_lines != NaN) {
         let manufacturings_passed = []
         let ids = []
         for(let line of manufacturing_lines){
@@ -343,7 +343,7 @@ router.post('/update', async (req, res) => {
 
         json["manufacturing_lines"] = ids;
     }
-    if (manufacturing_rate) {       
+    if (manufacturing_rate != undefined && manufacturing_rate != NaN) {       
         let map = await ManufacturingSchedule.findOne({'activity.sku': sku._id}).exec();
         if(map != null && manufacturing_rate != sku.manufacturing_rate){
             res.json({success: false, message: 'Cannot edit rate of a SKU that has been mapped to the Manufacturing Schedule'});
@@ -357,7 +357,7 @@ router.post('/update', async (req, res) => {
         }
         json["manufacturing_rate"] = manufacturing_rate;
     }
-    if(setup_cost){
+    if(setup_cost != undefined && setup_cost != NaN){
         let setup_numeric = validator.isNumeric(setup_cost);
         if(!setup_numeric[0]){
             res.json({success: false, message: setup_numeric[1]});
@@ -371,7 +371,7 @@ router.post('/update', async (req, res) => {
         }  
         json["setup_cost"] = setup_cost;
     }
-    if(run_cost){
+    if(run_cost != undefined && run_cost != NaN){
         let run_numeric = validator.isNumeric(run_cost);
         if(!run_numeric[0]){
             res.json({success: false, message: run_numeric[1]});
@@ -385,7 +385,7 @@ router.post('/update', async (req, res) => {
         }  
         json["run_cost"] = run_cost;
     }
-    if (comment) {
+    if (comment != undefined && comment != NaN) {
         json["comment"] = comment;
     }
 

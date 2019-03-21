@@ -52,7 +52,7 @@ router.post('/update', (req, res) => {
 
     let json = {};
 
-    if(name){
+    if(name != undefined && name != NaN){
         let name_passed = validator.proper_name_length(name);
         if(!name_passed[0]){
             res.json({success: false, message: name_passed[1]});
@@ -60,7 +60,7 @@ router.post('/update', (req, res) => {
         }
         json["name"] = name;
     }
-    if(newshortname){
+    if(newshortname != undefined && newshortname != NaN){
         let shortname_passed = validator.proper_shortname_length(newshortname);
         if(!shortname_passed[0]){
             res.json({success: false, message: shortname_passed[1]});
@@ -68,7 +68,7 @@ router.post('/update', (req, res) => {
         }
         json["shortname"] = newshortname;
     }
-    if(comment){
+    if(comment != undefined && comment != NaN){
         json["comment"] = comment;
     }
 

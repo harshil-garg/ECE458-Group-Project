@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddFormulaDialogComponent } from './add-formula-dialog/add-formula-dialog.component';
 import { CrudFormulaService, Response } from '../crud-formula.service';
 import { FormulaTableComponent } from '../formula-table.component';
@@ -16,7 +16,7 @@ export class AddFormulaComponent {
   formula: Formula = new Formula();
 
   constructor(public dialog: MatDialog, public crudFormulaService: CrudFormulaService,
-    public formulaTableComponent: FormulaTableComponent) { }
+    public formulaTableComponent: FormulaTableComponent, private snackBar: MatSnackBar) { }
 
 
   public openDialog(){
@@ -52,6 +52,11 @@ export class AddFormulaComponent {
   }
 
   private handleResponse(response: Response) {
+    if (!response.success) {
+      this.snackBar.open(response.message, "Close", {duration:3000});
+    } else {
+      this.formulaTableComponent.refresh();
+    }
     console.log(response);
     this.formulaTableComponent.refresh();
   }

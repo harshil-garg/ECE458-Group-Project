@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { ProductLineTableComponent } from '../product-line-table.component';
 import { AddProductLineDialogComponent } from './add-product-line-dialog/add-product-line-dialog.component';
 import { CrudProductLineService, Response } from '../crud-product-line.service';
@@ -16,7 +16,7 @@ export class AddProductLineComponent {
     productLine: ProductLine = new ProductLine();
 
     constructor(public dialog: MatDialog, public productLineTableComponent: ProductLineTableComponent,
-      public crudProductLineService: CrudProductLineService) {}
+      public crudProductLineService: CrudProductLineService, private snackBar: MatSnackBar) {}
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddProductLineDialogComponent, {
@@ -48,7 +48,7 @@ export class AddProductLineComponent {
 
     private handleResponse(response: Response) {
       if (!response.success) {
-        alert(response.message);
+        this.snackBar.open(response.message, "Close", {duration:3000});
       }
       this.productLineTableComponent.refresh();
     }
