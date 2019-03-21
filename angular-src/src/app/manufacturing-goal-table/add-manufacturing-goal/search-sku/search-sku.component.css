@@ -1,3 +1,18 @@
-button {
-  margin: 5px;
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+mat-button-toggle-group {
+  height: 30px;
+  top: 15px;
+}
+
+mat-button-toggle {
+  height: 30px;
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 10px;
+  align-items: center;
+  text-align: center;
 }
