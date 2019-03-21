@@ -48,6 +48,8 @@ export class AddSkuComponent {
         formula_scale_factor: sku.formula_scale_factor,
         manufacturing_lines: sku.manufacturing_lines,
         manufacturing_rate: sku.manufacturing_rate,
+        setup_cost: sku.setup_cost,
+        run_cost: sku.run_cost,
         comment: sku.comment
       }).subscribe(
       response => this.handleResponse(response),

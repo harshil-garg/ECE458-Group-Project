@@ -85,6 +85,14 @@
         <input type="text" class="form-control" id="manufacturing_rate" pattern="^\d*\.?\d*$" required [(ngModel)]="sku.manufacturing_rate" name="manufacturing_rate" #manufacturing_rate="ngModel">
         <div [hidden]="manufacturing_rate.valid || manufacturing_rate.pristine" class="alert alert-danger">Manufacturing Rate must be a decimal number</div>
 
+        <label for="setup_cost">Manufacturing Setup Cost</label>
+        <input type="text" class="form-control" id="setup_cost" pattern="^\d*\.?\d*$" required [(ngModel)]="sku.setup_cost" name="setup_cost" #setup_cost="ngModel">
+        <div [hidden]="setup_cost.valid || setup_cost.pristine" class="alert alert-danger">Manufacturing Setup Cost must be a decimal number</div>
+
+        <label for="run_cost">Manufacturing Run Cost</label>
+        <input type="text" class="form-control" id="run_cost" pattern="^\d*\.?\d*$" required [(ngModel)]="sku.run_cost" name="run_cost" #run_cost="ngModel">
+        <div [hidden]="run_cost.valid || run_cost.pristine" class="alert alert-danger">Manufacturing Run Cost must be a decimal number</div>
+
         <label for="comment">Comment</label>
         <textarea type="text" class="form-control" id="comment" [(ngModel)]="sku.comment" name="comment" #comment="ngModel"></textarea>
       </div>

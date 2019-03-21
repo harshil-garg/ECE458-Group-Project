@@ -14,5 +14,7 @@ export class Sku {
   formula_scale_factor: string;
   manufacturing_lines: string[];
   manufacturing_rate: string;
+  setup_cost: number;
+  run_cost: number;
   comment: string;
 }

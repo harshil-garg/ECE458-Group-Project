@@ -23,7 +23,7 @@ export class SkuTableComponent implements OnInit{
     ingredients: Array<any> = [];
     productLines: Array<any> = [];
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'comment'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'setup_cost', 'run_cost', 'comment'];
     selection = new SelectionModel<Sku>(true, []);
     dataSource = new MatTableDataSource<Sku>(this.skuList);
     maxPages: number;
@@ -133,6 +133,8 @@ export class SkuTableComponent implements OnInit{
           formula_scale_factor: editedSku.formula_scale_factor,
           manufacturing_lines: editedSku.manufacturing_lines,
           manufacturing_rate: editedSku.manufacturing_rate,
+          setup_cost: editedSku.setup_cost,
+          run_cost: editedSku.run_cost,
           comment: editedSku.comment
         }).subscribe(
         response => {
@@ -194,6 +196,8 @@ export class SkuTableComponent implements OnInit{
         formula_scale_factor: editedSku.formula_scale_factor,
         manufacturing_lines: editedSku.manufacturing_lines,
         manufacturing_rate: editedSku.manufacturing_rate,
+        setup_cost: editedSku.setup_cost,
+        run_cost: editedSku.run_cost,
         comment: editedSku.comment
       }).subscribe(
         response => {
@@ -296,6 +300,8 @@ export class SkuTableComponent implements OnInit{
               formula_scale_factor: sku.formula_scale_factor,
               manufacturing_lines: manufLines,
               manufacturing_rate: sku.manufacturing_rate,
+              setup_cost: sku.setup_cost,
+              run_cost: sku.run_cost,
               comment: sku.comment
           });
         }
