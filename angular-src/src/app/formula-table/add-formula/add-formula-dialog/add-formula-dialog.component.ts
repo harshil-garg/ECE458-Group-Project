@@ -19,6 +19,10 @@ export class AddFormulaDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public formula: Formula) { }
 
   ngOnInit() {
+    this.formula.name = "";
+    this.formula.number = undefined;
+    this.formula.ingredient_tuples = [];
+    this.formula.comment = "";
     this.formulaForm = new FormGroup({
       number: new FormControl(''),
       name: new FormControl('', [Validators.required]),
@@ -32,7 +36,7 @@ export class AddFormulaDialogComponent implements OnInit {
     })
   }
 
-  
+
 
   submit(formulaFormValue): void {
     if (this.formulaForm.valid) {
@@ -66,7 +70,7 @@ export class AddFormulaDialogComponent implements OnInit {
         unit: tupleFormValue.unit
       }
       this.ingredient_tuples.push(tuple);
-    } 
+    }
   }
 
   removeIngrQuant(ingr_id){
