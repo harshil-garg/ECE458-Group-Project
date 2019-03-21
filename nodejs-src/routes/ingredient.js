@@ -71,10 +71,10 @@ router.post('/update', async (req, res) => {
 
     var json = {};
 
-    if (newname) {
+    if (newname != undefined && newname != NaN) {
         json["name"] = newname;
     }
-    if (number) {
+    if (number != undefined && number != NaN) {
         let num_numeric = validator.isNumeric(number);
         if(!num_numeric[0]){
             res.json({success: false, message: num_numeric[1]});
@@ -88,10 +88,10 @@ router.post('/update', async (req, res) => {
         }
         json["number"] = number;
     }
-    if (vendor_info) {
+    if (vendor_info != undefined && vendor_info != NaN) {
         json["vendor_info"] = vendor_info;
     }
-    if (package_size) {
+    if (package_size != undefined && package_size != NaN) {
         let size_numeric = validator.isNumeric(package_size);
         if(!size_numeric[0]){
             res.json({success: false, message: size_numeric[1]});
@@ -105,7 +105,7 @@ router.post('/update', async (req, res) => {
         }
         json["package_size"] = package_size;
     }
-    if (unit) {
+    if (unit != undefined && unit != NaN) {
         //check that new unit is of same type
         let unit_passed = units.validUnit(unit);
         if(!unit_passed){
@@ -121,7 +121,7 @@ router.post('/update', async (req, res) => {
         }
         json["unit"] = unit;
     }
-    if (cost) {
+    if (cost != undefined && cost != NaN) {
         let cost_numeric = validator.isNumeric(cost);
         if(!cost_numeric[0]){
             res.json({success: false, message: cost_numeric[1]});
@@ -136,7 +136,7 @@ router.post('/update', async (req, res) => {
         let rounded_cost = validator.roundCost(cost);
         json["cost"] = rounded_cost;
     }
-    if (comment) {
+    if (comment != undefined && comment != NaN) {
         json["comment"] = comment;
     }
 
