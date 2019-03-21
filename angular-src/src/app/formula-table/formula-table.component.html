@@ -1,4 +1,4 @@
-<h2 class="mat-display-2">Formulas</h2>
+<h1 class="mat-display-3" align="center">Formulas</h1>
 <div class="search-div">
     <!-- <app-search-ingredient class="search"></app-search-ingredient> -->
     <br style="clear:both" />
@@ -56,13 +56,15 @@
   <ng-container matColumnDef="ingredient_tuples">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Ingredient Tuples</th>
     <td mat-cell *matCellDef="let element">
-      <mat-chip-list>
-        <ng-container *ngFor="let tuple of element.ingredient_tuples; let ingr_id=index">
-          <div>
-            <mat-chip>{{tuple.ingredient}} : {{tuple.quantity}} {{tuple.unit}} <mat-icon (click)="removeIngrQuant(ingr_id, element.id)">clear</mat-icon></mat-chip>
-          </div>
-        </ng-container>
-      </mat-chip-list>
+      <div class="ingr-tuples">
+        <mat-chip-list class="mat-chip-list-stacked">
+          <ng-container *ngFor="let tuple of element.ingredient_tuples; let ingr_id=index">
+            <div>
+              <mat-chip class="chip">{{tuple.ingredient}} : {{tuple.quantity}} {{tuple.unit}} <mat-icon (click)="removeIngrQuant(ingr_id, element.id)">clear</mat-icon></mat-chip>
+            </div>
+          </ng-container>
+        </mat-chip-list>
+      </div>
     </td>
   </ng-container>
 

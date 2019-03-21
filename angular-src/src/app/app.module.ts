@@ -47,6 +47,7 @@ import { ManufacturingScheduleReportComponent } from './manufacturing-schedule/m
 import { FormulaEditorComponent } from './sku-table/formula-editor/formula-editor.component';
 import { AddFormulaComponent } from './formula-table/add-formula/add-formula.component';
 import { AddFormulaDialogComponent } from './formula-table/add-formula/add-formula-dialog/add-formula-dialog.component';
+import { UnitAutocompleteComponent } from './ingredients-table/unit-autocomplete/unit-autocomplete.component';
 
 const routes: Routes = [
   {
@@ -99,7 +100,8 @@ const routes: Routes = [
     ActivityDialogComponent,
     FormulaEditorComponent,
     AddFormulaComponent,
-    AddFormulaDialogComponent
+    AddFormulaDialogComponent,
+    UnitAutocompleteComponent
   ],
   imports: [
     BrowserModule,

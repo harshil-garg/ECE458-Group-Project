@@ -1,4 +1,4 @@
-<h2 class="mat-display-2">Ingredients</h2>
+<h1 class="mat-display-3" align="center">Ingredients</h1>
 <div class="search-div">
     <app-search-ingredient class="search"></app-search-ingredient>
     <br style="clear:both" />
@@ -67,10 +67,7 @@
   <ng-container matColumnDef="package_size">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Package Size</th>
     <td mat-cell *matCellDef="let element">
-      <!-- <mat-form-field floatLabel="never">
-        <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size', package_size.value)" required>
-      </mat-form-field> -->
-      <div class="unit-picker-component">
+      <!-- <div class="unit-picker-component">
         <mat-form-field>
            <mat-label>Package Size</mat-label>
            <input #package_size matInput placeholder="Package Size" [value]="element.package_size" (blur)="edit(element.name, 'package_size', package_size.value)" required>
@@ -78,16 +75,8 @@
                <mat-option *ngFor="let type of measUnits" [value]="type">{{type}}</mat-option>
            </mat-select>
          </mat-form-field>
-      </div>
-      <!-- <mat-form-field appearance="outline" style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
-       <mat-label>Package Size</mat-label>
-       <mat-select name="unit" class="unit">
-         <mat-option *ngFor="let type of measUnits" [value]="type">
-           {{type}}
-         </mat-option>
-       </mat-select>
-       <input matInput type="time" placeholder="HH:MM" id="end_time_hour" [formControl]="timeFormControl">
-     </mat-form-field> -->
+      </div> -->
+      <app-unit-autocomplete [initUnit]="element.package_size + element.unit" (messageEvent)="edit(element.name, 'package_size', $event)"></app-unit-autocomplete>
     </td>
   </ng-container>
 

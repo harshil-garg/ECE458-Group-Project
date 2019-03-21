@@ -20,17 +20,19 @@
       </div>
       <mat-card>
         <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
-        <mat-chip-list>
-          <ng-container *ngFor="let ingredient of formula.ingredient_tuples; let ingr_id=index">
-            <div>
-              <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
-            </div>
-          </ng-container>
-        </mat-chip-list>
+        <div class="tuple-list">
+          <mat-chip-list class="mat-chip-list-stacked">
+            <ng-container *ngFor="let ingredient of formula.ingredient_tuples; let ingr_id=index">
+              <div>
+                <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
+              </div>
+            </ng-container>
+          </mat-chip-list>
+        </div>
         <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
         <div class="unit-picker-component">
           <mat-form-field>
-             <mat-label>Package Size</mat-label>
+             <mat-label>Quantity</mat-label>
              <input matInput [(ngModel)]="quantityInput" placeholder="Quantity" required>
              <mat-select name="unit" class="unit" [value]="unitInput" (selectionChange)="updateUnit($event.value)">
                  <mat-option *ngFor="let type of measUnits" [value]="type">{{type}}</mat-option>

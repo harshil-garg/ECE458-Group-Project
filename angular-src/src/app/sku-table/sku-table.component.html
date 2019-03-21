@@ -1,4 +1,4 @@
-<h2 class="mat-display-2">SKUs</h2>
+<h1 class="mat-display-3" align="center">SKUs</h1>
 <div class="search-div">
     <app-search-sku class="search"></app-search-sku>
     <br style="clear:both" />
@@ -39,7 +39,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-			  <input #name matInput placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
+			  <input #name matInput class = "padded-input" placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
 			</mat-form-field>
     </td>
   </ng-container>
@@ -87,7 +87,7 @@
   <!-- Comment Column -->
   <ng-container matColumnDef="count_per_case">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Count Per Case</th>
-    <td mat-cell *matCellDef="let element">
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
         <input #count_per_case matInput placeholder="Count Per Case" [value]="element.count_per_case" (blur)="edit(element.id, 'count_per_case', count_per_case.value)" required>
       </mat-form-field>
@@ -108,14 +108,14 @@
   <ng-container matColumnDef="formula">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula</th>
     <td mat-cell *matCellDef="let element">
-      <app-formula-editor (formulaOutput)="updateFormula(element.id, $event)" [initFormula]="element.formula"></app-formula-editor> 
+      <app-formula-editor (formulaOutput)="updateFormula(element.id, $event)" [initFormula]="element.formula"></app-formula-editor>
     </td>
   </ng-container>
 
   <!-- Formula Scale Factor Column -->
   <ng-container matColumnDef="formula_scale_factor">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula Scale Factor</th>
-    <td mat-cell *matCellDef="let element">
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
         <input #formula_scale_factor matInput placeholder="Formula Scale Factor" [value]="element.formula_scale_factor" (blur)="edit(element.id, 'formula_scale_factor', formula_scale_factor.value)" required>
       </mat-form-field>
@@ -126,19 +126,22 @@
   <ng-container matColumnDef="manufacturing_lines">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Lines</th>
     <td mat-cell *matCellDef="let element">
-      <mat-list>
-        <ng-container *ngFor="let manufLine of element.manufacturing_lines; let id=index">
-          <mat-divider *ngIf="id>0"></mat-divider>
-          <mat-list-item>{{manufLine}}</mat-list-item>
-        </ng-container>
-      </mat-list>
+      <div class="main-centered">
+        <div class="centered">
+          <mat-chip-list class="mat-chip-list-stacked">
+            <ng-container *ngFor="let manufLine of element.manufacturing_lines; let id=index">
+              <mat-chip>{{manufLine}}</mat-chip>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+      </div>
     </td>
   </ng-container>
 
   <!-- Manufacturing Rate -->
   <ng-container matColumnDef="manufacturing_rate">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Rate</th>
-    <td mat-cell *matCellDef="let element">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Rate</th>
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
         <input #manufacturing_rate matInput placeholder="Manufacturing Rate" [value]="element.manufacturing_rate" (blur)="edit(element.id, 'manufacturing_rate', manufacturing_rate.value)" required>
       </mat-form-field>
@@ -147,8 +150,8 @@
 
   <!-- Setup cost Column -->
   <ng-container matColumnDef="setup_cost">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Setup Cost</th>
-    <td mat-cell *matCellDef="let element">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Setup Cost</th>
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
         <input #setup_cost matInput placeholder="Setup Cost" [value]="element.setup_cost" (blur)="edit(element.id, 'setup_cost', setup_cost.value)" required>
       </mat-form-field>
@@ -157,8 +160,8 @@
 
   <!-- Run cost Column -->
   <ng-container matColumnDef="run_cost">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Run Cost</th>
-    <td mat-cell *matCellDef="let element">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Run Cost</th>
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
         <input #run_cost matInput placeholder="Run Cost" [value]="element.run_cost" (blur)="edit(element.id, 'run_cost', run_cost.value)" required>
       </mat-form-field>
