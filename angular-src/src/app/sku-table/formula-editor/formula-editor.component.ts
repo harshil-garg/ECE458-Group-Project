@@ -73,4 +73,8 @@ export class FormulaEditorComponent implements OnInit {
     this.quantityInput = ev.quantity;
   }
 
+  formulaChange(ev){
+    this.formula = ev;
+  }
+
 }

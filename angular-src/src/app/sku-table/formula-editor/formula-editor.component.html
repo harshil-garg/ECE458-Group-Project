@@ -3,7 +3,8 @@
     <mat-expansion-panel class="mat-elevation-z0">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          <input type="text" maxlength="32" id="formula_name" (click)="stopPropagation($event)" (keydown)="stopSpacebar($event)" placeholder="Formula Name" required [(ngModel)]="formula.name" name="formula_name" #formula_name>
+          <app-formula-autocomplete [initFormula]="formula" (messageEvent)="formulaChange($event)"></app-formula-autocomplete>
+          <!-- <input type="text" maxlength="32" id="formula_name" (click)="stopPropagation($event)" (keydown)="stopSpacebar($event)" placeholder="Formula Name" required [(ngModel)]="formula.name" name="formula_name" #formula_name> -->
         </mat-panel-title>
         <mat-panel-description>
           Edit Formula
@@ -15,7 +16,7 @@
         </mat-form-field>
         <br>
         <mat-form-field>
-          <textarea matInput type="text" id="comment" required [(ngModel)]="formula.comment" placeholder="Comment" name="comment" #comment="ngModel"></textarea>
+          <textarea matInput type="text" id="comment" [(ngModel)]="formula.comment" placeholder="Comment" name="comment" #comment="ngModel"></textarea>
         </mat-form-field>
       </div>
       <mat-card>
