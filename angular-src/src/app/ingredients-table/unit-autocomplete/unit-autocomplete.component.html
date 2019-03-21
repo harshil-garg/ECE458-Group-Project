@@ -1,0 +1,18 @@
+<!-- <mat-form-field style="width: 200px;">
+  <input type="text" matInput [formControl]="inputField" [matAutocomplete]="auto" placeholder="Quantity-Unit">
+  <mat-error *ngIf="hasError()">Ingredient is required</mat-error>
+</mat-form-field>
+
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+  <mat-option *ngFor="let ingredient of suggestedIngredients" [value]="ingredient.name">{{ingredient.name}}
+     <font color="lightgray">Ingredient</font> </mat-option>
+</mat-autocomplete> -->
+
+  <mat-form-field style="width: 200px;">
+    <input type="text" placeholder="Quantity-Unit" matInput [formControl]="inputField" [matAutocomplete]="auto">
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)" (blur)="onBlur()">
+      <mat-option *ngFor="let option of filteredUnits | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>

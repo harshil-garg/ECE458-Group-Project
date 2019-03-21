@@ -57,6 +57,8 @@ export class CrudIngredientsService {
   }
 
   edit(requestedIngredient: EditMessage): Observable<Response>{
+    console.log("EDDDIIITTT");
+    console.log(requestedIngredient);
     return this.http.post<Response>('api/ingredients/update', requestedIngredient, httpOptions);
   }
 }

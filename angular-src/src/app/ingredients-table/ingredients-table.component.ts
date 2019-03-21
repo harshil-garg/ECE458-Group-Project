@@ -102,13 +102,16 @@ export class IngredientsTableComponent implements OnInit{
           editedIngredient.vendor_info = updated_value;
           break;
         }
-        case 'unit':{
-          editedIngredient.unit = updated_value;
-          console.log(updated_value);
-          break;
-        }
         case 'package_size':{
-          editedIngredient.package_size = updated_value;
+          var splitString = updated_value.match(/[a-z]+|[^a-z]+/gi);
+          if(splitString!=null && splitString.length == 2){
+            var size = splitString[0];
+            var unit = splitString[1];
+            console.log(unit);
+            console.log(size);
+            editedIngredient.unit = unit;
+            editedIngredient.package_size = size;
+          }
           break;
         }
         case 'cost_per_package':{

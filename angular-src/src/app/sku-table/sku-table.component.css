@@ -120,3 +120,7 @@ h1 {
   padding-top: 20px;
   margin-bottom: 5px;
 }
+
+.small-cell{
+  width: 10px;
+}
