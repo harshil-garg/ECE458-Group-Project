@@ -237,7 +237,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     private handleResponse(response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh b/c deselects focused item
       //this.refresh();
     }

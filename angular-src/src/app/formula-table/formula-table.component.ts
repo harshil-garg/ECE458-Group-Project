@@ -135,7 +135,7 @@ export class FormulaTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh for edits
       //this.refresh();
     }

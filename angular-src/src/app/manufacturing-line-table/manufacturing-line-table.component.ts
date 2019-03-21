@@ -102,7 +102,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
     }
 
     isAdmin() {
