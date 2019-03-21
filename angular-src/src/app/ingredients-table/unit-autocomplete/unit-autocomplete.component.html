@@ -9,8 +9,8 @@
 </mat-autocomplete> -->
 
   <mat-form-field style="width: 200px;">
-    <input type="text" placeholder="Quantity-Unit" matInput [formControl]="inputField" [matAutocomplete]="auto">
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)" (blur)="onBlur()">
+    <input type="text" placeholder="Quantity-Unit" matInput [formControl]="inputField" [matAutocomplete]="auto" (blur)="onBlur()">
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
       <mat-option *ngFor="let option of filteredUnits | async" [value]="option">
         {{option}}
       </mat-option>
