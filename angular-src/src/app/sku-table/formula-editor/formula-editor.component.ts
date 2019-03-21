@@ -69,7 +69,8 @@ export class FormulaEditorComponent implements OnInit {
   }
 
   updateUnit(ev){
-    this.unitInput = ev;
+    this.unitInput = ev.unit;
+    this.quantityInput = ev.quantity;
   }
 
 }

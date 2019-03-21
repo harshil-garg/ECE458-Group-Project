@@ -24,21 +24,13 @@
           <mat-chip-list class="mat-chip-list-stacked">
             <ng-container *ngFor="let ingredient of formula.ingredient_tuples; let ingr_id=index">
               <div>
-                <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
+                <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} {{ingredient.unit}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
               </div>
             </ng-container>
           </mat-chip-list>
         </div>
         <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
-        <div class="unit-picker-component">
-          <mat-form-field>
-             <mat-label>Quantity</mat-label>
-             <input matInput [(ngModel)]="quantityInput" placeholder="Quantity" required>
-             <mat-select name="unit" class="unit" [value]="unitInput" (selectionChange)="updateUnit($event.value)">
-                 <mat-option *ngFor="let type of measUnits" [value]="type">{{type}}</mat-option>
-             </mat-select>
-           </mat-form-field>
-        </div>
+        <app-unit-autocomplete [initUnit]="" (messageEvent)="updateUnit($event)"></app-unit-autocomplete>
         <br>
         <button mat-raised-button type="button" (click)="addIngredientQuantity()" color="accent">Add Ingr-Quant</button>
       </mat-card>

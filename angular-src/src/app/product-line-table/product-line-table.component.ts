@@ -57,31 +57,33 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, updated_value:any) {
-      var editedProductLine : ProductLine = new ProductLine();
-      var newName : string;
-      editedProductLine.name = name;
-      switch(property){
-        case 'name':{
-          newName = updated_value; //new name
+      if(this.isAdmin()){
+        var editedProductLine : ProductLine = new ProductLine();
+        var newName : string;
+        editedProductLine.name = name;
+        switch(property){
+          case 'name':{
+            newName = updated_value; //new name
+          }
         }
-      }
-      this.crudProductLineService.edit({
-          name : editedProductLine.name,
-          newname: newName
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
-          }
-          else{
-            this.handleError(response);
-          }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
-          };
+        this.crudProductLineService.edit({
+            name : editedProductLine.name,
+            newname: newName
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            };
         });
+      }
     }
 
     private handleError(response){
