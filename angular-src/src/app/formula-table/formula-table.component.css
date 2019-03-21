@@ -109,3 +109,19 @@ h1 {
   padding-top: 20px;
   margin-bottom: 5px;
 }
+
+.ingr-tuples {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  height: 140px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.chip {
+  line-height: normal;
+}
+
+.mat-cell {
+  padding: 8px 8px 0 0;
+}
