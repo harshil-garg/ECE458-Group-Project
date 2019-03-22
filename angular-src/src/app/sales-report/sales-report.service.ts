@@ -1,0 +1,41 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams, HttpResponse, HttpHeaders } from '@angular/common/http';
+
+export class SummaryRequest {
+    product_lines: Array<string>;
+    customers: Array<string>;
+}
+
+export class DrilldownRequest {
+  sku_number: number;
+  customers: Array<string>;
+  start: string;
+  end: string;
+}
+
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type':  'application/json',
+  })
+};
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SalesReportService {
+
+  constructor(private http: HttpClient) { }
+
+  getSummary(request: SummaryRequest) {
+    return this.http.post('api/sales_record/summary', request, httpOptions);
+  }
+
+  getDrilldown(request: DrilldownRequest) {
+    return this.http.post('api/sales_record/drilldown', request, httpOptions);
+  }
+
+  doFlush() {
+    return this.http.post('api/sales_record/flush', {}, httpOptions);
+  }
+  
+}

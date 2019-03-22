@@ -100,8 +100,9 @@ router.post('/summary', async function(req, res) {
                 continue;
             }
             
-            let xd = await getTotalSummaryData(sku, sku_yearly_data, new Date(start, 0, 1).toISOString());
-            sku_summary_data["sku_ten_year_data"] = xd;
+            let tenYearData = await getTotalSummaryData(sku, sku_yearly_data, new Date(start, 0, 1).toISOString());
+            sku_summary_data["sku_ten_year_data"] = tenYearData;
+            sku_summary_data["success"] = true;
             product_line_summary_data.push(sku_summary_data);
         }
         data[product_line_name] = product_line_summary_data;
