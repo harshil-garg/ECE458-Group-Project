@@ -26,7 +26,6 @@ export class CustomerAutocompleteComponent implements OnInit {
           if(result!=null && result.data!=null){
             this.suggestedCustomers = ["all"];
             for(let customer of result.data){
-              console.log(customer)
               this.suggestedCustomers.push(customer.name)
           }
          }
