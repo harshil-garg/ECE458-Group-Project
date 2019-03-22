@@ -162,6 +162,6 @@ const routes: Routes = [
   ],
   providers: [Title],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, SalesSummaryComponent]
 })
 export class AppModule { }
