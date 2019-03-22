@@ -1,3 +1,14 @@
-.small-input{
+.small-input {
     width: 120px !important;
+}
+table {
+    width: 100%;
+}
+
+tr.mat-footer-row {
+    font-weight: bold;
+}
+
+.mat-form-field {
+    padding: 5px
 }
