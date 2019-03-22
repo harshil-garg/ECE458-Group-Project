@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatSnackBar, MatPaginator, MatSort } from '@angular/material';
+import { Component, OnInit, Input, Output, ViewChild, Inject } from '@angular/core';
+import { MatTableDataSource, MatSnackBar, MatPaginator, MatSort, MAT_DIALOG_DATA } from '@angular/material';
 import { Sku } from '../../model/sku';
 import { SalesRecord } from '../../model/sales-record';
 import { SalesReportService, DrilldownRequest } from '../sales-report.service';
@@ -31,12 +31,12 @@ export class SalesDrilldownComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   
-  constructor(public salesReportService: SalesReportService) { }
+  constructor(public salesReportService: SalesReportService, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
     this.sku = {
       name: "Burger_Beef",
-      id: 1001,
+      id: this.data.sku_number,
       unit_size: "5 pounds",
       count_per_case: 30
     }
@@ -66,7 +66,6 @@ export class SalesDrilldownComponent implements OnInit {
   }
 
   refresh(){
-    console.log('refresh')
     let request = {
       sku_number: this.sku.id,
       customers: this.customers,
@@ -84,9 +83,7 @@ export class SalesDrilldownComponent implements OnInit {
   }
 
   handleRefreshResponse(response){
-    console.log("RESPONSE");
     if(response.success){
-      console.log(response);
       this.recordList = [];
       this.totalDocs = response.records.length;
       for(let record of response.records){
