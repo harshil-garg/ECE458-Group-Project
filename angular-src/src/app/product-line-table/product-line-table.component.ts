@@ -92,7 +92,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      this.snackBar.open(response.message, "Close", {duration:1000});
+      console.log(response);
       //refreshing every time gets rid of active element
       //this.refresh();
     }

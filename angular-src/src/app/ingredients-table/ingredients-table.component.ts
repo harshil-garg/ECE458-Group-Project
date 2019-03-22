@@ -149,7 +149,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      this.snackBar.open(response.message, "Close", {duration:1000});
+      console.log(response);
       //don't refresh for edits
       //this.refresh();
     }
