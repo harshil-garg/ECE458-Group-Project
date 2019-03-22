@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { AccountsService } from '../../accounts.service';
+import { SalesReportService } from '../sales-report.service';
 
 @Component({
   selector: 'app-customer-autocomplete',
@@ -9,27 +9,28 @@ import { AccountsService } from '../../accounts.service';
 })
 export class CustomerAutocompleteComponent implements OnInit {
 
-  suggestedUsers: string[];
+  suggestedCustomers: string[];
   inputField : FormControl = new FormControl();
 
-  @Input() initUser : string;
+  @Input() initCustomer : string;
   @Output() messageEvent = new EventEmitter<any>();
 
-  constructor(public accountsService: AccountsService) { }
+  constructor(public salesReportService: SalesReportService) { }
 
   ngOnInit() {
-    this.inputField.setValue(this.initUser);
+    this.inputField.setValue(this.initCustomer);
     this.inputField.valueChanges.debounceTime(200)
    .distinctUntilChanged()
-   .switchMap((query) =>  this.accountsService.autocompleteUsers(query))
+   .switchMap((query) =>  this.salesReportService.autocompleteCustomers({input: query}))
    .subscribe( result => {
           if(result!=null && result.data!=null){
-            this.suggestedUsers = ["all"];
-            for(let user of result.data){
-              this.suggestedUsers.push(user.email)
+            this.suggestedCustomers = ["all"];
+            for(let customer of result.data){
+              console.log(customer)
+              this.suggestedCustomers.push(customer.name)
           }
          }
-         this.suggestedUsers.slice(0,10)
+         this.suggestedCustomers.slice(0,10)
     });
   }
 
@@ -53,7 +54,7 @@ export class CustomerAutocompleteComponent implements OnInit {
     ev.stopPropagation();
   }
 
-  displayFn(user: string): string | undefined {
-    return user;
+  displayFn(customer: string): string | undefined {
+    return customer;
   }
 }

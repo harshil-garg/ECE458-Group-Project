@@ -1,8 +1,8 @@
 <mat-form-field style="width: 200px;">
   <input type="text" placeholder="Customer (or all)" matInput (click)="stopPropagation($event)" [formControl]="inputField" [matAutocomplete]="auto" (blur)="onBlur()">
   <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSelectionChanged($event)">
-    <mat-option *ngFor="let user of suggestedUsers" [value]="user">
-      {{user}}
+    <mat-option *ngFor="let customer of suggestedCustomers" [value]="customer">
+      {{customer}}
     </mat-option>
   </mat-autocomplete>
 </mat-form-field>

@@ -13,6 +13,14 @@ export class DrilldownRequest {
   end: string;
 }
 
+export class AutocompleteMessage {
+	input: string;
+}
+
+export class AutocompleteResponse {
+	data : string[];
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -36,6 +44,10 @@ export class SalesReportService {
 
   doFlush() {
     return this.http.post('api/sales_record/flush', {}, httpOptions);
+  }
+
+  autocompleteCustomers(autocompleteMessage: AutocompleteMessage){
+    return this.http.post<AutocompleteResponse>('api/customers/autocomplete', autocompleteMessage, httpOptions);
   }
   
 }
