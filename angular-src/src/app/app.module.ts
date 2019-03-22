@@ -53,6 +53,7 @@ import { FormulaAutocompleteComponent } from './formula-table/formula-autocomple
 import { SalesReportComponent } from './sales-report/sales-report.component';
 import { SalesSummaryComponent } from './sales-report/sales-summary/sales-summary.component';
 import { SalesDrilldownComponent } from './sales-report/sales-drilldown/sales-drilldown.component';
+import { CustomerAutocompleteComponent } from './sales-report/customer-autocomplete/customer-autocomplete.component';
 
 const routes: Routes = [
   {
@@ -112,7 +113,8 @@ const routes: Routes = [
     FormulaAutocompleteComponent,
     SalesReportComponent,
     SalesSummaryComponent,
-    SalesDrilldownComponent
+    SalesDrilldownComponent,
+    CustomerAutocompleteComponent
   ],
   imports: [
     BrowserModule,
