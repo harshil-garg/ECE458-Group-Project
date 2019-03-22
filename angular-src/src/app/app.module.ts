@@ -48,6 +48,7 @@ import { FormulaEditorComponent } from './sku-table/formula-editor/formula-edito
 import { AddFormulaComponent } from './formula-table/add-formula/add-formula.component';
 import { AddFormulaDialogComponent } from './formula-table/add-formula/add-formula-dialog/add-formula-dialog.component';
 import { UnitAutocompleteComponent } from './ingredients-table/unit-autocomplete/unit-autocomplete.component';
+import { ProductLineAutocompleteComponent } from './product-line-table/product-line-autocomplete/product-line-autocomplete.component';
 
 const routes: Routes = [
   {
@@ -101,7 +102,8 @@ const routes: Routes = [
     FormulaEditorComponent,
     AddFormulaComponent,
     AddFormulaDialogComponent,
-    UnitAutocompleteComponent
+    UnitAutocompleteComponent,
+    ProductLineAutocompleteComponent
   ],
   imports: [
     BrowserModule,
