@@ -73,83 +73,85 @@ export class SkuTableComponent implements OnInit{
     }
 
     edit(num:any, property:string, updated_value:any) {
-      var editedSku : Sku = new Sku();
-      var formula : Formula = new Formula();
-      editedSku.formula = formula;
-      var newNumber : number;
-      editedSku.id = num*1;
-      switch(property){
-        case 'name':{
-          editedSku.name = updated_value;
-          break;
-        }
-        case 'id':{
-          newNumber = updated_value*1;
-          break;
-        }
-        case 'case_upc':{
-          editedSku.case_upc = updated_value;
-          break;
-        }
-        case 'unit_upc':{
-          editedSku.unit_upc = updated_value;
-          break;
-        }
-        case 'unit_size':{
-          editedSku.unit_size = updated_value;
-          break;
-        }
-        case 'count_per_case':{
-          editedSku.count_per_case = updated_value;
-          break;
-        }
-        case 'product_line':{
-          editedSku.product_line = updated_value;
-          break;
-        }
-        case 'formula':{
-          editedSku.formula = updated_value;
-          break;
-        }
-        case 'ingredient_quantity':{
-          //editedSku.ingredient_quantity = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedSku.comment = updated_value;
-          break;
-        }
-      }
-      this.crudSkuService.edit({
-          name : editedSku.name,
-          number : editedSku.id,
-          newnumber: newNumber,
-          case_upc : editedSku.case_upc,
-          unit_upc: editedSku.unit_upc,
-          size : editedSku.unit_size,
-          count: editedSku.count_per_case,
-          product_line : editedSku.product_line,
-          formula: editedSku.formula.name,
-          formula_scale_factor: editedSku.formula_scale_factor,
-          manufacturing_lines: editedSku.manufacturing_lines,
-          manufacturing_rate: editedSku.manufacturing_rate,
-          setup_cost: editedSku.setup_cost,
-          run_cost: editedSku.run_cost,
-          comment: editedSku.comment
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
+      if(this.isAdmin()){
+        var editedSku : Sku = new Sku();
+        var formula : Formula = new Formula();
+        editedSku.formula = formula;
+        var newNumber : number;
+        editedSku.id = num*1;
+        switch(property){
+          case 'name':{
+            editedSku.name = updated_value;
+            break;
           }
-          else{
-            this.handleError(response);
+          case 'id':{
+            newNumber = updated_value*1;
+            break;
           }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+          case 'case_upc':{
+            editedSku.case_upc = updated_value;
+            break;
           }
-        });
+          case 'unit_upc':{
+            editedSku.unit_upc = updated_value;
+            break;
+          }
+          case 'unit_size':{
+            editedSku.unit_size = updated_value;
+            break;
+          }
+          case 'count_per_case':{
+            editedSku.count_per_case = updated_value;
+            break;
+          }
+          case 'product_line':{
+            editedSku.product_line = updated_value;
+            break;
+          }
+          case 'formula':{
+            editedSku.formula = updated_value;
+            break;
+          }
+          case 'ingredient_quantity':{
+            //editedSku.ingredient_quantity = updated_value;
+            break;
+          }
+          case 'comment':{
+            editedSku.comment = updated_value;
+            break;
+          }
+        }
+        this.crudSkuService.edit({
+            name : editedSku.name,
+            number : editedSku.id,
+            newnumber: newNumber,
+            case_upc : editedSku.case_upc,
+            unit_upc: editedSku.unit_upc,
+            size : editedSku.unit_size,
+            count: editedSku.count_per_case,
+            product_line : editedSku.product_line,
+            formula: editedSku.formula.name,
+            formula_scale_factor: editedSku.formula_scale_factor,
+            manufacturing_lines: editedSku.manufacturing_lines,
+            manufacturing_rate: editedSku.manufacturing_rate,
+            setup_cost: editedSku.setup_cost,
+            run_cost: editedSku.run_cost,
+            comment: editedSku.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
+          });
+        }
     }
 
     updateFormula(id:number, updated_value:Formula) {

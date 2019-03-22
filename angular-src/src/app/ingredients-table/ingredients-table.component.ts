@@ -86,66 +86,61 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, updated_value:any) {
-      var editedIngredient : Ingredient = new Ingredient();
-      var newName : string;
-      editedIngredient.name = name;
-      switch(property){
-        case 'name':{
-          newName = updated_value; //new name
-          break;
-        }
-        case 'id':{
-          editedIngredient.id = updated_value;
-          break;
-        }
-        case 'vendor_info':{
-          editedIngredient.vendor_info = updated_value;
-          break;
-        }
-        case 'package_size':{
-          var splitString = updated_value.match(/[a-z]+|[^a-z]+/gi);
-          if(splitString!=null && splitString.length == 2){
-            var size = splitString[0];
-            var unit = splitString[1];
-            console.log(unit);
-            console.log(size);
-            editedIngredient.unit = unit;
-            editedIngredient.package_size = size;
+      if(this.isAdmin()){
+        var editedIngredient : Ingredient = new Ingredient();
+        var newName : string;
+        editedIngredient.name = name;
+        switch(property){
+          case 'name':{
+            newName = updated_value; //new name
+            break;
           }
-          break;
-        }
-        case 'cost_per_package':{
-          editedIngredient.cost_per_package = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedIngredient.comment = updated_value;
-          break;
-        }
-      }
-      this.crudIngredientsService.edit({
-          name : editedIngredient.name,
-          newname: newName,
-          number : editedIngredient.id,
-          vendor_info : editedIngredient.vendor_info,
-          unit: editedIngredient.unit,
-          package_size: Number(editedIngredient.package_size),
-          cost : editedIngredient.cost_per_package*1,
-          comment : editedIngredient.comment
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
+          case 'id':{
+            editedIngredient.id = updated_value;
+            break;
           }
-          else{
-            this.handleError(response);
+          case 'vendor_info':{
+            editedIngredient.vendor_info = updated_value;
+            break;
           }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+          case 'package_size':{
+            editedIngredient.unit = updated_value.unit;
+            editedIngredient.package_size = updated_value.quantity;
+            break;
           }
+          case 'cost_per_package':{
+            editedIngredient.cost_per_package = updated_value;
+            break;
+          }
+          case 'comment':{
+            editedIngredient.comment = updated_value;
+            break;
+          }
+        }
+        this.crudIngredientsService.edit({
+            name : editedIngredient.name,
+            newname: newName,
+            number : editedIngredient.id,
+            vendor_info : editedIngredient.vendor_info,
+            unit: editedIngredient.unit,
+            package_size: Number(editedIngredient.package_size),
+            cost : editedIngredient.cost_per_package*1,
+            comment : editedIngredient.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
         });
+      }
     }
 
     private handleError(response){

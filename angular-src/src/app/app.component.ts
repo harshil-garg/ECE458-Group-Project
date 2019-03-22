@@ -18,4 +18,8 @@ export class AppComponent implements OnInit{
   ngOnInit() {
     this.titleService.setTitle(this.title);
   }
+
+  isAdmin() {
+    return this.authService.loginState.isAdmin;
+  }
 }

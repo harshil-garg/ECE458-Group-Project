@@ -8,14 +8,20 @@ import { ManufacturingGoal, SkuNameQuantity } from '../../../model/manufacturing
   templateUrl: './add-manufacturing-goal-dialog.component.html',
   styleUrls: ['./add-manufacturing-goal-dialog.component.css']
 })
-export class AddManufacturingGoalDialogComponent {
+export class AddManufacturingGoalDialogComponent implements OnInit {
 
   skuInput: any;
   quantityInput: any;
 
   constructor(
     public dialogRef: MatDialogRef<AddManufacturingGoalDialogComponent>,
-      @Inject(MAT_DIALOG_DATA) public manufGoal: ManufacturingGoal){this.manufGoal.sku_tuples = [];}
+      @Inject(MAT_DIALOG_DATA) public manufGoal: ManufacturingGoal){}
+
+    ngOnInit(){
+      this.manufGoal.sku_tuples = [];
+      this.manufGoal.name = "";
+      this.manufGoal.deadline = new Date();
+    }
 
     onNoClick(): void {
       this.dialogRef.close();

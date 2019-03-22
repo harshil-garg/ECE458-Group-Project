@@ -4,6 +4,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Tuple } from '../model/ingredient';
+import { Formula } from '../model/formula';
 
 export class FilterMessage {
 	sortBy : string;
@@ -32,7 +33,7 @@ export class FilterResponse {
 }
 
 export class AutocompleteResponse {
-	data : string[];
+	data : Formula[];
 }
 
 const httpOptions = {
@@ -52,9 +53,9 @@ export class FilterFormulaService {
 		console.log(filterMessage);
     return this.http.post<FilterResponse>('api/formulas/filter', filterMessage, httpOptions);
   }
-
-	//Autocomplete ingredients
+	
 	autocomplete(autocompleteMessage: AutocompleteMessage): Observable<AutocompleteResponse>{
-		return this.http.post<AutocompleteResponse>('api/ingredients/autocomplete', autocompleteMessage, httpOptions);
+		console.log(autocompleteMessage);
+		return this.http.post<AutocompleteResponse>('api/formulas/autocomplete', autocompleteMessage, httpOptions);
 	}
 }

@@ -16,7 +16,7 @@ export class UnitAutocompleteComponent implements OnInit {
       inputField : FormControl = new FormControl();
 
       @Input() initUnit : string;
-      @Output() messageEvent = new EventEmitter<string>();
+      @Output() messageEvent = new EventEmitter<any>();
 
       constructor() { }
 
@@ -43,12 +43,24 @@ export class UnitAutocompleteComponent implements OnInit {
       }
 
       onSelectionChanged(ev){
-        this.messageEvent.emit(ev.option.value);
+        var spliced = ev.option.value.match(/[a-z]+|[^a-z]+/gi);
+        var quantity = spliced[0];
+        var unit = spliced[1];
+        this.messageEvent.emit({
+          quantity: quantity,
+          unit: unit
+        });
       }
 
       onBlur(){
-        if(this.inputField.value.match(/[a-z]+|[^a-z]+/gi)!=null && this.inputField.value.match(/[a-z]+|[^a-z]+/gi).length==2){
-          this.messageEvent.emit(this.inputField.value);
+        var spliced = this.inputField.value.match(/[a-z]+|[^a-z]+/gi);
+        if(spliced!=null && spliced.length==2){
+          var quantity = spliced[0];
+          var unit = spliced[1];
+          this.messageEvent.emit({
+            quantity: quantity,
+            unit: unit
+          });
         }
       }
 

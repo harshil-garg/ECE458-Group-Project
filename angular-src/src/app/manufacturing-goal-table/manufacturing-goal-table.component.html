@@ -42,7 +42,7 @@
     <th mat-header-cell *matHeaderCellDef>SKUs</th>
     <td mat-cell *matCellDef="let element">
       <ng-container *ngFor="let sku of element.sku_tuples; let sku_id=index">
-        <a *ngIf="sku.sku!=null">{{sku.sku.name}} ({{sku.sku.number}}) : {{sku.case_quantity}}<br></a>
+        <a *ngIf="sku.sku!=undefined">{{sku.sku.name}} ({{sku.sku.number}}) : {{sku.case_quantity}}<br></a>
       </ng-container>
     </td>
   </ng-container>

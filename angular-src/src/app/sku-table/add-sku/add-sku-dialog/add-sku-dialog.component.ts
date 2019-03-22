@@ -24,14 +24,25 @@ export class AddSkuDialogComponent implements OnInit{
     public dialogRef: MatDialogRef<AddSkuDialogComponent>, private crudManufacturingLineService: CrudManufacturingLineService,
       @Inject(MAT_DIALOG_DATA) public sku: Sku)
       {
-        this.formula=new Formula();
-        this.formula.ingredient_tuples = [];
-        sku.formula = this.formula;
-        sku.formula_scale_factor = "1.0";
-        sku.manufacturing_lines = [];
       }
 
     ngOnInit(){
+      this.formula=new Formula();
+      this.formula.ingredient_tuples = [];
+      this.sku.id = undefined;
+      this.sku.name = "";
+      this.sku.case_upc = undefined;
+      this.sku.unit_upc = undefined;
+      this.sku.unit_size = "";
+      this.sku.count_per_case = undefined;
+      this.sku.product_line = "";
+      this.sku.formula = this.formula;
+      this.sku.formula_scale_factor = "1.0";
+      this.sku.manufacturing_lines = [];
+      this.sku.manufacturing_rate = "";
+      this.sku.setup_cost = undefined;
+      this.sku.run_cost = undefined;
+      this.sku.comment = "";
       this.crudManufacturingLineService.read({
           pageNum: -1,
           page_size: 0,

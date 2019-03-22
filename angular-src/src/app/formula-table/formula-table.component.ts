@@ -84,47 +84,49 @@ export class FormulaTableComponent implements OnInit{
     }
 
     edit(id:any, property:string, updated_value:any) {
-      var editedFormula : Formula = new Formula();
-      var newnumber : string;
-      editedFormula.number = id;
-      switch(property){
-        case 'name':{
-          editedFormula.name = updated_value; //new name
-          break;
-        }
-        case 'id':{
-          newnumber = updated_value;
-          break;
-        }
-        case 'tuple':{
-          editedFormula.ingredient_tuples = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedFormula.comment = updated_value;
-          break;
-        }
-      }
-      this.crudFormulaService.edit({
-          name : editedFormula.name,
-          number : editedFormula.number.toString(),
-          newnumber: newnumber,
-          ingredient_tuples: editedFormula.ingredient_tuples,
-          comment : editedFormula.comment
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
+      if(this.isAdmin()){
+        var editedFormula : Formula = new Formula();
+        var newnumber : string;
+        editedFormula.number = id;
+        switch(property){
+          case 'name':{
+            editedFormula.name = updated_value; //new name
+            break;
           }
-          else{
-            this.handleError(response);
+          case 'id':{
+            newnumber = updated_value;
+            break;
           }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+          case 'tuple':{
+            editedFormula.ingredient_tuples = updated_value;
+            break;
           }
-        });
+          case 'comment':{
+            editedFormula.comment = updated_value;
+            break;
+          }
+        }
+        this.crudFormulaService.edit({
+            name : editedFormula.name,
+            number : editedFormula.number.toString(),
+            newnumber: newnumber,
+            ingredient_tuples: editedFormula.ingredient_tuples,
+            comment : editedFormula.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
+          });
+        }
     }
 
     private handleError(response){

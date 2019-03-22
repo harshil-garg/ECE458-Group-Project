@@ -56,42 +56,44 @@ export class ManufacturingLineTableComponent implements OnInit{
     }
 
     edit(shortname:any, property:string, updated_value:any) {
-      var editedManufacturingLine : ManufacturingLine = new ManufacturingLine();
-      var newshortname : string;
-      editedManufacturingLine.shortname = shortname;
-      switch(property){
-        case 'name':{
-          editedManufacturingLine.name = updated_value; //new name
-          break;
-        }
-        case 'shortname':{
-          newshortname = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedManufacturingLine.comment = updated_value;
-          break;
-        }
-      }
-      this.crudManufacturingLineService.edit({
-          name : editedManufacturingLine.name,
-          shortname: editedManufacturingLine.shortname,
-          newshortname: newshortname,
-          comment: editedManufacturingLine.comment
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
+      if(this.isAdmin()){
+        var editedManufacturingLine : ManufacturingLine = new ManufacturingLine();
+        var newshortname : string;
+        editedManufacturingLine.shortname = shortname;
+        switch(property){
+          case 'name':{
+            editedManufacturingLine.name = updated_value; //new name
+            break;
           }
-          else{
-            this.handleError(response);
+          case 'shortname':{
+            newshortname = updated_value;
+            break;
           }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
-          };
-        });
+          case 'comment':{
+            editedManufacturingLine.comment = updated_value;
+            break;
+          }
+        }
+        this.crudManufacturingLineService.edit({
+            name : editedManufacturingLine.name,
+            shortname: editedManufacturingLine.shortname,
+            newshortname: newshortname,
+            comment: editedManufacturingLine.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            };
+          });
+        }
     }
 
     private handleError(response){
