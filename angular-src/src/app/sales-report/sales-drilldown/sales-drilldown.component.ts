@@ -15,8 +15,10 @@ export class SalesDrilldownComponent implements OnInit {
   // @Input() sku : Sku, customers: Array<any>
   display_name: string;
   customers: Array<any> = ['Walmart'];
+  start_date: Date = new Date();
+  end_date: Date = new Date();
   start: string;
-  end: string = new Date().toISOString();
+  end: string;
   stats: any = {};
 
   displayedColumns: string[] = ['year', 'week', 'customer number', 'customer name', 'sales', 'price', 'revenue'];
@@ -40,9 +42,11 @@ export class SalesDrilldownComponent implements OnInit {
       unit_size: "5 pounds",
       count_per_case: 30
     }
-    let date: Date = new Date();
-    date.setFullYear(date.getFullYear()-1);
-    this.start = date.toISOString();
+
+    this.start_date.setFullYear(this.start_date.getFullYear()-1);
+    this.start = this.start_date.toISOString();
+    this.end = this.end_date.toISOString();
+
 
     this.display_name = `${this.sku.name} : ${this.sku.unit_size} * ${this.sku.count_per_case} (${this.sku.id})`;
 
@@ -105,6 +109,12 @@ export class SalesDrilldownComponent implements OnInit {
       this.transpose();
       this.dataSource.data = this.recordList;
     }
+  }
+
+  refreshDate(){
+    this.start = this.start_date.toISOString();
+    this.end = this.end_date.toISOString();
+    this.refresh();
   }
 
 }
