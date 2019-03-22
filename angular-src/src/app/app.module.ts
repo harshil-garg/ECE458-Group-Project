@@ -49,6 +49,9 @@ import { AddFormulaComponent } from './formula-table/add-formula/add-formula.com
 import { AddFormulaDialogComponent } from './formula-table/add-formula/add-formula-dialog/add-formula-dialog.component';
 import { UnitAutocompleteComponent } from './ingredients-table/unit-autocomplete/unit-autocomplete.component';
 import { FormulaAutocompleteComponent } from './formula-table/formula-autocomplete/formula-autocomplete.component';
+import { SalesReportComponent } from './sales-report/sales-report.component';
+import { SalesSummaryComponent } from './sales-report/sales-summary/sales-summary.component';
+import { SalesDrilldownComponent } from './sales-report/sales-drilldown/sales-drilldown.component';
 
 const routes: Routes = [
   {
@@ -66,6 +69,7 @@ const routes: Routes = [
           { path: 'manufacturing-goals', component: ManufacturingGoalTableComponent },
           { path: 'manufacturing-lines', component: ManufacturingLineTableComponent },
           { path: 'manufacturing-schedule', component: ManufacturingScheduleDisplayComponent },
+          { path: 'sales-report', component: SalesReportComponent}
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -103,7 +107,10 @@ const routes: Routes = [
     AddFormulaComponent,
     AddFormulaDialogComponent,
     UnitAutocompleteComponent,
-    FormulaAutocompleteComponent
+    FormulaAutocompleteComponent,
+    SalesReportComponent,
+    SalesSummaryComponent,
+    SalesDrilldownComponent
   ],
   imports: [
     BrowserModule,
