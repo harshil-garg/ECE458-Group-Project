@@ -17,6 +17,7 @@ export class SalesReportComponent implements OnInit {
 
   summary_data = {};
   keys = [];
+  displayedColumns: string[] = ['number', 'name', 'size', 'count', 'summary', 'drilldown'];
 
   constructor(private salesReportService: SalesReportService, public dialog: MatDialog) { 
     this.product_lines = ["Salad"];
