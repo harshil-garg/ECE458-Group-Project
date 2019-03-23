@@ -32,10 +32,14 @@ export class SalesReportComponent implements OnInit {
     
   }
 
-  openDrilldown(){
+  openDrilldown(sku_number) {
+    console.log(sku_number);
     let dialogRef = this.dialog.open(SalesDrilldownComponent, {
       height: '800px',
-      width: '1000px'
+      width: '1000px',
+      data: {
+        sku_number: sku_number
+      }
     })
   }
 
