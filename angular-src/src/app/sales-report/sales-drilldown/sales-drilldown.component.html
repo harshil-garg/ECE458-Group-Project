@@ -89,6 +89,8 @@
   <tr mat-row *matRowDef="let row; columns: displayedSummaryColumns;"></tr>
 </table>
 
+<h2>Weekly Revenue Over Time</h2>
+<app-line-graph [recordList]="recordList"></app-line-graph>
 
 <canvas>
 

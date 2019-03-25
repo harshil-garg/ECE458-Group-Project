@@ -30,7 +30,7 @@ export class SalesDrilldownComponent implements OnInit {
   totalDocs: number;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  
+
   constructor(public salesReportService: SalesReportService, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {

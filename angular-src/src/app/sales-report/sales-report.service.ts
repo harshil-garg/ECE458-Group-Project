@@ -18,7 +18,7 @@ export class AutocompleteMessage {
 }
 
 export class AutocompleteResponse {
-	data : string[];
+	data : {name:string}[];
 }
 
 const httpOptions = {
@@ -49,5 +49,5 @@ export class SalesReportService {
   autocompleteCustomers(autocompleteMessage: AutocompleteMessage){
     return this.http.post<AutocompleteResponse>('api/customers/autocomplete', autocompleteMessage, httpOptions);
   }
-  
+
 }
