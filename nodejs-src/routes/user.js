@@ -3,7 +3,7 @@ const passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../model/user_model');
 const autocomplete = require('../controllers/autocomplete');
-
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 //Autcomplete
@@ -70,23 +70,6 @@ router.post('/register', (req,res) => {
     });
 
 })
-
-//Login handle
-//request params: email, password
-router.post('/login',
-    passport.authenticate('local'), (req, res) => {
-        let admin = false;
-        User.findOne({email: req.body.email}, (err, user) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                admin = user.admin;
-                res.json({success: true, message: "worked", admin: admin});
-            }
-            
-        });
-		
-	});
 
 router.post('/netid', (req, res) => {
     const {name, email} = req.body;

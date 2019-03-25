@@ -54,6 +54,8 @@ import { SalesReportComponent } from './sales-report/sales-report.component';
 import { SalesSummaryComponent } from './sales-report/sales-summary/sales-summary.component';
 import { SalesDrilldownComponent } from './sales-report/sales-drilldown/sales-drilldown.component';
 import { CustomerAutocompleteComponent } from './sales-report/customer-autocomplete/customer-autocomplete.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TokenInterceptor } from './token.interceptor';
 
 const routes: Routes = [
   {
@@ -162,7 +164,14 @@ const routes: Routes = [
     MatBadgeModule,
     MatTooltipModule
   ],
-  providers: [Title],
+  providers: [
+    Title, 
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
   entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, SalesSummaryComponent]
 })

@@ -20,6 +20,6 @@ export class AppComponent implements OnInit{
   }
 
   isAdmin() {
-    return this.authService.loginState.isAdmin;
+    return this.authService.isAdmin();
   }
 }

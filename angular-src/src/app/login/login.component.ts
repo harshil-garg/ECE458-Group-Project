@@ -16,6 +16,12 @@ export class LoginComponent implements OnInit {
 	constructor(private authenticationService: AuthenticationService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar) { }
 
 	ngOnInit() { 
+		if (this.authenticationService.isAuthenticated()) {
+			console.log('hellllll')
+			this.router.navigate(['dashboard']);
+			return;
+		}
+
 	    var url = this.route.snapshot.fragment;
 	    if (url && url.length > 10) {
 	        console.log(url);
@@ -74,8 +80,6 @@ export class LoginComponent implements OnInit {
 
 	private handleResponse(response: LoginResponse, email: string) {
 	    if (response.success) {
-	        this.authenticationService.loginState.loggedIn = true;
-	        this.authenticationService.loginState.isAdmin = response.admin;
           this.authenticationService.loginState.user = email;
 
 			this.loginError = false;
