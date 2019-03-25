@@ -125,7 +125,9 @@ export class LineGraphComponent implements OnInit, DoCheck {
         });
         dataArray.push(dateData);
       }
-      this.lineChartData.push({ data: dataArray, label: this.recordList[0].customer_name, spanGaps: true});
+      if(this.recordList!=null && this.recordList[0]!=null){
+        this.lineChartData.push({ data: dataArray, label: this.recordList[0].customer_name, spanGaps: true});
+      }
     }
   }
 

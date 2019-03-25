@@ -1,57 +1,98 @@
-<app-customer-autocomplete></app-customer-autocomplete>
+<mat-sidenav-container id="container" fullscreen>
+    <!-- product line sidebar -->
+    <mat-sidenav mode="side" opened>
+      <div>
+        <h2>Product Lines</h2>
+        <mat-card class="mat-elevation-z2">
+          <mat-card-content>
+            <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
+            <app-product-line-autocomplete (messageEvent)="refreshProductLines($event)"></app-product-line-autocomplete>
+          </mat-card-content>    
+          <mat-card-content>
+            <button mat-raised-button color="accent" (click)="addAllProductLines()">Add All</button>
+          </mat-card-content>
+               
+        </mat-card>
+        <br>
+        <mat-card class="elevation">
+          <mat-card-subtitle [style.color]="'black'">Selected Product Lines</mat-card-subtitle>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item class="right" *ngFor="let item of product_lines; let id=index">
+                {{item}} <mat-icon (click)="removeProductLine(id)">clear</mat-icon>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-sidenav>
+    <!-- main content -->
+    <mat-sidenav-content>
+      <h1>Sales Report</h1>
+      <!-- buttons and inputs -->
+      <div class="flex-box-space">
+        <div class="flex-item">
+          <button mat-raised-button color="accent">Export to CSV</button>
+        </div>
+        <div class="flex-item">
+          <app-customer-autocomplete [initCustomer] = "all" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
+        </div>
+      </div>
+      <!-- content -->
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let product_line of keys">
+          <mat-expansion-panel-header>
+            {{product_line}}
+          </mat-expansion-panel-header>
+      
+          <!--- SKU info -- 2 buttons -->
+          <table mat-table [dataSource]="summary_data[product_line]" class="mat-elevation-z8">
+      
+            <!--- Note that these columns can be defined in any order.
+                  The actual rendered columns are set as a property on the row definition" -->
+          
+            <!-- Position Column -->
+            <ng-container matColumnDef="number">
+              <th mat-header-cell *matHeaderCellDef class="centre">SKU number</th>
+              <td mat-cell *matCellDef="let element">{{element.sku.number}}</td>
+            </ng-container>
+          
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef class="centre">Name</th>
+              <td mat-cell *matCellDef="let element">{{element.sku.name}}</td>
+            </ng-container>
+          
+            <!-- Weight Column -->
+            <ng-container matColumnDef="size">
+              <th mat-header-cell *matHeaderCellDef class="centre">Size</th>
+              <td mat-cell *matCellDef="let element">{{element.sku.size}}</td>
+            </ng-container>
+          
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="count">
+              <th mat-header-cell *matHeaderCellDef class="centre">Count</th>
+              <td mat-cell *matCellDef="let element">{{element.sku.count}}</td>
+            </ng-container>
+      
+            <ng-container matColumnDef="summary">
+              <th mat-header-cell *matHeaderCellDef class="centre">Summary</th>
+              <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" [disabled]="!element.success">Summary</button></td>
+            </ng-container>
+      
+            <ng-container matColumnDef="drilldown">
+              <th mat-header-cell *matHeaderCellDef class="centre">Drilldown</th>
+              <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" (click)="openDrilldown(element.sku)" [disabled]="!element.success">Drilldown</button></td>
+            </ng-container>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+      
+        </mat-expansion-panel>
+      
+      </mat-accordion>
+          
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 
-<button (click)="getSummary()">Hello, click me and wait 5 secs</button>
-<mat-accordion>
-
-  <mat-expansion-panel *ngFor="let product_line of keys">
-    <mat-expansion-panel-header>
-      {{product_line}}
-    </mat-expansion-panel-header>
-
-    <!--- SKU info -- 2 buttons -->
-    <table mat-table [dataSource]="summary_data[product_line]" class="mat-elevation-z8">
-
-      <!--- Note that these columns can be defined in any order.
-            The actual rendered columns are set as a property on the row definition" -->
-    
-      <!-- Position Column -->
-      <ng-container matColumnDef="number">
-        <th mat-header-cell *matHeaderCellDef class="centre">SKU number</th>
-        <td mat-cell *matCellDef="let element">{{element.sku.number}}</td>
-      </ng-container>
-    
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef class="centre">Name</th>
-        <td mat-cell *matCellDef="let element">{{element.sku.name}}</td>
-      </ng-container>
-    
-      <!-- Weight Column -->
-      <ng-container matColumnDef="size">
-        <th mat-header-cell *matHeaderCellDef class="centre">Size</th>
-        <td mat-cell *matCellDef="let element">{{element.sku.size}}</td>
-      </ng-container>
-    
-      <!-- Symbol Column -->
-      <ng-container matColumnDef="count">
-        <th mat-header-cell *matHeaderCellDef class="centre">Count</th>
-        <td mat-cell *matCellDef="let element">{{element.sku.count}}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="summary">
-        <th mat-header-cell *matHeaderCellDef class="centre">Summary</th>
-        <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" [disabled]="!element.success">Summary</button></td>
-      </ng-container>
-
-      <ng-container matColumnDef="drilldown">
-        <th mat-header-cell *matHeaderCellDef class="centre">Drilldown</th>
-        <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" (click)="openDrilldown(element.sku.number)" [disabled]="!element.success">Drilldown</button></td>
-      </ng-container>
-    
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-  </mat-expansion-panel>
-
-</mat-accordion>

@@ -12,11 +12,13 @@ import { SalesReportService, DrilldownRequest } from '../sales-report.service';
 export class SalesDrilldownComponent implements OnInit {
   recordList: Array<SalesRecord> = [];
   sku: any;
-  // @Input() sku : Sku, customers: Array<any>
+  // @Input() sku : Sku
+  // @Input() customers: Array<any>
   display_name: string;
-  customers: Array<any> = ['Walmart'];
-  start: string;
-  end: string = new Date().toISOString();
+  selected_customer: string;
+  customers: Array<any> = [];
+  start_date: Date = new Date();
+  end_date: Date = new Date();
   stats: any = {};
 
   displayedColumns: string[] = ['year', 'week', 'customer number', 'customer name', 'sales', 'price', 'revenue'];
@@ -34,22 +36,18 @@ export class SalesDrilldownComponent implements OnInit {
   constructor(public salesReportService: SalesReportService, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
-    this.sku = {
-      name: "Burger_Beef",
-      id: this.data.sku_number,
-      unit_size: "5 pounds",
-      count_per_case: 30
-    }
-    let date: Date = new Date();
-    date.setFullYear(date.getFullYear()-1);
-    this.start = date.toISOString();
+    this.sku = this.data.sku;
+    this.customers = this.data.customers;
+    this.selected_customer = "all";
 
-    this.display_name = `${this.sku.name} : ${this.sku.unit_size} * ${this.sku.count_per_case} (${this.sku.id})`;
+    this.start_date.setFullYear(this.start_date.getFullYear()-1);
 
+    this.display_name = `${this.sku.name} : ${this.sku.size} * ${this.sku.count} (${this.sku.number})`;
 
     this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;
     this.paginator.page.subscribe(x => this.refresh());
+    this.dataSource.paginator = this.paginator;
     this.refresh();
   }
 
@@ -67,10 +65,10 @@ export class SalesDrilldownComponent implements OnInit {
 
   refresh(){
     let request = {
-      sku_number: this.sku.id,
+      sku_number: this.sku.number,
       customers: this.customers,
-      start: this.start,
-      end: this.end
+      start: this.start_date.toISOString(),
+      end: this.end_date.toISOString()
     }
 
     this.salesReportService.getDrilldown(request).subscribe((response) => {
@@ -101,6 +99,28 @@ export class SalesDrilldownComponent implements OnInit {
       this.stats = response.summary;
       this.transpose();
       this.dataSource.data = this.recordList;
+    }
+  }
+
+  initCustomer(){
+    return (this.customers.length > 1) ? 'all' : this.customers[0];
+  }
+
+  refreshCustomer(customer){
+    console.log(customer)
+    this.selected_customer = customer;
+    if(customer == 'all'){
+      this.salesReportService.allCustomers().subscribe((response) => {
+        let customer_objs = response.data;
+        this.customers = [];
+        for(let obj of customer_objs){
+          this.customers.push(obj.name);
+        }
+        this.refresh();
+      });
+    }else{
+      this.customers = [customer];
+      this.refresh();
     }
   }
 

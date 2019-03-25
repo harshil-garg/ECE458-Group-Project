@@ -6,3 +6,21 @@ table {
 .centre {
     text-align: center;
 }
+
+.example-container {
+    height: 100%;
+    width: 200px;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+#container {
+    top: 64px !important;
+}
+
+@media(max-width: 599px) {
+    #container {
+    top: 56px !important;
+    }
+}

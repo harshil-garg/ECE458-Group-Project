@@ -18,7 +18,8 @@ export class AutocompleteMessage {
 }
 
 export class AutocompleteResponse {
-	data : {name:string}[];
+	// data : {name:string}[];
+	data : any[];
 }
 
 const httpOptions = {
@@ -50,4 +51,7 @@ export class SalesReportService {
     return this.http.post<AutocompleteResponse>('api/customers/autocomplete', autocompleteMessage, httpOptions);
   }
 
+  allCustomers(){
+    return this.http.post<AutocompleteResponse>('api/customers/all', {}, httpOptions);
+  }
 }

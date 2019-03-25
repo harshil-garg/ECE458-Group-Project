@@ -19,6 +19,11 @@ router.post('/autocomplete', async (req, res) => {
     res.json({success: true, data: results});
 });
 
+router.post('/all', async (req, res) => {
+    let results = await Customer.find({}).exec();
+    res.json({success: true, data: results});
+});
+
 //process customer page and save to db
 async function process(response){
     let lines = response.match(/[^\r\n]+/g);

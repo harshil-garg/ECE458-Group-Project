@@ -3,13 +3,13 @@
   <!-- export -->
   <button mat-raised-button color="accent">Export to CSV</button>
   <!-- customer picker -->
-  <app-customer-autocomplete></app-customer-autocomplete>
+  <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
   <!-- start and end date picker -->
   <div class="flex-box-end">
     <div class="flex-item">
       <mat-form-field class=small-input>
         <mat-label>Start date</mat-label>
-        <input matInput [matDatepicker]="picker" placeholder="Choose a date">
+        <input matInput [matDatepicker]="picker" [(ngModel)]="start_date" (ngModelChange)="refresh()" placeholder="Choose a date">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -17,7 +17,7 @@
     <div class="flex-item">
       <mat-form-field class=small-input>
         <mat-label>End date</mat-label>
-        <input matInput [matDatepicker]="picker2" placeholder="Choose a date">
+        <input matInput [matDatepicker]="picker2" [(ngModel)]="end_date" (ngModelChange)="refresh()" placeholder="Choose a date">
         <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
         <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
@@ -89,8 +89,8 @@
   <tr mat-row *matRowDef="let row; columns: displayedSummaryColumns;"></tr>
 </table>
 
-<h2>Weekly Revenue Over Time</h2>
-<app-line-graph [recordList]="recordList"></app-line-graph>
+<h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
+<app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>
 
 <canvas>
 
