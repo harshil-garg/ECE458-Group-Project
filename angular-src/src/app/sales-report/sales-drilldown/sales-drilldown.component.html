@@ -3,7 +3,7 @@
   <!-- export -->
   <button mat-raised-button color="accent">Export to CSV</button>
   <!-- customer picker -->
-  <app-customer-autocomplete></app-customer-autocomplete>
+  <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
   <!-- start and end date picker -->
   <div class="flex-box-end">
     <div class="flex-item">

@@ -100,4 +100,25 @@ export class SalesDrilldownComponent implements OnInit {
     }
   }
 
+  initCustomer(){
+    return (this.customers.length > 1) ? 'all' : this.customers[0];
+  }
+
+  refreshCustomer(customer){
+    console.log(customer)
+    if(customer == 'all'){
+      this.salesReportService.allCustomers().subscribe((response) => {
+        let customer_objs = response.data;
+        this.customers = [];
+        for(let obj of customer_objs){
+          this.customers.push(obj.name);
+        }
+        this.refresh();
+      });
+    }else{
+      this.customers = [customer];
+      this.refresh();
+    }
+  }
+
 }

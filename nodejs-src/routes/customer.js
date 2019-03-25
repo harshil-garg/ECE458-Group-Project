@@ -22,7 +22,7 @@ router.post('/autocomplete', async (req, res) => {
 router.post('/all', async (req, res) => {
     let results = await Customer.find({}).exec();
     res.json({success: true, data: results});
-})
+});
 
 //process customer page and save to db
 async function process(response){

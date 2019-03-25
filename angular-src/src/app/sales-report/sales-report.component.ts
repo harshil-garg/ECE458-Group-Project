@@ -14,6 +14,7 @@ export class SalesReportComponent implements OnInit {
 
   product_lines = [];
   customers = [];
+  all = "all";
 
   summary_data = {};
   keys = [];
@@ -21,12 +22,20 @@ export class SalesReportComponent implements OnInit {
 
   constructor(private salesReportService: SalesReportService, public dialog: MatDialog) { 
     this.product_lines = ["Salad"];
-    this.customers = ["SuperTarget"];
   }
 
   ngOnInit() {
-  
+    this.salesReportService.allCustomers().subscribe((response) => {
+      let customer_objs = response.data;
+      console.log(response.data)
+      this.customers = [];
+      for(let obj of customer_objs){
+        this.customers.push(obj.name);
+      }
+    });
+    this.getSummary();
   }
+
 
   openSummary() {
     
@@ -65,5 +74,20 @@ export class SalesReportComponent implements OnInit {
     // TODO @Jesse Yue / Jimmy Shackford
           // Display snackbar dialog claiming that the data is not available. Please wait a few seconds
           // to try again. Perhaps we can set an interval to try to auto run this method in a few seconds.
+  }
+
+  refreshCustomer(customer){
+    if(customer == 'all'){
+      this.salesReportService.allCustomers().subscribe((response) => {
+        let customer_objs = response.data;
+        this.customers = [];
+        for(let obj of customer_objs){
+          this.customers.push(obj.name);
+        }
+      });
+    }else{
+      this.customers = [customer];
+    }
+    this.getSummary();
   }
 }
