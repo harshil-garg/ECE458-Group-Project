@@ -1,22 +1,44 @@
-<div class="flex-box-space">
-  <div class="flex-item">
-    <button mat-raised-button color="accent">Export to CSV</button>
-  </div>
-  <div class="flex-item">
-    <app-customer-autocomplete [initCustomer] = "all" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
-  </div>
-</div>
-
-<mat-sidenav-container>
+<mat-sidenav-container id="container" fullscreen>
     <!-- product line sidebar -->
     <mat-sidenav mode="side" opened>
-      <div class="example-container">
+      <div>
         <h2>Product Lines</h2>
-        <app-product-line-autocomplete></app-product-line-autocomplete>
+        <mat-card class="mat-elevation-z2">
+          <mat-card-content>
+            <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
+            <app-product-line-autocomplete (messageEvent)="refreshProductLines($event)"></app-product-line-autocomplete>
+          </mat-card-content>    
+          <mat-card-content>
+            <button mat-raised-button color="accent" (click)="addAllProductLines()">Add All</button>
+          </mat-card-content>
+               
+        </mat-card>
+        <br>
+        <mat-card class="elevation">
+          <mat-card-subtitle [style.color]="'black'">Selected Product Lines</mat-card-subtitle>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item class="right" *ngFor="let item of product_lines; let id=index">
+                {{item}} <mat-icon (click)="removeProductLine(id)">clear</mat-icon>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
       </div>
     </mat-sidenav>
     <!-- main content -->
     <mat-sidenav-content>
+      <h1>Sales Report</h1>
+      <!-- buttons and inputs -->
+      <div class="flex-box-space">
+        <div class="flex-item">
+          <button mat-raised-button color="accent">Export to CSV</button>
+        </div>
+        <div class="flex-item">
+          <app-customer-autocomplete [initCustomer] = "all" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
+        </div>
+      </div>
+      <!-- content -->
       <mat-accordion>
         <mat-expansion-panel *ngFor="let product_line of keys">
           <mat-expansion-panel-header>

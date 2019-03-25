@@ -13,7 +13,7 @@ export class ProductLineAutocompleteComponent implements OnInit {
   inputField : FormControl = new FormControl();
 
   @Input() initProductLine : string;
-  @Output() messageEvent = new EventEmitter<string>();
+  @Output() messageEvent = new EventEmitter<any>();
 
   constructor(public productLineService: CrudProductLineService) { }
 
@@ -28,6 +28,7 @@ export class ProductLineAutocompleteComponent implements OnInit {
     .subscribe((result) => {
       if(result!=null && result.data!=null){
         for(let line of result.data){
+          this.suggestedProductLines = [];
           this.suggestedProductLines.push(line.name);
         }
       }
