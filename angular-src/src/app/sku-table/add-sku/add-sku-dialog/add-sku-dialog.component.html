@@ -26,8 +26,9 @@
         <div [hidden]="count_per_case.valid || count_per_case.pristine" class="alert alert-danger">Count Per Case is required</div>
 
         <label for="product_line">Product Line</label>
-        <input type="text" min="0" class="form-control" id="product_line" required [(ngModel)]="sku.product_line" name="product_line" #product_line="ngModel">
-        <div [hidden]="product_line.valid || product_line.pristine" class="alert alert-danger">Product Line is required</div>
+        <app-product-line-autocomplete (messageEvent)="updateProductLine($event)"></app-product-line-autocomplete>
+        <!-- <input type="text" min="0" class="form-control" id="product_line" required [(ngModel)]="sku.product_line" name="product_line" #product_line="ngModel"> -->
+        <!-- <div [hidden]="product_line.valid || product_line.pristine" class="alert alert-danger">Product Line is required</div> -->
 
         <label for="formula">Formula</label>
         <mat-accordion>

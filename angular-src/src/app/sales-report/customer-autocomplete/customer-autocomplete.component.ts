@@ -29,7 +29,6 @@ export class CustomerAutocompleteComponent implements OnInit {
               this.suggestedCustomers.push(customer.name)
           }
          }
-         this.suggestedCustomers.slice(0,10)
     });
   }
 

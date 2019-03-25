@@ -1,3 +1,8 @@
-<p>
-  product-line-autocomplete works!
-</p>
+<mat-form-field style="width: 200px;">
+  <input type="text" placeholder="ProductLine" matInput (click)="stopPropagation($event)" [formControl]="inputField" [matAutocomplete]="auto">
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+    <mat-option *ngFor="let line of suggestedProductLines" [value]="line">
+      {{line}}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

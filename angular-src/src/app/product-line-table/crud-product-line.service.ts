@@ -55,7 +55,7 @@ export class AutocompleteMessage {
 }
 
 export class AutocompleteResponse {
-	data : string[];
+	data : any[];
 }
 
 const httpOptions = {

@@ -112,4 +112,8 @@ export class AddSkuDialogComponent implements OnInit{
       this.formula.ingredient_tuples.splice(ingr_id, 1);
     }
 
+    updateProductLine(line){
+      this.sku.product_line = line;
+    }
+
 }
