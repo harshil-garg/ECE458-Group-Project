@@ -21,7 +21,7 @@ export class SalesReportComponent implements OnInit {
 
   constructor(private salesReportService: SalesReportService, public dialog: MatDialog) { 
     this.product_lines = ["Salad"];
-    this.customers = ["SuperTarget", "Meijer"];
+    this.customers = ["SuperTarget"];
   }
 
   ngOnInit() {
@@ -32,13 +32,14 @@ export class SalesReportComponent implements OnInit {
     
   }
 
-  openDrilldown(sku_number) {
-    console.log(sku_number);
+  openDrilldown(sku) {
+    console.log(sku);
     let dialogRef = this.dialog.open(SalesDrilldownComponent, {
       height: '800px',
       width: '1000px',
       data: {
-        sku_number: sku_number
+        sku: sku,
+        customers: this.customers
       }
     })
   }

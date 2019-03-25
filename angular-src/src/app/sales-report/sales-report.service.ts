@@ -49,5 +49,9 @@ export class SalesReportService {
   autocompleteCustomers(autocompleteMessage: AutocompleteMessage){
     return this.http.post<AutocompleteResponse>('api/customers/autocomplete', autocompleteMessage, httpOptions);
   }
+
+  allCustomers(){
+    return this.http.post<AutocompleteResponse>('api/customers/all', {}, httpOptions);
+  }
   
 }
