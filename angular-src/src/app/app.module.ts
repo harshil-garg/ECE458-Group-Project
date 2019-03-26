@@ -169,7 +169,7 @@ const routes: Routes = [
     ChartsModule
   ],
   providers: [
-    Title, 
+    Title,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

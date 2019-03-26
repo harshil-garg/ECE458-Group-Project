@@ -36,6 +36,7 @@ export class FormulaTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
 
@@ -84,7 +85,7 @@ export class FormulaTableComponent implements OnInit{
     }
 
     edit(id:any, property:string, updated_value:any) {
-      if(this.isAdmin()){
+      if(this.isEditable()){
         var editedFormula : Formula = new Formula();
         var newnumber : string;
         editedFormula.number = id;
@@ -135,7 +136,7 @@ export class FormulaTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh for edits
       //this.refresh();
     }
@@ -215,6 +216,10 @@ export class FormulaTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 
 }

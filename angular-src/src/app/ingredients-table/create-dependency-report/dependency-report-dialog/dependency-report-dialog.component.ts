@@ -1,15 +1,58 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { FilterIngredientsService } from '../../filter-ingredients.service'
 
 @Component({
   selector: 'app-dependency-report-dialog',
   templateUrl: './dependency-report-dialog.component.html',
   styleUrls: ['./dependency-report-dialog.component.css']
 })
-export class DependencyReportDialogComponent {
+export class DependencyReportDialogComponent implements OnInit {
 
-  constructor(public dialogRef: MatDialogRef<DependencyReportDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public ingredientList: Array<any>) { }
+  ingredientList: Array<any> = [];
+  loadingResults: boolean;
+
+  constructor(public dialogRef: MatDialogRef<DependencyReportDialogComponent>, public filterIngredientsService: FilterIngredientsService,
+    @Inject(MAT_DIALOG_DATA) public inputData: {sortBy: string, keywords: Array<any>, skus: Array<any>}) { }
+
+    ngOnInit(){
+      this.ingredientList = [];
+      this.loadingResults = true;
+      this.filterIngredientsService.filter({
+          sortBy : this.inputData.sortBy,
+          pageNum: '-1',
+          page_size: 0,
+          keywords: this.inputData.keywords,
+          skus : this.inputData.skus
+        }).subscribe(
+        response => this.handleRefreshResponse(response),
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleRefreshResponse(response){
+      console.log("RESPONSE:");
+      console.log(response);
+      this.loadingResults = false;
+      if(response.success){
+        this.ingredientList = [];
+        for(let ingredient of response.data){
+          this.ingredientList.push({
+              id: ingredient.number,
+              name: ingredient.name,
+              vendor_info: ingredient.vendor_info,
+              package_size: ingredient.package_size,
+              cost_per_package: ingredient.cost,
+              skus: ingredient.skus,
+              comment: ingredient.comment
+          });
+        }
+      }
+    }
 
     onNoClick(): void {
       this.dialogRef.close();

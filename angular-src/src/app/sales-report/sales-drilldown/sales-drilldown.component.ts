@@ -28,6 +28,7 @@ export class SalesDrilldownComponent implements OnInit {
   summaryColumns: string[] = ['total_revenue', 'manufacturing_run_size', 'ingredient_cost_per_case', 'manufacturing_setup_cost_per_case', 'manufacturing_run_cost_per_case', 'cogs_per_case', 'revenue_per_case', 'profit_per_case', 'profit_margin']
   summarySource: MatTableDataSource<any>;
   displayedSummaryColumns: string[] = ['stat', 'value'];
+  loadingResults: boolean = false;
 
   totalDocs: number;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -64,6 +65,7 @@ export class SalesDrilldownComponent implements OnInit {
   }
 
   refresh(){
+    this.loadingResults = true;
     let request = {
       sku_number: this.sku.number,
       customers: this.customers,
@@ -99,6 +101,7 @@ export class SalesDrilldownComponent implements OnInit {
       this.stats = response.summary;
       this.transpose();
       this.dataSource.data = this.recordList;
+      this.loadingResults = false;
     }
   }
 
