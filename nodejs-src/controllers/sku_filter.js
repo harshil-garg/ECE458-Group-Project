@@ -51,7 +51,7 @@ module.exports.filter = async function(pageNum, sortBy, page_size, keywords, ing
     {$unwind: '$product_line'},
     {$addFields: {product_line: '$product_line.name'}});
     if(product_lines.length > 0){
-        pipeline.push({$match: {'product_line.name': {$all: product_lines}}});   
+        pipeline.push({$match: {'product_line': {$all: product_lines}}});   
     }
     pipeline.push({
         $lookup: {

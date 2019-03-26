@@ -98,9 +98,11 @@
   <ng-container matColumnDef="product_line">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Line</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #product_line matInput placeholder="Product Line" [readonly]="!isAdmin()" [value]="element.product_line" (blur)="edit(element.id, 'product_line', product_line.value)" required>
-      </mat-form-field>
+      <!-- <mat-form-field floatLabel="never" class="input-flex-width"> -->
+        <!-- <input #product_line matInput placeholder="Product Line" [readonly]="!isAdmin()" [value]="element.product_line" (blur)="edit(element.id, 'product_line', product_line.value)" required> -->
+        <app-product-line-autocomplete *ngIf="isAdmin()" [initProductLine]="element.product_line" (messageEvent)="edit(element.id, 'product_line', $event)"></app-product-line-autocomplete>
+        <ng-container *ngIf="!isAdmin()">{{element.product_line}}</ng-container>
+      <!-- </mat-form-field> -->
     </td>
   </ng-container>
 
