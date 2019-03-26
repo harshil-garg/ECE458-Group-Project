@@ -106,7 +106,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     }
 
     isAdmin() {
-      return this.authenticationService.loginState.isAdmin;
+      return this.authenticationService.isAdmin();
     }
 
     refresh(){
