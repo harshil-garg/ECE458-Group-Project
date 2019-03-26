@@ -32,9 +32,6 @@
       <!-- buttons and inputs -->
       <div class="flex-box-space">
         <div class="flex-item">
-          <button mat-raised-button color="accent">Export to CSV</button>
-        </div>
-        <div class="flex-item">
           <app-customer-autocomplete [initCustomer] = "all" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
         </div>
       </div>
