@@ -34,6 +34,9 @@
         <div class="flex-item">
           <app-customer-autocomplete [initCustomer] = "all" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
         </div>
+        <div class="flex-item">
+          <button mat-raised-button color="accent" (click)="flush()">Flush Cache</button>
+        </div>
       </div>
       <!-- content -->
       <mat-accordion>

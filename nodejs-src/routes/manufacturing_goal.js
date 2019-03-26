@@ -11,14 +11,16 @@ const validator = require('../controllers/validator');
 const unit = require('../controllers/units');
 const utils = require('../utils/utils');
 const manufacturing_goal_filter = require('../controllers/manufacturing_goal_filter');
+const jwtDecode = require('jwt-decode');
 
 
 function getUser(req){
-    if(!req.user){
-        return;
-    }else {
-        return req.user.email;
-    }
+    let jwt = req.headers.authorization
+    let payload = jwt.split(' ')[1]
+    let decoded = jwtDecode(payload)
+
+    return decoded.email;
+    
 }
 
 router.post('/calculator', async (req, res) => {

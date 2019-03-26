@@ -114,4 +114,10 @@ export class SalesReportComponent implements OnInit {
       this.refresh();
     })
   }
+
+  flush(){
+    this.salesReportService.doFlush().subscribe((response) => {
+      this.refresh();
+    })
+  }
 }

@@ -25,8 +25,10 @@ module.exports.nameOrNumber = async (model, input) => {
     await cursor.eachAsync((sku) => {
         results.push(sku);
     });
+    if(model.modelName == 'Formula'){
+        populateIngredients(results);
+    }
 
-    populateIngredients(results);
 
     return results;
 }
