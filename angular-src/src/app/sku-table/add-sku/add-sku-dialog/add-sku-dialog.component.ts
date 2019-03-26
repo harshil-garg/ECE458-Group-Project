@@ -84,7 +84,7 @@ export class AddSkuDialogComponent implements OnInit{
       this.dialogRef.close();
     }
 
-    submit(skuFormValue): void {
+    submit(): void {
       this.dialogRef.close();
       // if (this.skuForm.valid) {
       //   let sku = {
