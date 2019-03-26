@@ -22,7 +22,7 @@ const Unit = require('../controllers/units');
 
 // Variables (explained more in depth in functions)
 var queue = new Queue();
-var cache = new LRUCache(100);
+var cache = new LRUCache(1000);
 
 /****************************************************************************************************
  * ROUTES / APIs
