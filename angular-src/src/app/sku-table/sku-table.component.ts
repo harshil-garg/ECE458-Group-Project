@@ -29,6 +29,7 @@ export class SkuTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
 
@@ -73,7 +74,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     edit(num:any, property:string, updated_value:any) {
-      if(this.isAdmin()){
+      if(this.isEditable()){
         var editedSku : Sku = new Sku();
         var formula : Formula = new Formula();
         editedSku.formula = formula;
@@ -237,7 +238,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     private handleResponse(response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh b/c deselects focused item
       //this.refresh();
     }
@@ -417,6 +418,9 @@ export class SkuTableComponent implements OnInit{
           this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
+    }
 
 }
 //

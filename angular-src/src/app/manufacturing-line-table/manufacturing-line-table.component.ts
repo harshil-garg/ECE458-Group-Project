@@ -19,6 +19,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
@@ -56,7 +57,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     }
 
     edit(shortname:any, property:string, updated_value:any) {
-      if(this.isAdmin()){
+      if(this.isEditable()){
         var editedManufacturingLine : ManufacturingLine = new ManufacturingLine();
         var newshortname : string;
         editedManufacturingLine.shortname = shortname;
@@ -102,7 +103,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
     }
 
     isAdmin() {
@@ -154,5 +155,9 @@ export class ManufacturingLineTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 }

@@ -3,8 +3,11 @@
     <app-search-ingredient class="search"></app-search-ingredient>
     <br style="clear:both" />
 </div>
+<div *ngIf="isAdmin()" align="center">
+  <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
+</div>
 <div class="button-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <app-add-ingredient class="add" *ngIf="isAdmin()"></app-add-ingredient>
   <app-create-dependency-report class="dependency" [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
   <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
@@ -38,7 +41,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-			  <input #name matInput placeholder="Name" [readonly]="!isAdmin()" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
+			  <input #name matInput placeholder="Name" [readonly]="!isEditable()" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
 			</mat-form-field>
     </td>
   </ng-container>
@@ -48,7 +51,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Ingr#</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <input #number matInput placeholder="Number" [readonly]="!isAdmin()" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
+        <input #number matInput placeholder="Number" [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -58,7 +61,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Vendor Info</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #vendor_info matInput placeholder="Vendor Info" [readonly]="!isAdmin()" [value]="element.vendor_info" (blur)="edit(element.name, 'vendor_info', vendor_info.value)" optional></textarea>
+        <textarea #vendor_info matInput placeholder="Vendor Info" [readonly]="!isEditable()" [value]="element.vendor_info" (blur)="edit(element.name, 'vendor_info', vendor_info.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>
@@ -67,8 +70,8 @@
   <ng-container matColumnDef="package_size">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Package Size</th>
     <td mat-cell *matCellDef="let element">
-      <app-unit-autocomplete *ngIf="isAdmin()" [initUnit]="element.package_size + element.unit" (messageEvent)="edit(element.name, 'package_size', $event)"></app-unit-autocomplete>
-      <ng-container *ngIf="!isAdmin()">
+      <app-unit-autocomplete *ngIf="isEditable()" [initUnit]="element.package_size + element.unit" (messageEvent)="edit(element.name, 'package_size', $event)"></app-unit-autocomplete>
+      <ng-container *ngIf="!isEditable()">
         {{element.package_size}}{{element.unit}}
       </ng-container>
     </td>
@@ -79,7 +82,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Cost Per Package</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <input #cost_per_package matInput placeholder="Cost Per Package" [readonly]="!isAdmin()" [value]="element.cost_per_package" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value)" required>
+        <input #cost_per_package matInput placeholder="Cost Per Package" [readonly]="!isEditable()" [value]="element.cost_per_package" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -89,7 +92,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #comment matInput placeholder="Comment" [readonly]="!isAdmin()" [value]="element.comment" (blur)="edit(element.name, 'comment', comment.value)" optional></textarea>
+        <textarea #comment matInput placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.name, 'comment', comment.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>

@@ -3,8 +3,11 @@
     <app-search-sku class="search"></app-search-sku>
     <br style="clear:both" />
 </div>
+<div *ngIf="isAdmin()" align="center">
+  <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
+</div>
 <div class="button-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <app-bulk-sku-edit *ngIf="isAdmin()" [selectedSkus]="selection.selected"></app-bulk-sku-edit>
   <app-add-sku class="add" *ngIf="isAdmin()"></app-add-sku>
   <button mat-raised-button="export_skus" class="export_skus" type="button" (click)="exportSkus()" color="accent">Export SKUs</button>
@@ -39,7 +42,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-			  <input #name matInput class = "padded-input" [readonly]="!isAdmin()" placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
+			  <input #name matInput class = "padded-input" [readonly]="!isEditable()" placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
 			</mat-form-field>
     </td>
   </ng-container>
@@ -49,7 +52,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #number matInput placeholder="Number" [readonly]="!isAdmin()" [value]="element.id" (blur)="edit(element.id, 'id', number.value)" optional>
+        <input #number matInput placeholder="Number" [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.id, 'id', number.value)" optional>
       </mat-form-field>
     </td>
   </ng-container>
@@ -59,7 +62,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Case UPC Number</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #case_upc matInput placeholder="Case UPC" [readonly]="!isAdmin()" [value]="element.case_upc" (blur)="edit(element.id, 'case_upc', case_upc.value)" required>
+        <input #case_upc matInput placeholder="Case UPC" [readonly]="!isEditable()" [value]="element.case_upc" (blur)="edit(element.id, 'case_upc', case_upc.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -69,7 +72,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit UPC Number</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #unit_upc matInput placeholder="Unit UPC" [readonly]="!isAdmin()" [value]="element.unit_upc" (blur)="edit(element.id, 'unit_upc', unit_upc.value)" required>
+        <input #unit_upc matInput placeholder="Unit UPC" [readonly]="!isEditable()" [value]="element.unit_upc" (blur)="edit(element.id, 'unit_upc', unit_upc.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -79,7 +82,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit Size</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #unit_size matInput placeholder="Unit Size" [readonly]="!isAdmin()" [value]="element.unit_size" (blur)="edit(element.id, 'unit_size', unit_size.value)" required>
+        <input #unit_size matInput placeholder="Unit Size" [readonly]="!isEditable()" [value]="element.unit_size" (blur)="edit(element.id, 'unit_size', unit_size.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -89,7 +92,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Count Per Case</th>
     <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #count_per_case matInput placeholder="Count Per Case" [readonly]="!isAdmin()" [value]="element.count_per_case" (blur)="edit(element.id, 'count_per_case', count_per_case.value)" required>
+        <input #count_per_case matInput placeholder="Count Per Case" [readonly]="!isEditable()" [value]="element.count_per_case" (blur)="edit(element.id, 'count_per_case', count_per_case.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -99,7 +102,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Line</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #product_line matInput placeholder="Product Line" [readonly]="!isAdmin()" [value]="element.product_line" (blur)="edit(element.id, 'product_line', product_line.value)" required>
+        <input #product_line matInput placeholder="Product Line" [readonly]="!isEditable()" [value]="element.product_line" (blur)="edit(element.id, 'product_line', product_line.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -108,8 +111,8 @@
   <ng-container matColumnDef="formula">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula</th>
     <td mat-cell *matCellDef="let element">
-      <app-formula-editor *ngIf="isAdmin()" (formulaOutput)="updateFormula(element.id, $event)" [initFormula]="element.formula"></app-formula-editor>
-      <ng-container *ngIf="!isAdmin()">
+      <app-formula-editor *ngIf="isEditable()" (formulaOutput)="updateFormula(element.id, $event)" [initFormula]="element.formula"></app-formula-editor>
+      <ng-container *ngIf="!isEditable()">
         {{element.formula.name}} ({{element.formula.number}})
       </ng-container>
     </td>
@@ -120,7 +123,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula Scale Factor</th>
     <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #formula_scale_factor matInput placeholder="Formula Scale Factor" [readonly]="!isAdmin()" [value]="element.formula_scale_factor" (blur)="edit(element.id, 'formula_scale_factor', formula_scale_factor.value)" required>
+        <input #formula_scale_factor matInput placeholder="Formula Scale Factor" [readonly]="!isEditable()" [value]="element.formula_scale_factor" (blur)="edit(element.id, 'formula_scale_factor', formula_scale_factor.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -146,7 +149,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Rate</th>
     <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #manufacturing_rate matInput placeholder="Manufacturing Rate" [readonly]="!isAdmin()" [value]="element.manufacturing_rate" (blur)="edit(element.id, 'manufacturing_rate', manufacturing_rate.value)" required>
+        <input #manufacturing_rate matInput placeholder="Manufacturing Rate" [readonly]="!isEditable()" [value]="element.manufacturing_rate" (blur)="edit(element.id, 'manufacturing_rate', manufacturing_rate.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -156,7 +159,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Setup Cost</th>
     <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #setup_cost matInput placeholder="Setup Cost" [readonly]="!isAdmin()" [value]="element.setup_cost" (blur)="edit(element.id, 'setup_cost', setup_cost.value)" required>
+        <input #setup_cost matInput placeholder="Setup Cost" [readonly]="!isEditable()" [value]="element.setup_cost" (blur)="edit(element.id, 'setup_cost', setup_cost.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -166,7 +169,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Run Cost</th>
     <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #run_cost matInput placeholder="Run Cost" [readonly]="!isAdmin()" [value]="element.run_cost" (blur)="edit(element.id, 'run_cost', run_cost.value)" required>
+        <input #run_cost matInput placeholder="Run Cost" [readonly]="!isEditable()" [value]="element.run_cost" (blur)="edit(element.id, 'run_cost', run_cost.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -177,7 +180,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #comment matInput placeholder="Comment" [readonly]="!isAdmin()" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
+        <textarea #comment matInput placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>
