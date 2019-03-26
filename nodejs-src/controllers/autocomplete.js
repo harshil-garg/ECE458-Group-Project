@@ -7,10 +7,23 @@ module.exports.nameOrNumber = async (model, input) => {
     }else{
         //tolower converts number to string, 1 means to include
         let results = [];
-        let cursor = await model.aggregate([{$addFields: {num2str: {'$toLower' : '$number'}}}]).match({num2str: regex}).limit(limit).cursor({}).exec();
+        let pipeline = [{$addFields: {num2str: {'$toLower' : '$number'}}}];
+        if(model.modelName == 'Formula'){
+            pipeline.push({
+                $lookup: {
+                    from: 'ingredients',
+                    localField: 'ingredient_tuples.ingredient',
+                    foreignField: '_id',
+                    as: 'ingredients'
+                }
+            })
+        }
+        let cursor = await model.aggregate(pipeline).match({num2str: regex}).limit(limit).cursor({}).exec();
         await cursor.eachAsync((sku) => {
             results.push(sku);
         });
+
+        populateIngredients(results);
 
         return results;
     }
@@ -31,4 +44,17 @@ module.exports.nameOrEmail = async (model, goal, user) => {
 module.exports.email = async (model, input) => {
     let regex = new RegExp('^'+input, 'i');
     return await model.find({email: regex}).limit(limit).collation({locale: 'en'}).sort('email').lean().exec();
+}
+
+function populateIngredients(results){
+    for(let item of results){
+        for(let ingredient of item.ingredients){
+            for(let tuple of item.ingredient_tuples){
+                if(ingredient._id.equals(tuple.ingredient)){
+                    tuple.ingredient = ingredient.name;
+                }
+            }
+        }
+        delete item.ingredients;
+    }
 }
