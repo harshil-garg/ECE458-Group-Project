@@ -38,7 +38,7 @@
              <tr>
                <td>
                   <mat-form-field>
-                      <mat-select placeholder="Give administrator priveleges" [(value)]="adminSelection">
+                      <mat-select placeholder="Give administrator priveleges" [(value)]="newAdminSelection">
                         <mat-option [value]="true">Yes</mat-option>
                         <mat-option [value]="false">No</mat-option>
                       </mat-select>
@@ -56,7 +56,7 @@
   </mat-card>
   <mat-card class="make-admin-card">
       <mat-card-header>
-          <mat-card-title>Make a user an admin (prepend "netid_" to select NetId users)</mat-card-title>
+          <mat-card-title>Update a user's settings (prepend "netid_" to select NetId users)</mat-card-title>
         </mat-card-header>
       <mat-card-content>
       <form>
@@ -68,10 +68,17 @@
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
+          <mat-form-field>
+            <mat-select placeholder="Give administrator priveleges" [(value)]="adminSelection">
+              <mat-option [value]="true">Yes</mat-option>
+              <mat-option [value]="false">No</mat-option>
+            </mat-select>
+          </mat-form-field>
         </form>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button (click)="makeAdmin(adminFormControl.value)" color="primary">Make Admin</button>
+        <button mat-raised-button (click)="updatePriveleges(adminFormControl.value, adminSelection)" color="primary">Update Priveleges</button>
+        <button mat-raised-button (click)="deleteUser(adminFormControl.value)" color="primary">Delete user</button>
       </mat-card-actions>
   </mat-card>
 </div>

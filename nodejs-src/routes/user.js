@@ -12,7 +12,7 @@ router.post('/autocomplete', async (req, res) => {
     res.json({success: true, data: results});
 });
 
-router.post('/make-admin', async (req, res) => {    
+router.post('/update-priveleges', async (req, res) => {    
     User.findOne({email: req.body.email}, (err, result) =>{
         if (!result) {
             res.json({success: false, message: 'User not found'});
@@ -20,15 +20,34 @@ router.post('/make-admin', async (req, res) => {
         else if (err) {
             res.json({success: false, message: err});
         }
-        else if (result.admin == true){
-            res.json({success: false, message: 'User is already admin'});
+        else if (result.admin == req.body.admin){
+            res.json({success: false, message: `User is already ${result.admin ? 'admin' : 'not an admin'}`});
         }
         else {
-            User.findOneAndUpdate({email: req.body.email}, {admin: true}, (err, result) => {
+            User.findOneAndUpdate({email: req.body.email}, {admin: req.body.admin}, (err, result) => {
                 if (err) {
                     res.json({success: false, message: err});
                 }
-                else res.json({success: true, message: 'Gave user admin permissions succesfully'});
+                else res.json({success: true, message: 'Updated user admin permissions succesfully'});
+            });
+        }
+    });
+});
+
+router.post('/delete-user', async (req, res) => {    
+    User.findOne({email: req.body.email}, (err, result) =>{
+        if (!result) {
+            res.json({success: false, message: 'User not found'});
+        }
+        else if (err) {
+            res.json({success: false, message: err});
+        }
+        else {
+            User.findOneAndRemove({email: req.body.email},(err, result) => {
+                if (err) {
+                    res.json({success: false, message: err});
+                }
+                else res.json({success: true, message: 'Deleted user succesfully'});
             });
         }
     });
