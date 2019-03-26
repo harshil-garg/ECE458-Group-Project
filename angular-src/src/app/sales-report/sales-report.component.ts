@@ -20,8 +20,9 @@ export class SalesReportComponent implements OnInit {
   summary_data = {};
   keys = [];
   displayedColumns: string[] = ['number', 'name', 'size', 'count', 'summary', 'drilldown'];
+  loadingResults: boolean = false;
 
-  constructor(private salesReportService: SalesReportService, public dialog: MatDialog, public productLineService: CrudProductLineService) { 
+  constructor(private salesReportService: SalesReportService, public dialog: MatDialog, public productLineService: CrudProductLineService) {
   }
 
   ngOnInit() {
@@ -37,7 +38,7 @@ export class SalesReportComponent implements OnInit {
 
 
   openSummary() {
-    
+
   }
 
   openDrilldown(sku) {
@@ -53,6 +54,7 @@ export class SalesReportComponent implements OnInit {
   }
 
   refresh() {
+    this.loadingResults = true;
     var request = {
       product_lines: this.product_lines,
       customers: this.customers
@@ -62,6 +64,7 @@ export class SalesReportComponent implements OnInit {
         this.summary_data = response;
         this.keys = Object.keys(this.summary_data);
         console.log(this.summary_data);
+        this.loadingResults = false;
       },
       error => {
         console.log(error);
