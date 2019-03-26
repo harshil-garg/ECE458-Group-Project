@@ -26,6 +26,9 @@
 </div>
 
 <h2>Sales Records</h2>
+<div class="example-loading-shade" *ngIf="loadingResults">
+  <mat-spinner></mat-spinner>
+</div>
 <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
   <!-- Year Column -->
@@ -89,6 +92,8 @@
   <tr mat-row *matRowDef="let row; columns: displayedSummaryColumns;"></tr>
 </table>
 
+<h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
+<app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>
 
 <canvas>
 

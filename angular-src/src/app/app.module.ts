@@ -54,6 +54,8 @@ import { SalesReportComponent } from './sales-report/sales-report.component';
 import { SalesSummaryComponent } from './sales-report/sales-summary/sales-summary.component';
 import { SalesDrilldownComponent } from './sales-report/sales-drilldown/sales-drilldown.component';
 import { CustomerAutocompleteComponent } from './sales-report/customer-autocomplete/customer-autocomplete.component';
+import { ChartsModule } from 'ng2-charts';
+import { LineGraphComponent } from './sales-report/sales-drilldown/line-graph/line-graph.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from './token.interceptor';
 
@@ -116,7 +118,8 @@ const routes: Routes = [
     SalesReportComponent,
     SalesSummaryComponent,
     SalesDrilldownComponent,
-    CustomerAutocompleteComponent
+    CustomerAutocompleteComponent,
+    LineGraphComponent
   ],
   imports: [
     BrowserModule,
@@ -162,10 +165,11 @@ const routes: Routes = [
     MatButtonToggleModule,
     MatSlideToggleModule,
     MatBadgeModule,
-    MatTooltipModule
+    MatTooltipModule,
+    ChartsModule
   ],
   providers: [
-    Title, 
+    Title,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

@@ -18,6 +18,7 @@ export class AutocompleteMessage {
 }
 
 export class AutocompleteResponse {
+	// data : {name:string}[];
 	data : any[];
 }
 
@@ -53,5 +54,4 @@ export class SalesReportService {
   allCustomers(){
     return this.http.post<AutocompleteResponse>('api/customers/all', {}, httpOptions);
   }
-  
 }

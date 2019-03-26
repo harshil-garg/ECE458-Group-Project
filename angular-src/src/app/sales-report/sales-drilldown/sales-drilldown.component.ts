@@ -15,7 +15,8 @@ export class SalesDrilldownComponent implements OnInit {
   // @Input() sku : Sku
   // @Input() customers: Array<any>
   display_name: string;
-  customers: Array<any> = ['Walmart'];
+  selected_customer: string;
+  customers: Array<any> = [];
   start_date: Date = new Date();
   end_date: Date = new Date();
   stats: any = {};
@@ -27,16 +28,18 @@ export class SalesDrilldownComponent implements OnInit {
   summaryColumns: string[] = ['total_revenue', 'manufacturing_run_size', 'ingredient_cost_per_case', 'manufacturing_setup_cost_per_case', 'manufacturing_run_cost_per_case', 'cogs_per_case', 'revenue_per_case', 'profit_per_case', 'profit_margin']
   summarySource: MatTableDataSource<any>;
   displayedSummaryColumns: string[] = ['stat', 'value'];
+  loadingResults: boolean = false;
 
   totalDocs: number;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  
+
   constructor(public salesReportService: SalesReportService, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
     this.sku = this.data.sku;
     this.customers = this.data.customers;
+    this.selected_customer = "all";
 
     this.start_date.setFullYear(this.start_date.getFullYear()-1);
 
@@ -62,6 +65,7 @@ export class SalesDrilldownComponent implements OnInit {
   }
 
   refresh(){
+    this.loadingResults = true;
     let request = {
       sku_number: this.sku.number,
       customers: this.customers,
@@ -97,6 +101,7 @@ export class SalesDrilldownComponent implements OnInit {
       this.stats = response.summary;
       this.transpose();
       this.dataSource.data = this.recordList;
+      this.loadingResults = false;
     }
   }
 
@@ -106,6 +111,7 @@ export class SalesDrilldownComponent implements OnInit {
 
   refreshCustomer(customer){
     console.log(customer)
+    this.selected_customer = customer;
     if(customer == 'all'){
       this.salesReportService.allCustomers().subscribe((response) => {
         let customer_objs = response.data;

@@ -19,13 +19,13 @@ mat-header-cell {
 .export_skus {
   float: left;
   position: relative;
-  left: 28%;
+  left: 24%;
 }
 
 .export_formulas {
   float: left;
   position: relative;
-  left: 28%;
+  left: 24%;
 }
 
 .search {
