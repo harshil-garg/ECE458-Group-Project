@@ -49,7 +49,7 @@ export class RegisterComponent implements OnInit {
 	}
 
   isAdmin(){
-    return this.authenticationService.loginState.isAdmin;
+    return this.authenticationService.isAdmin();
   }
 
 }

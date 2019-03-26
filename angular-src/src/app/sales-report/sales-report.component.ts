@@ -37,8 +37,14 @@ export class SalesReportComponent implements OnInit {
   }
 
 
-  openSummary() {
-
+  openSummary(sku) {
+    this.dialog.open(SalesSummaryComponent, {
+      height: '800px',
+      width: '1400px',
+      data: {
+        sku: sku
+      }
+    })
   }
 
   openDrilldown(sku) {

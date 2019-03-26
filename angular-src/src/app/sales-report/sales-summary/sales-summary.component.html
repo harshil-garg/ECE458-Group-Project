@@ -1,3 +1,68 @@
-<p>
-  sales-summary works!
-</p>
+<h2 mat-dialog-title>Sales Summary</h2>
+<mat-dialog-content>
+  <mat-table class="summary-table" [dataSource]="data.sku.sku_yearly_data">
+    <ng-container matColumnDef="SKU number">
+        <mat-header-cell *matHeaderCellDef> SKU number </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{data.sku.sku.number}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="sales">
+      <mat-header-cell *matHeaderCellDef> Sales </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.sales}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="revenue">
+      <mat-header-cell *matHeaderCellDef> Revenue </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.revenue}} </mat-cell>
+    </ng-container>
+   <ng-container matColumnDef="revenue_per_case">
+      <mat-header-cell *matHeaderCellDef> Revenue per Case </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.revenue_per_case}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
+  </mat-table>
+  <mat-divider></mat-divider>
+  <mat-table class="summary-table" [dataSource]="sku_ten_year_data">
+    <ng-container matColumnDef="total_revenue">
+        <mat-header-cell *matHeaderCellDef> Total Rev. </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.total_revenue}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="revenue_per_case">
+      <mat-header-cell *matHeaderCellDef> Rev. per Case </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.revenue_per_case}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="profit_per_case">
+      <mat-header-cell *matHeaderCellDef> Profit per Case </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.profit_per_case}} </mat-cell>
+    </ng-container>
+   <ng-container matColumnDef="profit_margin">
+      <mat-header-cell *matHeaderCellDef> Profit Margin </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.profit_margin}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="manufacturing_setup_cost_per_case">
+      <mat-header-cell *matHeaderCellDef> Setup Cost per case </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.manufacturing_setup_cost_per_case}} </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="manufacturing_run_size">
+    <mat-header-cell *matHeaderCellDef> Run Size </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.manufacturing_run_size}} </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="manufacturing_run_cost_per_case">
+    <mat-header-cell *matHeaderCellDef> Run Cost per Case </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.manufacturing_run_cost_per_case}} </mat-cell>
+  </ng-container>
+ <ng-container matColumnDef="ingredient_cost_per_case">
+    <mat-header-cell *matHeaderCellDef> Ing. Cost per Case </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.ingredient_cost_per_case}} </mat-cell>
+  </ng-container>
+  <ng-container matColumnDef="cogs_per_case">
+    <mat-header-cell *matHeaderCellDef> Cogs per Case </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{element.cogs_per_case}} </mat-cell>
+  </ng-container>
+    <mat-header-row *matHeaderRowDef="ldisplayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ldisplayedColumns;"></mat-row>
+  </mat-table>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button color="primary" (click)="exportYearlyToCSV()">Export Yearly to CSV</button>
+  <button mat-button color="primary" (click)="exportTotalsToCSV()">Export Totals to CSV</button>
+</mat-dialog-actions>

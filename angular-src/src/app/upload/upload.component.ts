@@ -211,6 +211,6 @@ export class UploadComponent {
   }
 
   isAdmin(): boolean {
-    return this.authService.loginState.isAdmin;
+    return this.authService.isAdmin();
   }
 }
