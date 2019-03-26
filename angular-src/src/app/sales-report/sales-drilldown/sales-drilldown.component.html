@@ -1,7 +1,5 @@
 <h1 class="mat-display-3" align="center">{{display_name}}</h1>
 <div class='flex-box-space'>
-  <!-- export -->
-  <button mat-raised-button color="accent">Export to CSV</button>
   <!-- customer picker -->
   <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
   <!-- start and end date picker -->
@@ -41,13 +39,13 @@
   </ng-container>
 
   <!-- Customer Number Column -->
-  <ng-container matColumnDef="customer number">
+  <ng-container matColumnDef="customer_number">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Number</th>
     <td mat-cell *matCellDef="let element">{{element.customer_number}}</td>
   </ng-container>
 
   <!-- Customer Came Column -->
-  <ng-container matColumnDef="customer name">
+  <ng-container matColumnDef="customer_name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Came</th>
     <td mat-cell *matCellDef="let element">{{element.customer_name}}</td>
   </ng-container>
@@ -76,6 +74,9 @@
 </table>
 <mat-paginator [length]="totalDocs" [pageSize]="10 < totalDocs ? 10 : totalDocs" [pageSizeOptions]="[10, totalDocs]" showFirstLastButtons></mat-paginator>
 
+<!-- export -->
+<button mat-raised-button color="accent" (click)="exportDrilldownToCSV()">Export to CSV</button>
+
 <h2>Total Stats</h2>
 <table mat-table [dataSource]="summarySource" class="mat-elevation-z8">
   <ng-container matColumnDef="stat">
@@ -88,6 +89,9 @@
 
   <tr mat-row *matRowDef="let row; columns: displayedSummaryColumns;"></tr>
 </table>
+<br>
+<!-- export -->
+<button mat-raised-button color="accent" (click)="exportTotalsToCSV()">Export to CSV</button>
 
 <h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
 <app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>

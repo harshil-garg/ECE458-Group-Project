@@ -3,6 +3,7 @@ import { MatTableDataSource, MatSnackBar, MatPaginator, MatSort, MAT_DIALOG_DATA
 import { Sku } from '../../model/sku';
 import { SalesRecord } from '../../model/sales-record';
 import { SalesReportService, DrilldownRequest } from '../sales-report.service';
+import { ExportService } from '../../export.service';
 
 @Component({
   selector: 'app-sales-drilldown',
@@ -21,7 +22,7 @@ export class SalesDrilldownComponent implements OnInit {
   end_date: Date = new Date();
   stats: any = {};
 
-  displayedColumns: string[] = ['year', 'week', 'customer number', 'customer name', 'sales', 'price', 'revenue'];
+  displayedColumns: string[] = ['year', 'week', 'customer_number', 'customer_name', 'sales', 'price', 'revenue'];
   dataSource: MatTableDataSource<SalesRecord> = new MatTableDataSource<SalesRecord>(this.recordList)
 
   summaryLabels: string[] = ['Total Revenue', 'Manufacturing Run Size', 'Ingredient Cost Per Case', 'Manufacturing Setup Cost Per Case', 'Manufacturing Run Cost Per Case', 'COGS Per Case', 'Revenue Per Case', 'Profit Per Case', 'Profit Margin']
@@ -33,7 +34,7 @@ export class SalesDrilldownComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(public salesReportService: SalesReportService, @Inject(MAT_DIALOG_DATA) public data: any) { }
+  constructor(public salesReportService: SalesReportService, public exportService: ExportService, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
     this.sku = this.data.sku;
@@ -97,6 +98,7 @@ export class SalesDrilldownComponent implements OnInit {
       }
 
       this.stats = response.summary;
+      console.log(this.stats)
       this.transpose();
       this.dataSource.data = this.recordList;
     }
@@ -122,6 +124,14 @@ export class SalesDrilldownComponent implements OnInit {
       this.customers = [customer];
       this.refresh();
     }
+  }
+
+  exportDrilldownToCSV() {
+    this.exportService.exportJSON(this.displayedColumns, this.recordList, `${this.sku.number}_drilldown`);
+  }
+
+  exportTotalsToCSV() {
+    this.exportService.exportJSON(this.summaryColumns, [this.stats], `${this.sku.number}_total_stats`);
   }
 
 }
