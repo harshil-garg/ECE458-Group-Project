@@ -38,6 +38,7 @@ export class IngredientsTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
 
@@ -86,7 +87,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, updated_value:any) {
-      if(this.isAdmin()){
+      if(this.isEditable()){
         var editedIngredient : Ingredient = new Ingredient();
         var newName : string;
         editedIngredient.name = name;
@@ -149,7 +150,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh for edits
       //this.refresh();
     }
@@ -263,6 +264,10 @@ export class IngredientsTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 
 }

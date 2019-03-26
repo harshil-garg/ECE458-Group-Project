@@ -20,6 +20,7 @@ export class ProductLineTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
@@ -57,7 +58,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, updated_value:any) {
-      if(this.isAdmin()){
+      if(this.isEditable()){
         var editedProductLine : ProductLine = new ProductLine();
         var newName : string;
         editedProductLine.name = name;
@@ -92,7 +93,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //refreshing every time gets rid of active element
       //this.refresh();
     }
@@ -178,5 +179,9 @@ export class ProductLineTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 }
