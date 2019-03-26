@@ -125,9 +125,14 @@ router.post('/filter', async (req, res) => {
     key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
+
+    let product_exps;
+    product_exps = product_lines.map((line) => {
+        return new RegExp(line, 'i');
+    })
     
 
-    let result = await sku_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients, product_lines);
+    let result = await sku_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients, product_exps);
     
     res.json(result);
 });

@@ -22,6 +22,7 @@
 			<button mat-button (click)="router.navigate(['dashboard/sales-report'])">Sales Report</button>
 			<button mat-button  *ngIf="this.authService.isAdmin()" (click)="router.navigate(['dashboard/upload'])">Data Import</button>
 			<button mat-button (click)="router.navigate(['dashboard/accounts'])">Accounts</button>
+			<button mat-button (click)="authService.logout()">Log out</button>
 	 </mat-toolbar-row>
 	</mat-toolbar>
 </div>

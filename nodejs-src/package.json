@@ -19,13 +19,14 @@
     "extract-zip": "^1.6.7",
     "fast-csv": "^2.4.1",
     "joi": "^14.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^2.2.0",
     "mathjs": "^5.5.0",
     "mongoose": "^5.4.12",
     "multer": "^1.4.1",
-    "jsonwebtoken": "^8.5.1",
     "passport": "^0.4.0",
-    "passport-local": "^1.0.0",
     "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
     "xmlhttprequest": "^1.8.0"
   },
   "repository": {

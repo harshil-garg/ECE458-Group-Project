@@ -14,8 +14,12 @@ export class SalesSummaryComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, public exportService: ExportService) {
     let newTenYear = {};
     Object.keys(data.sku.sku_ten_year_data).forEach(function(key,index) {
-      newTenYear[key] = data.sku.sku_ten_year_data[key].toFixed(2);
-  });
+      if (key == "manufacturing_run_size") {
+        newTenYear[key] = data.sku.sku_ten_year_data[key].toFixed(2);
+      } else {
+        newTenYear[key] = data.sku.sku_ten_year_data[key].toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      }
+    });
     this.sku_ten_year_data.push(newTenYear);
   }
 
