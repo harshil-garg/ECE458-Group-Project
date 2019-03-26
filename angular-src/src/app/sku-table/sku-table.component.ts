@@ -165,7 +165,7 @@ export class SkuTableComponent implements OnInit{
         }).subscribe(
         response => {
           if(response.success){
-            console.log("FOMRULA SUCCESS");
+            console.log("FORMULA SUCCESS");
             this.handleResponse(response);
           }
           else{

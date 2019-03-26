@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {CrudManufacturingLineService} from '../../../manufacturing-line-table/crud-manufacturing-line.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Sku } from '../../../model/sku';
 import { Tuple } from '../../../model/ingredient';
@@ -12,6 +13,8 @@ import { Formula } from '../../../model/formula';
   styleUrls: ['./add-sku-dialog.component.css']
 })
 export class AddSkuDialogComponent implements OnInit{
+  skuForm: FormGroup
+  formulaForm: FormGroup
 
   ingredientInput: string;
   quantityInput: any;
@@ -59,14 +62,48 @@ export class AddSkuDialogComponent implements OnInit{
           }
         }
       );
+
+      this.skuForm = new FormGroup({
+        number: new FormControl(''),
+        name: new FormControl('', [Validators.required]),
+        case_upc: new FormControl('', [Validators.required]),
+        unit_upc: new FormControl('', [Validators.required]),
+        unit_size: new FormControl('', [Validators.required]),
+        count_per_case: new FormControl('', [Validators.required]),
+        product_line: new FormControl('', [Validators.required]),
+        formula_scale_factor: new FormControl('', [Validators.required]),
+        manufacturing_lines: new FormControl('', [Validators.required]),
+        manufacturing_rate: new FormControl('', [Validators.required]),
+        setup_cost: new FormControl('', [Validators.required]),
+        run_cost: new FormControl('', [Validators.required]),
+        comment: new FormControl('')
+      });
     }
 
     onNoClick(): void {
       this.dialogRef.close();
     }
 
-    submit(): void {
-      this.dialogRef.close(this.sku);
+    submit(skuFormValue): void {
+      this.dialogRef.close();
+      // if (this.skuForm.valid) {
+      //   let sku = {
+      //     number: skuFormValue.number,
+      //     name: skuFormValue.name,
+      //     case_upc: skuFormValue.case_upc,
+      //     unit_upc: skuFormValue.unit_upc,
+      //     unit_size: skuFormValue.unit_size,
+      //     count_per_case: skuFormValue.count_per_case,
+      //     product_line: skuFormValue.product_line,
+      //     formula_scale_factor: skuFormValue.,
+      //     manufacturing_lines: skuFormValue.,
+      //     manufacturing_rate: skuFormValue.,
+      //     setup_cost: skuFormValue.,
+      //     run_cost: skuFormValue.,
+      //     comment: skuFormValue.comment
+      //   }
+      //   this.dialogRef.close(sku);
+      // }
     }
 
     keyPressed(event){
@@ -114,6 +151,10 @@ export class AddSkuDialogComponent implements OnInit{
 
     updateProductLine(line){
       this.sku.product_line = line;
+    }
+
+    hasSKUError = (controlName: string, errorName: string) =>{
+      return this.skuForm.controls[controlName].hasError(errorName);
     }
 
 }
