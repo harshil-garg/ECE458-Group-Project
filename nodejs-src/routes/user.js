@@ -132,6 +132,12 @@ router.post('/netid', (req, res) => {
     });
 });
 
+router.get('/get', async (req, res) => {
+    let users = await User.find();
+    let emails = users.map(user => user.email);
+    res.send(emails);
+})
+
 //Logout Handle
 router.get('/logout', (req,res) => {
     req.logOut();
