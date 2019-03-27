@@ -35,9 +35,6 @@
       <!-- buttons and inputs -->
       <div class="flex-box-space">
         <div class="flex-item">
-          <app-customer-autocomplete [initCustomer] = "all" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
-        </div>
-        <div class="flex-item">
           <button mat-raised-button color="accent" (click)="flush()">Flush Cache</button>
         </div>
       </div>
@@ -49,7 +46,7 @@
           </mat-expansion-panel-header>
 
           <!--- SKU info -- 2 buttons -->
-          <table mat-table [dataSource]="summary_data[product_line]" class="mat-elevation-z8">
+          <table mat-table [dataSource]="main_data[product_line]" class="mat-elevation-z8">
 
             <!--- Note that these columns can be defined in any order.
                   The actual rendered columns are set as a property on the row definition" -->
@@ -57,35 +54,35 @@
             <!-- Position Column -->
             <ng-container matColumnDef="number">
               <th mat-header-cell *matHeaderCellDef class="centre">SKU number</th>
-              <td mat-cell *matCellDef="let element">{{element.sku.number}}</td>
+              <td mat-cell *matCellDef="let element">{{element.number}}</td>
             </ng-container>
 
             <!-- Name Column -->
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef class="centre">Name</th>
-              <td mat-cell *matCellDef="let element">{{element.sku.name}}</td>
+              <td mat-cell *matCellDef="let element">{{element.name}}</td>
             </ng-container>
 
             <!-- Weight Column -->
             <ng-container matColumnDef="size">
               <th mat-header-cell *matHeaderCellDef class="centre">Size</th>
-              <td mat-cell *matCellDef="let element">{{element.sku.size}}</td>
+              <td mat-cell *matCellDef="let element">{{element.size}}</td>
             </ng-container>
 
             <!-- Symbol Column -->
             <ng-container matColumnDef="count">
               <th mat-header-cell *matHeaderCellDef class="centre">Count</th>
-              <td mat-cell *matCellDef="let element">{{element.sku.count}}</td>
+              <td mat-cell *matCellDef="let element">{{element.count}}</td>
             </ng-container>
 
             <ng-container matColumnDef="summary">
               <th mat-header-cell *matHeaderCellDef class="centre">Summary</th>
-              <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" (click)="openSummary(element)" [disabled]="!element.success">Summary</button></td>
+              <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" (click)="openSummary(element)">Summary</button></td>
             </ng-container>
 
             <ng-container matColumnDef="drilldown">
               <th mat-header-cell *matHeaderCellDef class="centre">Drilldown</th>
-              <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" (click)="openDrilldown(element.sku)" [disabled]="!element.success">Drilldown</button></td>
+              <td mat-cell *matCellDef="let element"><button mat-raised-button color="accent" (click)="openDrilldown(element)">Drilldown</button></td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

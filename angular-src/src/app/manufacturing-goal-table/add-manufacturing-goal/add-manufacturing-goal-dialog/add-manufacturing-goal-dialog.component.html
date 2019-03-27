@@ -11,13 +11,13 @@
       <mat-chip-list>
         <ng-container *ngFor="let sku_quant of manufGoal.sku_tuples; let id=index">
           <div>
-            <mat-chip>sku id = {{sku_quant.sku}} : quantity = {{sku_quant.case_quantity}} <mat-icon (click)="removeSku(id)">clear</mat-icon></mat-chip><br>
+            <mat-chip>{{sku_quant.sku.name}} : {{sku_quant.sku.size}} * {{sku_quant.sku.count}} , {{sku_quant.case_quantity}} <mat-icon (click)="removeSku(id)">clear</mat-icon></mat-chip><br>
           </div>
         </ng-container>
       </mat-chip-list>
       <mat-card>
         <mat-card-subtitle [style.color]="'black'">New Sku-Quantity Pair</mat-card-subtitle>
-        <app-search-sku></app-search-sku>
+        <app-search-sku (skuSelected)="setSku($event)"></app-search-sku>
         <input class="form-control" name="quantity" [(ngModel)]="quantityInput" name="quantity" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
         <button mat-raised-button type="button" (click)="addSkuQuantity($event)" color="accent"
           [disabled]="skuInput==undefined || skuInput.name.length==0 || quantityInput==undefined || quantityInput.length==0">Add Sku-Quantity</button>

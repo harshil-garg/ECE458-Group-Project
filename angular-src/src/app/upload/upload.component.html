@@ -6,7 +6,7 @@
                 </mat-card-header>
                 <mat-card-content>
                     <p>
-                        You may import your files either by selecting one CSV file at a time.
+                        Welcome to the import utility. You may upload one CSV file at a time. The filename of the CSV you are uploading must be prefixed by "skus", "ingredients", "product_lines", or "formulas", depending on what data you are trying to upload. Refer to <a href="https://d1b10bmlvqabco.cloudfront.net/attach/jpvlvyxg51d1nc/iddif2iv5hz4jx/jsw8pso5ahmg/Bulk_Import_Export_Format_Draft_3.1.pdf">this</a> to see the required headers and formatting for each data type.
                     </p>
                     <mat-list>
                         <mat-list-item *ngFor="let file of files">
@@ -20,10 +20,10 @@
                 </mat-card-content>
                 <mat-card-actions>
                     <button mat-raised-button color="primary" class="add-files-btn" (click)="addFiles()">
-                        Add Files
+                        Select a file
                     </button>
                     <button [disabled]="!filesSelected()" mat-raised-button color="primary" class="submit-files-btn" (click)="sendFiles()">
-                            Submit Files
+                            Submit File
                     </button>
                 </mat-card-actions>
         </mat-card>
