@@ -1,7 +1,7 @@
-# Clone repository
-git clone https://github.com/jap87/ECE458-Group-Project.git
+## Clone repository
+`git clone https://github.com/jap87/ECE458-Group-Project.git`
 
-# SSH into Duke-provisioned VM using credentials and run the following
+## SSH into Duke-provisioned VM using credentials and run the following
 sudo apt-get update
 sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -14,8 +14,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo usermod -aG docker ${USER}
 logout
 
-# SSH into Duke-provisioned VM AGAIN as the previous command logged you out.
-# The below sets up node, angular, docker, certificates.
+## SSH into Duke-provisioned VM AGAIN as the previous command logged you out.
+## The below sets up node, angular, docker, certificates.
 
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && sudo apt-get install -y nodejs
 sudo npm install -g @angular/cli
@@ -40,10 +40,10 @@ cd backup
 rm -rf backup.log
 sudo npm install
 
-# Run the backup setup script. Step through it step by step. Make sure you have a second Duke VM provisioned as backup.
-# You will be asked for a backup server hostname, password, and email address to send notifications to.
+## Run the backup setup script. Step through it step by step. Make sure you have a second Duke VM provisioned as backup.
+## You will be asked for a backup server hostname, password, and email address to send notifications to.
 bash backup_setup.sh
 
-# Bring up production server
+## Bring up production server
 cd ..
 docker-compose down -v && docker-compose up --build
