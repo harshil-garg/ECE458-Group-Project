@@ -16,6 +16,12 @@ export class LoginComponent implements OnInit {
 	constructor(private authenticationService: AuthenticationService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar) { }
 
 	ngOnInit() { 
+		if (this.authenticationService.isAuthenticated()) {
+			console.log('hellllll')
+			this.router.navigate(['dashboard']);
+			return;
+		}
+
 	    var url = this.route.snapshot.fragment;
 	    if (url && url.length > 10) {
 	        console.log(url);
@@ -33,7 +39,7 @@ export class LoginComponent implements OnInit {
 		        this.authenticationService.login_NetID(info["netid"], info["displayName"]).subscribe(
 			    response => {
 			        console.log(response);
-				this.handleResponse(response, info["netid"])
+				this.handleResponse(response, 'netid_' + info["netid"])
 			    },
 			    err => {
 			        this.snackBar.open("Unable to login with NetID", "Close");
@@ -73,13 +79,12 @@ export class LoginComponent implements OnInit {
 
 
 	private handleResponse(response: LoginResponse, email: string) {
+		console.log('logged in email: ' + email);
 	    if (response.success) {
-	        this.authenticationService.loginState.loggedIn = true;
-	        this.authenticationService.loginState.isAdmin = response.admin;
           this.authenticationService.loginState.user = email;
-
+			this.authenticationService.saveToken(response.token);
 			this.loginError = false;
-      this.showSpinner = false;
+      		this.showSpinner = false;
 			this.router.navigate(['dashboard']);
 	    }
   	}

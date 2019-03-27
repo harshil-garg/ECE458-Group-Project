@@ -51,10 +51,15 @@ router.post('/formulas', async (req, res) => {
 });
 
 function processComment(comment){
-    if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
-        return '"'+comment+'"';
-    }else{
-        return comment
+    if(comment != undefined){
+        if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
+            return '"'+comment+'"';
+        }else{
+            return comment;
+        }
+    }
+    else{
+        return ''
     }
 }
 
@@ -87,7 +92,8 @@ function format_skus(skus) {
         newsku['PL Name'] = sku.product_line;
         newsku['Formula#'] = sku.formula.number;
         newsku['Formula factor'] = sku.formula_scale_factor;
-
+        newsku['Count per case'] = sku.count;
+        
         let mls = `"`;
         let counter = 0;
         for(let ml of sku.manufacturing_lines){
@@ -97,10 +103,11 @@ function format_skus(skus) {
         mls += `${counter > 0 ? '' : '"'}`;
         newsku['ML Shortnames'] = mls;
         newsku['Rate'] = sku.manufacturing_rate;
+        newsku['Mfg setup cost'] = sku.setup_cost;
+        newsku['Mfg run cost'] = sku.run_cost;
         newsku['Comment'] = processComment(sku.comment);
         result.push(newsku);
     }
-    console.log(result);
     return result;
 }
 
@@ -124,7 +131,7 @@ function format_formulas(formulas){
             newformula = {};
             newformula['Formula#'] = formula.number;
             newformula['Name'] = formula.name;
-            newFormula['Ingr#'] = tuple.ingredient.number;
+            newformula['Ingr#'] = tuple.number;
             newformula['Quantity'] = `${tuple.quantity} ${tuple.unit}`;
             newformula['Comment'] = first ? processComment(formula.comment) : '';
             first = false;

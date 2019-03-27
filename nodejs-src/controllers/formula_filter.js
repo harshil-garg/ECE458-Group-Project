@@ -41,7 +41,8 @@ function populateIngredients(result){
         for(let ingredient of item.ingredients){
             for(let tuple of item.ingredient_tuples){
                 if(ingredient._id.equals(tuple.ingredient)){
-                    tuple.ingredient = ingredient;
+                    tuple.ingredient = ingredient.name;
+                    tuple['number'] = ingredient.number;
                 }
             }
         }

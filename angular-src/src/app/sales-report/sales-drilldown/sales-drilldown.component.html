@@ -1,0 +1,115 @@
+<h1 class="mat-display-3" align="center">{{display_name}}</h1>
+<ng-container *ngIf="!failedRequest">
+  <div class='flex-box-space'>
+    <!-- customer picker -->
+    <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
+    <!-- start and end date picker -->
+    <div class="flex-box-end">
+      <div class="flex-item">
+        <mat-form-field class=small-input>
+          <mat-label>Start date</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="start_date" (ngModelChange)="refresh()" placeholder="Choose a date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="flex-item">
+        <mat-form-field class=small-input>
+          <mat-label>End date</mat-label>
+          <input matInput [matDatepicker]="picker2" [(ngModel)]="end_date" (ngModelChange)="refresh()" placeholder="Choose a date">
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <h2>Sales Records</h2>
+  <div class="example-loading-shade" *ngIf="loadingResults">
+    <mat-spinner></mat-spinner>
+  </div>
+  <!-- export -->
+  <div class="flex-box-center">
+    <div class="flex-item">
+      <button mat-raised-button color="accent" (click)="exportDrilldownToCSV()">Export Drilldown to CSV</button>
+    </div>
+  </div>
+  <br>
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+    <!-- Year Column -->
+    <ng-container matColumnDef="year">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Year</th>
+      <td mat-cell *matCellDef="let element">{{element.year}}</td>
+    </ng-container>
+
+    <!-- Week Column -->
+    <ng-container matColumnDef="week">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Week</th>
+      <td mat-cell *matCellDef="let element">{{element.week}}</td>
+    </ng-container>
+
+    <!-- Customer Number Column -->
+    <ng-container matColumnDef="customer_number">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Number</th>
+      <td mat-cell *matCellDef="let element">{{element.customer_number}}</td>
+    </ng-container>
+
+    <!-- Customer Came Column -->
+    <ng-container matColumnDef="customer_name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Came</th>
+      <td mat-cell *matCellDef="let element">{{element.customer_name}}</td>
+    </ng-container>
+
+    <!-- Sales Column -->
+    <ng-container matColumnDef="sales">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Sales</th>
+      <td mat-cell *matCellDef="let element">{{element.sales}}</td>
+    </ng-container>
+
+    <!-- Price Column -->
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+      <td mat-cell *matCellDef="let element">{{element.price | currency}}</td>
+    </ng-container>
+
+    <!-- Revenue Column -->
+    <ng-container matColumnDef="revenue">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Revenue</th>
+      <td mat-cell *matCellDef="let element">{{element.revenue | currency}}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  </table>
+</ng-container>
+<mat-paginator [length]="totalDocs" [pageSize]="10 < totalDocs ? 10 : totalDocs" [pageSizeOptions]="[10, totalDocs]" showFirstLastButtons></mat-paginator>
+<ng-container *ngIf="!failedRequest">
+  <h2>Total Stats</h2>
+  <!-- export -->
+  <div class="flex-box-center">
+    <div class="flex-item">
+      <button mat-raised-button color="accent" (click)="exportTotalsToCSV()">Export Totals to CSV</button>
+    </div>
+  </div>
+  <br>
+  <table mat-table [dataSource]="summarySource" class="mat-elevation-z8">
+    <ng-container matColumnDef="stat">
+      <td mat-cell *matCellDef="let element">{{ element.stat }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="value">
+      <td mat-cell *matCellDef="let element"> {{ element.value }} </td>
+    </ng-container>
+
+    <tr mat-row *matRowDef="let row; columns: displayedSummaryColumns;"></tr>
+  </table>
+  <br>
+
+  <h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
+  <app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>
+</ng-container>
+<ng-container *ngIf="failedRequest">
+  <h1 class="mat-display-3" align="center">Records being loaded. Check again in 10-15 seconds.</h1>
+</ng-container>

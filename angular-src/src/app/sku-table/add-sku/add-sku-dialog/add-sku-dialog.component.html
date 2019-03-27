@@ -26,9 +26,12 @@
         <div [hidden]="count_per_case.valid || count_per_case.pristine" class="alert alert-danger">Count Per Case is required</div>
 
         <label for="product_line">Product Line</label>
-        <input type="text" min="0" class="form-control" id="product_line" required [(ngModel)]="sku.product_line" name="product_line" #product_line="ngModel">
-        <div [hidden]="product_line.valid || product_line.pristine" class="alert alert-danger">Product Line is required</div>
-
+        <div>
+          <app-product-line-autocomplete (messageEvent)="updateProductLine($event)"></app-product-line-autocomplete>
+        </div>
+        <!-- <input type="text" min="0" class="form-control" id="product_line" required [(ngModel)]="sku.product_line" name="product_line" #product_line="ngModel">
+        <div [hidden]="product_line.valid || product_line.pristine" class="alert alert-danger">Product Line is required</div> -->
+        
         <label for="formula">Formula</label>
         <mat-accordion>
           <mat-expansion-panel>
@@ -85,6 +88,14 @@
         <input type="text" class="form-control" id="manufacturing_rate" pattern="^\d*\.?\d*$" required [(ngModel)]="sku.manufacturing_rate" name="manufacturing_rate" #manufacturing_rate="ngModel">
         <div [hidden]="manufacturing_rate.valid || manufacturing_rate.pristine" class="alert alert-danger">Manufacturing Rate must be a decimal number</div>
 
+        <label for="setup_cost">Manufacturing Setup Cost</label>
+        <input type="text" class="form-control" id="setup_cost" pattern="^\d*\.?\d*$" required [(ngModel)]="sku.setup_cost" name="setup_cost" #setup_cost="ngModel">
+        <div [hidden]="setup_cost.valid || setup_cost.pristine" class="alert alert-danger">Manufacturing Setup Cost must be a decimal number</div>
+
+        <label for="run_cost">Manufacturing Run Cost</label>
+        <input type="text" class="form-control" id="run_cost" pattern="^\d*\.?\d*$" required [(ngModel)]="sku.run_cost" name="run_cost" #run_cost="ngModel">
+        <div [hidden]="run_cost.valid || run_cost.pristine" class="alert alert-danger">Manufacturing Run Cost must be a decimal number</div>
+
         <label for="comment">Comment</label>
         <textarea type="text" class="form-control" id="comment" [(ngModel)]="sku.comment" name="comment" #comment="ngModel"></textarea>
       </div>
@@ -93,48 +104,131 @@
 
     </form>
 </div>
+<!-- 
+<h1>Add SKU</h1>
+<mat-card>    
+  <mat-card-content>
+    <form [formGroup]="skuForm" autocomplete="off" novalidate (ngSubmit)="submit(skuForm.value)" fxLayout="column wrap"
+    fxLayoutAlign="center center" fxLayoutGap="10px">
+  
+      <h5>SKU Number</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="SKU Number" formControlName="number" id="number">
+        <mat-error *ngIf="hasSKUError('number', 'required')">Number is required</mat-error>
+      </mat-form-field>
+  
+      <h5>SKU Name</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="SKU Name" formControlName="name" id="name">
+        <mat-error *ngIf="hasSKUError('name', 'required')">Name is required</mat-error>
+      </mat-form-field>
 
-<!-- <h1 mat-dialog-title>Add SKU</h1>
-<div mat-dialog-content>
-  <table class="table table-bordered table-responsive-md table-striped text-center">
-    <tr>
-      <th class="text-center">SKU Name</th>
-      <th class="text-center">SKU Number</th>
-      <th class="text-center">Case UPC Number</th>
-      <th class="text-center">Unit UPC Number</th>
-      <th class="text-center">Unit Size</th>
-      <th class="text-center">Count Per Case</th>
-      <th class="text-center">Product Line</th>
-      <th class="text-center">Ingredient-Quantity</th>
-      <th class="text-center">Comment</th>
-    </tr>
+      <h5>Case UPC Number</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Case UPC" formControlName="case" id="case">
+        <mat-error *ngIf="hasSKUError('case', 'required')">Case UPC is required</mat-error>
+      </mat-form-field>
 
-    <tr>
+      <h5>Unit UPC Number</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Unit UPC" formControlName="unit" id="unit">
+        <mat-error *ngIf="hasSKUError('unit', 'required')">Unit UPC is required</mat-error>
+      </mat-form-field>
 
-      <td> <input class = "input" [(ngModel)]="sku.name"></td>
-      <td> <input class = "input" [(ngModel)]="sku.id"></td>
-      <td> <input class = "input" [(ngModel)]="sku.case_upc"></td>
-      <td> <input class = "input" [(ngModel)]="sku.unit_upc"></td>
-      <td> <input class = "input" [(ngModel)]="sku.unit_size"></td>
-      <td> <input class = "input" [(ngModel)]="sku.count_per_case"></td>
-      <td> <input class = "input" [(ngModel)]="sku.product_line"></td>
+      <h5>Unit Size</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Unit Size" formControlName="size" id="size">
+        <mat-error *ngIf="hasSKUError('size', 'required')">Unit size is required</mat-error>
+      </mat-form-field>
 
-      <td contenteditable="false">
-        <ng-container *ngFor="let ingredient of sku.ingredient_quantity; let ingr_id=index">
-          <a *ngIf="ingredient.ingredient_name!=null">{{ingredient.ingredient_name}} : {{ingredient.quantity}}
-            <i (click)="removeIngrQuant(ingr_id)" class="fa fa-remove"> </i><br></a>
-        </ng-container>
-        <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
-        <mat-form-field style="width: 200px;">
-          <input matInput [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
-        </mat-form-field>
-      </td>
-      <td> <input class = "input" [(ngModel)]="sku.comment"></td>
+      <h5>Count per Case</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Count per Case" formControlName="count" id="count">
+        <mat-error *ngIf="hasSKUError('count', 'required')">Count is required</mat-error>
+      </mat-form-field>
 
-    <tr>
-  </table>
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="sku" cdkFocusInitial>Ok</button>
-</div> -->
+      <h5>Product Line</h5>
+      <app-product-line-autocomplete (messageEvent)="updateProductLine($event)"></app-product-line-autocomplete>
+
+      <h5>Formula</h5>
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <input matInput (click)="handleClick($event)" placeholder="Formula Name">
+            </mat-panel-title>
+            <mat-panel-description>Edit Formula</mat-panel-description>
+          </mat-expansion-panel-header>
+          <div>
+            <mat-form-field floatLabel="never">
+              <input matInput [(ngModel)]="sku.formula.number" name="formula#" placeholder="Formula#">
+            </mat-form-field>
+            <mat-form-field floatLabel="never">
+              <textarea matInput [(ngModel)]="sku.formula.comment" name="formula comment" placeholder="Comment"></textarea>
+            </mat-form-field>
+          </div>
+          <mat-card>
+            <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
+            <mat-chip-list>
+              <ng-container *ngFor="let ingredient of sku.formula.ingredient_tuples; let ingr_id=index">
+                <div>
+                  <mat-chip>{{ingredient.ingredient_name}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
+                </div>
+              </ng-container>
+            </mat-chip-list>
+            <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
+            <mat-form-field style="width: 200px;">
+              <input matInput [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" name="quantity" type="text" placeholder="Quantity"/><br>
+            </mat-form-field>
+            <button mat-raised-button type="button" (click)="addIngredientQuantity($event)" color="accent"
+              [disabled]="ingredientInput==null || ingredientInput.length==0 || quantityInput==null || quantityInput.length==0">Add Ingr-Quant</button>
+          </mat-card>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <h5>Formula Scale Factor</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Formula Scale Factor" formControlName="factor" id="factor">
+        <mat-error *ngIf="hasSKUError('factor', 'required')">Formula scale factor is required</mat-error>
+      </mat-form-field>
+
+      <h5>Manufacturing Lines</h5>
+      <li *ngFor="let manufLine of manufLines.selectedOptions.selected">{{manufLine.value}}</li>
+      <button mat-raised-button type="button" [matMenuTriggerFor]="menu">Select Manufacturing Lines</button>
+      <mat-menu #menu="matMenu">
+        <mat-selection-list (selectionChange)="setManufacturingLines(manufLines.selectedOptions.selected)" #manufLines>
+          <mat-list-option (click)="handleClick($event)" *ngFor="let manufLine of manufacturingLines" [value]='manufLine'>{{manufLine}}</mat-list-option>
+        </mat-selection-list>
+      </mat-menu>
+
+      <h5>Manufacturing Rate</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Manufacturing Rate" formControlName="rate" id="rate">
+        <mat-error *ngIf="hasSKUError('rate', 'required')">Manufacturing rate is required</mat-error>
+      </mat-form-field>
+
+      <h5>Manufacturing Setup Cost</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Manufacturing Setup Cost" formControlName="setup" id="setup">
+        <mat-error *ngIf="hasSKUError('setup', 'required')">Manufacturing setup cost is required</mat-error>
+      </mat-form-field>
+
+      <h5>Manufacturing Run Cost</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Manufacturing Run Cost" formControlName="run" id="run">
+        <mat-error *ngIf="hasSKUError('run', 'required')">Manufacturing run cost is required</mat-error>
+      </mat-form-field>
+
+      <h5>Comment</h5>
+      <mat-form-field>
+        <textarea matInput type="text" placeholder="Comment" formControlName="comment" id="comment"></textarea>
+      </mat-form-field>
+      
+    </form>
+    <br>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-raised-button color="accent" (click)="submit(formulaForm.value)">submit</button>
+  </mat-card-actions>
+</mat-card>
+ -->

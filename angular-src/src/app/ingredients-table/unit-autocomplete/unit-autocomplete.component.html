@@ -1,0 +1,8 @@
+<mat-form-field style="width: 200px;" floatLabel="never">
+  <input type="text" placeholder="Quantity-Unit" matInput [formControl]="inputField" [matAutocomplete]="auto" (blur)="onBlur()" required>
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+    <mat-option *ngFor="let option of filteredUnits | async" [value]="option">
+      {{option}}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

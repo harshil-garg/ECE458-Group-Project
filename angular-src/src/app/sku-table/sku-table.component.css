@@ -9,6 +9,7 @@ mat-header-cell {
 
 .remove {
   float:left;
+  margin-left: 20px;
 }
 
 .add {
@@ -18,19 +19,19 @@ mat-header-cell {
 .export_skus {
   float: left;
   position: relative;
-  left: 30%;
+  left: 26%;
 }
 
 .export_formulas {
   float: left;
   position: relative;
-  left: 30%;
+  left: 26%;
 }
 
 .search {
   float: left;
   position: relative;
-  left: 37%;
+  left: 40%;
 }
 
 table {
@@ -81,7 +82,6 @@ tr.example-element-row:not(.example-expanded-row):active {
   opacity: 0.5;
 }
 
-
 mat-icon:hover{
   cursor: pointer;
 }
@@ -101,4 +101,26 @@ mat-icon:hover{
 
 button {
   margin: 5px;
+  margin-top: 20px;
+}
+
+.mat-cell {
+  padding: 8px 8px 8px 0;
+}
+
+.main-centered {
+  text-align: center;
+}
+
+.centered {
+  display:inline-block;
+}
+
+h1 {
+  padding-top: 20px;
+  margin-bottom: 5px;
+}
+
+.small-cell{
+  width: 10px;
 }

@@ -197,7 +197,7 @@ async function handleFiles(res) {
       await Formula.attemptImport(jsonFormulas, csvFormulas, results);
     }
     // if theres errors, end the session
-    if (results.ingredients.errorlist.length || results.skus.errorlist.length || results.product_lines.errorlist.length || results.formulas.errorlist.length) {
+    if (results.ingredients.errorlist.length>0 || results.skus.errorlist.length>0 || results.product_lines.errorlist.length>0 || results.formulas.errorlist.length>0) {
       results.success = false;
       uploadSessionStarted = false;
     }else {
@@ -327,6 +327,7 @@ function resetSession() {
       createlist: [],
     },
     formulas: {
+      changelist: [],
       createlist: [],
     }
   };
@@ -341,7 +342,7 @@ async function asyncForEach(array, callback) {
   }
 }
 
-let sku_properties = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#', 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
+let sku_properties = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#', 'Formula factor', 'ML Shortnames', 'Rate', 'Mfg setup cost', 'Mfg run cost', 'Comment'];
 let ingredient_properties = ['Ingr#', 'Name', 'Vendor Info', 'Size', 'Cost', 'Comment'];
 let product_properties = ['Name'];
 let formula_properties = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];

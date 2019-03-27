@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddSkuDialogComponent } from './add-sku-dialog/add-sku-dialog.component';
 import { CrudSkuService, Response } from '../crud-sku.service';
 import { SkuTableComponent } from '../sku-table.component';
@@ -17,7 +17,7 @@ export class AddSkuComponent {
   sku: Sku = new Sku();
 
   constructor(public dialog: MatDialog, public crudSkuService: CrudSkuService,
-    public skuTableComponent: SkuTableComponent) {}
+    public skuTableComponent: SkuTableComponent, private snackBar: MatSnackBar) {}
 
   public openDialog() {
     let dialogRef = this.dialog.open(AddSkuDialogComponent, {
@@ -44,10 +44,12 @@ export class AddSkuComponent {
         size: sku.unit_size,
         count: sku.count_per_case,
         product_line: sku.product_line,
-        formula: sku.formula.number.toString(),
+        formula: sku.formula,
         formula_scale_factor: sku.formula_scale_factor,
         manufacturing_lines: sku.manufacturing_lines,
         manufacturing_rate: sku.manufacturing_rate,
+        setup_cost: sku.setup_cost,
+        run_cost: sku.run_cost,
         comment: sku.comment
       }).subscribe(
       response => this.handleResponse(response),
@@ -60,8 +62,13 @@ export class AddSkuComponent {
   }
 
   private handleResponse(response: Response) {
+    if (!response.success) {
+      this.snackBar.open(response.message, "Close", {duration:3000});
+    } else {
+      this.skuTableComponent.refresh();
+    }
     console.log(response);
-    this.skuTableComponent.refresh();
+    
   }
 
 }

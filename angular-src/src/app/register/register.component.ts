@@ -15,6 +15,7 @@ import 'rxjs/add/operator/switchMap';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
+	newAdminSelection = false;
 	adminSelection = false;
 	adminFormControl = new FormControl();
 	suggestedUsers = [];
@@ -33,23 +34,31 @@ export class RegisterComponent implements OnInit {
 	}
 
 	register(name: string, email: string, password: string, password2: string) {
-		this.accountsService.register(name, email, password, password2, this.adminSelection).subscribe((response) => {
+		this.accountsService.register(name, email, password, password2, this.newAdminSelection).subscribe((response) => {
 				this.snackBar.open(response.message, 'close');
 		}, (err) => {
 			this.snackBar.open(err, 'close');
 		});
 	}
 
-	makeAdmin(email: string) {
-		this.accountsService.makeAdmin(email).subscribe((response) => {
+	updatePriveleges(email: string, admin: boolean) {
+		this.accountsService.updatePriveleges(email, admin).subscribe((response) => {
 				this.snackBar.open(response.message, 'close');
 		}, (err) => {
 			this.snackBar.open(err, 'close');
 		});
+	}
+
+	deleteUser(email: string) {
+		this.accountsService.deleteUser(email).subscribe((response) => {
+			this.snackBar.open(response.message, 'close');
+	}, (err) => {
+		this.snackBar.open(err, 'close');
+	});
 	}
 
   isAdmin(){
-    return this.authenticationService.loginState.isAdmin;
+    return this.authenticationService.isAdmin();
   }
 
 }

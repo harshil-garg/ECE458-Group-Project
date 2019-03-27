@@ -1,4 +1,3 @@
-// We’ll declare all our dependencies here
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
@@ -8,10 +7,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
-
 const uploadroute = require('./routes/upload');
 const exportroute = require('./routes/export');
-const passport_config = require('./config/passport');
+require('./config/passport');
 const mongo_config = require('./config/database');
 const elastic = require('./config/elasticsearch');
 const users = require('./routes/user');
@@ -22,13 +20,17 @@ const manufacturing_goals = require('./routes/manufacturing_goal');
 const formulas = require('./routes/formula');
 const manufacturing_lines = require('./routes/manufacturing_line');
 const manufacturing_schedule = require('./routes/manufacturing_schedule');
-
+const sales_record = require('./routes/sales_record');
+const customers = require('./routes/customer');
+const jwt = require("jsonwebtoken");
+const login = require('./routes/login')
 //Connect mongoose to our database
 mongoose.connect(mongo_config.uri, { useNewUrlParser: true }, function(err) {
     if (err) {
         console.log("Not connected to database: "+err);
     } else {
         console.log("Successfully connected to MongoDB")
+	console.log(mongo_config.uri)
     }
 });
 
@@ -51,29 +53,22 @@ app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-app.use(
-    session({
-        secret: 'secret',
-        resave: true,
-        saveUninitialized: true
-    })
-);
 
 app.use(passport.initialize());
-app.use(passport.session());
-
 // Routes
-app.use('/api/*', ensureAuthenticated);
-app.use('/api/upload', uploadroute);
-app.use('/api/export', exportroute);
-app.use('/api/ingredients', ingredients);
-app.use('/api/skus', skus)
-app.use('/api/product_lines', product_lines);
-app.use('/api/users', users);
-app.use('/api/manufacturing_goals', manufacturing_goals);
-app.use('/api/formulas', formulas.router);
-app.use('/api/manufacturing_lines', manufacturing_lines);
-app.use('/api/manufacturing_schedule', manufacturing_schedule);
+app.use('/api/login', login);
+app.use('/api/upload', passport.authenticate('jwt', { session: false }), uploadroute);
+app.use('/api/export', passport.authenticate('jwt', { session: false }), exportroute);
+app.use('/api/ingredients', passport.authenticate('jwt', { session: false }), ingredients);
+app.use('/api/skus', passport.authenticate('jwt', { session: false }), skus)
+app.use('/api/product_lines', passport.authenticate('jwt', { session: false }), product_lines);
+app.use('/api/users', passport.authenticate('jwt', { session: false }), users);
+app.use('/api/manufacturing_goals', passport.authenticate('jwt', { session: false }), manufacturing_goals);
+app.use('/api/formulas', passport.authenticate('jwt', { session: false }), formulas.router);
+app.use('/api/manufacturing_lines', passport.authenticate('jwt', { session: false }), manufacturing_lines);
+app.use('/api/manufacturing_schedule', passport.authenticate('jwt', { session: false }), manufacturing_schedule);
+app.use('/api/sales_record', passport.authenticate('jwt', { session: false }),sales_record);
+app.use('/api/customers', passport.authenticate('jwt', { session: false }), customers);
 
 //Create https server
 let httpsServer = https.createServer({
@@ -85,11 +80,3 @@ let httpsServer = https.createServer({
 httpsServer.listen(port, () => {
     console.log(`Starting the server at port ${port}`);
 });
-
-
-function ensureAuthenticated(req, res, next) {
-    if(req.isAuthenticated() || req.originalUrl === '/api/users/login'){
-         return next();
-    }
-    res.redirect('/login');
-}

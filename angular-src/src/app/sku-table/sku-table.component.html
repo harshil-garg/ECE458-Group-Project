@@ -1,14 +1,16 @@
-<h2 class="mat-display-2">SKUs</h2>
+<h1 class="mat-display-3" align="center">SKUs</h1>
 <div class="search-div">
     <app-search-sku class="search"></app-search-sku>
     <br style="clear:both" />
 </div>
+<div *ngIf="isAdmin()" align="center">
+  <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
+</div>
 <div class="button-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <app-bulk-sku-edit *ngIf="isAdmin()" [selectedSkus]="selection.selected"></app-bulk-sku-edit>
   <app-add-sku class="add" *ngIf="isAdmin()"></app-add-sku>
-  <button mat-raised-button="export_skus" class="export_skus" type="button" (click)="exportSkus()" color="accent">Export SKUs</button>
-  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="exportFormulas()" color="accent">Export Formulas</button>
+  <button mat-raised-button="export_skus" class="export_skus" type="button" (click)="exportSkus()" color="accent">Export</button>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>
@@ -39,17 +41,17 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-			  <input #name matInput placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
+			  <input #name matInput class = "padded-input" [readonly]="!isEditable()" placeholder="Name" [value]="element.name" maxlength="32" (blur)="edit(element.id, 'name', name.value)" required>
 			</mat-form-field>
     </td>
   </ng-container>
 
-  <!-- Name Column -->
+  <!-- Number Column -->
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #number matInput placeholder="Number" [value]="element.id" (blur)="edit(element.id, 'id', number.value)" required>
+        <input #number matInput placeholder="Number" [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.id, 'id', number.value)" optional>
       </mat-form-field>
     </td>
   </ng-container>
@@ -59,7 +61,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Case UPC Number</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #case_upc matInput placeholder="Case UPC" [value]="element.case_upc" (blur)="edit(element.id, 'case_upc', case_upc.value)" required>
+        <input #case_upc matInput placeholder="Case UPC" [readonly]="!isEditable()" [value]="element.case_upc" (blur)="edit(element.id, 'case_upc', case_upc.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -69,27 +71,27 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit UPC Number</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #unit_upc matInput placeholder="Unit UPC" [value]="element.unit_upc" (blur)="edit(element.id, 'unit_upc', unit_upc.value)" required>
+        <input #unit_upc matInput placeholder="Unit UPC" [readonly]="!isEditable()" [value]="element.unit_upc" (blur)="edit(element.id, 'unit_upc', unit_upc.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
 
   <!-- Cost Per Package Column -->
-  <ng-container matColumnDef="unit_size">
+  <ng-container matColumnDef="size">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit Size</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #unit_size matInput placeholder="Unit Size" [value]="element.unit_size" (blur)="edit(element.id, 'unit_size', unit_size.value)" required>
+        <input #unit_size matInput placeholder="Unit Size" [readonly]="!isEditable()" [value]="element.unit_size" (blur)="edit(element.id, 'unit_size', unit_size.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
 
   <!-- Comment Column -->
-  <ng-container matColumnDef="count_per_case">
+  <ng-container matColumnDef="count">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Count Per Case</th>
-    <td mat-cell *matCellDef="let element">
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #count_per_case matInput placeholder="Count Per Case" [value]="element.count_per_case" (blur)="edit(element.id, 'count_per_case', count_per_case.value)" required>
+        <input #count_per_case matInput placeholder="Count Per Case" [readonly]="!isEditable()" [value]="element.count_per_case" (blur)="edit(element.id, 'count_per_case', count_per_case.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -98,9 +100,8 @@
   <ng-container matColumnDef="product_line">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Line</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #product_line matInput placeholder="Product Line" [value]="element.product_line" (blur)="edit(element.id, 'product_line', product_line.value)" required>
-      </mat-form-field>
+      <app-product-line-autocomplete *ngIf="isEditable()" [initProductLine]="element.product_line" (messageEvent)="edit(element.id, 'product_line', $event)"></app-product-line-autocomplete>
+      <ng-container *ngIf="!isEditable()">{{element.product_line}}</ng-container>
     </td>
   </ng-container>
 
@@ -108,53 +109,19 @@
   <ng-container matColumnDef="formula">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula</th>
     <td mat-cell *matCellDef="let element">
-
-      <mat-accordion>
-        <mat-expansion-panel class="mat-elevation-z0">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <input type="text" class="form-control" maxlength="32" id="formula_name" (click)="stopPropagation($event)" placeholder="Formula Name" required [(ngModel)]="element.formula.name" name="formula_name" #formula_name>
-            </mat-panel-title>
-            <mat-panel-description>
-              Edit Formula
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <div>
-            <mat-form-field>
-              <input matInput type="text" class="form-control" id="number" required [(ngModel)]="element.formula.number" placeholder="Formula Number" name="number" #number="ngModel">
-            </mat-form-field>
-            <br>
-            <mat-form-field>
-              <textarea matInput type="text" class="form-control" id="comment" required [(ngModel)]="element.formula.comment" placeholder="Comment" name="comment" #comment="ngModel"></textarea>
-            </mat-form-field>
-          </div>
-          <mat-card>
-            <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
-            <mat-chip-list>
-              <ng-container *ngFor="let ingredient of element.formula.ingredient_tuples; let ingr_id=index">
-                <div>
-                  <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
-                </div>
-              </ng-container>
-            </mat-chip-list>
-            <app-ingredient-autocomplete (messageEvent)="setIngredientInput(id, $event)"></app-ingredient-autocomplete>
-            <mat-form-field style="width: 200px;">
-              <input matInput [(ngModel)]="quantityInput" (keydown) = "keyPressed($event)" name="quantity" type="text" placeholder="Quantity"/><br>
-            </mat-form-field>
-            <button mat-raised-button type="button" (click)="addIngredientQuantity(id, $event)" color="accent">Add Ingr-Quant</button>
-          </mat-card>
-        </mat-expansion-panel>
-      </mat-accordion>
-
+      <app-formula-editor *ngIf="isEditable()" (formulaOutput)="updateFormula(element.id, $event)" [initFormula]="element.formula"></app-formula-editor>
+      <ng-container *ngIf="!isEditable()">
+        {{element.formula.name}} ({{element.formula.number}})
+      </ng-container>
     </td>
   </ng-container>
 
   <!-- Formula Scale Factor Column -->
   <ng-container matColumnDef="formula_scale_factor">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula Scale Factor</th>
-    <td mat-cell *matCellDef="let element">
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #formula_scale_factor matInput placeholder="Formula Scale Factor" [value]="element.formula_scale_factor" (blur)="edit(element.id, 'formula_scale_factor', formula_scale_factor.value)" required>
+        <input #formula_scale_factor matInput placeholder="Formula Scale Factor" [readonly]="!isEditable()" [value]="element.formula_scale_factor" (blur)="edit(element.id, 'formula_scale_factor', formula_scale_factor.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -163,31 +130,55 @@
   <ng-container matColumnDef="manufacturing_lines">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Lines</th>
     <td mat-cell *matCellDef="let element">
-      <mat-list>
-        <ng-container *ngFor="let manufLine of element.manufacturing_lines; let id=index">
-          <mat-divider *ngIf="id>0"></mat-divider>
-          <mat-list-item>{{manufLine}}</mat-list-item>
-        </ng-container>
-      </mat-list>
+      <div class="main-centered">
+        <div class="centered">
+          <mat-chip-list class="mat-chip-list-stacked">
+            <ng-container *ngFor="let manufLine of element.manufacturing_lines; let id=index">
+              <mat-chip>{{manufLine}}</mat-chip>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+      </div>
     </td>
   </ng-container>
 
   <!-- Manufacturing Rate -->
   <ng-container matColumnDef="manufacturing_rate">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturing Rate</th>
-    <td mat-cell *matCellDef="let element">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Rate</th>
+    <td mat-cell class="small-cell" *matCellDef="let element">
       <mat-form-field floatLabel="never" class="input-flex-width">
-        <input #manufacturing_rate matInput placeholder="Manufacturing Rate" [value]="element.manufacturing_rate" (blur)="edit(element.id, 'manufacturing_rate', manufacturing_rate.value)" required>
+        <input #manufacturing_rate matInput placeholder="Manufacturing Rate" [readonly]="!isEditable()" [value]="element.manufacturing_rate" (blur)="edit(element.id, 'manufacturing_rate', manufacturing_rate.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
+
+  <!-- Setup cost Column -->
+  <ng-container matColumnDef="setup_cost">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Setup Cost</th>
+    <td mat-cell class="small-cell" *matCellDef="let element">
+      <mat-form-field floatLabel="never" class="input-flex-width">
+        <input #setup_cost matInput placeholder="Setup Cost" [readonly]="!isEditable()" [value]="element.setup_cost" (blur)="edit(element.id, 'setup_cost', setup_cost.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
+  <!-- Run cost Column -->
+  <ng-container matColumnDef="run_cost">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Run Cost</th>
+    <td mat-cell class="small-cell" *matCellDef="let element">
+      <mat-form-field floatLabel="never" class="input-flex-width">
+        <input #run_cost matInput placeholder="Run Cost" [readonly]="!isEditable()" [value]="element.run_cost" (blur)="edit(element.id, 'run_cost', run_cost.value)" required>
+      </mat-form-field>
+    </td>
+  </ng-container>
+
 
   <!-- Comment Column -->
   <ng-container matColumnDef="comment">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #comment matInput placeholder="Comment" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
+        <textarea #comment matInput placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>

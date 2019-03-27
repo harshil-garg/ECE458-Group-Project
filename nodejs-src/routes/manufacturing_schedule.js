@@ -149,13 +149,13 @@ router.post('/update', async (req, res) => {
     }
 
     let json = {};
-    if(manufacturing_line){
+    if(manufacturing_line != undefined && manufacturing_line != NaN){
         json['manufacturing_line'] = errors.manufacturing_line;
     }
-    if(start_date){
+    if(start_date != undefined && start_date != NaN){
         json['start_date'] = start_date;
     }
-    if(duration){
+    if(duration != undefined && duration != NaN){
         let sku = await SKU.findOne({_id: errors.sku}).exec();
         let goal = await ManufacturingGoal.findOne({_id: errors.manufacturing_goal}).exec();
         let quantity;

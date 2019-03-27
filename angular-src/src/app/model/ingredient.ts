@@ -3,6 +3,7 @@ import { MeasurementUnit } from './measurement-unit'
 export class Tuple {
     ingredient: string;
     quantity: number;
+    unit: string;
 }
 
 export class NumberUnit {

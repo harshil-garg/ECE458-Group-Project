@@ -1,0 +1,8 @@
+<mat-form-field style="width: 200px;">
+  <input type="text" placeholder="Formula Name" maxlength="32" matInput (click)="stopPropagation($event)" [formControl]="inputField" [matAutocomplete]="auto" (blur)="onBlur()">
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSelectionChanged($event)">
+    <mat-option *ngFor="let formula of suggestedFormulas" [value]="formula">
+      {{formula.name}} ({{formula.number}})
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

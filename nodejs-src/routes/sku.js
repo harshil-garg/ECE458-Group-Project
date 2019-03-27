@@ -64,6 +64,12 @@ router.post('/populate_lines', async (req, res) => {
         none.push(line.shortname)
     }
 
+    some = new Set(some)
+    for(let line of all){
+        some.delete(line);
+    }
+    some = Array.from(some);
+
     let results = {
         all: all,
         some: some,
@@ -119,9 +125,14 @@ router.post('/filter', async (req, res) => {
     key_exps = keywords.map((keyword) => {
         return new RegExp(keyword, 'i');
     });
+
+    let product_exps;
+    product_exps = product_lines.map((line) => {
+        return new RegExp(line, 'i');
+    })
     
 
-    let result = await sku_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients, product_lines);
+    let result = await sku_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients, product_exps);
     
     res.json(result);
 });
@@ -129,30 +140,33 @@ router.post('/filter', async (req, res) => {
 
 //Create
 router.post('/create', async (req, res) => {
-    const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
+    const { name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment } = req.body;
 
-    let product_passed = await validator.itemExists(ProductLine, product_line);
-    let manufacturings_passed = []
-    let manufacturing_ids = [];
-    for(let line of manufacturing_lines){
-        let manufacturing_passed = await validator.itemExists(ManufacturingLine, line);
-        manufacturings_passed.push(manufacturing_passed);
-        manufacturing_ids.push(manufacturing_passed[2]);
-    }   
-    let case_passed = sku_validator.isUPCStandard(case_upc);
-    let unit_passed = sku_validator.isUPCStandard(unit_upc);
-    let name_passed = validator.proper_name_length(name);
-    let count_passed = validator.isPositive(count, 'Count');
-    let scale_passed = validator.isPositive(formula_scale_factor, 'Scale factor');
-    let rate_passed = validator.isPositive(manufacturing_rate, 'Manufacturing Rate');
-    
-    let errors = validator.compileErrors(product_passed, ...manufacturings_passed, case_passed, unit_passed, name_passed, count_passed, scale_passed, rate_passed);
-    if(errors.length > 0){
-        res.json({success: false, message: errors});
+    let sku = {
+        name: name,
+        number: number,
+        case_upc: case_upc,
+        unit_upc: unit_upc,
+        size: size,
+        count: count,
+        product_line: product_line,
+        formula: formula.number,
+        formula_scale_factor: formula_scale_factor,
+        manufacturing_lines: manufacturing_lines,
+        manufacturing_rate: manufacturing_rate,
+        setup_cost: setup_cost,
+        run_cost: run_cost,
+        comment: comment
+    }
+
+    let error = await SKU.syntaxValidation(sku);
+    if(error != null){
+        console.log(error)
+        res.json({success: false, message: error});
         return;
     }
+    
     let int_count = validator.forceInteger(count);
-    let product_line_id = product_passed[2];
 
     let formula_id = await formulaHandler(formula, res);
     if(!formula_id){
@@ -160,22 +174,13 @@ router.post('/create', async (req, res) => {
         return;
     }
 
-    if(number){
-        create_SKU(name, number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);
-    }else{
-        let gen_number = await generator.autogen(SKU);
-        create_SKU(name, gen_number, case_upc, unit_upc, size, int_count, product_line_id, formula_id, formula_scale_factor, manufacturing_ids, manufacturing_rate, comment, res);        
-    }    
+    create_SKU(name, sku.number, case_upc, unit_upc, size, int_count, sku.product_line, formula_id, formula_scale_factor, sku.manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment, res);
 });
 
 async function formulaHandler(formula, res){
-    if(!formula.ingredient_tuples){    //if no tuples then this should be existing formula
-        let formula_passed = await validator.itemExists(Formula, formula.number.toString());
-        if(!formula_passed[0]){
-            res.json({success: false, message: formula_passed[1]});
-            return;
-        }
-        return formula_passed[2];
+    let formula_exists = await Formula.findOne({name: formula.name});
+    if(formula_exists != null){    //existing formula
+        return formula_exists._id;
     }else{  //create new formula
         if(formula.number){
             try{
@@ -204,20 +209,23 @@ async function formulaHandler(formula, res){
     }
 }
 
-function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment, res){
-    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment});
+function create_SKU(name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment, res){
+    let sku = new SKU({name, number, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment});
     SKU.createSKU(sku, (err) => {
         if(err){
+            console.log(err)
             res.json({success: false, message: `Failed to create SKU. Error: ${err}`});
+            return;
         }else{
             res.json({success: true, message: "Created successfully"});
+            return;
         }
     });
 }
 
 //Update
 router.post('/update', async (req, res) => {
-    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, comment } = req.body;
+    const { name, number, newnumber, case_upc, unit_upc, size, count, product_line, formula, formula_scale_factor, manufacturing_lines, manufacturing_rate, setup_cost, run_cost, comment } = req.body;
 
     let sku = await SKU.findOne({number: number}).exec();
     if(sku == null){
@@ -227,7 +235,7 @@ router.post('/update', async (req, res) => {
     let deleted_lines = []
 
     var json = {};
-    if (name) {
+    if (name != undefined && name != NaN) {
         name_passed = validator.proper_name_length(name);
         if(!name_passed[0]){
             res.json({success: false, message: name_passed[1]});
@@ -235,10 +243,21 @@ router.post('/update', async (req, res) => {
         }
         json["name"] = name;
     }
-    if (newnumber) {
+    if (newnumber != undefined && newnumber != NaN) {
+        let num_numeric = validator.isNumeric(newnumber);
+        if(!num_numeric[0]){
+            res.json({success: false, message: num_numeric[1]});
+            return;
+        }else{
+            let num_positive = validator.isPositive(newnumber, 'Number');
+            if(!num_positive[0]){
+                res.json({success: false, message: num_positive[1]});
+                return;     
+            }
+        }   
         json["number"] = newnumber;
     }
-    if (case_upc) {
+    if (case_upc != undefined && case_upc != NaN) {
         let case_passed = sku_validator.isUPCStandard(case_upc);
         if(!case_passed[0]){
             res.json({success: false, message: case_passed[1]});
@@ -246,7 +265,7 @@ router.post('/update', async (req, res) => {
         }
         json["case_upc"] = case_upc;
     }
-    if (unit_upc) {
+    if (unit_upc != undefined && unit_upc != NaN) {
         let unit_passed = sku_validator.isUPCStandard(unit_upc);
         if(!unit_passed[0]){
             res.json({success: false, message: unit_passed[1]});
@@ -254,18 +273,24 @@ router.post('/update', async (req, res) => {
         }
         json["unit_upc"] = unit_upc;
     }
-    if (size) {
+    if (size != undefined && size != NaN) {
         json["size"] = size;
     }
-    if (count) {
-        let count_passed = validator.isPositive(count);
-        if(!count_passed[0]){
-            res.json({success: false, message: count_passed[1]});
+    if (count != undefined && count != NaN) {
+        let count_numeric = validator.isNumeric(count);
+        if(!count_numeric[0]){
+            res.json({success: false, message: count_numeric[1]});
             return;
-        }
+        }else{
+            let count_positive = validator.isPositive(count, 'Count');
+            if(!count_positive[0]){
+                res.json({success: false, message: count_positive[1]});
+                return;     
+            }
+        }  
         json["count"] = count;
     }
-    if (product_line) {
+    if (product_line != undefined && product_line != NaN) {
         let product_passed = await validator.itemExists(ProductLine, product_line);
         if(!product_passed[0]){
             res.json({success: false, message: product_passed[1]});
@@ -273,7 +298,7 @@ router.post('/update', async (req, res) => {
         }
         json["product_line"] = product_passed[2];
     }
-    if (formula) {
+    if (formula != undefined && formula != NaN) {
         let formula_id = await formulaHandler(formula, res);
         if(!formula_id){
             return;
@@ -281,15 +306,21 @@ router.post('/update', async (req, res) => {
 
         json["formula"] = formula_id;
     }
-    if (formula_scale_factor) {
-        let scale_passed = validator.isPositive(formula_scale_factor);
-        if(!scale_passed[0]){
-            res.json({success: false, message: scale_passed[1]});
+    if (formula_scale_factor != undefined && formula_scale_factor != NaN) {
+        let factor_numeric = validator.isNumeric(formula_scale_factor);
+        if(!factor_numeric[0]){
+            res.json({success: false, message: factor_numeric[1]});
             return;
-        }
+        }else{
+            let factor_positive = validator.isPositive(formula_scale_factor, 'Count');
+            if(!count_positive[0]){
+                res.json({success: false, message: count_positive[1]});
+                return;     
+            }
+        }  
         json["formula_scale_factor"] = formula_scale_factor;
     }
-    if (manufacturing_lines) {
+    if (manufacturing_lines != undefined && manufacturing_lines != NaN) {
         let manufacturings_passed = []
         let ids = []
         for(let line of manufacturing_lines){
@@ -317,7 +348,7 @@ router.post('/update', async (req, res) => {
 
         json["manufacturing_lines"] = ids;
     }
-    if (manufacturing_rate) {       
+    if (manufacturing_rate != undefined && manufacturing_rate != NaN) {       
         let map = await ManufacturingSchedule.findOne({'activity.sku': sku._id}).exec();
         if(map != null && manufacturing_rate != sku.manufacturing_rate){
             res.json({success: false, message: 'Cannot edit rate of a SKU that has been mapped to the Manufacturing Schedule'});
@@ -331,7 +362,35 @@ router.post('/update', async (req, res) => {
         }
         json["manufacturing_rate"] = manufacturing_rate;
     }
-    if (comment) {
+    if(setup_cost != undefined && setup_cost != NaN){
+        let setup_numeric = validator.isNumeric(setup_cost);
+        if(!setup_numeric[0]){
+            res.json({success: false, message: setup_numeric[1]});
+            return;
+        }else{
+            let setup_positive = validator.isPositive(setup_cost, 'Count');
+            if(!setup_positive[0]){
+                res.json({success: false, message: setup_positive[1]});
+                return;     
+            }
+        }  
+        json["setup_cost"] = setup_cost;
+    }
+    if(run_cost != undefined && run_cost != NaN){
+        let run_numeric = validator.isNumeric(run_cost);
+        if(!run_numeric[0]){
+            res.json({success: false, message: run_numeric[1]});
+            return;
+        }else{
+            let run_positive = validator.isPositive(run_cost, 'Count');
+            if(!run_positive[0]){
+                res.json({success: false, message: run_positive[1]});
+                return;     
+            }
+        }  
+        json["run_cost"] = run_cost;
+    }
+    if (comment != undefined && comment != NaN) {
         json["comment"] = comment;
     }
 

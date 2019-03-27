@@ -20,6 +20,7 @@ export class ProductLineTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     ngOnInit() {
@@ -57,31 +58,33 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, updated_value:any) {
-      var editedProductLine : ProductLine = new ProductLine();
-      var newName : string;
-      editedProductLine.name = name;
-      switch(property){
-        case 'name':{
-          newName = updated_value; //new name
+      if(this.isEditable()){
+        var editedProductLine : ProductLine = new ProductLine();
+        var newName : string;
+        editedProductLine.name = name;
+        switch(property){
+          case 'name':{
+            newName = updated_value; //new name
+          }
         }
-      }
-      this.crudProductLineService.edit({
-          name : editedProductLine.name,
-          newname: newName
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
-          }
-          else{
-            this.handleError(response);
-          }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
-          };
+        this.crudProductLineService.edit({
+            name : editedProductLine.name,
+            newname: newName
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            };
         });
+      }
     }
 
     private handleError(response){
@@ -90,19 +93,20 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //refreshing every time gets rid of active element
       //this.refresh();
     }
 
     isAdmin() {
-      return this.authenticationService.loginState.isAdmin;
+      return this.authenticationService.isAdmin();
     }
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1
       this.crudProductLineService.read({
-          pageNum: this.paginator.pageIndex+1,
+          pageNum: pageIndex,
           page_size: this.paginator.pageSize
         }).subscribe(
         response => this.handleRefreshResponse(response),
@@ -175,5 +179,9 @@ export class ProductLineTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 }

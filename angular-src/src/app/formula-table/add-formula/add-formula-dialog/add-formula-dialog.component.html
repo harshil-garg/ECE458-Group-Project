@@ -1,0 +1,69 @@
+<h1>Add Formula</h1>
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="formulaForm" autocomplete="off" novalidate (ngSubmit)="submit(formulaForm.value)" fxLayout="column wrap"
+    fxLayoutAlign="center center" fxLayoutGap="10px">
+
+      <h5>Formula Number</h5>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Formula Number" formControlName="number" id="number">
+        <mat-error *ngIf="hasFormulaError('number', 'required')">Number is required</mat-error>
+      </mat-form-field>
+
+      <h5>Formula Name</h5>
+      <mat-form-field>
+        <input matInput maxlength="32" type="text" placeholder="Formula Name" formControlName="name" id="name">
+        <mat-error *ngIf="hasFormulaError('name', 'required')">Name is required</mat-error>
+      </mat-form-field>
+
+      <h5>Comment</h5>
+      <mat-form-field>
+        <textarea matInput type="text" placeholder="Comment" formControlName="comment" id="comment"></textarea>
+      </mat-form-field>
+
+    </form>
+    <mat-card class="mat-elevation-z3">
+        <mat-card-title>Ingredient Quantity Pairs</mat-card-title>
+        <div class="tuple-list">
+          <mat-chip-list class="mat-chip-list-stacked">
+            <ng-container *ngFor="let ingredient of ingredient_tuples; let ingr_id=index">
+              <div>
+                <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} {{ingredient.unit}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
+              </div>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+
+
+        <mat-card-content>
+            <form [formGroup]='tupleForm' autocomplete="off" novalidate (ngSubmit)="addTuple(tupleForm.value)" fxLayout="column wrap"
+            fxLayoutAlign="center center" fxLayoutGap="10px">
+
+              <h5>Ingredient</h5>
+              <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
+
+              <h5>Quantity</h5>
+              <mat-form-field>
+                <input matInput type="text" placeholder="Quantity" formControlName="quantity" id="quantity">
+                <mat-error *ngIf="hasTupleError('quantity', 'required')">Quantity is required</mat-error>
+              </mat-form-field>
+
+              <h5>Unit</h5>
+              <mat-form-field>
+                <input matInput type="text" placeholder="Unit" formControlName="unit" id="unit">
+                <mat-error *ngIf="hasTupleError('unit', 'required')">Unit is required</mat-error>
+              </mat-form-field>
+              <br>
+
+            </form>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="accent" (click)="addTuple(tupleForm.value)">Add Pair</button>
+        </mat-card-actions>
+      </mat-card>
+    <br>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-raised-button color="accent" (click)="submit(formulaForm.value)">submit</button>
+  </mat-card-actions>
+</mat-card>

@@ -51,7 +51,7 @@ module.exports.filter = async function(pageNum, sortBy, page_size, keywords, ing
     {$unwind: '$product_line'},
     {$addFields: {product_line: '$product_line.name'}});
     if(product_lines.length > 0){
-        pipeline.push({$match: {'product_line.name': {$all: product_lines}}});   
+        pipeline.push({$match: {'product_line': {$all: product_lines}}});   
     }
     pipeline.push({
         $lookup: {
@@ -76,7 +76,7 @@ function populateIngredients(result){
         for(let ingredient of item.ingredients){
             for(let tuple of item.formula.ingredient_tuples){
                 if(ingredient._id.equals(tuple.ingredient)){
-                    tuple.ingredient = ingredient;
+                    tuple.ingredient = ingredient.name;
                 }
             }
         }

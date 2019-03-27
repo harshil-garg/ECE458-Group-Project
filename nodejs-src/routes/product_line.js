@@ -19,7 +19,6 @@ router.post('/autocomplete', async (req, res) => {
 router.post('/create', (req, res) => {
     const {name} = req.body;
 
-
     let product_line = new ProductLine({name});
     ProductLine.createProductLine(product_line, (err) => {
         if(err){
@@ -45,10 +44,9 @@ router.post('/read', async (req, res) => {
 router.post('/update', (req, res) => {
     const { name, newname } = req.body;
 
-
     var json = {};
 
-    if (newname) {
+    if (newname != undefined && newname != NaN) {
         json["name"] = newname;
     }
 

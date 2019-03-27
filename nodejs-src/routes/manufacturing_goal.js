@@ -11,14 +11,16 @@ const validator = require('../controllers/validator');
 const unit = require('../controllers/units');
 const utils = require('../utils/utils');
 const manufacturing_goal_filter = require('../controllers/manufacturing_goal_filter');
+const jwtDecode = require('jwt-decode');
 
 
 function getUser(req){
-    if(!req.user){
-        return;
-    }else {
-        return req.user.email;
-    }
+    let jwt = req.headers.authorization
+    let payload = jwt.split(' ')[1]
+    let decoded = jwtDecode(payload)
+
+    return decoded.email;
+    
 }
 
 router.post('/calculator', async (req, res) => {
@@ -45,6 +47,11 @@ router.post('/calculator', async (req, res) => {
             let key = ingredient.name;
 
             let unit_value = sku_tuple.case_quantity * sku.formula_scale_factor * ingr_tuple.quantity * unit.convert(ingr_tuple.unit, ingredient.unit); // goal case quantity * sku scale factor * formula quantity * conversion
+
+            console.log("scale factor: "+sku.formula_scale_factor)
+            console.log("formula unit: "+ingr_tuple.unit+" formula amount: "+ingr_tuple.quantity)
+            console.log("ingredient unit: "+ingredient.unit)
+            console.log("conversion: "+unit.convert(ingr_tuple.unit, ingredient.unit))
 
             // If ingredient already in map, update values
             if(key in ingredientMap){
@@ -101,7 +108,7 @@ router.post('/create', async (req, res) => {
     // Check that SKUS exist
     let valid_tuples = [];
     for(let tuple of sku_tuples){
-        valid_tuples.push(await validator.itemExists(SKU, tuple.sku.toString()));
+        valid_tuples.push(await validator.itemExists(SKU, tuple.sku.number.toString()));
     }
 
     let errors = validator.compileErrors(...valid_tuples);

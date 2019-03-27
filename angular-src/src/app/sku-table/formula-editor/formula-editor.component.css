@@ -1,0 +1,15 @@
+.fixed-width{
+  max-width: 400px;
+}
+
+.tuple-list {
+  max-height: 400px;
+  max-width: 400px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+mat-icon:hover{
+  cursor: pointer;
+  color: mediumaquamarine;
+}

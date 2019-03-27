@@ -1,3 +1,8 @@
 .bulk-edit-button {
     float: left;
 }
+
+button {
+  margin: 5px;
+  margin-top: 20px;
+}

@@ -4,6 +4,7 @@ import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { Formula } from '../model/formula'
 import { CrudSkuService, Response } from './crud-sku.service';
+import { CrudFormulaService } from '../formula-table/crud-formula.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
@@ -22,15 +23,13 @@ export class SkuTableComponent implements OnInit{
     ingredients: Array<any> = [];
     productLines: Array<any> = [];
 
-    ingredientInputs: Array<any> = [];
-    quantityInputs: Array<any> = [];
-
-    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'comment'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'size', 'count', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'setup_cost', 'run_cost', 'comment'];
     selection = new SelectionModel<Sku>(true, []);
     dataSource = new MatTableDataSource<Sku>(this.skuList);
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
 
@@ -46,7 +45,7 @@ export class SkuTableComponent implements OnInit{
       this.refresh();
     }
 
-    constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService,
+    constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService, public crudFormulaService: CrudFormulaService,
       public filterSkuService: FilterSkuService, private snackBar: MatSnackBar, private exportService: ExportService){}
 
     remove() {
@@ -75,66 +74,99 @@ export class SkuTableComponent implements OnInit{
     }
 
     edit(num:any, property:string, updated_value:any) {
-      var editedSku : Sku = new Sku();
-      var formula : Formula = new Formula();
-      editedSku.formula = formula;
-      var newNumber : number;
-      editedSku.id = num*1;
-      switch(property){
-        case 'name':{
-          editedSku.name = updated_value;
-          break;
+      if(this.isEditable()){
+        var editedSku : Sku = new Sku();
+        var formula : Formula = new Formula();
+        editedSku.formula = formula;
+        var newNumber : number;
+        editedSku.id = num*1;
+        switch(property){
+          case 'name':{
+            editedSku.name = updated_value;
+            break;
+          }
+          case 'id':{
+            newNumber = updated_value*1;
+            break;
+          }
+          case 'case_upc':{
+            editedSku.case_upc = updated_value;
+            break;
+          }
+          case 'unit_upc':{
+            editedSku.unit_upc = updated_value;
+            break;
+          }
+          case 'unit_size':{
+            editedSku.unit_size = updated_value;
+            break;
+          }
+          case 'count_per_case':{
+            editedSku.count_per_case = updated_value;
+            break;
+          }
+          case 'product_line':{
+            editedSku.product_line = updated_value;
+            break;
+          }
+          case 'formula':{
+            editedSku.formula = updated_value;
+            break;
+          }
+          case 'ingredient_quantity':{
+            //editedSku.ingredient_quantity = updated_value;
+            break;
+          }
+          case 'comment':{
+            editedSku.comment = updated_value;
+            break;
+          }
         }
-        case 'id':{
-          newNumber = updated_value*1;
-          break;
+        this.crudSkuService.edit({
+            name : editedSku.name,
+            number : editedSku.id,
+            newnumber: newNumber,
+            case_upc : editedSku.case_upc,
+            unit_upc: editedSku.unit_upc,
+            size : editedSku.unit_size,
+            count: editedSku.count_per_case,
+            product_line : editedSku.product_line,
+            formula: editedSku.formula.name,
+            formula_scale_factor: editedSku.formula_scale_factor,
+            manufacturing_lines: editedSku.manufacturing_lines,
+            manufacturing_rate: editedSku.manufacturing_rate,
+            setup_cost: editedSku.setup_cost,
+            run_cost: editedSku.run_cost,
+            comment: editedSku.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
+          });
         }
-        case 'case_upc':{
-          editedSku.case_upc = updated_value;
-          break;
-        }
-        case 'unit_upc':{
-          editedSku.unit_upc = updated_value;
-          break;
-        }
-        case 'unit_size':{
-          editedSku.unit_size = updated_value;
-          break;
-        }
-        case 'count_per_case':{
-          editedSku.count_per_case = updated_value;
-          break;
-        }
-        case 'product_line':{
-          editedSku.product_line = updated_value;
-          break;
-        }
-        case 'ingredient_quantity':{
-          //editedSku.ingredient_quantity = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedSku.comment = updated_value;
-          break;
-        }
-      }
-      this.crudSkuService.edit({
-          name : editedSku.name,
-          number : editedSku.id,
-          newnumber: newNumber,
-          case_upc : editedSku.case_upc,
-          unit_upc: editedSku.unit_upc,
-          size : editedSku.unit_size,
-          count: editedSku.count_per_case,
-          product_line : editedSku.product_line,
-          formula: editedSku.formula.name,
-          formula_scale_factor: editedSku.formula_scale_factor,
-          manufacturing_lines: editedSku.manufacturing_lines,
-          manufacturing_rate: editedSku.manufacturing_rate,
-          comment: editedSku.comment
+    }
+
+    updateFormula(id:number, updated_value:Formula) {
+      var editedFormula : Formula = updated_value;
+      this.crudFormulaService.edit({
+          name : editedFormula.name,
+          number : editedFormula.number.toString(),
+          newnumber: editedFormula.number.toString(),
+          ingredient_tuples: editedFormula.ingredient_tuples,
+          comment : editedFormula.comment
         }).subscribe(
         response => {
           if(response.success){
+            console.log("FORMULA SUCCESS");
             this.handleResponse(response);
           }
           else{
@@ -167,6 +199,8 @@ export class SkuTableComponent implements OnInit{
         formula_scale_factor: editedSku.formula_scale_factor,
         manufacturing_lines: editedSku.manufacturing_lines,
         manufacturing_rate: editedSku.manufacturing_rate,
+        setup_cost: editedSku.setup_cost,
+        run_cost: editedSku.run_cost,
         comment: editedSku.comment
       }).subscribe(
         response => {
@@ -204,7 +238,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     private handleResponse(response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh b/c deselects focused item
       //this.refresh();
     }
@@ -214,14 +248,15 @@ export class SkuTableComponent implements OnInit{
     }
 
     isAdmin() {
-      return this.authenticationService.loginState.isAdmin;
+      return this.authenticationService.isAdmin();
     }
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1;
       this.filterSkuService.filter({
           sortBy : this.sortBy,
-          pageNum: this.paginator.pageIndex.toString()+1,
+          pageNum: pageIndex.toString(),
           page_size: this.paginator.pageSize,
           keywords: this.keywords,
           ingredients: this.ingredients,
@@ -268,6 +303,8 @@ export class SkuTableComponent implements OnInit{
               formula_scale_factor: sku.formula_scale_factor,
               manufacturing_lines: manufLines,
               manufacturing_rate: sku.manufacturing_rate,
+              setup_cost: sku.setup_cost,
+              run_cost: sku.run_cost,
               comment: sku.comment
           });
         }
@@ -277,21 +314,6 @@ export class SkuTableComponent implements OnInit{
         this.totalDocs = response.total_docs;
         this.maxPages = response.pages;
         this.loadingResults = false;
-      }
-    }
-
-    keyPressed(sku_num, id, event){
-      if(event.keyCode == 13){ //enter pressed
-        if(this.ingredientInputs[id]!=null && this.ingredientInputs[id].length>0 && this.quantityInputs[id]!=null && this.quantityInputs[id].length>0){
-          var added_ingr_quant: Tuple = {
-            ingredient: this.ingredientInputs[id],
-            quantity: this.quantityInputs[id]
-          }
-          this.addIngredientQuantity(sku_num, id, added_ingr_quant);
-          this.refresh();
-          this.ingredientInputs[id] = '';
-          this.quantityInputs[id] = '';
-        }
       }
     }
 
@@ -312,7 +334,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     handleExportSkusResponse(response){
-      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
+      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Mfg setup cost', 'Mfg run cost', 'Comment'];
       this.exportService.exportJSON(headers, response.data, 'skus');
     }
 
@@ -344,43 +366,21 @@ export class SkuTableComponent implements OnInit{
     //   }
     // }
 
-    exportFormulas(){
-      this.filterSkuService.exportFormulas({
-        sortBy : this.sortBy,
-        keywords: this.keywords,
-        ingredients : this.ingredients,
-        product_lines : this.productLines
-      }).subscribe(
-      response => this.handleExportFormulasResponse(response),
-      err => {
-        if (err.status === 401) {
-          console.log("401 Error")
-          }
-        }
-      );
-    }
-
-    handleExportFormulasResponse(response){
-      const headers = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
-      this.exportService.exportJSON(headers, response.data, 'formulas');
-    }
-
-    setIngredientInput(id, event){
-      this.ingredientInputs[id] = event;
-    }
-
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
     setSearchedIngredients(newIngredients : Array<any>){
       this.ingredients = newIngredients;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
     setSearchedProductLines(newProductLines : Array<any>){
       this.productLines = newProductLines;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
@@ -397,8 +397,8 @@ export class SkuTableComponent implements OnInit{
           this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
-    stopPropagation(ev) {
-      ev.stopPropagation();
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 
 }

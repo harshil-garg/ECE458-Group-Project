@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FilterSkuService } from '../../../sku-table/filter-sku.service'
 import { FormControl } from '@angular/forms';
 import { AddManufacturingGoalDialogComponent } from '../add-manufacturing-goal-dialog/add-manufacturing-goal-dialog.component';
+import { Sku } from '../../../model/sku';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/switchMap';
@@ -13,37 +14,27 @@ import 'rxjs/add/operator/switchMap';
 })
 export class SearchSkuComponent implements OnInit {
 
+  input: string = "";
+  skuName: string = "";
+  productLine: string = "";
+  inputField: FormControl = new FormControl();
+  selectedValue : string = "sku";
+  selectedSku : any;
   suggestedSkus : Array<any> = [];
-  suggestedProductLines : Array<any> = [];
-  productLine : Array<any> = [];
-  productLineField : FormControl = new FormControl();
-  skuField : FormControl = new FormControl();
+  @Output() skuSelected : EventEmitter<any> = new EventEmitter<any>();
 
   constructor(public addManufacturingGoalDialogComponent: AddManufacturingGoalDialogComponent, public filterSkuService: FilterSkuService) { }
 
   ngOnInit() {
-    this.productLineField.valueChanges.debounceTime(200)
-   .distinctUntilChanged()
-   .switchMap((query) =>  this.filterSkuService.autocompleteProductLines({input: query}))
-   .subscribe( result => {
-          if(result!=null && result.data!=null){
-            this.suggestedProductLines = [];
-            for(let productLine of result.data){
-              this.suggestedProductLines.push(productLine)
-          }
-         }
-         this.suggestedProductLines.slice(0,10)
-    });
-
-    this.skuField.valueChanges.debounceTime(200)
+    this.inputField.valueChanges.debounceTime(200)
    .distinctUntilChanged()
    .switchMap((query) =>  this.filterSkuService.filter({
       sortBy : 'name',
      	pageNum: '1',
       page_size: 10,
-     	keywords: [query],
+     	keywords: [this.skuName],
      	ingredients: [],
-     	product_lines: this.productLine
+     	product_lines: [this.productLine]
     })).subscribe( result => {
           console.log(result);
           if(result!=null && result.data!=null){
@@ -57,40 +48,40 @@ export class SearchSkuComponent implements OnInit {
 
   }
 
-  keyPressedProductLine(event){
-    if(event.keyCode == 13){ //enter pressed
-      this.productLine = [];
-      this.productLine.push(this.suggestedProductLines[0].name);
-      this.productLineField.setValue(this.suggestedProductLines[0].name);
+  updateValue(){
+    if(this.selectedValue==='sku'){
+      this.skuName = this.input;
+    }
+    else{
+      this.productLine = this.input;
     }
   }
 
-  keyPressedSku(event){
-    if(event.keyCode == 13){ //enter pressed
-      this.addManufacturingGoalDialogComponent.setSku(this.suggestedSkus[0]);
-      this.skuField.setValue(this.suggestedSkus[0].name);
+  changeInputType(newType){
+    this.selectedValue = newType;
+    if(newType==='sku'){
+      this.input = this.skuName;
+    }
+    else {
+      this.input = this.productLine;
     }
   }
 
-  // addSku(skuName : any){
-  //   this.skus.push(skuName);
-  //   this.ingredientsTableComponent.setSearchedSkus(this.skus);
-  //   this.skuField.setValue('');
-  // }
-
-  onProductLineSelection(event){
-    this.productLine = [];
-    this.productLine.push(event.option.value);
+  onSelectionChanged(event){
+    this.selectedSku = event.option.value;
+    this.skuName = event.option.value.name;
+    this.productLine = event.option.value.product_line;
+    this.selectedValue = "sku";
+    this.inputField.setValue(this.skuName);
+    this.skuSelected.emit(this.selectedSku);
   }
 
-  onSkuSelection(event){
-    console.log("SKU SELECTED");
-    console.log(event.option.value);
-    this.addManufacturingGoalDialogComponent.setSku(event.option.value);
-  }
-
-  displaySku(sku): string | undefined{
-    return sku ? sku.name : undefined;
+  enable(){
+    this.skuSelected.emit(this.selectedSku);
+    this.selectedSku = null;
+    this.skuName = "";
+    this.productLine = "";
+    this.inputField.setValue("");
   }
 
 }

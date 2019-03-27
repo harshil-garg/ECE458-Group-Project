@@ -8,6 +8,7 @@ import { FilterFormulaService, FilterResponse } from './filter-formula.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import { ExportService } from '../export.service';
 
 @Component({
   selector: 'formula-table',
@@ -29,6 +30,9 @@ export class FormulaTableComponent implements OnInit{
     sortBy: string = "name";
     keywords: Array<any> = [];
     ingredients: Array<any> = [];
+    ingredientInput: string = "";
+    unitInput: string = "";
+    quantityInput: string = "";
 
     displayedColumns: string[] = ['select', 'name', 'number', 'ingredient_tuples', 'comment'];
     selection = new SelectionModel<Formula>(true, []);
@@ -36,6 +40,7 @@ export class FormulaTableComponent implements OnInit{
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
 
@@ -56,7 +61,7 @@ export class FormulaTableComponent implements OnInit{
     }
 
     constructor(private authenticationService: AuthenticationService, public crudFormulaService: CrudFormulaService,
-      public filterFormulaService: FilterFormulaService, private snackBar: MatSnackBar){}
+      public filterFormulaService: FilterFormulaService, private snackBar: MatSnackBar, private exportService: ExportService){}
 
     remove() {
       for(let selected of this.selection.selected){
@@ -84,43 +89,49 @@ export class FormulaTableComponent implements OnInit{
     }
 
     edit(id:any, property:string, updated_value:any) {
-      var editedFormula : Formula = new Formula();
-      var newnumber : string;
-      editedFormula.number = id;
-      switch(property){
-        case 'name':{
-          editedFormula.name = updated_value; //new name
-          break;
-        }
-        case 'id':{
-          newnumber = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedFormula.comment = updated_value;
-          break;
-        }
-      }
-      this.crudFormulaService.edit({
-          name : editedFormula.name,
-          number : editedFormula.number.toString(),
-          newnumber: newnumber,
-          ingredient_tuples: undefined,
-          comment : editedFormula.comment
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
+      if(this.isEditable()){
+        var editedFormula : Formula = new Formula();
+        var newnumber : string;
+        editedFormula.number = id;
+        switch(property){
+          case 'name':{
+            editedFormula.name = updated_value; //new name
+            break;
           }
-          else{
-            this.handleError(response);
+          case 'id':{
+            newnumber = updated_value;
+            break;
           }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+          case 'tuple':{
+            editedFormula.ingredient_tuples = updated_value;
+            break;
           }
-        });
+          case 'comment':{
+            editedFormula.comment = updated_value;
+            break;
+          }
+        }
+        this.crudFormulaService.edit({
+            name : editedFormula.name,
+            number : editedFormula.number.toString(),
+            newnumber: newnumber,
+            ingredient_tuples: editedFormula.ingredient_tuples,
+            comment : editedFormula.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
+          });
+        }
     }
 
     private handleError(response){
@@ -129,20 +140,21 @@ export class FormulaTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh for edits
       //this.refresh();
     }
 
     isAdmin() {
-      return this.authenticationService.loginState.isAdmin;
+      return this.authenticationService.isAdmin();
     }
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1;
       this.filterFormulaService.filter({
           sortBy : this.sortBy,
-          pageNum: this.paginator.pageIndex.toString()+1,
+          pageNum: pageIndex.toString(),
           page_size: this.paginator.pageSize,
           keywords: this.keywords,
           ingredients : this.ingredients
@@ -165,6 +177,7 @@ export class FormulaTableComponent implements OnInit{
           this.formulaList.push({
               id: formula.number,
               name: formula.name,
+              ingredient_tuples: formula.ingredient_tuples,
               comment: formula.comment
           });
         }
@@ -196,6 +209,12 @@ export class FormulaTableComponent implements OnInit{
       return numSelected === numRows;
     }
 
+    removeIngrQuant(ingr_id:number, formula_id:number){
+      var ingredient_tuples = this.formulaList[formula_id].ingredient_tuples;
+      ingredient_tuples.splice(ingr_id, 1);
+      this.edit(formula_id, 'tuple', ingredient_tuples);
+    }
+
 /** Selects all rows if they are not all selected; otherwise clear selection. */
     masterToggle() {
       this.isAllSelected() ?
@@ -203,4 +222,54 @@ export class FormulaTableComponent implements OnInit{
           this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
+    }
+
+    export(){
+      this.crudFormulaService.export({
+        sortBy : this.sortBy,
+        keywords: this.keywords,
+        ingredients : this.ingredients,
+      }).subscribe(
+      response => this.handleExport(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExport(response){
+      const headers = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
+      this.exportService.exportJSON(headers, response.data, 'formulas');
+    }
+
+    setIngredientInput(event){
+      this.ingredientInput = event;
+    }
+
+    updateUnit(ev){
+      this.unitInput = ev.unit;
+      this.quantityInput = ev.quantity;
+    }
+
+    addIngredientQuantity(id){
+      if(this.isEditable){
+        var added_ingr_quant = {
+          ingredient: this.ingredientInput,
+          quantity: +this.quantityInput,
+          unit: this.unitInput
+        }
+        for(let formula of this.formulaList){
+          if(formula.id == id){
+            formula.ingredient_tuples.push(added_ingr_quant);
+            this.edit(id, 'tuple', formula.ingredient_tuples);
+          }
+        }
+        this.ingredientInput = '';
+        this.quantityInput = '';
+      }
+    }
 }

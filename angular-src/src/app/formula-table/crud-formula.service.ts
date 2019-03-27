@@ -8,7 +8,7 @@ import { Tuple } from '../model/ingredient';
 export class CreateMessage {
   name : string;
   number : string;
-  ingredient_tuples : [Tuple];
+  ingredient_tuples : Tuple[];
   comment : string;
 }
 
@@ -20,13 +20,24 @@ export class EditMessage {
   name : string;
   number : string;
   newnumber: string;
-  ingredient_tuples : [Tuple];
+  ingredient_tuples : Tuple[];
   comment : string;
 }
 
 export class Response {
   success: boolean;
   message: string;
+}
+
+export class ExportFormulasMessage {
+	sortBy : string;
+	keywords: Array<string>;
+	ingredients: Array<string>;
+}
+
+export class ExportFormulasResponse {
+  success: boolean;
+  data: Array<any>;
 }
 
 const httpOptions = {
@@ -55,4 +66,8 @@ export class CrudFormulaService {
     console.log(requestedFormula);
     return this.http.post<Response>('api/formulas/update', requestedFormula, httpOptions);
   }
+
+  export(exportFormulasMessage: ExportFormulasMessage): Observable<ExportFormulasResponse>{
+		return this.http.post<ExportFormulasResponse>('api/export/formulas', exportFormulasMessage, httpOptions);
+	}
 }

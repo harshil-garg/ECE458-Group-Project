@@ -1,5 +1,5 @@
-<div *ngIf="this.authService.loginState.loggedIn">
-	<mat-toolbar class="fixed-header" color="primary" *ngIf="this.authService.loginState.loggedIn">
+<div *ngIf="this.authService.isAuthenticated()">
+	<mat-toolbar class="fixed-header" color="primary" *ngIf="this.authService.isAuthenticated()">
 	<mat-toolbar-row>
 	<span>{{title}}</span>
 	    <span class="example-fill-remaining-space"></span>
@@ -17,10 +17,12 @@
 			<mat-menu #manufacturingMenu="matMenu">
 				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-goals'])">Goals</button>
 				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-lines'])">Lines</button>
-				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-schedule'])">Schedule</button>
+				<button *ngIf="this.authService.isAdmin()" mat-menu-item (click)="router.navigate(['dashboard/manufacturing-schedule'])">Schedule</button>
 			</mat-menu>
-			<button mat-button  *ngIf="this.authService.loginState.isAdmin" (click)="router.navigate(['dashboard/upload'])">Data Import</button>
-			<button mat-button (click)="router.navigate(['dashboard/accounts'])">Accounts</button>
+			<button mat-button (click)="router.navigate(['dashboard/sales-report'])">Sales Report</button>
+			<button mat-button *ngIf="this.authService.isAdmin()" (click)="router.navigate(['dashboard/upload'])">Data Import</button>
+			<button mat-button *ngIf="this.authService.isAdmin()" (click)="router.navigate(['dashboard/accounts'])">Accounts</button>
+			<button mat-button (click)="authService.logout()">Log out</button>
 	 </mat-toolbar-row>
 	</mat-toolbar>
 </div>

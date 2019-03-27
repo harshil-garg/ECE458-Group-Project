@@ -38,10 +38,18 @@ export class AccountsService {
     return this.http.post<AutocompleteResponse>('api/users/autocomplete', body, httpOptions);
   }
 
-  makeAdmin(email: string): Observable<RegisterResponse> {
+  updatePriveleges(email: string, admin: boolean): Observable<RegisterResponse> {
+    let body = {
+      email: email,
+      admin: admin
+    };
+    return this.http.post<RegisterResponse>('api/users/update-priveleges', body, httpOptions);
+  }
+
+  deleteUser(email: string): Observable<RegisterResponse> {
     let body = {
       email: email
     };
-    return this.http.post<RegisterResponse>('api/users/make-admin', body, httpOptions);
+    return this.http.post<RegisterResponse>('api/users/delete-user', body, httpOptions);
   }
 }

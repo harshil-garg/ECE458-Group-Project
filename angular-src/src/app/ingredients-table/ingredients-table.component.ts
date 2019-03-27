@@ -32,12 +32,13 @@ export class IngredientsTableComponent implements OnInit{
     keywords: Array<any> = [];
     skus: Array<any> = [];
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'vendor_info', 'package_size', 'cost_per_package', 'comment', 'num_skus'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'vendor_info', 'package_size', 'cost', 'comment', 'num_skus'];
     selection = new SelectionModel<Ingredient>(true, []);
     dataSource = new MatTableDataSource<Ingredient>(this.ingredientList);
     maxPages: number;
     totalDocs: number;
     loadingResults: boolean = false;
+    liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
 
@@ -86,63 +87,61 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     edit(name:any, property:string, updated_value:any) {
-      var editedIngredient : Ingredient = new Ingredient();
-      var newName : string;
-      editedIngredient.name = name;
-      switch(property){
-        case 'name':{
-          newName = updated_value; //new name
-          break;
-        }
-        case 'id':{
-          editedIngredient.id = updated_value;
-          break;
-        }
-        case 'vendor_info':{
-          editedIngredient.vendor_info = updated_value;
-          break;
-        }
-        case 'unit':{
-          editedIngredient.unit = updated_value;
-          console.log(updated_value);
-          break;
-        }
-        case 'package_size':{
-          editedIngredient.package_size = updated_value;
-          break;
-        }
-        case 'cost_per_package':{
-          editedIngredient.cost_per_package = updated_value;
-          break;
-        }
-        case 'comment':{
-          editedIngredient.comment = updated_value;
-          break;
-        }
-      }
-      this.crudIngredientsService.edit({
-          name : editedIngredient.name,
-          newname: newName,
-          number : editedIngredient.id,
-          vendor_info : editedIngredient.vendor_info,
-          unit: editedIngredient.unit,
-          package_size: Number(editedIngredient.package_size),
-          cost : editedIngredient.cost_per_package*1,
-          comment : editedIngredient.comment
-        }).subscribe(
-        response => {
-          if(response.success){
-            this.handleResponse(response);
+      if(this.isEditable()){
+        var editedIngredient : Ingredient = new Ingredient();
+        var newName : string;
+        editedIngredient.name = name;
+        switch(property){
+          case 'name':{
+            newName = updated_value; //new name
+            break;
           }
-          else{
-            this.handleError(response);
+          case 'id':{
+            editedIngredient.id = updated_value;
+            break;
           }
-        },
-        err => {
-          if (err.status === 401) {
-            console.log("401 Error")
+          case 'vendor_info':{
+            editedIngredient.vendor_info = updated_value;
+            break;
           }
+          case 'package_size':{
+            editedIngredient.unit = updated_value.unit;
+            editedIngredient.package_size = updated_value.quantity;
+            break;
+          }
+          case 'cost_per_package':{
+            editedIngredient.cost_per_package = updated_value;
+            break;
+          }
+          case 'comment':{
+            editedIngredient.comment = updated_value;
+            break;
+          }
+        }
+        this.crudIngredientsService.edit({
+            name : editedIngredient.name,
+            newname: newName,
+            number : editedIngredient.id,
+            vendor_info : editedIngredient.vendor_info,
+            unit: editedIngredient.unit,
+            package_size: Number(editedIngredient.package_size),
+            cost : editedIngredient.cost_per_package*1,
+            comment : editedIngredient.comment
+          }).subscribe(
+          response => {
+            if(response.success){
+              this.handleResponse(response);
+            }
+            else{
+              this.handleError(response);
+            }
+          },
+          err => {
+            if (err.status === 401) {
+              console.log("401 Error")
+            }
         });
+      }
     }
 
     private handleError(response){
@@ -151,7 +150,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     private handleResponse(response: Response) {
-      console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       //don't refresh for edits
       //this.refresh();
     }
@@ -165,7 +164,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     isAdmin() {
-      return this.authenticationService.loginState.isAdmin;
+      return this.authenticationService.isAdmin();
     }
 
     getNumSkus(ingredient: Ingredient){
@@ -174,9 +173,12 @@ export class IngredientsTableComponent implements OnInit{
 
     refresh(){
       this.loadingResults = true;
+      var pageIndex : number = this.paginator.pageIndex+1
+      console.log("REFRESH");
+      console.log(this.paginator.pageIndex.toString());
       this.filterIngredientsService.filter({
           sortBy : this.sortBy,
-          pageNum: this.paginator.pageIndex.toString()+1,
+          pageNum: pageIndex.toString(),
           page_size: this.paginator.pageSize,
           keywords: this.keywords,
           skus : this.skus
@@ -191,6 +193,8 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     handleRefreshResponse(response: FilterResponse){
+      console.log("REFRESH RESPONSEEEE");
+      console.log(response);
       if(response.success){
         this.ingredientList = [];
         for(let ingredient of response.data){
@@ -219,11 +223,13 @@ export class IngredientsTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
     setSearchedSkus(newSkus : Array<any>){
       this.skus = newSkus;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
@@ -258,6 +264,10 @@ export class IngredientsTableComponent implements OnInit{
       this.isAllSelected() ?
           this.selection.clear() :
           this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    isEditable(){
+      return this.isAdmin() && this.liveEditing;
     }
 
 }

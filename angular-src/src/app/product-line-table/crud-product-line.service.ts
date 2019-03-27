@@ -50,6 +50,14 @@ export class ExportResponse {
   data: Array<ProductLineCsvData>;
 }
 
+export class AutocompleteMessage {
+	input: string;
+}
+
+export class AutocompleteResponse {
+	data : any[];
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -81,5 +89,9 @@ export class CrudProductLineService {
 
   export(exportRequest: ExportMessage): Observable<ExportResponse>{
     return this.http.post<ExportResponse>('api/export/product_lines', exportRequest, httpOptions);
+  }
+
+  autocomplete(autocompleteMessage: AutocompleteMessage){
+    return this.http.post<AutocompleteResponse>('api/product_lines/autocomplete', autocompleteMessage, httpOptions);
   }
 }

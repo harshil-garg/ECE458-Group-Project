@@ -1,7 +1,13 @@
 <!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
-<h2 class="mat-display-2">Product Lines</h2>
+<h1 class="mat-display-3" align="center">Product Lines</h1>
+<div class="search-div">
+    <br style="clear:both" />
+</div>
+<div *ngIf="isAdmin()" align="center">
+  <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
+</div>
 <div id="search-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <app-add-product-line class="add" *ngIf="isAdmin()"></app-add-product-line>
   <button  class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
 </div>
@@ -34,7 +40,7 @@
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-			  <input #name matInput placeholder="Name" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
+			  <input #name matInput placeholder="Name" [readonly]="!isEditable()" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
 			</mat-form-field>
     </td>
   </ng-container>

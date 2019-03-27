@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
+import {Formula} from '../model/formula'
 import { Tuple } from '../model/ingredient'
 
 export class CreateMessage {
@@ -14,10 +14,12 @@ export class CreateMessage {
   size: string;
   count: number;
   product_line: string;
-  formula: string;
+  formula: Formula;
   formula_scale_factor: string;
   manufacturing_lines: string[];
   manufacturing_rate: string;
+  setup_cost: number;
+  run_cost: number;
   comment: string;
 }
 
@@ -38,6 +40,8 @@ export class EditMessage {
   formula_scale_factor: string;
   manufacturing_lines: string[];
   manufacturing_rate: string;
+  setup_cost: number;
+  run_cost: number;
   comment: string;
 }
 
@@ -94,7 +98,6 @@ export class CrudSkuService {
   }
 
   edit(requestedSku: EditMessage): Observable<Response>{
-    console.log(requestedSku);
     return this.http.post<Response>('api/skus/update', requestedSku, httpOptions);
   }
 

@@ -9,6 +9,7 @@ mat-header-cell {
 
 .remove {
   float:left;
+  margin-left: 20px;
 }
 
 .add {
@@ -18,19 +19,19 @@ mat-header-cell {
 .dependency {
   float: left;
   position: relative;
-  left: 30%;
+  left: 34%;
 }
 
 .export {
   float: left;
   position: relative;
-  left: 30%;
+  left: 34%;
 }
 
 .search {
   float: left;
   position: relative;
-  left: 37%;
+  left: 42%;
 }
 
 table {
@@ -101,4 +102,10 @@ mat-icon:hover{
 
 button {
   margin: 5px;
+  margin-top: 20px;
+}
+
+h1 {
+  padding-top: 20px;
+  margin-bottom: 5px;
 }

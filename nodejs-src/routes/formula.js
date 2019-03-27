@@ -7,6 +7,7 @@ const validator = require('../controllers/validator');
 const formula_validator = require('../controllers/formula_validator');
 const formula_filter = require('../controllers/formula_filter');
 const autocomplete = require('../controllers/autocomplete');
+const Units = require('../controllers/units');
 
 //Autocomplete 
 router.post('/autocomplete', async (req, res) => {
@@ -27,7 +28,6 @@ router.post('/filter', async (req, res) => {
         return new RegExp(keyword, 'i');
     });
     
-    console.log(Formula.schema.obj)
     let result = await formula_filter.filter(pageNum, sortBy, page_size, key_exps, ingredients);
     
     res.json(result);
@@ -42,7 +42,8 @@ router.post('/create', async (req, res) => {
             await this.createFormula(name, number, ingredient_tuples, comment, res);
             res.json({success: true, message: 'Created successfuly'});
         }catch(err){
-            res.json({success: false, message: err});
+            console.log(err)
+            res.json({success: false, message: err.toString()});
         }
         
     }else{
@@ -52,7 +53,7 @@ router.post('/create', async (req, res) => {
             res.json({success: true, message: 'Created successfuly'});
         })
         .catch((err) => {
-            console.log(err)
+            // console.log(err)
             res.json({success: false, message: err.toString()});
         })
     }
@@ -66,7 +67,7 @@ router.post('/update', async (req, res) => {
 
     let json = {};
 
-    if (name) {
+    if (name != undefined && name != NaN) {
         name_passed = validator.proper_name_length(name);
         if(!name_passed[0]){
             res.json({success: false, message: name_passed[1]});
@@ -74,23 +75,55 @@ router.post('/update', async (req, res) => {
         }
         json["name"] = name;
     }
-    if(newnumber){
+    if(newnumber != undefined && newnumber != NaN){
+        let num_numeric = validator.isNumeric(newnumber);
+        if(!num_numeric[0]){
+            res.json({success: false, message: num_numeric[1]});
+            return;
+        }else{
+            let num_positive = validator.isPositive(newnumber, 'Number');
+            if(!num_positive[0]){
+                res.json({success: false, message: num_positive[1]});
+                return;
+            }
+        }
         json["number"] = newnumber;
     }
-    if(ingredient_tuples){
+    if(ingredient_tuples != undefined && ingredient_tuples != NaN){
         let valid_tuples = [];
+        let valid_quantities = [];
+        let positive_quantities = [];
+        let valid_units = [];
+        let ingredient_set = new Set();
         for(let tuple of ingredient_tuples){
-            valid_tuples.push(await formula_validator.validIngredientTuple(tuple.ingredient, tuple.unit));
+            if(ingredient_set.has(tuple.ingredient)){
+                continue;
+            }
+            ingredient_set.add(tuple.ingredient)
+            valid_tuples.push(await formula_validator.validIngredientTuple(Ingredient, tuple.ingredient, tuple.unit));
+            valid_quantities.push(validator.isNumeric(tuple.quantity));
+            positive_quantities.push(validator.isPositive(tuple.quantity));
+            valid_units.push(Units.validUnit(tuple.unit));
         }
-        let errors = validator.compileErrors(...valid_tuples);
+        let errors = validator.compileErrors(...valid_tuples, ...valid_quantities, ...positive_quantities);
 
         if(errors.length > 0){
             res.json({success: false, message: errors});
-            return errors;
+            return;
+        }
+        for(let valid of valid_units){
+            if(!valid){
+                res.json({success: false, message: 'Invalid unit'});
+                return;
+            }
+        }
+        //change from ingredient name to id
+        for(let i = 0; i < valid_tuples.length; i++){
+            ingredient_tuples[i]['ingredient'] = valid_tuples[i][2]; //id of ingredient
         }
         json["ingredient_tuples"] = ingredient_tuples;
     }
-    if(comment){
+    if(comment != undefined && comment != NaN){
         json["comment"] = comment;
     }
 
@@ -127,25 +160,42 @@ router.post('/delete', async (req, res) => {
 });
 
 module.exports.createFormula = async function(name, number, ingredient_tuples, comment, res){
-    const required_params = { name, number, ingredient_tuples };
-    let inputs_exist = validator.inputsExist(required_params);
     let name_passed = validator.proper_name_length(name);
+    let num_numeric = validator.isNumeric(number);
+    let num_positive = validator.isPositive(number, 'Number');
 
     //Check if given ingredients exist and have valid units
     let valid_tuples = [];
+    let valid_quantities = [];
+    let positive_quantities = [];
+    let valid_units = [];
+    let ingredient_set = new Set();
     for(let tuple of ingredient_tuples){
+        if(ingredient_set.has(tuple.ingredient)){
+            continue;
+        }
+        ingredient_set.add(tuple.ingredient)
         valid_tuples.push(await formula_validator.validIngredientTuple(Ingredient, tuple.ingredient, tuple.unit));
+        valid_quantities.push(validator.isNumeric(tuple.quantity));
+        positive_quantities.push(validator.isPositive(tuple.quantity));
+        valid_units.push(Units.validUnit(tuple.unit));
     }
-    let errors = validator.compileErrors(inputs_exist, name_passed, ...valid_tuples);
+
+    let errors = validator.compileErrors(name_passed, num_numeric, num_positive, ...valid_tuples, ...valid_quantities, ...positive_quantities);
 
     if(errors.length > 0){
-        res.json({success: false, message: errors});
-        return errors;
+        throw(errors);
+    }
+    for(let valid of valid_units){
+        if(!valid){
+            throw('Invalid unit')
+        }
     }
     //change from ingredient name to id
     for(let i = 0; i < valid_tuples.length; i++){
         ingredient_tuples[i]['ingredient'] = valid_tuples[i][2]; //id of ingredient
     }
+    // console.log(formula)
     const formula = new Formula({name, number, ingredient_tuples, comment});
     return await Formula.create(formula)
 }

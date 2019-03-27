@@ -1,0 +1,53 @@
+table {
+    width: 100%;
+    text-align: center;
+}
+
+.centre {
+    text-align: center;
+}
+
+.example-container {
+    height: 100%;
+    width: 200px;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+#container {
+    top: 64px !important;
+}
+
+@media(max-width: 599px) {
+    #container {
+    top: 56px !important;
+    }
+}
+
+.example-loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+mat-icon:hover{
+    cursor: pointer;
+    color: mediumaquamarine;
+}
+
+.sales-report {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.flush {
+  margin: 10px
+}

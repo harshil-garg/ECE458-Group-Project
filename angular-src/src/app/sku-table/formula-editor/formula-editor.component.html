@@ -1,0 +1,42 @@
+<div class="fixed-width">
+  <mat-accordion>
+    <mat-expansion-panel class="mat-elevation-z0">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <app-formula-autocomplete [initFormula]="formula" (messageEvent)="formulaChange($event)"></app-formula-autocomplete>
+          <!-- <input type="text" maxlength="32" id="formula_name" (click)="stopPropagation($event)" (keydown)="stopSpacebar($event)" placeholder="Formula Name" required [(ngModel)]="formula.name" name="formula_name" #formula_name> -->
+        </mat-panel-title>
+        <mat-panel-description>
+          Edit Formula
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div>
+        <mat-form-field>
+          <input matInput type="text" id="number" required [(ngModel)]="formula.number" placeholder="Formula Number" name="number" #number="ngModel">
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <textarea matInput type="text" id="comment" [(ngModel)]="formula.comment" placeholder="Comment" name="comment" #comment="ngModel"></textarea>
+        </mat-form-field>
+      </div>
+      <mat-card>
+        <mat-card-subtitle [style.color]="'black'">Ingredient-Quantity Pairs</mat-card-subtitle>
+        <div class="tuple-list">
+          <mat-chip-list class="mat-chip-list-stacked">
+            <ng-container *ngFor="let ingredient of formula.ingredient_tuples; let ingr_id=index">
+              <div>
+                <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} {{ingredient.unit}} <mat-icon (click)="removeIngrQuant(ingr_id)">clear</mat-icon></mat-chip>
+              </div>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+        <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
+        <app-unit-autocomplete [initUnit]="" (messageEvent)="updateUnit($event)"></app-unit-autocomplete>
+        <br>
+        <button mat-raised-button type="button" (click)="addIngredientQuantity()" color="accent">Add Ingr-Quant</button>
+      </mat-card>
+      <br>
+      <button mat-raised-button type="button" (click)="updateFormula()" color="accent">Update Formula</button>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

@@ -44,6 +44,20 @@ import { BulkSkuEditComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit.co
 import { BulkSkuEditDialogComponent } from './sku-table/bulk-sku-edit/bulk-sku-edit-dialog/bulk-sku-edit-dialog.component';
 import { ActivityDialogComponent } from './manufacturing-schedule/activity-dialog/activity-dialog.component';
 import { ManufacturingScheduleReportComponent } from './manufacturing-schedule/manufacturing-schedule-report/manufacturing-schedule-report.component';
+import { FormulaEditorComponent } from './sku-table/formula-editor/formula-editor.component';
+import { AddFormulaComponent } from './formula-table/add-formula/add-formula.component';
+import { AddFormulaDialogComponent } from './formula-table/add-formula/add-formula-dialog/add-formula-dialog.component';
+import { UnitAutocompleteComponent } from './ingredients-table/unit-autocomplete/unit-autocomplete.component';
+// import { ProductLineAutocompleteComponent } from './product-line-table/product-line-autocomplete/product-line-autocomplete.component';
+import { FormulaAutocompleteComponent } from './formula-table/formula-autocomplete/formula-autocomplete.component';
+import { SalesReportComponent } from './sales-report/sales-report.component';
+import { SalesSummaryComponent } from './sales-report/sales-summary/sales-summary.component';
+import { SalesDrilldownComponent } from './sales-report/sales-drilldown/sales-drilldown.component';
+import { CustomerAutocompleteComponent } from './sales-report/customer-autocomplete/customer-autocomplete.component';
+import { ChartsModule } from 'ng2-charts';
+import { LineGraphComponent } from './sales-report/sales-drilldown/line-graph/line-graph.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TokenInterceptor } from './token.interceptor';
 
 const routes: Routes = [
   {
@@ -61,6 +75,7 @@ const routes: Routes = [
           { path: 'manufacturing-goals', component: ManufacturingGoalTableComponent },
           { path: 'manufacturing-lines', component: ManufacturingLineTableComponent },
           { path: 'manufacturing-schedule', component: ManufacturingScheduleDisplayComponent },
+          { path: 'sales-report', component: SalesReportComponent}
     ]
   },
   {path: 'login', component: LoginComponent },
@@ -93,7 +108,18 @@ const routes: Routes = [
     ManufacturingScheduleReportComponent,
     BulkSkuEditComponent,
     BulkSkuEditDialogComponent,
-    ActivityDialogComponent
+    ActivityDialogComponent,
+    FormulaEditorComponent,
+    AddFormulaComponent,
+    AddFormulaDialogComponent,
+    UnitAutocompleteComponent,
+    // ProductLineAutocompleteComponent,
+    FormulaAutocompleteComponent,
+    SalesReportComponent,
+    SalesSummaryComponent,
+    SalesDrilldownComponent,
+    CustomerAutocompleteComponent,
+    LineGraphComponent
   ],
   imports: [
     BrowserModule,
@@ -139,10 +165,18 @@ const routes: Routes = [
     MatButtonToggleModule,
     MatSlideToggleModule,
     MatBadgeModule,
-    MatTooltipModule
+    MatTooltipModule,
+    ChartsModule
   ],
-  providers: [Title],
+  providers: [
+    Title,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, SalesSummaryComponent]
 })
 export class AppModule { }

@@ -15,22 +15,10 @@ mat-header-cell {
   float:right;
 }
 
-.dependency {
-  float: left;
-  position: relative;
-  left: 30%;
-}
-
 .export {
   float: left;
   position: relative;
-  left: 30%;
-}
-
-.search {
-  float: left;
-  position: relative;
-  left: 37%;
+  left: 39%;
 }
 
 table {
@@ -101,4 +89,11 @@ mat-icon:hover{
 
 button {
   margin: 5px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+h1 {
+  padding-top: 20px;
+  margin-bottom: 5px;
 }
