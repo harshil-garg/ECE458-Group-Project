@@ -14,10 +14,10 @@ import { CrudProductLineService } from '../product-line-table/crud-product-line.
 export class SalesReportComponent implements OnInit {
 
   product_lines = [];
-  customers = [];
   all = "all";
 
   summary_data = {};
+  main_data = {};
   keys = [];
   displayedColumns: string[] = ['number', 'name', 'size', 'count', 'summary', 'drilldown'];
   loadingResults: boolean = false;
@@ -26,13 +26,6 @@ export class SalesReportComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.salesReportService.allCustomers().subscribe((response) => {
-      let customer_objs = response.data;
-      this.customers = [];
-      for(let obj of customer_objs){
-        this.customers.push(obj.name);
-      }
-    });
     this.refresh();
   }
 
@@ -48,13 +41,11 @@ export class SalesReportComponent implements OnInit {
   }
 
   openDrilldown(sku) {
-    console.log(sku);
-    let dialogRef = this.dialog.open(SalesDrilldownComponent, {
+    this.dialog.open(SalesDrilldownComponent, {
       height: '800px',
       width: '1000px',
       data: {
-        sku: sku,
-        customers: this.customers
+        sku: sku
       }
     })
   }
@@ -62,40 +53,18 @@ export class SalesReportComponent implements OnInit {
   refresh() {
     this.loadingResults = true;
     var request = {
-      product_lines: this.product_lines,
-      customers: this.customers
-    };
-    this.salesReportService.getSummary(request).subscribe(
+      product_lines: this.product_lines
+    }
+    this.salesReportService.getMain(request).subscribe(
       response => {
-        this.summary_data = response;
-        this.keys = Object.keys(this.summary_data);
-        console.log(this.summary_data);
+        this.main_data = response;
+        this.keys = Object.keys(this.main_data);
         this.loadingResults = false;
-      },
+      }, 
       error => {
-        console.log(error);
+        console.log("Error")
       }
     );
-  }
-
-  getDrilldown() {
-    // TODO @Jesse Yue / Jimmy Shackford
-          // Display snackbar dialog claiming that the data is not available. Please wait a few seconds
-          // to try again. Perhaps we can set an interval to try to auto run this method in a few seconds.
-  }
-
-  refreshCustomer(customer){
-    if(customer == 'all'){
-      this.salesReportService.allCustomers().subscribe((response) => {
-        this.customers = [];
-        for(let obj of response.data){
-          this.customers.push(obj.name);
-        }
-      });
-    }else{
-      this.customers = [customer];
-    }
-    this.refresh();
   }
 
   refreshProductLines(line){

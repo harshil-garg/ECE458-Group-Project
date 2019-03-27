@@ -39,18 +39,13 @@ export class SalesDrilldownComponent implements OnInit {
 
   ngOnInit() {
     this.sku = this.data.sku;
-    this.customers = this.data.customers;
-    this.selected_customer = "all";
-
     this.start_date.setFullYear(this.start_date.getFullYear()-1);
-
     this.display_name = `${this.sku.name} : ${this.sku.size} * ${this.sku.count} (${this.sku.number})`;
-
     this.paginator.pageIndex = 0;
     this.paginator.pageSize = 10;
     this.paginator.page.subscribe(x => this.refresh());
     this.dataSource.paginator = this.paginator;
-    this.refresh();
+    this.refreshCustomer("all");
   }
 
   transpose() {
@@ -65,7 +60,7 @@ export class SalesDrilldownComponent implements OnInit {
     this.summarySource = new MatTableDataSource(transposedData);
   }
 
-  refresh(){
+  refresh() {
     this.loadingResults = true;
     let request = {
       sku_number: this.sku.number,
@@ -103,18 +98,17 @@ export class SalesDrilldownComponent implements OnInit {
       console.log(this.stats)
       this.transpose();
       this.dataSource.data = this.recordList;
-      this.loadingResults = false;
     }
+    this.loadingResults = false;  
   }
 
-  initCustomer(){
+  initCustomer() {
     return (this.customers.length > 1) ? 'all' : this.customers[0];
   }
 
-  refreshCustomer(customer){
-    console.log(customer)
+  refreshCustomer(customer) {
     this.selected_customer = customer;
-    if(customer == 'all'){
+    if (customer == 'all') {
       this.salesReportService.allCustomers().subscribe((response) => {
         let customer_objs = response.data;
         this.customers = [];
@@ -123,7 +117,7 @@ export class SalesDrilldownComponent implements OnInit {
         }
         this.refresh();
       });
-    }else{
+    } else  {
       this.customers = [customer];
       this.refresh();
     }
