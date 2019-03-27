@@ -10,7 +10,7 @@ mongoose.connect(mongo_config.uri, { useNewUrlParser: true }, function(err) {
         console.log("Successfully connected to MongoDB");
 	let user = new User({
           name: 'Seeder Admin',
-          email: 'admin458',
+          email: 'admin',
           password: 'BletchisCool1904u52u589u',
           admin : true
         });
