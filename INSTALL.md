@@ -77,3 +77,5 @@
 `cd ..`
 
 `docker-compose down -v && docker-compose up --build`
+
+## To ensure NETID login works, contact @Harshil Garg because he needs to add your production server URL to the Duke COLAB page that registers our application.
