@@ -128,10 +128,13 @@ module.exports.conflictCheck = async function(model, data, data_csv, results, ty
         }
         if(primary_match){
             //check identical
-            //TODO: fix
             let identical = true;
             for(let property of properties){
-                identical = identical && row[property] == primary_match[property]
+                if(property == 'num_skus'){
+                    continue;
+                }
+
+                identical = identical && row[property].toString() == primary_match[property].toString()                
             }
             
             //If row is identical to something in db, ignore
