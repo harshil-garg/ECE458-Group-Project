@@ -1,5 +1,5 @@
 # Deployment Guide
-Read INSTALL.MD. Walk through the script step by step for easy deployment. You need 2 Duke-provisioned VCMs, one for production and one for backup,
+Read INSTALL.MD. Walk through the script step by step for easy deployment. You need 2 Duke-provisioned VCMs, one for production and one for backup.
 
 # Development Guide
 ## Technologies/Frameworks
