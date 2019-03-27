@@ -53,7 +53,7 @@ export class SalesReportService {
   }
 
   getDrilldown(request: DrilldownRequest) {
-    return this.http.post('api/sales_record/drilldown', request, httpOptions);
+    return this.http.post<Response>('api/sales_record/drilldown', request, httpOptions);
   }
 
   doFlush() {

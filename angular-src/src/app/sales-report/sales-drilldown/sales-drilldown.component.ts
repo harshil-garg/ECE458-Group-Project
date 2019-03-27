@@ -30,6 +30,7 @@ export class SalesDrilldownComponent implements OnInit {
   summarySource: MatTableDataSource<any>;
   displayedSummaryColumns: string[] = ['stat', 'value'];
   loadingResults: boolean = false;
+  failedRequest: boolean = false;
 
   totalDocs: number;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -70,7 +71,11 @@ export class SalesDrilldownComponent implements OnInit {
     }
 
     this.salesReportService.getDrilldown(request).subscribe((response) => {
-      this.handleRefreshResponse(response);
+      if(!response.success){
+        this.failedRequest = true;
+      } else {
+        this.handleRefreshResponse(response);
+      }
     }, (err) => {
       if (err.status === 401) {
         console.log("401 Error")
@@ -99,7 +104,7 @@ export class SalesDrilldownComponent implements OnInit {
       this.transpose();
       this.dataSource.data = this.recordList;
     }
-    this.loadingResults = false;  
+    this.loadingResults = false;
   }
 
   initCustomer() {
