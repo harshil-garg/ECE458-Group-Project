@@ -32,7 +32,7 @@ export class IngredientsTableComponent implements OnInit{
     keywords: Array<any> = [];
     skus: Array<any> = [];
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'vendor_info', 'package_size', 'cost_per_package', 'comment', 'num_skus'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'vendor_info', 'package_size', 'cost', 'comment', 'num_skus'];
     selection = new SelectionModel<Ingredient>(true, []);
     dataSource = new MatTableDataSource<Ingredient>(this.ingredientList);
     maxPages: number;

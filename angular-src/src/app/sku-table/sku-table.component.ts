@@ -23,7 +23,7 @@ export class SkuTableComponent implements OnInit{
     ingredients: Array<any> = [];
     productLines: Array<any> = [];
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'unit_size', 'count_per_case', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'setup_cost', 'run_cost', 'comment'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'case_upc', 'unit_upc', 'size', 'count', 'product_line', 'formula', 'formula_scale_factor', 'manufacturing_lines', 'manufacturing_rate', 'setup_cost', 'run_cost', 'comment'];
     selection = new SelectionModel<Sku>(true, []);
     dataSource = new MatTableDataSource<Sku>(this.skuList);
     maxPages: number;
