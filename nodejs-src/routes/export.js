@@ -51,10 +51,15 @@ router.post('/formulas', async (req, res) => {
 });
 
 function processComment(comment){
-    if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
-        return '"'+comment+'"';
-    }else{
-        return comment
+    if(comment != undefined){
+        if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
+            return '"'+comment+'"';
+        }else{
+            return comment;
+        }
+    }
+    else{
+        return ''
     }
 }
 
