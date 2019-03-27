@@ -8,18 +8,18 @@ if [ $? -eq 0 ] && [ -d "$DIRNAME" ] && [ "$(ls -A $DIRNAME)" ]; then
     if [ -n "$DELETE_SUCCESS" ]; then
         RESTORE_ERROR=$(docker run --network=ece458-group-project_default --link ece458-group-project_database_1:db --rm -v $(pwd)/$DIRNAME:/backup mongo bash -c "mongorestore /backup --host db:27017" | grep "error");
         if [ -z "$RESTORE_ERROR" ]; then
-            #node js/index.js $email_address $(hostname) true
+            node js/index.js $email_address $(hostname) true
             echo "Success.";
         else
-            #node js/index.js $email_address $(hostname) false "Mongorestore failed. The data could be corrupted or the Docker container subnetwork is unreachable. Please debug manually."
+            #ode js/index.js $email_address $(hostname) false "Mongorestore failed. The data could be corrupted or the Docker container subnetwork is unreachable. Please debug manually."
             echo "Restore failed.";
         fi
     else
-        #node js/index.js $email_address $(hostname) false "Previous database could not be discarded. Please check MongoDB logs."
+        node js/index.js $email_address $(hostname) false "Previous database could not be discarded. Please check MongoDB logs."
         echo "Database drop failed.";
     fi
     sudo rm -rf $DIRNAME;
 else
-    #node js/index.js $email_address $(hostname) false "SCP failed, please check the backup server health, credentials, and sudo privileges. It may also be possible that the backup requested does not exist."
+    node js/index.js $email_address $(hostname) false "SCP failed, please check the backup server health, credentials, and sudo privileges. It may also be possible that the backup requested does not exist."
     echo "SCP failed.";
 fi
