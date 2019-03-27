@@ -42,10 +42,12 @@ export class SalesDrilldownComponent implements OnInit {
     this.sku = this.data.sku;
     this.start_date.setFullYear(this.start_date.getFullYear()-1);
     this.display_name = `${this.sku.name} : ${this.sku.size} * ${this.sku.count} (${this.sku.number})`;
-    this.paginator.pageIndex = 0;
-    this.paginator.pageSize = 10;
-    this.paginator.page.subscribe(x => this.refresh());
-    this.dataSource.paginator = this.paginator;
+    if(this.paginator!=null){
+      this.paginator.pageIndex = 0;
+      this.paginator.pageSize = 10;
+      this.paginator.page.subscribe(x => this.refresh());
+      this.dataSource.paginator = this.paginator;
+    }
     this.refreshCustomer("all");
   }
 
@@ -71,11 +73,11 @@ export class SalesDrilldownComponent implements OnInit {
     }
 
     this.salesReportService.getDrilldown(request).subscribe((response) => {
-      if(!response.success){
-        this.failedRequest = true;
-      } else {
+      // if(!response.success){
+      //   this.failedRequest = true;
+      // } else {
         this.handleRefreshResponse(response);
-      }
+      // }
     }, (err) => {
       if (err.status === 401) {
         console.log("401 Error")
