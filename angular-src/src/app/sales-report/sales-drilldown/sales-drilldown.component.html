@@ -100,3 +100,6 @@
   <h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
   <app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>
 </ng-container>
+<ng-container *ngIf="failedRequest">
+  <h1 class="mat-display-3" align="center">Records being loaded. Check again in 10-15 seconds.</h1>
+</ng-container>

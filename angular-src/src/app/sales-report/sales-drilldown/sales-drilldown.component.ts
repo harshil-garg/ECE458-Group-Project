@@ -73,11 +73,11 @@ export class SalesDrilldownComponent implements OnInit {
     }
 
     this.salesReportService.getDrilldown(request).subscribe((response) => {
-      // if(!response.success){
-      //   this.failedRequest = true;
-      // } else {
+      if(!response.success){
+        this.failedRequest = true;
+      } else {
         this.handleRefreshResponse(response);
-      // }
+      }
     }, (err) => {
       if (err.status === 401) {
         console.log("401 Error")
