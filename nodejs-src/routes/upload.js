@@ -197,7 +197,7 @@ async function handleFiles(res) {
       await Formula.attemptImport(jsonFormulas, csvFormulas, results);
     }
     // if theres errors, end the session
-    if (results.ingredients.errorlist.length || results.skus.errorlist.length || results.product_lines.errorlist.length || results.formulas.errorlist.length) {
+    if (results.ingredients.errorlist.length>0 || results.skus.errorlist.length>0 || results.product_lines.errorlist.length>0 || results.formulas.errorlist.length>0) {
       results.success = false;
       uploadSessionStarted = false;
     }else {

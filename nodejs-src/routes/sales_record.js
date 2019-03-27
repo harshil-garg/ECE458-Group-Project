@@ -273,7 +273,7 @@ function getYearlySummaryData(records) {
     return {
         revenue: getTotalRevenue(records),
         sales: getTotalSales(records),
-        revenue_per_case: getTotalRevenue(records) / getTotalSales(records)
+        revenue_per_case: getTotalRevenue(records) / Math.max(1, getTotalSales(records))
     }
 }
 
@@ -303,7 +303,7 @@ function getYearlySummaryData(records) {
 async function getTotalSummaryData(sku, records, start) {
     let total_revenue = getTotalRevenue(records);
     let total_sales = getTotalSales(records);
-    let revenue_per_case = total_revenue / total_sales;
+    let revenue_per_case = total_revenue / (Math.max(1, total_sales))
 
     let manufacturing_run_size = await getManufacturingRunSize(sku, start);
     let manufacturing_setup_cost_per_case = sku.setup_cost / manufacturing_run_size;

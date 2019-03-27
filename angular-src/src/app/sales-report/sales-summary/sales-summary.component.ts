@@ -21,6 +21,8 @@ export class SalesSummaryComponent implements OnInit {
 
   sku_ten_year_data = [];
   sku_yearly_data = [];
+  csv_sku_ten_year_data = [];
+  csv_sku_yearly_data = [];
 
   loadingResults: boolean;
   failedRequest: boolean = false;
@@ -50,25 +52,38 @@ export class SalesSummaryComponent implements OnInit {
           Object.keys(response["sku_ten_year_data"]).forEach(function(key,index) {
             if (key == "manufacturing_run_size") {
               newTenYear[key] = response["sku_ten_year_data"][key].toFixed(2);
+            } else if (key == "profit_margin") {
+              newTenYear[key] = response["sku_ten_year_data"][key].toFixed(2) + "%";
             } else {
               newTenYear[key] = response["sku_ten_year_data"][key].toLocaleString('en-US', { style: 'currency', currency: 'USD' });
             }
           });
           this.sku_ten_year_data.push(newTenYear);
+          this.csv_sku_ten_year_data = [response["sku_ten_year_data"]];
 
           let d = new Date();
           let year = d.getFullYear() - 9;
 
           this.sku_yearly_data = [];
+          this.csv_sku_yearly_data = [];
           response["sku_yearly_data"].forEach((row) => {
             let newRow = {};
+            let csvNewRow = {};
             Object.keys(row).forEach(function(key,index) {
-              newRow[key] = row[key];
+              if (key != "sales") {
+                newRow[key] = row[key].toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+              } else {
+                newRow[key] = row[key].toLocaleString();
+              }
+              csvNewRow[key] = row[key];
             });
             newRow['SKU number'] = this.sku_number;
             newRow['year'] = year;
+            csvNewRow['SKU number'] = this.sku_number;
+            csvNewRow['year'] = year;
             year++;
             this.sku_yearly_data.push(newRow);
+            this.csv_sku_yearly_data.push(csvNewRow);
           });
         }
 
@@ -102,10 +117,11 @@ export class SalesSummaryComponent implements OnInit {
   }
 
   exportYearlyToCSV() {
-    this.exportService.exportJSON(this.sdisplayedColumns, this.sku_yearly_data, `${this.sku_number}_yearly_sales`);
+    this.exportService.exportJSON(this.sdisplayedColumns, this.csv_sku_yearly_data, `${this.sku_number}_yearly_sales`);
   }
 
   exportTotalsToCSV() {
-    this.exportService.exportJSON(this.ldisplayedColumns, [this.sku_ten_year_data], `${this.sku_number}_ten_year_sales`);
+    console.log(this.csv_sku_ten_year_data);
+    this.exportService.exportJSON(this.ldisplayedColumns, this.csv_sku_ten_year_data, `${this.sku_number}_ten_year_sales`);
   }
 }

@@ -136,6 +136,10 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
         past_formulas.add(formula.number);
         prev_formula = formula.number;
     }
+    for(let obj of results[type].changelist){
+        console.log(obj)
+    }
+
 
     if(results[type].errorlist.length == 0){
         for(let formula of formula_map.values()){

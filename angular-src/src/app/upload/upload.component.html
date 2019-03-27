@@ -56,6 +56,16 @@
                                     <mat-row *matRowDef="let row; columns: idisplayedColumns;"></mat-row>
                                 </mat-table>
                             </mat-tab>
+                            <mat-tab *ngIf="fChangeList.length>0" label="Formulas">
+                                <mat-table class="upload-table" [dataSource]="fChangeList">
+                                    <ng-container *ngFor="let column of fdisplayedColumns" [matColumnDef]="column">
+                                        <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                        <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="fdisplayedColumns"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: fdisplayedColumns;"></mat-row>
+                                </mat-table>
+                            </mat-tab>
                     </mat-tab-group>
                 </mat-card-content>
                 <mat-card-actions>
@@ -149,6 +159,16 @@
                             <mat-tab-group>
                                 <mat-tab *ngIf="hasElements(results.formulas.createlist)" label="New">
                                         <mat-table class="upload-table" [dataSource]="results.formulas.createlist">
+                                            <ng-container *ngFor="let column of fdisplayedColumns" [matColumnDef]="column">
+                                                <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>
+                                            </ng-container>
+                                            <mat-header-row *matHeaderRowDef="fdisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: fdisplayedColumns;"></mat-row>
+                                        </mat-table>
+                                </mat-tab>
+                                <mat-tab *ngIf="hasElements(results.formulas.changelist)" label="Updated">
+                                        <mat-table class="upload-table" [dataSource]="results.formulas.changelist">
                                             <ng-container *ngFor="let column of fdisplayedColumns" [matColumnDef]="column">
                                                 <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
                                                 <mat-cell *matCellDef="let element"> {{element[column]}} </mat-cell>

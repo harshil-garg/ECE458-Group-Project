@@ -33,10 +33,6 @@ export class AuthenticationService {
 
   login(credentials: LoginCredentials):Observable<LoginResponse> {
     let result = this.http.post<LoginResponse>('api/login', credentials, httpOptions);
-    result.subscribe((result) => {
-      console.log(result);
-      this.saveToken(result.token);
-    });
     return result;
   }
   getNetIDInfo(access_token: string) {
@@ -49,12 +45,11 @@ export class AuthenticationService {
   }
   
   login_NetID(netid: string, username: string):Observable<LoginResponse> {
-    console.log(username);
-    console.log(netid);
-    return this.http.post<LoginResponse>('api/login/netid', {name: username, email: netid}, httpOptions);
+    let result = this.http.post<LoginResponse>('api/login/netid', {name: username, email: netid}, httpOptions);
+    return result;
   }
 
-  private saveToken(token: string): void {
+  public saveToken(token: string): void {
     localStorage.setItem('mean-token', token);
     this.token = token;
     this.getUserDetails();
