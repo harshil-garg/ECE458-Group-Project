@@ -257,7 +257,7 @@ export class FormulaTableComponent implements OnInit{
 
     addIngredientQuantity(id){
       if(this.isEditable){
-        var added_ingr_quant: Tuple = {
+        var added_ingr_quant = {
           ingredient: this.ingredientInput,
           quantity: +this.quantityInput,
           unit: this.unitInput
