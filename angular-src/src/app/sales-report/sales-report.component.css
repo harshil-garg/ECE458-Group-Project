@@ -42,3 +42,12 @@ mat-icon:hover{
     cursor: pointer;
     color: mediumaquamarine;
 }
+
+.sales-report {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.flush {
+  margin: 10px
+}

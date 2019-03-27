@@ -27,14 +27,21 @@
       display: flex;
       flex-wrap: nowrap;
       justify-content: space-between;
-      align-items: baseline;      
+      align-items: baseline;
 }
 
 .flex-box-end{
       display: flex;
       flex-wrap: nowrap;
       justify-content: flex-end;
-      align-items: baseline;      
+      align-items: baseline;
+}
+
+.flex-box-center{
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: baseline;
 }
 
 .flex-item{
