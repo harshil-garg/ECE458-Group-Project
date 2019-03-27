@@ -1,5 +1,8 @@
 <!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
 <h1 class="mat-display-3" align="center">Product Lines</h1>
+<div class="search-div">
+    <br style="clear:both" />
+</div>
 <div *ngIf="isAdmin()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>

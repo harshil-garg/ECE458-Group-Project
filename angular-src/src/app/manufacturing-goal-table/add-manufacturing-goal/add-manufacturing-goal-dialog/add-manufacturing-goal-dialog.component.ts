@@ -39,8 +39,8 @@ export class AddManufacturingGoalDialogComponent implements OnInit {
 
     addSkuQuantity(event){
       if(this.skuInput!=undefined && this.skuInput.name.length>0 && this.quantityInput!=undefined && this.quantityInput.length>0){
-        var added_sku_quant: SkuNameQuantity = {
-          sku: this.skuInput.number,
+        var added_sku_quant = {
+          sku: this.skuInput,
           case_quantity: this.quantityInput
         }
         this.manufGoal.sku_tuples.push(added_sku_quant);
