@@ -1,6 +1,9 @@
 # Deployment Guide
 Read INSTALL.MD. Walk through the script step by step for easy deployment. You need 2 Duke-provisioned VCMs, one for production and one for backup.
 
+# Backup Guide
+Read BACKUP.MD for an understanding of how the backups and restore are done or can be handled by the system administrator.
+
 # Development Guide
 ## Technologies/Frameworks
 Our app was built using the MEAN stack, meaning MongoDB for storage, Express for handling http requests, Angular for front end design, and Node for backend design.
