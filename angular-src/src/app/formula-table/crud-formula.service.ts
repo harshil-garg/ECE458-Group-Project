@@ -29,6 +29,17 @@ export class Response {
   message: string;
 }
 
+export class ExportFormulasMessage {
+	sortBy : string;
+	keywords: Array<string>;
+	ingredients: Array<string>;
+}
+
+export class ExportFormulasResponse {
+  success: boolean;
+  data: Array<any>;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -55,4 +66,8 @@ export class CrudFormulaService {
     console.log(requestedFormula);
     return this.http.post<Response>('api/formulas/update', requestedFormula, httpOptions);
   }
+
+  export(exportFormulasMessage: ExportFormulasMessage): Observable<ExportFormulasResponse>{
+		return this.http.post<ExportFormulasResponse>('api/export/formulas', exportFormulasMessage, httpOptions);
+	}
 }

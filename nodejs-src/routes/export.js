@@ -51,10 +51,15 @@ router.post('/formulas', async (req, res) => {
 });
 
 function processComment(comment){
-    if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
-        return '"'+comment+'"';
-    }else{
-        return comment
+    if(comment != undefined){
+        if(comment.indexOf('"') > -1 || comment.indexOf(',') > -1 || comment.indexOf('\n') > -1){
+            return '"'+comment+'"';
+        }else{
+            return comment;
+        }
+    }
+    else{
+        return ''
     }
 }
 
@@ -127,7 +132,7 @@ function format_formulas(formulas){
             newformula = {};
             newformula['Formula#'] = formula.number;
             newformula['Name'] = formula.name;
-            newFormula['Ingr#'] = tuple.ingredient.number;
+            newformula['Ingr#'] = tuple.number;
             newformula['Quantity'] = `${tuple.quantity} ${tuple.unit}`;
             newformula['Comment'] = first ? processComment(formula.comment) : '';
             first = false;

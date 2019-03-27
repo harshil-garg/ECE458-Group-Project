@@ -9,6 +9,7 @@
 <div class="button-div">
   <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <!-- <app-add-ingredient class="add" *ngIf="isAdmin()"></app-add-ingredient> -->
+  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export Formulas</button>
   <app-add-formula class="add" *ngIf="isAdmin()"></app-add-formula>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
