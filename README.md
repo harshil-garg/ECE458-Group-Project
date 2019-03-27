@@ -1,28 +1,5 @@
 # Deployment Guide
-sudo apt install nodejs  
-sudo apt install npm  
-sudo apt install -y mongodb  
-sudo npm install -g @angular/cli  
-sudo npm install -g nodemon  
-extract tar bol uploaded to sakai  
-cd into project  
-npm install  
-cd into angular-src  
-npm install  
-ng build  
-cd ..  
-npm start  
-send postman request for new admin account:  
-https://vcm-8612.vm.duke.edu:3000/api/users/register  
-body: { “email” : “admin”,  
-	 “password”: “password”,  
-	“password2”: “password”,  
-	“name”: “admin”,  
-	“admin”: true  
-}  
-  
-admin account: admin  
-admin password: password  
+Read INSTALL.MD. Walk through the script step by step for easy deployment. You need 2 Duke-provisioned VCMs, one for production and one for backup,
 
 # Development Guide
 ## Technologies/Frameworks
