@@ -26,6 +26,11 @@ export class AutocompleteResponse {
 	data : any[];
 }
 
+export class Response {
+  success: boolean;
+  message: string;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -45,7 +50,7 @@ export class SalesReportService {
   }
 
   getSummary(request: SummaryRequest) {
-    return this.http.post('api/sales_record/summary_performance', request, httpOptions);
+    return this.http.post<Response>('api/sales_record/summary_performance', request, httpOptions);
   }
 
   getDrilldown(request: DrilldownRequest) {
