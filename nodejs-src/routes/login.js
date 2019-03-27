@@ -5,6 +5,7 @@ const User = require('../model/user_model');
 const autocomplete = require('../controllers/autocomplete');
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const sessionTimeout = 6000000;
 //Login handle
 //request params: email, password
 router.post('/',
@@ -17,7 +18,7 @@ router.post('/',
                 admin = user.admin;
                 const email = req.body.email;
                 let d = new Date();
-                let exp = d.getTime() + 600000;
+                let exp = d.getTime() + sessionTimeout;
                 opts = {};
                 const secret = 'SECRET_KEY'; //normally stored in process.env.secret
                 const token = jwt.sign({ email, admin, exp }, secret, opts);
@@ -37,7 +38,7 @@ router.post('/netid', (req, res) => {
                 console.log(err);
         } else {
         if (!user) {
-            let user = new User({
+            user = new User({
                     name: name,
                     email: netid_email,
                     password: "hello",
@@ -54,18 +55,25 @@ router.post('/netid', (req, res) => {
                     if (err) {
                             res.json({success: false, message: `Failed to create a new user. Error: ${err}`});
                     } else {
-                    req.url = "/login";
-                    req.body.email = netid_email;
-                    req.body.password = "hello";
-                        router.handle(req, res);
-                }
+                        admin = user.admin;
+                        let d = new Date();
+                        let exp = d.getTime() + sessionTimeout;
+                        opts = {};
+                        const secret = 'SECRET_KEY'; //normally stored in process.env.secret
+                        const token = jwt.sign({ email: netid_email, admin, exp }, secret, opts);
+                        res.json({success: true, token})
+                    }
                 });
         } else {
-            req.url = "/login";
-            req.body.email = netid_email;
-            req.body.password = "hello";
-            router.handle(req, res);
+            admin = user.admin;
+            let d = new Date();
+            let exp = d.getTime() + sessionTimeout;
+            opts = {};
+            const secret = 'SECRET_KEY'; //normally stored in process.env.secret
+            const token = jwt.sign({ email: netid_email, admin, exp }, secret, opts);
+            res.json({success: true, token})
         }
+        ;
         }
     });
 });
