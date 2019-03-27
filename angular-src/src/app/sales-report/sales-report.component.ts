@@ -32,7 +32,7 @@ export class SalesReportComponent implements OnInit {
 
   openSummary(sku) {
     this.dialog.open(SalesSummaryComponent, {
-      height: '800px',
+      height: '1000px',
       width: '1400px',
       data: {
         sku: sku
@@ -60,7 +60,7 @@ export class SalesReportComponent implements OnInit {
         this.main_data = response;
         this.keys = Object.keys(this.main_data);
         this.loadingResults = false;
-      }, 
+      },
       error => {
         console.log("Error")
       }

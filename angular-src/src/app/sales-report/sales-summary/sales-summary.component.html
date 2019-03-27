@@ -30,7 +30,9 @@
       <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
       <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
     </mat-table>
+
     <mat-divider></mat-divider>
+    
     <mat-table class="summary-table" [dataSource]="sku_ten_year_data">
       <ng-container matColumnDef="total_revenue">
           <mat-header-cell *matHeaderCellDef> Total Rev. </mat-header-cell>
