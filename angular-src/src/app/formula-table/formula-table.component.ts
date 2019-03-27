@@ -30,6 +30,9 @@ export class FormulaTableComponent implements OnInit{
     sortBy: string = "name";
     keywords: Array<any> = [];
     ingredients: Array<any> = [];
+    ingredientInput: string = "";
+    unitInput: string = "";
+    quantityInput: string = "";
 
     displayedColumns: string[] = ['select', 'name', 'number', 'ingredient_tuples', 'comment'];
     selection = new SelectionModel<Formula>(true, []);
@@ -243,4 +246,30 @@ export class FormulaTableComponent implements OnInit{
       this.exportService.exportJSON(headers, response.data, 'formulas');
     }
 
+    setIngredientInput(event){
+      this.ingredientInput = event;
+    }
+
+    updateUnit(ev){
+      this.unitInput = ev.unit;
+      this.quantityInput = ev.quantity;
+    }
+
+    addIngredientQuantity(id){
+      if(this.isEditable){
+        var added_ingr_quant: Tuple = {
+          ingredient: this.ingredientInput,
+          quantity: +this.quantityInput,
+          unit: this.unitInput
+        }
+        for(let formula of this.formulaList){
+          if(formula.id == id){
+            formula.ingredient_tuples.push(added_ingr_quant);
+            this.edit(id, 'tuple', formula.ingredient_tuples);
+          }
+        }
+        this.ingredientInput = '';
+        this.quantityInput = '';
+      }
+    }
 }

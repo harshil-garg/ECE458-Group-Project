@@ -108,7 +108,6 @@ function format_skus(skus) {
         newsku['Comment'] = processComment(sku.comment);
         result.push(newsku);
     }
-    console.log(result);
     return result;
 }
 
