@@ -1,6 +1,10 @@
 # Deployment Guide
 Read INSTALL.MD. Walk through the script step by step for easy deployment. You need 2 Duke-provisioned VCMs, one for production and one for backup.
 
+As of evolution 3, our production server lives at https://vcm-9167.vm.duke.edu:4200 and our backup server lives at https://vcm-8793.vm.duke.edu.
+
+The passwords are seTrogrum5 and 6yTefrigao respectively.
+
 # Backup Guide
 Read BACKUP.MD for an understanding of how the backups and restore are done or can be handled by the system administrator.
 
