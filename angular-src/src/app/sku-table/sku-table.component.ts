@@ -334,7 +334,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     handleExportSkusResponse(response){
-      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Comment'];
+      const headers = ['SKU#', 'Name', 'Case UPC', 'Unit UPC', 'Unit size', 'Count per case', 'PL Name', 'Formula#' , 'Formula factor', 'ML Shortnames', 'Rate', 'Mfg setup cost', 'Mfg run cost', 'Comment'];
       this.exportService.exportJSON(headers, response.data, 'skus');
     }
 
@@ -365,27 +365,6 @@ export class SkuTableComponent implements OnInit{
     //     window.open(encodedUri);
     //   }
     // }
-
-    exportFormulas(){
-      this.filterSkuService.exportFormulas({
-        sortBy : this.sortBy,
-        keywords: this.keywords,
-        ingredients : this.ingredients,
-        product_lines : this.productLines
-      }).subscribe(
-      response => this.handleExportFormulasResponse(response),
-      err => {
-        if (err.status === 401) {
-          console.log("401 Error")
-          }
-        }
-      );
-    }
-
-    handleExportFormulasResponse(response){
-      const headers = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
-      this.exportService.exportJSON(headers, response.data, 'formulas');
-    }
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;

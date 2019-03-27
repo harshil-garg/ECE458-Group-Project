@@ -11,7 +11,6 @@
   <app-bulk-sku-edit *ngIf="isAdmin()" [selectedSkus]="selection.selected"></app-bulk-sku-edit>
   <app-add-sku class="add" *ngIf="isAdmin()"></app-add-sku>
   <button mat-raised-button="export_skus" class="export_skus" type="button" (click)="exportSkus()" color="accent">Export SKUs</button>
-  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="exportFormulas()" color="accent">Export Formulas</button>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>

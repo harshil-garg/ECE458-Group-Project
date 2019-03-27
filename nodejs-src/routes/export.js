@@ -127,7 +127,7 @@ function format_formulas(formulas){
             newformula = {};
             newformula['Formula#'] = formula.number;
             newformula['Name'] = formula.name;
-            newFormula['Ingr#'] = tuple.ingredient.number;
+            newformula['Ingr#'] = tuple.number;
             newformula['Quantity'] = `${tuple.quantity} ${tuple.unit}`;
             newformula['Comment'] = first ? processComment(formula.comment) : '';
             first = false;

@@ -8,6 +8,7 @@ import { FilterFormulaService, FilterResponse } from './filter-formula.service'
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import { ExportService } from '../export.service';
 
 @Component({
   selector: 'formula-table',
@@ -57,7 +58,7 @@ export class FormulaTableComponent implements OnInit{
     }
 
     constructor(private authenticationService: AuthenticationService, public crudFormulaService: CrudFormulaService,
-      public filterFormulaService: FilterFormulaService, private snackBar: MatSnackBar){}
+      public filterFormulaService: FilterFormulaService, private snackBar: MatSnackBar, private exportService: ExportService){}
 
     remove() {
       for(let selected of this.selection.selected){
@@ -220,6 +221,26 @@ export class FormulaTableComponent implements OnInit{
 
     isEditable(){
       return this.isAdmin() && this.liveEditing;
+    }
+
+    export(){
+      this.crudFormulaService.export({
+        sortBy : this.sortBy,
+        keywords: this.keywords,
+        ingredients : this.ingredients,
+      }).subscribe(
+      response => this.handleExport(response),
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+          }
+        }
+      );
+    }
+
+    handleExport(response){
+      const headers = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
+      this.exportService.exportJSON(headers, response.data, 'formulas');
     }
 
 }

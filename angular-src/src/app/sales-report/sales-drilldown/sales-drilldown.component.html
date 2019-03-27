@@ -79,7 +79,7 @@
 
 <!-- export -->
 <button mat-raised-button color="accent" (click)="exportDrilldownToCSV()">Export to CSV</button>
-
+<br>
 <h2>Total Stats</h2>
 <table mat-table [dataSource]="summarySource" class="mat-elevation-z8">
   <ng-container matColumnDef="stat">
@@ -99,6 +99,3 @@
 <h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
 <app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>
 
-<canvas>
-
-</canvas>
