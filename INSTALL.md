@@ -24,8 +24,7 @@
 
 `logout`
 
-## SSH into Duke-provisioned VM AGAIN as the previous command logged you out.
-## The below sets up node, angular, docker, certificates.
+## SSH into Duke-provisioned VM AGAIN as the previous command logged you out. The below sets up node, angular, docker, certificates.
 
 `curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && sudo apt-get install -y nodejs`
 
@@ -71,8 +70,7 @@
 
 `sudo npm install`
 
-## Run the backup setup script. Step through it step by step. Make sure you have a second Duke VM provisioned as backup.
-## You will be asked for a backup server hostname, password, and email address to send notifications to.
+## Run the backup setup script. Step through it step by step. Make sure you have a second Duke VM provisioned as backup. You will be asked for a backup server hostname, password, and email address to send notifications to.
 `bash backup_setup.sh`
 
 ## Bring up production server
