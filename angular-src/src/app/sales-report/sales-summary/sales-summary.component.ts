@@ -12,7 +12,7 @@ import { SalesReportService } from '../sales-report.service';
 export class SalesSummaryComponent implements OnInit {
   sdisplayedColumns = ['SKU number', 'year', 'sales', 'revenue', 'revenue_per_case']
   ldisplayedColumns = ['total_revenue', 'revenue_per_case', 'profit_per_case', 'profit_margin', 'manufacturing_setup_cost_per_case', 'manufacturing_run_size', 'manufacturing_run_cost_per_case', 'ingredient_cost_per_case', 'cogs_per_case'];
-  
+
   selected_customer: string;
   customers: Array<any> = [];
 
@@ -23,6 +23,7 @@ export class SalesSummaryComponent implements OnInit {
   sku_yearly_data = [];
 
   loadingResults: boolean;
+  failedRequest: boolean = false;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, public salesReportService: SalesReportService, public exportService: ExportService) {
     this.sku_number = data.sku.number;
@@ -41,31 +42,35 @@ export class SalesSummaryComponent implements OnInit {
     };
     this.salesReportService.getSummary(request).subscribe(
       response => {
-        this.sku_ten_year_data = [];
-        let newTenYear = {};
-        Object.keys(response["sku_ten_year_data"]).forEach(function(key,index) {
-          if (key == "manufacturing_run_size") {
-            newTenYear[key] = response["sku_ten_year_data"][key].toFixed(2);
-          } else {
-            newTenYear[key] = response["sku_ten_year_data"][key].toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-          }
-        });
-        this.sku_ten_year_data.push(newTenYear);
-
-        let d = new Date();
-        let year = d.getFullYear() - 9;
-    
-        this.sku_yearly_data = [];
-        response["sku_yearly_data"].forEach((row) => {
-          let newRow = {};
-          Object.keys(row).forEach(function(key,index) {
-            newRow[key] = row[key];
+        if(!response.success){
+          this.failedRequest = true;
+        } else {
+          this.sku_ten_year_data = [];
+          let newTenYear = {};
+          Object.keys(response["sku_ten_year_data"]).forEach(function(key,index) {
+            if (key == "manufacturing_run_size") {
+              newTenYear[key] = response["sku_ten_year_data"][key].toFixed(2);
+            } else {
+              newTenYear[key] = response["sku_ten_year_data"][key].toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            }
           });
-          newRow['SKU number'] = this.sku_number;
-          newRow['year'] = year;
-          year++;
-          this.sku_yearly_data.push(newRow);
-        });
+          this.sku_ten_year_data.push(newTenYear);
+
+          let d = new Date();
+          let year = d.getFullYear() - 9;
+
+          this.sku_yearly_data = [];
+          response["sku_yearly_data"].forEach((row) => {
+            let newRow = {};
+            Object.keys(row).forEach(function(key,index) {
+              newRow[key] = row[key];
+            });
+            newRow['SKU number'] = this.sku_number;
+            newRow['year'] = year;
+            year++;
+            this.sku_yearly_data.push(newRow);
+          });
+        }
 
         this.loadingResults = false;
       },
