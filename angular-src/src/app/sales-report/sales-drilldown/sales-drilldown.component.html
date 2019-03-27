@@ -76,8 +76,9 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
   </table>
-  <mat-paginator [length]="totalDocs" [pageSize]="10 < totalDocs ? 10 : totalDocs" [pageSizeOptions]="[10, totalDocs]" showFirstLastButtons></mat-paginator>
-
+</ng-container>
+<mat-paginator [length]="totalDocs" [pageSize]="10 < totalDocs ? 10 : totalDocs" [pageSizeOptions]="[10, totalDocs]" showFirstLastButtons></mat-paginator>
+<ng-container *ngIf="!failedRequest">
   <!-- export -->
   <button mat-raised-button color="accent" (click)="exportDrilldownToCSV()">Export to CSV</button>
   <br>
@@ -99,4 +100,7 @@
 
   <h2 *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0">Weekly Revenue Over Time</h2>
   <app-line-graph [recordList]="recordList" *ngIf="selected_customer!='all' && recordList!=null && recordList.length>0"></app-line-graph>
+</ng-container>
+<ng-container *ngIf="failedRequest">
+  <h1 class="mat-display-3" align="center">Records being loaded. Check again in 10-15 seconds.</h1>
 </ng-container>
