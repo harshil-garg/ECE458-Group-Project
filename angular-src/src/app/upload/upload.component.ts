@@ -31,8 +31,9 @@ export class UploadComponent {
   fErrorList = [];
   iChangeList = [];
   sChangeList = [];
-  sdisplayedColumns: string[] = ['SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate','Comment'];
-  esdisplayedColumns: string[] = ['message', 'SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate','Comment'];
+  fChangeList = [];
+  sdisplayedColumns: string[] = ['SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate', 'Mfg setup cost','Mfg run cost','Comment'];
+  esdisplayedColumns: string[] = ['message', 'SKU#','Name','Case UPC','Unit UPC','Unit size','Count per case','PL Name','Formula#','Formula factor','ML Shortnames' ,'Rate','Mfg setup cost','Mfg run cost','Comment'];
   idisplayedColumns: string[] = ['Ingr#','Name','Vendor Info','Size','Cost','Comment'];
   eidisplayedColumns: string[] = ['message', 'Ingr#','Name','Vendor Info','Size','Cost','Comment'];
   fdisplayedColumns: string[] = ['Formula#', 'Name', 'Ingr#', 'Quantity', 'Comment'];
@@ -129,6 +130,8 @@ export class UploadComponent {
             'Formula#': element.data['Formula#'],
             'Formula factor': element.data['Formula factor'],
             'ML Shortnames': element.data['ML Shortnames'],
+            'Mfg setup cost': element.data['Mfg setup cost'],
+            'Mfg run cost': element.data['Mfg run cost'],
             'Rate': element.data['Rate'],
           })
         });
@@ -146,9 +149,11 @@ export class UploadComponent {
 
         this.changeState(UploadState.SHOWING_ERRORS);
       }
-      else if (val.skus.changelist.length || val.ingredients.changelist.length) {
+      else if (val.skus.changelist.length || val.ingredients.changelist.length || val.formulas.changelist.length) {
+        console.log(val.formulas.changelist)
         this.iChangeList =  val.ingredients.changelist;
         this.sChangeList = val.skus.changelist;
+        this.fChangeList = val.formulas.changelist;
         this.changeState(UploadState.CONFIRMING);
       }
       else {
@@ -201,7 +206,7 @@ export class UploadComponent {
     return this.results.product_lines.createlist.length || this.results.product_lines.ignorelist.length;
   }
   formulasImported(): boolean {
-    return this.results.formulas.createlist.length || this.results.formulas.ignorelist.length;
+    return this.results.formulas.createlist.length || this.results.formulas.changelist.length;
   }
   ingredientsImported(): boolean {
     return this.results.ingredients.createlist.length || this.results.ingredients.changelist.length ||  this.results.ingredients.ignorelist.length;
