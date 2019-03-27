@@ -69,7 +69,11 @@ export class SearchSkuComponent implements OnInit {
 
   onSelectionChanged(event){
     this.selectedSku = event.option.value;
-    this.inputField.setValue("");
+    this.skuName = event.option.value.name;
+    this.productLine = event.option.value.product_line;
+    this.selectedValue = "sku";
+    this.inputField.setValue(this.skuName);
+    this.skuSelected.emit(this.selectedSku);
   }
 
   enable(){

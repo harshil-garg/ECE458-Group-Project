@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse, HttpHeaders } from '@angular/common/http';
 
+export class MainRequest {
+  product_lines: Array<string>;
+}
+
 export class SummaryRequest {
-    product_lines: Array<string>;
+    sku_number: number;
     customers: Array<string>;
 }
 
@@ -35,8 +39,13 @@ export class SalesReportService {
 
   constructor(private http: HttpClient) { }
 
+  getMain(request: MainRequest) {
+    console.log("Hi");
+    return this.http.post('api/sales_record/main', request, httpOptions);
+  }
+
   getSummary(request: SummaryRequest) {
-    return this.http.post('api/sales_record/summary', request, httpOptions);
+    return this.http.post('api/sales_record/summary_performance', request, httpOptions);
   }
 
   getDrilldown(request: DrilldownRequest) {

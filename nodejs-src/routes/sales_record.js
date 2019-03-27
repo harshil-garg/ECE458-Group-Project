@@ -28,6 +28,66 @@ var cache = new LRUCache(1000);
  * ROUTES / APIs
  ****************************************************************************************************/
 
+ router.post('/main', async function(req, res) {
+    const { product_lines } = req.body;
+    let data = {};
+    for (let product_line_name of product_lines) {
+        let product_line = await ProductLine.findOne({
+            name: product_line_name
+        });
+        let skus = await SKU.find({
+            product_line: product_line._id
+        });
+        data[product_line_name] = skus;
+    }
+    res.send(data);
+ });
+
+ router.post('/summary_performance', async function(req, res) {
+    const { sku_number, customers } = req.body;
+
+    let sku = await SKU.findOne({
+        number: sku_number
+    });
+
+    var sku_summary_data = {
+        sku: sku
+    };
+    var sku_yearly_data = [];
+    let start = new Date().getFullYear() - 9; let end = new Date().getFullYear();
+
+    for (year = start; year <= end; year++) {
+        let response = await getSalesRecords(sku.number, year);
+        if (response.success) {
+            console.log(response.source);
+            const filteredRecords = response.data.filter(record => (
+                customers.includes(record.customer_name)
+            ));
+            const mappedRecords = filteredRecords.map(record => (
+                {
+                    sales: record.sales,
+                    price: record.price,
+                    revenue: record.sales*record.price
+                }
+            ));
+            sku_yearly_data.push(getYearlySummaryData(mappedRecords));
+        }
+    }
+    sku_summary_data["sku_yearly_data"] = sku_yearly_data;
+
+    if (sku_yearly_data.length < 10) {
+        sku_summary_data["success"] = false;
+        sku_summary_data["sku_ten_year_data"] = {};
+    } else {
+        let tenYearData = await getTotalSummaryData(sku, sku_yearly_data, new Date(start, 0, 1).toISOString());
+        sku_summary_data["sku_ten_year_data"] = tenYearData;
+        sku_summary_data["success"] = true;
+    }
+
+    res.send(sku_summary_data);
+
+ });
+ 
  /**
   * API to serve the summary view that returns a JSON object. The JSON object returned will have
   * fields corresponding to each of the product lines requested. There will be an array associated
@@ -73,7 +133,7 @@ router.post('/summary', async function(req, res) {
             };
 
             var sku_yearly_data = [];
-            let start = new Date().getFullYear() - 10; let end = new Date().getFullYear();
+            let start = new Date().getFullYear() - 9; let end = new Date().getFullYear();
             for (year = start; year <= end; year++) {
                 let response = await getSalesRecords(sku.number, year);
                 if (response.success) {
@@ -93,7 +153,7 @@ router.post('/summary', async function(req, res) {
             }
             sku_summary_data["sku_yearly_data"] = sku_yearly_data;
 
-            if (sku_yearly_data.length < 11) {
+            if (sku_yearly_data.length < 10) {
                 sku_summary_data["success"] = false;
                 sku_summary_data["sku_ten_year_data"] = {};
                 product_line_summary_data.push(sku_summary_data);

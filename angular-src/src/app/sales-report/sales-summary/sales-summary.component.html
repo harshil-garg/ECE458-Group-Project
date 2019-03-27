@@ -1,9 +1,11 @@
-<h2 mat-dialog-title>Sales Summary</h2>
+<h1 class="mat-display-3" align="center">{{display_name}}</h1>
+<app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)"></app-customer-autocomplete>
+<h2>Summary Statistics</h2>
 <mat-dialog-content>
   <mat-table class="summary-table" [dataSource]="sku_yearly_data">
     <ng-container matColumnDef="SKU number">
         <mat-header-cell *matHeaderCellDef> SKU number </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{data.sku.sku.number}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{sku_number}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="year">
       <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
