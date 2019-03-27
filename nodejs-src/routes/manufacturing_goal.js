@@ -19,8 +19,7 @@ function getUser(req){
     let payload = jwt.split(' ')[1]
     let decoded = jwtDecode(payload)
 
-    return decoded.email;
-    
+    return decoded.email;  
 }
 
 router.post('/calculator', async (req, res) => {

@@ -11,13 +11,14 @@ const schedule_validator = require('../controllers/schedule_validator');
 const autocomplete = require('../controllers/autocomplete');
 const schedule_filter = require('../controllers/schedule_filter');
 const unit = require('../controllers/units');
+const jwtDecode = require('jwt-decode');
 
 function getUser(req){
-    if(!req.user){
-        return;
-    }else {
-        return req.user.email;
-    }
+    let jwt = req.headers.authorization
+    let payload = jwt.split(' ')[1]
+    let decoded = jwtDecode(payload)
+
+    return decoded.email;  
 }
 
 //Display manufacturing goals for admin to select, filter by name and username
