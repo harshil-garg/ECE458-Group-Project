@@ -8,3 +8,8 @@
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
+mat-icon:hover{
+  cursor: pointer;
+  color: mediumaquamarine;
+}

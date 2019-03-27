@@ -104,11 +104,12 @@ router.post('/all', async (req, res) => {
 // CREATE
 router.post('/create', async (req, res) => {
     const { name, sku_tuples, deadline } = req.body;
+    console.log(sku_tuples)
 
     // Check that SKUS exist
     let valid_tuples = [];
     for(let tuple of sku_tuples){
-        valid_tuples.push(await validator.itemExists(SKU, tuple.sku.toString()));
+        valid_tuples.push(await validator.itemExists(SKU, tuple.sku.number.toString()));
     }
 
     let errors = validator.compileErrors(...valid_tuples);

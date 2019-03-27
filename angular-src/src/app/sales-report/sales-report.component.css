@@ -37,3 +37,8 @@ table {
   align-items: center;
   justify-content: center;
 }
+
+mat-icon:hover{
+    cursor: pointer;
+    color: mediumaquamarine;
+}

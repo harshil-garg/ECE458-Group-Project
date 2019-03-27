@@ -45,7 +45,6 @@ export class SalesReportService {
   constructor(private http: HttpClient) { }
 
   getMain(request: MainRequest) {
-    console.log("Hi");
     return this.http.post('api/sales_record/main', request, httpOptions);
   }
 
@@ -58,7 +57,7 @@ export class SalesReportService {
   }
 
   doFlush() {
-    return this.http.post('api/sales_record/flush', {}, httpOptions);
+    return this.http.post('api/sales_record/flush', httpOptions);
   }
 
   autocompleteCustomers(autocompleteMessage: AutocompleteMessage){
