@@ -90,59 +90,10 @@ router.post('/register', (req,res) => {
 
 })
 
-router.post('/netid', (req, res) => {
-    const {name, email} = req.body;
-    var netid_email = "netid_"+email;
-    User.findOne({email: netid_email}, (err, user) => {
-	    if (err) {
-		res.json({success: false, message: `Failed to create a new user. Error: ${err}`});
-            	console.log(err);
-	    } else {
-		if (!user) {
-			let user = new User({
-        			name: name,
-			        email: netid_email,
-			        password: "hello",
-        			admin : false
-    			});
-
-    			bcrypt.genSalt(10, (err, salt) => {
-        			bcrypt.hash(user.password, salt, null, (err, hash) => {
-            				user.password = hash;
-        			});
-    			});
-
-    			User.createUser(user, (err) => {
-        			if (err) {
-            				res.json({success: false, message: `Failed to create a new user. Error: ${err}`});
-        			} else {
-					req.url = "/login";
-					req.body.email = netid_email;
-					req.body.password = "hello";
-				        router.handle(req, res);
-				}
-    			});
-		} else {
-			req.url = "/login";
-			req.body.email = netid_email;
-			req.body.password = "hello";
-			router.handle(req, res);
-		}
-	    }
-    });
-});
-
 router.get('/get', async (req, res) => {
     let users = await User.find();
     let emails = users.map(user => user.email);
     res.send(emails);
 })
-
-//Logout Handle
-router.get('/logout', (req,res) => {
-    req.logOut();
-    res.redirect('/login');
-});
-
 
 module.exports = router;

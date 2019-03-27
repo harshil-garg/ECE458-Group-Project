@@ -51,7 +51,7 @@ export class AuthenticationService {
   login_NetID(netid: string, username: string):Observable<LoginResponse> {
     console.log(username);
     console.log(netid);
-    return this.http.post<LoginResponse>('api/users/netid', {name: username, email: netid}, httpOptions);
+    return this.http.post<LoginResponse>('api/login/netid', {name: username, email: netid}, httpOptions);
   }
 
   private saveToken(token: string): void {

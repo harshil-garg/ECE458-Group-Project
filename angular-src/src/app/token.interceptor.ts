@@ -18,15 +18,13 @@ export class TokenInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     
     let accessToken = localStorage.getItem("mean-token");
-    console.log('yes: ' + accessToken)
-    if(accessToken)
+    if(accessToken && request.url!='api/login' && request.url.indexOf('api.colab.duke')==-1 && request.url!='api/login/netid')
     {
         request = request.clone({
         setHeaders: {
             Authorization: `Bearer ${accessToken}`
         }
         });
-        console.log(request);
     }
 
     return next.handle(request).do((event: HttpEvent<any>) => {

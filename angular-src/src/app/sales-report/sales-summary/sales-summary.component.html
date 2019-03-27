@@ -1,10 +1,14 @@
 <h2 mat-dialog-title>Sales Summary</h2>
 <mat-dialog-content>
-  <mat-table class="summary-table" [dataSource]="data.sku.sku_yearly_data">
+  <mat-table class="summary-table" [dataSource]="sku_yearly_data">
     <ng-container matColumnDef="SKU number">
         <mat-header-cell *matHeaderCellDef> SKU number </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{data.sku.sku.number}} </mat-cell>
     </ng-container>
+    <ng-container matColumnDef="year">
+      <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+  </ng-container>
     <ng-container matColumnDef="sales">
       <mat-header-cell *matHeaderCellDef> Sales </mat-header-cell>
       <mat-cell *matCellDef="let element"> {{element.sales}} </mat-cell>
