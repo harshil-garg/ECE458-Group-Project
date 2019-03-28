@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { ManufacturingLine } from '../model/manufacturing-line'
 import { AuthenticationService } from '../authentication.service'
 import { CrudManufacturingLineService, Response, ReadResponse } from './crud-manufacturing-line.service'
-import {MatTableDataSource, MatPaginator, MatSnackBar} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
@@ -21,6 +21,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     loadingResults: boolean = false;
     liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
     ngOnInit() {
       this.paginator.pageIndex = 0;
@@ -142,6 +143,16 @@ export class ManufacturingLineTableComponent implements OnInit{
         this.maxPages = response.pages;
         this.loadingResults = false;
       }
+      this.formFields.changes.subscribe((change) => {
+        change.forEach(form => {
+          if(this.isEditable()){
+            form.underlineRef.nativeElement.className = "mat-form-field-underline";
+          }
+          else {
+            form.underlineRef.nativeElement.className = null;
+          }
+        });
+      });
     }
 
     isAllSelected() {

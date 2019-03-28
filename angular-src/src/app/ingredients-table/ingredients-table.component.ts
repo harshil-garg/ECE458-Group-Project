@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { Ingredient } from '../model/ingredient'
 import { HttpResponse } from '@angular/common/http';
 import { MeasurementUnit } from '../model/measurement-unit'
@@ -6,7 +6,7 @@ import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { CrudIngredientsService, Response } from './crud-ingredients.service';
 import { FilterIngredientsService, FilterResponse, IngredientCsvData } from './filter-ingredients.service'
-import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { ExportService } from '../export.service';
@@ -41,6 +41,7 @@ export class IngredientsTableComponent implements OnInit{
     liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
+    @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
     //skuShown: Array<boolean> = [false];
     expandedIngredient;
@@ -214,6 +215,16 @@ export class IngredientsTableComponent implements OnInit{
         this.maxPages = response.pages;
         this.loadingResults = false;
       }
+      this.formFields.changes.subscribe((change) => {
+        change.forEach(form => {
+          if(this.isEditable()){
+            form.underlineRef.nativeElement.className = "mat-form-field-underline";
+          }
+          else {
+            form.underlineRef.nativeElement.className = null;
+          }
+        });
+      });
     }
 
     setSortBy(property: string){

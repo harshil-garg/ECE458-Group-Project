@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { Ingredient, Tuple } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
@@ -6,7 +6,7 @@ import { Formula } from '../model/formula'
 import { CrudSkuService, Response } from './crud-sku.service';
 import { CrudFormulaService } from '../formula-table/crud-formula.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
-import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import { ExportService } from '../export.service';
 
@@ -32,6 +32,7 @@ export class SkuTableComponent implements OnInit{
     liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
+    @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
     ngOnInit() {
       this.paginator.pageIndex = 0;
@@ -315,6 +316,16 @@ export class SkuTableComponent implements OnInit{
         this.maxPages = response.pages;
         this.loadingResults = false;
       }
+      this.formFields.changes.subscribe((change) => {
+        change.forEach(form => {
+          if(this.isEditable()){
+            form.underlineRef.nativeElement.className = "mat-form-field-underline";
+          }
+          else {
+            form.underlineRef.nativeElement.className = null;
+          }
+        });
+      });
     }
 
     exportSkus(){
