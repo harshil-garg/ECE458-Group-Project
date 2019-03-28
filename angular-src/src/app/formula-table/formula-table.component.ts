@@ -221,7 +221,10 @@ export class FormulaTableComponent implements OnInit{
     }
 
     removeIngrQuant(ingr_id:number, formula_id:number){
-      var ingredient_tuples = this.formulaList[formula_id].ingredient_tuples;
+      var listId = this.formulaList.findIndex(element=>{
+        return element.id == formula_id;
+      });
+      var ingredient_tuples = this.formulaList[listId].ingredient_tuples;
       ingredient_tuples.splice(ingr_id, 1);
       this.edit(formula_id, 'tuple', ingredient_tuples);
     }
