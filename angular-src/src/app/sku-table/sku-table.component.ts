@@ -37,7 +37,10 @@ export class SkuTableComponent implements OnInit{
     ngOnInit() {
       this.paginator.pageIndex = 0;
       this.paginator.pageSize = 10;
-      this.paginator.page.subscribe(x => this.refresh());
+      this.paginator.page.subscribe(x => {
+        this.selection.clear();
+        this.refresh();
+      });
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
         this.refresh();
