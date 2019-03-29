@@ -73,6 +73,10 @@ export class AddFormulaDialogComponent implements OnInit {
     }
   }
 
+  updateIngrQuant(ingrQuant){
+    this.tupleForm.setValue({ingredient: this.tupleForm.value.ingredient, quantity: ingrQuant.quantity, unit: ingrQuant.unit});
+  }
+
   removeIngrQuant(ingr_id){
     this.ingredient_tuples.splice(ingr_id, 1);
   }

@@ -42,7 +42,8 @@
               <h5>Ingredient</h5>
               <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
 
-              <h5>Quantity</h5>
+              <app-unit-autocomplete (messageEvent)="updateIngrQuant($event)"></app-unit-autocomplete>
+              <!-- <h5>Quantity</h5>
               <mat-form-field>
                 <input matInput type="text" placeholder="Quantity" formControlName="quantity" id="quantity">
                 <mat-error *ngIf="hasTupleError('quantity', 'required')">Quantity is required</mat-error>
@@ -53,7 +54,7 @@
                 <input matInput type="text" placeholder="Unit" formControlName="unit" id="unit">
                 <mat-error *ngIf="hasTupleError('unit', 'required')">Unit is required</mat-error>
               </mat-form-field>
-              <br>
+              <br> -->
 
             </form>
         </mat-card-content>
