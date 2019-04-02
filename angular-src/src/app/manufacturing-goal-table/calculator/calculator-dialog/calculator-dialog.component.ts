@@ -15,6 +15,7 @@ export class CalculatorDialogComponent implements OnInit {
   calculateList : Array<any> = [];
 
   calculateColumns = ['Ingr#', 'Name', 'Measured Quantity', 'Package Quantity'];
+  loadingResults: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<CalculatorDialogComponent>, public exportService: ExportService, public manufacturingService: ManufacturingGoalService,
@@ -29,6 +30,7 @@ export class CalculatorDialogComponent implements OnInit {
     }
 
     calculate(){
+      this.loadingResults = true;
       this.manufacturingService.calculate({
           name : this.manufGoal
         }).subscribe(
@@ -43,6 +45,7 @@ export class CalculatorDialogComponent implements OnInit {
 
     handleRefreshResponse(response){
         this.calculateList = [];
+        this.loadingResults = false;
         for(let key in response.data){
 
           this.calculateList.push({

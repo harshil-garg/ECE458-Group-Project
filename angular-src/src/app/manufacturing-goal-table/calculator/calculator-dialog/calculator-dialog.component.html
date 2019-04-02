@@ -1,5 +1,8 @@
 <h1 mat-dialog-title>Manufacturing Goal Calculator</h1>
 <mat-dialog-content style="height:450px">
+  <div class="example-loading-shade" *ngIf="loadingResults">
+    <mat-spinner></mat-spinner>
+  </div>
   <p>{{manufGoal}}</p>
   <mat-table *ngIf="calculateList.length > 0" class="calculator-table" [dataSource]="calculateList">
     <ng-container *ngFor="let column of calculateColumns" [matColumnDef]="column">
@@ -14,4 +17,3 @@
   <button mat-raised-button color="accent" class="calculator-button" (click)="print()">View printable page</button>
   <button mat-raised-button color="accent" class="calculator-button" (click)="exportcsv()">Export CSV</button>
 </mat-dialog-actions>
-
