@@ -32,7 +32,7 @@ export class UnitAutocompleteComponent implements OnInit {
 
       private _filter(value: string): string[] {
         const splitString = value.match(/[a-z]+|[^a-z]+/gi);
-        if(splitString==null || splitString.length==0){
+        if(splitString==null || splitString.length==0 || (splitString.length>0 && isNaN(+splitString[0]))){
           return [];
         } else if(splitString.length==1){
           return this.measUnits.map(unit=>splitString[0]+unit);
@@ -54,7 +54,7 @@ export class UnitAutocompleteComponent implements OnInit {
 
       onBlur(){
         var spliced = this.inputField.value.match(/[a-z]+|[^a-z]+/gi);
-        if(spliced!=null && spliced.length==2){
+        if(spliced!=null && spliced.length==2 && !isNaN(+spliced[0])){
           var quantity = spliced[0];
           var unit = spliced[1];
           this.messageEvent.emit({
