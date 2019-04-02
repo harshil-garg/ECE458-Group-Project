@@ -35,25 +35,25 @@ export class RegisterComponent implements OnInit {
 
 	register(name: string, email: string, password: string, password2: string) {
 		this.accountsService.register(name, email, password, password2, this.newAdminSelection).subscribe((response) => {
-				this.snackBar.open(response.message, 'close');
+				this.snackBar.open(response.message, 'close', {duration:3000});
 		}, (err) => {
-			this.snackBar.open(err, 'close');
+			this.snackBar.open(err, 'close', {duration:3000});
 		});
 	}
 
 	updatePriveleges(email: string, admin: boolean) {
 		this.accountsService.updatePriveleges(email, admin).subscribe((response) => {
-				this.snackBar.open(response.message, 'close');
+				this.snackBar.open(response.message, 'close', {duration:3000});
 		}, (err) => {
-			this.snackBar.open(err, 'close');
+			this.snackBar.open(err, 'close', {duration:3000});
 		});
 	}
 
 	deleteUser(email: string) {
 		this.accountsService.deleteUser(email).subscribe((response) => {
-			this.snackBar.open(response.message, 'close');
+			this.snackBar.open(response.message, 'close', {duration:3000});
 	}, (err) => {
-		this.snackBar.open(err, 'close');
+		this.snackBar.open(err, 'close', {duration:3000});
 	});
 	}
 
