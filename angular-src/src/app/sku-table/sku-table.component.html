@@ -6,11 +6,16 @@
 <div *ngIf="isAdmin()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
-<div class="button-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <app-bulk-sku-edit *ngIf="isAdmin()" [selectedSkus]="selection.selected"></app-bulk-sku-edit>
-  <app-add-sku class="add" *ngIf="isAdmin()"></app-add-sku>
+<div class="button-div" *ngIf="isAdmin()">
+  <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
+  <app-bulk-sku-edit [selectedSkus]="selection.selected"></app-bulk-sku-edit>
+  <app-add-sku class="add"></app-add-sku>
   <button mat-raised-button="export_skus" class="export_skus" type="button" (click)="exportSkus()" color="accent">Export</button>
+</div>
+<div class="flex-box-center" *ngIf="!isAdmin()">
+  <div class="flex-item">
+    <button mat-raised-button="export_skus" type="button" (click)="exportSkus()" color="accent">Export</button>
+  </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>

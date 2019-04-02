@@ -6,10 +6,15 @@
 <div *ngIf="isAdmin()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
-<div id="search-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <app-add-product-line class="add" *ngIf="isAdmin()"></app-add-product-line>
-  <button  class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
+<div id="search-div" *ngIf="isAdmin()">
+  <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
+  <app-add-product-line class="add"></app-add-product-line>
+  <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
+</div>
+<div class="flex-box-center" *ngIf="!isAdmin()">
+  <div class="flex-item">
+    <button mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
+  </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>
