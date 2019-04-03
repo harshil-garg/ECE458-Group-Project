@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../accounts.service';
 import { AuthenticationService } from '../authentication.service';
+import { CrudManufacturingLineService } from '../manufacturing-line-table/crud-manufacturing-line.service';
 import { MatSnackBar } from '@angular/material';
 import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
@@ -17,21 +18,31 @@ import 'rxjs/add/operator/switchMap';
 export class RegisterComponent implements OnInit {
 	newAdminSelection = false;
 	adminSelection = false;
-	adminFormControl = new FormControl();
-	suggestedUsers = [];
+	userInput: string;
+  adminPriveleges: string[] = ['Analyst', 'Product Manager', 'Business Manager', 'Plant Manager', 'Administrator'];
+  selectedOptions: string[] = ['Analyst'];
+  manufacturingLines = [];
 
-	constructor(private authenticationService: AuthenticationService, private accountsService: AccountsService, private snackBar: MatSnackBar) { }
+	constructor(private authenticationService: AuthenticationService, private crudManufacturingLineService: CrudManufacturingLineService, private accountsService: AccountsService, private snackBar: MatSnackBar) { }
 
 	ngOnInit() {
-		this.adminFormControl.valueChanges.debounceTime(200)
-		.distinctUntilChanged()
-		.switchMap((query) =>  this.accountsService.autocompleteUsers(query))
-		.subscribe( result => {
-			if(result!=null && result.data!=null){
-					 this.suggestedUsers = result.data.slice();
-			 }
-		 });
-	}
+    this.crudManufacturingLineService.read({
+        pageNum: -1,
+        page_size: 0,
+        sortBy: "name"
+      }).subscribe(
+      response => {
+        for(let manufacturingLine of response.data){
+          this.manufacturingLines.push(manufacturingLine.shortname);
+        }
+      },
+      err => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      }
+    );
+  }
 
 	register(name: string, email: string, password: string, password2: string) {
 		this.accountsService.register(name, email, password, password2, this.newAdminSelection).subscribe((response) => {
@@ -41,16 +52,17 @@ export class RegisterComponent implements OnInit {
 		});
 	}
 
-	updatePriveleges(email: string, admin: boolean) {
-		this.accountsService.updatePriveleges(email, admin).subscribe((response) => {
+	updatePriveleges() {
+    var admin = this.selectedOptions.indexOf('Administrator')>-1;
+		this.accountsService.updatePriveleges(this.userInput, admin).subscribe((response) => {
 				this.snackBar.open(response.message, 'close', {duration:3000});
 		}, (err) => {
 			this.snackBar.open(err, 'close', {duration:3000});
 		});
 	}
 
-	deleteUser(email: string) {
-		this.accountsService.deleteUser(email).subscribe((response) => {
+	deleteUser() {
+		this.accountsService.deleteUser(this.userInput).subscribe((response) => {
 			this.snackBar.open(response.message, 'close', {duration:3000});
 	}, (err) => {
 		this.snackBar.open(err, 'close', {duration:3000});
@@ -59,6 +71,14 @@ export class RegisterComponent implements OnInit {
 
   isAdmin(){
     return this.authenticationService.isAdmin();
+  }
+
+  updateUser(ev){
+    this.userInput = ev;
+  }
+
+  handleClick(ev){
+    ev.stopPropagation();
   }
 
 }

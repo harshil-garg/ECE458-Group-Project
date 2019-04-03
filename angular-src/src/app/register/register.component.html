@@ -59,26 +59,24 @@
           <mat-card-title>Update a user's settings (prepend "netid_" to select NetId users)</mat-card-title>
         </mat-card-header>
       <mat-card-content>
-      <form>
-          <mat-form-field class="example-full-width">
-            <input type="text" placeholder="User email" aria-label="User email" matInput [formControl]="adminFormControl" [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete">
-              <mat-option *ngFor="let option of suggestedUsers" [value]="option.email">
-                {{option.email}}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-select placeholder="Give administrator priveleges" [(value)]="adminSelection">
-              <mat-option [value]="true">Yes</mat-option>
-              <mat-option [value]="false">No</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </form>
+        <app-user-autocomplete (messageEvent)="updateUser($event)"></app-user-autocomplete>
+        <mat-selection-list #list [(ngModel)]="selectedOptions" *ngIf="userInput!=null && userInput.length>0">
+          <mat-list-option *ngFor="let priv of adminPriveleges" [value]="priv">
+            {{priv}}
+          </mat-list-option>
+        </mat-selection-list>
+
+        <button mat-raised-button type="button" [matMenuTriggerFor]="menu" *ngIf="selectedOptions.indexOf('Plant Manager')>-1">Select Manufacturing Lines for Plant Manager</button>
+        <mat-menu #menu="matMenu">
+          <mat-selection-list (selectionChange)="setManufacturingLines(manufLines.selectedOptions.selected)" #manufLines>
+            <mat-list-option (click)="handleClick($event)" *ngFor="let manufLine of manufacturingLines" [value]='manufLine'>{{manufLine}}</mat-list-option>
+          </mat-selection-list>
+        </mat-menu>
+
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button (click)="updatePriveleges(adminFormControl.value, adminSelection)" color="primary">Update Priveleges</button>
-        <button mat-raised-button (click)="deleteUser(adminFormControl.value)" color="primary">Delete user</button>
+        <button mat-raised-button (click)="updatePriveleges()" color="primary">Update Priveleges</button>
+        <button mat-raised-button (click)="deleteUser()" color="primary">Delete user</button>
       </mat-card-actions>
   </mat-card>
 </div>

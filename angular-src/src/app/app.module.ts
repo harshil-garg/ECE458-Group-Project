@@ -58,6 +58,7 @@ import { ChartsModule } from 'ng2-charts';
 import { LineGraphComponent } from './sales-report/sales-drilldown/line-graph/line-graph.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from './token.interceptor';
+import { UserAutocompleteComponent } from './register/user-autocomplete/user-autocomplete.component';
 
 const routes: Routes = [
   {
@@ -119,7 +120,8 @@ const routes: Routes = [
     SalesSummaryComponent,
     SalesDrilldownComponent,
     CustomerAutocompleteComponent,
-    LineGraphComponent
+    LineGraphComponent,
+    UserAutocompleteComponent
   ],
   imports: [
     BrowserModule,
