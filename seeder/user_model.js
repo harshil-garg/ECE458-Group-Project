@@ -21,7 +21,26 @@ const UserSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    product_manager: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    business_manager: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    plant_manager: {
+        type: [Schema.ObjectId]
+    },
+    analyst:{
+        type: Boolean,
+        required: true,
+        default: false
     }
+
 });
 
 
