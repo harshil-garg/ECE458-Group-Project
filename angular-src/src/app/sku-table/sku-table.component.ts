@@ -321,6 +321,8 @@ export class SkuTableComponent implements OnInit{
       }
       this.formFields.changes.subscribe((change) => {
         change.forEach(form => {
+          console.log("FORMMMMSS");
+          console.log(form);
           if(this.isEditable()){
             form.underlineRef.nativeElement.className = "mat-form-field-underline";
           }

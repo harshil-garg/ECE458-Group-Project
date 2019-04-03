@@ -220,12 +220,12 @@ export class IngredientsTableComponent implements OnInit{
       }
       this.formFields.changes.subscribe((change) => {
         change.forEach(form => {
-          if(this.isEditable()){
-            form.underlineRef.nativeElement.className = "mat-form-field-underline";
-          }
-          else {
+          // if(this.isEditable()){
+          //   form.underlineRef.nativeElement.className = "mat-form-field-underline";
+          // }
+          // else {
             form.underlineRef.nativeElement.className = null;
-          }
+          // }
         });
       });
     }
@@ -282,6 +282,18 @@ export class IngredientsTableComponent implements OnInit{
 
     isEditable(){
       return this.isAdmin() && this.liveEditing;
+    }
+
+    addUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = "mat-form-field-underline";
+      }
+    }
+
+    removeUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = null;
+      }
     }
 
 }
