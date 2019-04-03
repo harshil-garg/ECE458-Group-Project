@@ -82,8 +82,13 @@ tr.example-element-row:not(.example-expanded-row):active {
   opacity: 0.5;
 }
 
-mat-icon:hover{
+mat-icon {
+  color: grey;
+}
+
+mat-icon:hover {
   cursor: pointer;
+  color: mediumaquamarine;
 }
 
 .example-loading-shade {

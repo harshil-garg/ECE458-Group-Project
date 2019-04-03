@@ -47,7 +47,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-			  <input #name matInput placeholder="Name" [readonly]="!isEditable()" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
+			  <input #name matInput [readonly]="!isEditable()" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
 			</mat-form-field>
     </td>
   </ng-container>
@@ -57,7 +57,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Ingr#</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <input #number matInput placeholder="Number" [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
+        <input #number matInput [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -67,7 +67,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Vendor Info</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #vendor_info matInput cdkTextareaAutosize placeholder="Vendor Info" [readonly]="!isEditable()" [value]="element.vendor_info" (blur)="edit(element.name, 'vendor_info', vendor_info.value)" optional></textarea>
+        <textarea #vendor_info matInput cdkTextareaAutosize [readonly]="!isEditable()" [value]="element.vendor_info" (blur)="edit(element.name, 'vendor_info', vendor_info.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>
@@ -88,7 +88,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Cost Per Package</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <input #cost_per_package matInput placeholder="Cost Per Package" [readonly]="!isEditable()" [value]="element.cost_per_package" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value)" required>
+        <input #cost_per_package matInput [readonly]="!isEditable()" [value]="element.cost_per_package" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -98,7 +98,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #comment="cdkTextareaAutosize" matInput cdkTextareaAutosize placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.name, 'comment', comment.value)" optional></textarea>
+        <textarea #comment="cdkTextareaAutosize" matInput cdkTextareaAutosize [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.name, 'comment', comment.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>
