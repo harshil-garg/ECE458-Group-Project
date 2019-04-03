@@ -109,3 +109,7 @@ h1 {
   padding-top: 20px;
   margin-bottom: 5px;
 }
+
+textarea.mat-input-element{
+  padding: 0px 0;
+}

@@ -124,3 +124,7 @@ h1 {
 .small-cell{
   width: 10px;
 }
+
+textarea.mat-input-element{
+  padding: 0px 0;
+}

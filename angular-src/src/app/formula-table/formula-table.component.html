@@ -89,7 +89,7 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
       <mat-form-field floatLabel="never">
-        <textarea #comment matInput placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
+        <textarea #comment cdkTextareaAutosize matInput placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>
