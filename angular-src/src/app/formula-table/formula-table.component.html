@@ -44,8 +44,8 @@
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-			  <input #name matInput [readonly]="!isEditable()" maxlength="32" [value]="element.name" (blur)="edit(element.id, 'name', name.value)" required>
+      <mat-form-field floatLabel="never" #nameField>
+			  <input #name matInput [readonly]="!isEditable()" maxlength="32" (focus)="addUnderline(nameField)" [value]="element.name" (blur)="edit(element.id, 'name', name.value); removeUnderline(nameField)" required>
 			</mat-form-field>
     </td>
   </ng-container>
@@ -54,8 +54,8 @@
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Formula#</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-        <input #number matInput [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.id, 'id', number.value)" required>
+      <mat-form-field floatLabel="never" #numberField>
+        <input #number matInput [readonly]="!isEditable()" [value]="element.id" (focus)="addUnderline(numberField)" (blur)="edit(element.id, 'id', number.value); removeUnderline(numberField)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -88,8 +88,8 @@
   <ng-container matColumnDef="comment">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-        <textarea #comment cdkTextareaAutosize matInput [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.id, 'comment', comment.value)" optional></textarea>
+      <mat-form-field floatLabel="never" #commentField>
+        <textarea #comment cdkTextareaAutosize matInput [readonly]="!isEditable()" [value]="element.comment" (focus)="addUnderline(commentField)" (blur)="edit(element.id, 'comment', comment.value); removeUnderline(commentField)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>

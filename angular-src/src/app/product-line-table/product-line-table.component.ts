@@ -138,12 +138,7 @@ export class ProductLineTableComponent implements OnInit{
       }
       this.formFields.changes.subscribe((change) => {
         change.forEach(form => {
-          if(this.isEditable()){
-            form.underlineRef.nativeElement.className = "mat-form-field-underline";
-          }
-          else {
-            form.underlineRef.nativeElement.className = null;
-          }
+          form.underlineRef.nativeElement.className = null;
         });
       });
     }
@@ -197,5 +192,17 @@ export class ProductLineTableComponent implements OnInit{
 
     isEditable(){
       return this.isAdmin() && this.liveEditing;
+    }
+
+    addUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = "mat-form-field-underline";
+      }
+    }
+
+    removeUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = null;
+      }
     }
 }
