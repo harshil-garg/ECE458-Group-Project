@@ -3,10 +3,12 @@ import { Ingredient, Tuple } from '../model/ingredient'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { Formula } from '../model/formula'
+import { FormulaViewDialogComponent } from './formula-view-dialog/formula-view-dialog.component';
+import { FormulaEditDialogComponent } from './formula-edit-dialog/formula-edit-dialog.component';
 import { CrudSkuService, Response } from './crud-sku.service';
 import { CrudFormulaService } from '../formula-table/crud-formula.service';
 import { FilterSkuService, FilterResponse } from './filter-sku.service'
-import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField, MatDialog} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import { ExportService } from '../export.service';
 
@@ -50,7 +52,7 @@ export class SkuTableComponent implements OnInit{
     }
 
     constructor(private authenticationService: AuthenticationService, public crudSkuService: CrudSkuService, public crudFormulaService: CrudFormulaService,
-      public filterSkuService: FilterSkuService, private snackBar: MatSnackBar, private exportService: ExportService){}
+      public filterSkuService: FilterSkuService, private snackBar: MatSnackBar, private exportService: ExportService, public dialog: MatDialog){}
 
     remove() {
       for(let selected of this.selection.selected){
@@ -182,6 +184,7 @@ export class SkuTableComponent implements OnInit{
             console.log("401 Error")
           }
         });
+      this.edit(id, 'formula', updated_value);
     }
 
     private handleError(response){
@@ -420,6 +423,31 @@ export class SkuTableComponent implements OnInit{
       if(this.isEditable()){
         form.underlineRef.nativeElement.className = null;
       }
+    }
+
+    openFormulaViewDialog(formula: Formula){
+      this.dialog.open(FormulaViewDialogComponent, {
+        height: '600px',
+        width: '300px',
+        data: {
+          formula: formula
+        }
+      });
+    }
+
+    openFormulaEditDialog(id:number, formula: Formula){
+      let dialogRef = this.dialog.open(FormulaEditDialogComponent, {
+        height: '800px',
+        width: '300px',
+        data: {
+          formula: formula
+        }
+      });
+      dialogRef.afterClosed().subscribe(result =>{
+        if(result!=null){
+          this.updateFormula(id, result);
+        }
+      });
     }
 
 }

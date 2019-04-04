@@ -59,6 +59,8 @@ import { LineGraphComponent } from './sales-report/sales-drilldown/line-graph/li
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from './token.interceptor';
 import { UserAutocompleteComponent } from './register/user-autocomplete/user-autocomplete.component';
+import { FormulaViewDialogComponent } from './sku-table/formula-view-dialog/formula-view-dialog.component';
+import { FormulaEditDialogComponent } from './sku-table/formula-edit-dialog/formula-edit-dialog.component';
 
 const routes: Routes = [
   {
@@ -121,7 +123,9 @@ const routes: Routes = [
     SalesDrilldownComponent,
     CustomerAutocompleteComponent,
     LineGraphComponent,
-    UserAutocompleteComponent
+    UserAutocompleteComponent,
+    FormulaViewDialogComponent,
+    FormulaEditDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -179,6 +183,6 @@ const routes: Routes = [
     }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, SalesSummaryComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, SalesSummaryComponent, FormulaEditDialogComponent, FormulaViewDialogComponent]
 })
 export class AppModule { }

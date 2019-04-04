@@ -118,8 +118,8 @@
       <ng-container *ngIf="isEditable()">
         {{element.formula.name}} {{element.formula.number}}
         <br>
-        <mat-icon color="grey">visibility</mat-icon>
-        <mat-icon color="grey">edit</mat-icon>
+        <mat-icon color="grey" (click)="openFormulaViewDialog(element.formula)">visibility</mat-icon>
+        <mat-icon color="grey" (click)="openFormulaEditDialog(element.id, element.formula)">edit</mat-icon>
       </ng-container>
       <ng-container *ngIf="!isEditable()">
         {{element.formula.name}} ({{element.formula.number}})
