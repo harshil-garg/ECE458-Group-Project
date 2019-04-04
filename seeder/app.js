@@ -12,7 +12,11 @@ mongoose.connect(mongo_config.uri, { useNewUrlParser: true }, function(err) {
           name: 'Seeder Admin',
           email: 'admin',
           password: 'BletchisCool1904u52u589u',
-          admin : true
+          admin: true,
+          product_manager: true,
+          business_manager: true,
+          plant_manager: [],
+          analyst: true
         });
 	
 	bcrypt.genSalt(10, (err, salt) => {
