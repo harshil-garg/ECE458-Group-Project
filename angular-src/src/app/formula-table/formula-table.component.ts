@@ -34,7 +34,7 @@ export class FormulaTableComponent implements OnInit{
     unitInput: string = "";
     quantityInput: string = "";
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'ingredient_tuples', 'comment'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'ingredient_tuples', 'comment', 'sku_dropdown'];
     selection = new SelectionModel<Formula>(true, []);
     dataSource = new MatTableDataSource<Formula>(this.formulaList);
     maxPages: number;
