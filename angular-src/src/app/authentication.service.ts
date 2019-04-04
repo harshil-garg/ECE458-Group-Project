@@ -43,7 +43,7 @@ export class AuthenticationService {
       }
     });
   }
-  
+
   login_NetID(netid: string, username: string):Observable<LoginResponse> {
     let result = this.http.post<LoginResponse>('api/login/netid', {name: username, email: netid}, httpOptions);
     return result;
@@ -76,7 +76,7 @@ export class AuthenticationService {
   public isAuthenticated(): boolean {
     // get the token
     const token = this.getUserDetails();
-    // return a boolean reflecting 
+    // return a boolean reflecting
     // whether or not the token is expired
     if (token) {
       let d = new Date();

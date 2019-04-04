@@ -204,6 +204,7 @@ export class FormulaTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 

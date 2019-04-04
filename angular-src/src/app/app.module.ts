@@ -61,6 +61,7 @@ import { TokenInterceptor } from './token.interceptor';
 import { UserAutocompleteComponent } from './register/user-autocomplete/user-autocomplete.component';
 import { FormulaViewDialogComponent } from './sku-table/formula-view-dialog/formula-view-dialog.component';
 import { FormulaEditDialogComponent } from './sku-table/formula-edit-dialog/formula-edit-dialog.component';
+import { SearchFormulaComponent } from './formula-table/search-formula/search-formula.component';
 
 const routes: Routes = [
   {
@@ -125,7 +126,8 @@ const routes: Routes = [
     LineGraphComponent,
     UserAutocompleteComponent,
     FormulaViewDialogComponent,
-    FormulaEditDialogComponent
+    FormulaEditDialogComponent,
+    SearchFormulaComponent
   ],
   imports: [
     BrowserModule,

@@ -123,6 +123,8 @@
       </ng-container>
       <ng-container *ngIf="!isEditable()">
         {{element.formula.name}} ({{element.formula.number}})
+        <br>
+        <mat-icon color="grey" (click)="openFormulaViewDialog(element.formula)">visibility</mat-icon>
       </ng-container>
     </td>
   </ng-container>
