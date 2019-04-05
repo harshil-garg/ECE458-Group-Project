@@ -27,6 +27,15 @@ module.exports.filter = async function(pageNum, sortBy, page_size, keywords, ing
         pipeline.push({$match: {'ingredients.name': {$all: ingredients}}});
     }
 
+    pipeline.push({
+        $lookup: {
+            from: 'skus',
+            localField: '_id',
+            foreignField: 'formula',
+            as: 'skus'
+        }
+    })
+
     let agg = Formula.aggregate(pipeline);
 
     let result = await pagination.paginate(agg, pageNum, sortBy, page_size);

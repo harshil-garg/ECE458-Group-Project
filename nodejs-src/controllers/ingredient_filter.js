@@ -27,12 +27,29 @@ module.exports.filter = async function(pageNum, sortBy, page_size, keywords, sku
         pipeline.push({$match: {_id: {$in: ingredientIDs}}});
     }
     pipeline.push({$addFields: {cost: validator.roundCost('$cost')}})
+    //hallelujah dis be amazing
+    pipeline.push({
+        $lookup: {
+            from: 'formulas',
+            localField: '_id',
+            foreignField: 'ingredient_tuples.ingredient',
+            as: 'formulas'
+        }
+    });
+    pipeline.push({
+        $lookup: {
+            from: 'skus',
+            localField: 'formulas._id',
+            foreignField: 'formula',
+            as: 'skus'
+        }
+    })
 
     let agg = Ingredient.aggregate(pipeline);
 
     let result = await pagination.paginate(agg, pageNum, sortBy, page_size);
-
-    return appendSKUs(result);
+    
+    return result
 }
 
 function getFormulas(skus){
@@ -53,20 +70,20 @@ function getIngredients(formulas){
     return Array.from(ingredients);
 }
 
-async function appendSKUs(ingredients){
-    for(let ingredient of ingredients.data){
-        let formulas = await Formula.find({'ingredient_tuples.ingredient': ingredient._id}).exec();
-        let skus = [];
-        for(let formula of formulas){
-            let skuList = await SKU.find({formula: formula._id}, 'name size count number').exec();
-            skus = skus.concat(skuList);
-        }
-        ingredient.num_skus = skus.length;
-        //save num skus
-        await Ingredient.findOneAndUpdate({name: ingredient.name}, ingredient).exec();
-        ingredient.skus = skus;
-    }
+// async function appendSKUs(ingredients){
+//     for(let ingredient of ingredients.data){
+//         let formulas = await Formula.find({'ingredient_tuples.ingredient': ingredient._id}).exec();
+//         let skus = [];
+//         for(let formula of formulas){
+//             let skuList = await SKU.find({formula: formula._id}, 'name size count number').exec();
+//             skus = skus.concat(skuList);
+//         }
+//         ingredient.num_skus = skus.length;
+//         //save num skus
+//         await Ingredient.findOneAndUpdate({name: ingredient.name}, ingredient).exec();
+//         ingredient.skus = skus;
+//     }
 
-    return ingredients;
+//     return ingredients;
     
-}
+// }
