@@ -82,15 +82,20 @@ tr.example-element-row:not(.example-expanded-row):active {
   opacity: 0.5;
 }
 
-mat-icon:hover{
+mat-icon {
+  color: grey;
+}
+
+mat-icon:hover {
   cursor: pointer;
+  color: mediumaquamarine;
 }
 
 .example-loading-shade {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: 64px;
   left: 0;
-  bottom: 56px;
+  bottom: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.15);
   z-index: 1;
@@ -123,4 +128,8 @@ h1 {
 
 .small-cell{
   width: 10px;
+}
+
+textarea.mat-input-element{
+  padding: 0px 0;
 }

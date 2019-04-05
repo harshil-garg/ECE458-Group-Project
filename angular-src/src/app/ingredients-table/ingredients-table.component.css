@@ -88,10 +88,10 @@ mat-icon:hover{
 }
 
 .example-loading-shade {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: 64px;
   left: 0;
-  bottom: 56px;
+  bottom: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.15);
   z-index: 1;
@@ -108,4 +108,8 @@ button {
 h1 {
   padding-top: 20px;
   margin-bottom: 5px;
+}
+
+textarea.mat-input-element{
+  padding: 0px 0;
 }

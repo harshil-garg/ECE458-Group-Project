@@ -1,4 +1,5 @@
-import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewChild, AfterViewInit} from '@angular/core';
+import { MatFormField } from '@angular/material';
 import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -9,7 +10,7 @@ import { MeasurementUnit } from '../../model/measurement-unit';
   templateUrl: './unit-autocomplete.component.html',
   styleUrls: ['./unit-autocomplete.component.css']
 })
-export class UnitAutocompleteComponent implements OnInit {
+export class UnitAutocompleteComponent implements OnInit, AfterViewInit {
 
       measUnits: Array<any>;
       filteredUnits: Observable<string[]>;
@@ -17,6 +18,7 @@ export class UnitAutocompleteComponent implements OnInit {
 
       @Input() initUnit : string;
       @Output() messageEvent = new EventEmitter<any>();
+      @ViewChild(MatFormField) formField: MatFormField;
 
       constructor() { }
 
@@ -30,9 +32,15 @@ export class UnitAutocompleteComponent implements OnInit {
         );
       }
 
+      ngAfterViewInit() {
+        if(this.formField!=null && this.formField.underlineRef!=null){
+          this.formField.underlineRef.nativeElement.className = null;
+        }
+      }
+
       private _filter(value: string): string[] {
         const splitString = value.match(/[a-z]+|[^a-z]+/gi);
-        if(splitString==null || splitString.length==0){
+        if(splitString==null || splitString.length==0 || (splitString.length>0 && isNaN(+splitString[0]))){
           return [];
         } else if(splitString.length==1){
           return this.measUnits.map(unit=>splitString[0]+unit);
@@ -52,9 +60,10 @@ export class UnitAutocompleteComponent implements OnInit {
         });
       }
 
-      onBlur(){
+      onBlur(form){
+        form.underlineRef.nativeElement.className = null;
         var spliced = this.inputField.value.match(/[a-z]+|[^a-z]+/gi);
-        if(spliced!=null && spliced.length==2){
+        if(spliced!=null && spliced.length==2 && !isNaN(+spliced[0])){
           var quantity = spliced[0];
           var unit = spliced[1];
           this.messageEvent.emit({
@@ -62,6 +71,10 @@ export class UnitAutocompleteComponent implements OnInit {
             unit: unit
           });
         }
+      }
+
+      onFocus(form){
+        form.underlineRef.nativeElement.className = "mat-form-field-underline";
       }
 
 }

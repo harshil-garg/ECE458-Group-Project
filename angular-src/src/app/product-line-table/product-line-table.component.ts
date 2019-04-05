@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { ProductLine } from '../model/product-line'
 import { AuthenticationService } from '../authentication.service'
 import { CrudProductLineService, Response, ReadResponse } from './crud-product-line.service'
-import {MatTableDataSource, MatPaginator, MatSnackBar} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import { ExportService } from '../export.service';
 
@@ -22,11 +22,15 @@ export class ProductLineTableComponent implements OnInit{
     loadingResults: boolean = false;
     liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
     ngOnInit() {
       this.paginator.pageIndex = 0;
       this.paginator.pageSize = 10;
-      this.paginator.page.subscribe(x => this.refresh());
+      this.paginator.page.subscribe(x => {
+        this.selection.clear();
+        this.refresh();
+      });
       this.refresh();
     }
 
@@ -132,6 +136,11 @@ export class ProductLineTableComponent implements OnInit{
         this.maxPages = response.pages
         this.loadingResults = false;
       }
+      this.formFields.changes.subscribe((change) => {
+        change.forEach(form => {
+          form.underlineRef.nativeElement.className = null;
+        });
+      });
     }
 
     export(){
@@ -183,5 +192,17 @@ export class ProductLineTableComponent implements OnInit{
 
     isEditable(){
       return this.isAdmin() && this.liveEditing;
+    }
+
+    addUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = "mat-form-field-underline";
+      }
+    }
+
+    removeUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = null;
+      }
     }
 }

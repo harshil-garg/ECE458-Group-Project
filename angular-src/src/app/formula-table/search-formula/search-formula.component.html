@@ -1,0 +1,11 @@
+<mat-chip-list>
+  <ng-container *ngFor="let keyword of keywords; let id=index">
+    <mat-chip>{{keyword}} <mat-icon (click)="remove(id)">clear</mat-icon></mat-chip>
+  </ng-container>
+</mat-chip-list>
+
+<br>
+
+<mat-form-field style="width: 300px;">
+  <input type="text" matInput [formControl]="inputField" placeholder="Search for Formula Name/Formula#" (keydown)="keyPressed($event)">
+</mat-form-field>

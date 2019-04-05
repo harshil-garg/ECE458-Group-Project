@@ -1,0 +1,8 @@
+<mat-form-field style="width: 200px;">
+  <input type="text" placeholder="User" matInput (click)="stopPropagation($event)" [formControl]="inputField" [matAutocomplete]="auto">
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+    <mat-option *ngFor="let user of suggestedUsers" [value]="user.email">
+      {{user.email}}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

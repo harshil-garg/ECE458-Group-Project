@@ -98,12 +98,14 @@ export class CrudSkuService {
   }
 
   edit(requestedSku: EditMessage): Observable<Response>{
+    console.log(requestedSku);
     return this.http.post<Response>('api/skus/update', requestedSku, httpOptions);
   }
 
   bulkSkuEdit(body: BulkSkuEditMessage): Observable<BulkSkuEditResponse> {
     return this.http.post<BulkSkuEditResponse>('api/skus/bulk_edit', body, httpOptions);
   }
+  
   bulkSkuPopulate(body: BulkSkuPopulateMessage): Observable<BulkSkuPopulateResponse> {
     return this.http.post<BulkSkuPopulateResponse>('api/skus/populate_lines', body, httpOptions);
   }
