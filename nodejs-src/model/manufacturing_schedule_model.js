@@ -34,6 +34,10 @@ const ManufacturingScheduleSchema = new Schema({
     duration_override: {
         type: Boolean,
         default: false
+    },
+    committed: {
+        type: Boolean,
+        default: true
     }
 });
 

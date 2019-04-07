@@ -13,6 +13,54 @@ const ManufacturingLine = require('../model/manufacturing_line_model');
 // Utilities
 const PriorityQueue = require('../utils/priority_queue')
 
+/****************************************************************************************************
+ * ROUTES / APIs
+ ****************************************************************************************************/
+
+/**
+ * API to automate manufacturing scheduling via the naive methodology proposed in the evolution
+ * requirements. Using a list of activities to schedule -- represented as SKU / goal pairs -- and a
+ * an absolute timeframe, the naive algorithm attempts to schedule as many activities as possible in
+ * the time period. To reframe the algorithm shortly, activities are first sorted by deadline, and then
+ * to break ties, by duration of the activity. The duration is a function of the SKU's manufacturing
+ * rate and the case quantity of the SKU needed to fulfill the manufacturing goal activity. Then, the
+ * algorithm attempts to schedule activities one at a time, essentially trying to schedule the activity
+ * on a manufacturing line greedily; more precisely, that the activity finishes as quickly as possible.
+ * Since this is a complicated NP-complete problem, the complex algorithm attempts to solve some of the
+ * flaws in this approach.
+ * 
+ * Diving more into the specifics of the implementation, we first convert the start and end times to EST
+ * because the manufacturing lines operate 8AM - 6PM. A priority queue is leveraged to sort the activities
+ * as mentioned in the algorithm overview, and an activity processing function is used to calculate the
+ * duration and retrieve the deadline of the activity (from the ManufacturingGoal collection). Tasks are 
+ * popped from the priority queue, and we attempt to schedule the task. We attempt to schedule the task 
+ * on a set intersection of the lines available to the plant manager and the lines the SKU can be produced
+ * on. For each line, we will (1) check if there is space on the line for the activity, (2) what it the
+ * earliest it can be scheduled. Then, choosing the optimal line for production is trivial as it is simply
+ * a Math.min() over all the lines. 
+ * 
+ * We first set the start time of our proposed activity as the start time of the timeframe. Then, we retrieve 
+ * all of the manufacturing activities currently on the line, and iterate through all of them making sure
+ * that we don't have any overlap. If there is overlap and a conflict is detected, we add an hour to the
+ * start time and try again. We keep going until we find a start time in which no other existing activity 
+ * conflicts. If we do we break out of the loop, and update the earliest start time over all the lines if it 
+ * is so (Math.min call that was described above). It may be that all lines are full, and the activity isn't 
+ * schedulable at any time over all the lines, in which case we return an error message and stop trying to add 
+ * any other activities. If the activity is schedulable, we simply add an uncommitted entry to our collection,
+ * and move on to the next activity.
+ * 
+ * @note The implementation of the algorithm is sequestered to another function because it is called by the
+ * complex algorithm, in case the complex algorithm is unable to reach an optimal allocation or an execution
+ * error occurs.
+ * 
+ * @todo Perhaps it makes sense to continue adding activities even if one is not schedulable, since different 
+ * activities have different resource dependencies and future activities could be schedulable.
+ * 
+ * @param {JSON} req Request from client to automatically schedule manufacturing activities given start / end date
+ * @param {JSON} res Response to send indicating success if all activities were schedulable
+ * 
+ * @since Evolution 4, Requirement 4.4.13
+ */
 router.post('/naive', async(req, res) => {
     return await automate_naive(req, res);
 });
@@ -76,7 +124,6 @@ async function automate_naive(req, res) {
                 message: `Some activities may have been added, but ${task.sku.name + ' (' + task.goal.name + ')'} cannot be scheduled`
             })
         } else {
-            // Schedule the activity
             let mapping = new ManufacturingSchedule({
                 activity: {
                     sku: task.sku._id,
@@ -85,7 +132,8 @@ async function automate_naive(req, res) {
                 manufacturing_line: bestLine,
                 start_date: moment.utc(earliestStartTime).format(), 
                 duration: task.duration, 
-                duration_override: false
+                duration_override: false,
+                committed: false
             });
             await ManufacturingSchedule.create(mapping);
         }
@@ -97,6 +145,10 @@ async function automate_naive(req, res) {
     });
 }
 
+/**
+ * Helper function to the naive algorithm which provides the priority queue implementation. The priority queue
+ * uses a sorting mechanism dependent first on the deadline, and then on the duration of the activities.
+ */
 function makePriorityQueue() {
     return new PriorityQueue([], function(a, b) {
         if (a.deadline < b.deadline) {
@@ -109,6 +161,17 @@ function makePriorityQueue() {
     });
 }
 
+/**
+ * The process activity function takes the raw activity submitted by the frontend, and extracts relevant info
+ * that will be required to prioritize or deprioritize activities for the algorithm via the priority queue. 
+ * The SKU and ManufacturingGoal are resolved, and then the duration is calculated so that automatic scheduling
+ * can commence. The deadline is also extracted from the goal, so that it is easily accessible by the priority 
+ * queue sorting mechanism.
+ * 
+ * @param {JSON} activity Raw data which contains two fields, the SKU number and the manufacturing goal name
+ * 
+ * @since Evolution 4, Requirement 4.4.13
+ */
 async function processActivity(activity) {
     let sku = await SKU.findOne({number: activity.sku}).exec();
     let goal = await ManufacturingGoal.findOne({name: activity.manufacturing_goal}).exec();
@@ -284,8 +347,6 @@ async function transformSchedule(schedule, times) {
         manufacturing_goal = await ManufacturingGoal.findOne({name: goal_name});
         sku = await SKU.findOne({number: sku_number});
         manufacturing_line = await ManufacturingLine.findOne({name: resource});
-        duration = s.end - s.start;
-        duration_override = false;
 
         let mapping = new ManufacturingSchedule({
             activity: {
@@ -294,8 +355,9 @@ async function transformSchedule(schedule, times) {
             },
             manufacturing_line: manufacturing_line._id,
             start_date: moment.utc(start).format(), 
-            duration: duration, 
-            duration_override: duration_override
+            duration: s.end - s.start, 
+            duration_override: false,
+            committed: false
         });
         console.log(mapping);
         mappings.push(mapping);
