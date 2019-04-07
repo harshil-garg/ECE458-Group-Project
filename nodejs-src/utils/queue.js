@@ -27,6 +27,3 @@ class Queue {
 }
 
 module.exports = Queue;
-
-// Tests
-    // Basic queue tests

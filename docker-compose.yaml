@@ -30,6 +30,12 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+  pyschedule:
+    build: ./pyschedule
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./pyschedule:/app
 volumes:
   db-data:
 

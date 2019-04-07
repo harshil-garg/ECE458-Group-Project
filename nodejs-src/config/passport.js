@@ -44,7 +44,6 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = 'SECRET_KEY'; //normally store this in process.env.secret
 
 passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
-    console.log(jwt_payload);
     User.findOne({email: jwt_payload.email}).exec()
         .then((user, err) => {
             if (user) {

@@ -28,7 +28,19 @@ var cache = new LRUCache(1000);
  * ROUTES / APIs
  ****************************************************************************************************/
 
- router.post('/main', async function(req, res) {
+/**
+ * API to serve the main view of the SalesRecord(s) page in the UI. The main view in the UI has been
+ * designed to simply display product lines as headers in expandable cards. Upon clicking the card,
+ * a list of all the SKUs in that product line are displayed. Each SKU in the list also has 2 action
+ * buttons associated with it -- one for the summary view, and another for the drilldown view.
+ *  
+ * Therefore, all this route does is expect a list of product lines, and sends back all the SKUs
+ * present across the product lines, grouped by product line.
+ * 
+ * @param {JSON} req Request from client for list of product lines
+ * @param {JSON} res Response to send, SKUs grouped by product line
+ */
+router.post('/main', async function(req, res) {
     const { product_lines } = req.body;
     let data = {};
     for (let product_line_name of product_lines) {
@@ -41,8 +53,34 @@ var cache = new LRUCache(1000);
         data[product_line_name] = skus;
     }
     res.send(data);
- });
+});
 
+ /**
+  * API to serve the summary view that returns a JSON object. The JSON object returned will have
+  * fields corresponding to each of the product lines requested. There will be an array associated
+  * with each product line with each entry corresponding to a SKU in that product line. For each
+  * SKU, information about the SKU (name, number, manufacturing rate, etc), yearly summary data of
+  * all SalesRecord(s) for the SKU (revenue in 2017, sales in 2014, etc), and a ten-year-summary of
+  * certain metrics will be returned.
+  *
+  * Product lines and customers must be provided, since we only want information on a select set of
+  * product lines and SalesRecord(s) filtered by a group of customers. For each product line, we will 
+  * calculate all the aforementioned statistics and metrics. Thus, we find all SKUs in the product
+  * line, and for each SKU we add its info, get the SalesRecords for the last 10 years, filter by 
+  * customer names, map the relevant information out of the SalesRecord(s), and push the yearly data 
+  * into an array. If the data for a given year is not available, we do not do any metric analysis at
+  * all, even if other years do exist. We simply queue the records to be retrieved from Prof. Bletsch's
+  * server and gracefully add a message stating that the records for the SKU are not available yet and
+  * move on to the next SKU. If all ten years of records are available, we do the basic calculations and
+  * then continue with the ten-year-summary report. We add the information for the SKU and move on to
+  * the next SKU in the product line. Once all SKUs in all product lines are processed, we return the
+  * JSON object.
+  *
+  * @param {JSON} req Request from client to give summary of a specific SKU, filtered by customers
+  * @param {JSON} res Response to send, all data
+  * 
+  * @since Evolution 3, Requirement 5.3.3
+  */
  router.post('/summary_performance', async function(req, res) {
     const { sku_number, customers } = req.body;
 
@@ -113,6 +151,7 @@ var cache = new LRUCache(1000);
   * @param {JSON} res Response to send, all data
   * 
   * @since Evolution 3, Requirement 5.3.3
+  * @deprecated for performance reasons in favor of @method summary_performance
   */
 router.post('/summary', async function(req, res) {
     const { product_lines, customers } = req.body;
@@ -169,6 +208,84 @@ router.post('/summary', async function(req, res) {
     }
     console.log(data);
     res.send(data);
+});
+
+router.post('/sales_projection_tool', async function(req, res) {
+    const { sku_number, start, end } = req.body;
+
+    let sku = await SKU.findOne({
+        number: sku_number
+    });
+    
+    let a = new Date(start);
+    let b = new Date(end);
+    while (b >= Date.now()) {
+        a.setFullYear(a.getFullYear() - 1);
+        b.setFullYear(b.getFullYear() - 1);
+    }
+
+    var data = {};
+    data["sku"] = sku;
+
+    var sku_yearly_data = [];
+    var data_available = true;
+    for (i = 3; i >= 0; i--) {
+        let s = new Date(a.getTime()); s.setFullYear(s.getFullYear() - i);
+        let e = new Date(b.getTime()); e.setFullYear(e.getFullYear() - i);
+
+        var records = [];
+        for (j = s.getFullYear(); j <= e.getFullYear(); j++) {
+            let response = await getSalesRecords(sku_number, j);
+            if (response.success) {
+                console.log(response.source);
+                const filteredRecords = response.data.filter(record => (
+                    new Date(record.date) >= s &&
+                    new Date(record.date) <= e
+                ));
+                const mappedRecords = filteredRecords.map(record => (
+                    {
+                        year: new Date(record.date).getFullYear(),
+                        week: Time.getISOWeekFromDate(new Date(record.date)),
+                        customer_number: record.customer_number,
+                        customer_name: record.customer_name,
+                        sales: record.sales,
+                        price: record.price,
+                        revenue: record.sales*record.price
+                    }
+                ));
+                records = records.concat(mappedRecords);
+                console.log(records.length);
+            } else {
+                data_available = false;
+            }
+        }
+
+        if (data_available) {
+            sku_yearly_data.push({
+                timespan: s.toISOString() + " - " + e.toISOString(),
+                sales: getTotalSales(records)
+            });
+        }
+    }
+
+    if (!data_available) {
+        res.send({
+            success: false,
+            message: "Data is not fully available yet"
+        });
+        return;
+    }
+
+
+    data["success"] = true;
+    data["sku_yearly_data"] = sku_yearly_data;
+    data["summary"] = {
+        average: Math.round(getAverageSales(sku_yearly_data)),
+        standard_deviation: Math.round(10 * getStandardDeviation(sku_yearly_data)) / 10
+    }
+
+    res.send(data);
+
 });
 
 /**
@@ -420,6 +537,19 @@ async function getIngredientCostPerCase(sku) {
     return total;
 }
 
+function getAverageSales(records) {
+    return getTotalSales(records) / records.length;
+}
+
+function getStandardDeviation(records) {
+    let xbar = getAverageSales(records);
+    let sum = 0;
+    for (let record of records) {
+        sum += Math.pow(record.sales - xbar, 2);
+    }
+    return Math.sqrt(sum / records.length);
+}
+
 /****************************************************************************************************
  * GET SALES RECORDS
  ****************************************************************************************************/
@@ -481,7 +611,7 @@ async function getSalesRecords(sku_number, year) {
  * @param {JSON} query Query object which encapuslates the SKU number and year
  */
 async function queryCache(query) {
-    var result = cache.read(query.str);
+    var result = await cache.read(query.str);
     if (result) {
         return {
             hit: true,
@@ -570,19 +700,16 @@ setInterval(function() {
  * The processing function is executed as a callback to the XMLHttpRequest made to Prof. Bletsch's
  * server, and is primarily responsible for processing the XMLHttpResponse (raw HTML) sent back. The
  * response is split into lines since each line maps to a unique sales record, and an array of
- * SalesRecord objects that conform to our MongoDB schema is created from the raw data. If the query
- * that yielded the raw data was requesting sales figures from the current year, it is possible the
- * source of the query was the refresh operation that is attempting to seek refreshed sales figures
- * from the server. Since the data from the current year is continuously changing and is not merely
- * historical, we must clean the database and cache, and repull the data as to not have duplications
- * in our records. In the case the query is for a previous year, the data will be permanently stored
- * in our local database, and no future requests to the server will ever be made, and so we can be
- * assured duplicate records are not a consideration. Therefore, the database and cache must only be
- * flushed for records pertaining to the current year. Then, regardless of year, the SalesRecord(s)
- * are inserted into the database, pulled back from the database, database, and copied into the
- * cache. The data must be pulled from the database instead of directly being admitted to the cache
- * because adding records into the database populates records with some additional fields, such as
- * ID, and those might be relevant for the future. In any case, this method is responsible for
+ * SalesRecord objects that conform to our MongoDB schema is created from the raw data. 
+ * 
+ * Even if the SalesRecord(s) already exist in the database, repulling them happens sometimes for 
+ * various events including refresh of sales figures (in case of 2019 requests), or if the cache or 
+ * database queries are too slow and an accidental repull happens. Therefore, we must clean the 
+ * database and cache, and repull the data as to not have duplications in our records. Then, the 
+ * SalesRecord(s) are inserted into the database, pulled back from the database, database, and copied 
+ * into the cache. The data must be pulled from the database instead of directly being admitted to the 
+ * cache because adding records into the database populates records with some additional fields, such 
+ * as ID, and those might be relevant for the future. In any case, this method is responsible for
  * caching the retrieved SalesRecord(s) in two ways: database and physical cache. These two layers
  * prevent the same query (SKU / year) tuple from being executed on the server again (barring
  * refresh operations for SKU / 2019).
@@ -615,16 +742,14 @@ async function process(query, xml_http_response) {
         }
     }
 
-    if (query.year >= new Date().getFullYear()) {
-        let error = await SalesRecord.deleteMany({
-            sku: sku._id,
-            date: {
-                "$gte": new Date(query.year, 0, 1), 
-                "$lte": new Date(query.year, 11, 31, 23, 59, 59, 999)
-            }
-        });
-        cache.flushCache();
-    }
+    let error = await SalesRecord.deleteMany({
+        sku: sku._id,
+        date: {
+            "$gte": new Date(query.year, 0, 1), 
+            "$lte": new Date(query.year, 11, 31, 23, 59, 59, 999)
+        }
+    });
+    cache.delete(query.str);
 
     var docs;
     try {
@@ -645,7 +770,7 @@ async function process(query, xml_http_response) {
 
     cache.write(query.str, data);
 
-    console.log("Data successfully admitted to MongoDB and cache");
+    console.log("Data successfully admitted to MongoDB and cache for " + query.str);
 }
 
 /****************************************************************************************************

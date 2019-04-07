@@ -20,6 +20,7 @@ const manufacturing_goals = require('./routes/manufacturing_goal');
 const formulas = require('./routes/formula');
 const manufacturing_lines = require('./routes/manufacturing_line');
 const manufacturing_schedule = require('./routes/manufacturing_schedule');
+const manufacturing_schedule_automate = require('./routes/manufacturing_schedule_automate');
 const sales_record = require('./routes/sales_record');
 const customers = require('./routes/customer');
 const jwt = require("jsonwebtoken");
@@ -67,6 +68,7 @@ app.use('/api/manufacturing_goals', passport.authenticate('jwt', { session: fals
 app.use('/api/formulas', passport.authenticate('jwt', { session: false }), formulas.router);
 app.use('/api/manufacturing_lines', passport.authenticate('jwt', { session: false }), manufacturing_lines);
 app.use('/api/manufacturing_schedule', passport.authenticate('jwt', { session: false }), manufacturing_schedule);
+app.use('/api/manufacturing_schedule_automate', passport.authenticate('jwt', { session: false }), manufacturing_schedule_automate);
 app.use('/api/sales_record', passport.authenticate('jwt', { session: false }),sales_record);
 app.use('/api/customers', passport.authenticate('jwt', { session: false }), customers);
 
