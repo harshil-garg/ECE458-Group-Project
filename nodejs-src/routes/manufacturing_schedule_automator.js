@@ -14,7 +14,7 @@ const ManufacturingLine = require('../model/manufacturing_line_model');
 const PriorityQueue = require('../utils/priority_queue')
 
 /****************************************************************************************************
- * ROUTES / APIs
+ * NAIVE ALGORITHM
  ****************************************************************************************************/
 
 /**
@@ -219,6 +219,10 @@ function calculateEndTime(start, duration) {
     return end;
 }
 
+/****************************************************************************************************
+ * COMPLEX ALGORITHM
+ ****************************************************************************************************/
+
 router.post('/complex', async(req, res) => {
     let { activities, start_, end_} = req.body;
 
@@ -414,6 +418,10 @@ function getIndex(time, periods) {
     }
     return -1;
 }
+
+/****************************************************************************************************
+ * GENERIC HELPERS
+ ****************************************************************************************************/
 
 function to(promise) {
     return promise.then(data => {
