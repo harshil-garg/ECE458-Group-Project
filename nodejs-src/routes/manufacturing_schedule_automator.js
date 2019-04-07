@@ -420,6 +420,32 @@ function getIndex(time, periods) {
 }
 
 /****************************************************************************************************
+ * OTHER ROUTES / APIs
+ ****************************************************************************************************/
+
+router.post('/undo', async(req, res) => {
+    let response = await ManufacturingSchedule.deleteMany({
+        committed: false
+    });
+    res.json({
+        success: true,
+        message: "Removed autoscheduled activities that were not committed"
+    })
+});
+
+router.post('/commit', async(req, res) => {
+    let response = await ManufacturingSchedule.updateMany({
+        commited: false
+    }, {
+        committed: true
+    });
+    res.json({
+        success: true,
+        message: "Committed provisional activities to the manufacturing schedule"
+    });
+});
+
+/****************************************************************************************************
  * GENERIC HELPERS
  ****************************************************************************************************/
 
