@@ -32,23 +32,15 @@ export class CustomerAutocompleteComponent implements OnInit {
     });
   }
 
-  onSelectionChanged(ev){
+  onSelectionChanged(ev) {
     this.messageEvent.emit(ev.option.value);
   }
 
-  onBlur(){
-    // var spliced = this.inputField.value.match(/[a-z]+|[^a-z]+/gi);
-    // if(spliced!=null && spliced.length==2){
-    //   var quantity = spliced[0];
-    //   var unit = spliced[1];
-    //   this.messageEvent.emit({
-    //     quantity: quantity,
-    //     unit: unit
-    //   });
-    // }
+  onBlur() {
+    
   }
 
-  stopPropagation(ev){
+  stopPropagation(ev) {
     ev.stopPropagation();
   }
 

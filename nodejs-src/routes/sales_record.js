@@ -1,6 +1,7 @@
 // Core dependencies
 const express = require('express');
 const router = express.Router();
+const moment = require('moment-timezone');
 
 // Request libraries
 const CronJob = require('cron').CronJob;
@@ -168,7 +169,7 @@ router.post('/summary', async function(req, res) {
         var product_line_summary_data = [];
         for (let sku of skus) {
             var sku_summary_data = {
-                sku: sku
+                sku_info: sku
             };
 
             var sku_yearly_data = [];
@@ -229,7 +230,7 @@ router.post('/sales_projection_tool', async function(req, res) {
 
     var sku_yearly_data = [];
     var data_available = true;
-    for (i = 3; i >= 0; i--) {
+    for (i = 0; i <= 3; i++) {
         let s = new Date(a.getTime()); s.setFullYear(s.getFullYear() - i);
         let e = new Date(b.getTime()); e.setFullYear(e.getFullYear() - i);
 
@@ -262,7 +263,8 @@ router.post('/sales_projection_tool', async function(req, res) {
 
         if (data_available) {
             sku_yearly_data.push({
-                timespan: s.toISOString() + " - " + e.toISOString(),
+                start: moment.utc(s).format('LL'),
+                end: moment.utc(e).format('LL'),
                 sales: getTotalSales(records)
             });
         }

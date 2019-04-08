@@ -1,0 +1,38 @@
+<h1 mat-dialog-title>Sales projection tool</h1>
+<div mat-dialog-content *ngIf="projection.success">
+  <h2>Yearly sales data</h2>
+  <table mat-table class="summary-table" [dataSource]="projection.sku_yearly_data">
+    <ng-container matColumnDef="timespan">
+      <mat-header-cell *matHeaderCellDef> Timespan </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.timespan}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="sales">
+      <mat-header-cell *matHeaderCellDef> Sales </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.sales}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </table>
+  <br>
+  <h2>Summary statistics</h2>
+  <table mat-table class="summary-table" [dataSource]="[projection.summary]">
+    <ng-container matColumnDef="average">
+      <mat-header-cell *matHeaderCellDef> Average </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.average}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="standard_deviation">
+      <mat-header-cell *matHeaderCellDef> Standard Deviation </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.standard_deviation}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="summaryDisplayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: summaryDisplayedColumns;"></mat-row>
+  </table>
+</div>
+<div mat-dialog-content *ngIf="!projection.success">
+  <h3>The data is not currently available. Please check back in 10-15 seconds.</h3>
+</div>
+<br>
+<div mat-dialog-actions class="right" *ngIf="projection.success">
+  <button mat-raised-button color="accent" [mat-dialog-close]="projection.summary.average" cdkFocusInitial>Use sales projection</button>
+</div>
+<br>
