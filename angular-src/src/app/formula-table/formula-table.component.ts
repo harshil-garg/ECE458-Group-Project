@@ -182,7 +182,8 @@ export class FormulaTableComponent implements OnInit{
               id: formula.number,
               name: formula.name,
               ingredient_tuples: formula.ingredient_tuples,
-              comment: formula.comment
+              comment: formula.comment,
+              skus: formula.skus
           });
         }
         this.dataSource.data = this.formulaList;
@@ -284,6 +285,10 @@ export class FormulaTableComponent implements OnInit{
         this.ingredientInput = '';
         this.quantityInput = '';
       }
+    }
+
+    getNumSkus(formula){
+      return formula.skus.length;
     }
 
     addUnderline(form){

@@ -22,7 +22,8 @@ export class ResponseData {
   name: string;
   number: string;
   ingredient_tuples: [Tuple];
-  comment: string;
+	comment: string;
+	skus: [any];
 }
 
 export class FilterResponse {

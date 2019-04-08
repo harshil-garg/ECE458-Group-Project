@@ -97,7 +97,7 @@
   <!-- Num Skus Column -->
   <ng-container matColumnDef="sku_dropdown">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>SKUs</th>
-    <td mat-cell *matCellDef="let element">
+    <td mat-cell *matCellDef="let element"> {{getNumSkus(element)}}
     <mat-icon *ngIf="expandedFormula!=element" (click)="expandedFormula = expandedFormula === element ? null : element" color="accent">keyboard_arrow_down</mat-icon>
     <mat-icon *ngIf="expandedFormula==element" (click)="expandedFormula = expandedFormula === element ? null : element" color="accent">keyboard_arrow_up</mat-icon></td>
   </ng-container>
@@ -106,12 +106,18 @@
   <ng-container matColumnDef="expandedDetail">
     <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
       <div class="example-element-detail" [@detailExpand]="element == expandedFormula ? 'expanded' : 'collapsed'">
-        Hello world
         <!-- <mat-list>
           <ng-container *ngFor = "let sku of element.skus; let id2=index">
             <mat-list-item> {{sku.name}} : {{sku.size}} * {{sku.count}} ({{sku.number}}) </mat-list-item>
           </ng-container>
         </mat-list> -->
+        <mat-chip-list align="end" class="mat-chip-list-stacked">
+          <ng-container *ngFor="let sku of element.skus; let id2=index">
+            <div>
+              <mat-chip class="chip">{{sku.name}} : {{sku.size}} * {{sku.count}} ({{sku.number}})</mat-chip>
+            </div>
+          </ng-container>
+        </mat-chip-list>
       </div>
     </td>
   </ng-container>
