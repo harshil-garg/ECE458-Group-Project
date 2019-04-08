@@ -15,21 +15,27 @@ export class SalesProjectionToolDialogComponent implements OnInit {
   };
   displayedColumns = ['timespan', 'sales'];
   summaryDisplayedColumns = ['average', 'standard_deviation']
+  start_date: Date = new Date();
+  end_date: Date = new Date();
 
   constructor(public dialogRef: MatDialogRef<SalesProjectionToolDialogComponent>, @Inject(MAT_DIALOG_DATA) public sku: any, public salesReportService: SalesReportService) {}
 
   ngOnInit() {
+    this.start_date.setMonth(this.start_date.getMonth() - 3);
+    this.refresh();
+  }
+
+  refresh() {
     var request = {
       sku_number: this.sku.number,
-      start: '2019-01-01T00:00:00.000Z',
-      end: '2019-03-01T00:00:00.000Z'
+      start: this.start_date.toISOString(),
+      end: this.end_date.toISOString()
     }
     this.salesReportService.getSalesProjection(request).subscribe(
       response => {
         if(!response.success){
-          //this.dialogRef.updateSize('600px', '200px')
-        } else {
           console.log(response);
+        } else {
           this.projection = response;
           this.formatData();
         }
@@ -44,17 +50,11 @@ export class SalesProjectionToolDialogComponent implements OnInit {
 
   formatData() {
     for (let entry of this.projection.sku_yearly_data) {
-      /*let timespan = entry.timespan;
-      let start = timespan.split(" ")[0].trim();
-      console.log(`The start is ${start}`);
-      let start_utc = new Date(start).toUTCString();
-      let end = timespan.split(" ")[2].trim();
-      console.log(`The end is ${end}`);
-      let end_utc = new Date(end).toUTCString();
-      let start_formatted = (new Date(start_utc).getMonth() + 1) + "/" + new Date(start_utc).getDate() + "/" + new Date(start_utc).getFullYear();
-      let end_formatted = (new Date(end_utc).getMonth() + 1) + "/" + new Date(end_utc).getDate() + "/" + new Date(end_utc).getFullYear();*/
       entry.timespan = entry.start + " - " + entry.end;
+      entry.sales = entry.sales.toLocaleString();
     }
+    this.projection.summary.display_average = this.projection.summary.average.toLocaleString();
+    this.projection.summary.display_standard_deviation = this.projection.summary.standard_deviation.toLocaleString();
   }
 
   onNoClick() {
