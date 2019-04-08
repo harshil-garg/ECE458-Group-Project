@@ -3,6 +3,10 @@ table {
     text-align: center;
 }
 
+.summary-table {
+  width: 100%;
+}
+
 .centre {
     text-align: center;
 }
@@ -50,4 +54,13 @@ mat-icon:hover{
 
 .flush {
   margin: 10px
+}
+
+.padding {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.card-padding {
+  padding-bottom: 20px;
 }

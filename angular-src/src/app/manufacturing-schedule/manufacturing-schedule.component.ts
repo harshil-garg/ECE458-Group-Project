@@ -201,7 +201,7 @@ export class ManufacturingScheduleComponent implements OnInit {
     else{
       duration -= timeTil6;
       date.setDate(date.getDate() + 1); //supports rollover
-      while(duration >= 10){
+      while(duration > 10){
         date.setDate(date.getDate() + 1);
         duration-=10;
       }

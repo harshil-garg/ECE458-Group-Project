@@ -1,0 +1,59 @@
+<h1 mat-dialog-title>Sales projection tool</h1>
+<div class='flex-box-space'>
+  <!-- start and end date picker -->
+  <div class="flex-box-end">
+    <div class="flex-item">
+      <mat-form-field class=small-input>
+        <mat-label>Start date</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="start_date" (ngModelChange)="refresh()" placeholder="Choose a date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="flex-item">
+      <mat-form-field class=small-input>
+        <mat-label>End date</mat-label>
+        <input matInput [matDatepicker]="picker2" [(ngModel)]="end_date" (ngModelChange)="refresh()" placeholder="Choose a date">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
+<div mat-dialog-content *ngIf="projection.success">
+  <h2>Yearly sales data</h2>
+  <table mat-table class="summary-table" [dataSource]="projection.sku_yearly_data">
+    <ng-container matColumnDef="timespan">
+      <mat-header-cell *matHeaderCellDef> Timespan </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.timespan}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="sales">
+      <mat-header-cell *matHeaderCellDef> Sales </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.sales}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </table>
+  <br>
+  <h2>Summary statistics</h2>
+  <table mat-table class="summary-table" [dataSource]="[projection.summary]">
+    <ng-container matColumnDef="average">
+      <mat-header-cell *matHeaderCellDef> Average </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.display_average}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="standard_deviation">
+      <mat-header-cell *matHeaderCellDef> Standard Deviation </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.display_standard_deviation}} </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="summaryDisplayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: summaryDisplayedColumns;"></mat-row>
+  </table>
+</div>
+<div mat-dialog-content *ngIf="!projection.success">
+  <h3>The data is not currently available. Please check back in 10-15 seconds.</h3>
+</div>
+<br>
+<div mat-dialog-actions class="right" *ngIf="projection.success">
+  <button mat-raised-button color="accent" [mat-dialog-close]="projection.summary.average" cdkFocusInitial>Use sales projection</button>
+</div>
+<br>

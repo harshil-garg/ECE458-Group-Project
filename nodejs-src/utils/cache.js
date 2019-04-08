@@ -63,6 +63,15 @@ class LRUCache {
         }
     }
 
+    delete(key) {
+        if (this.map.has(key)) {
+            var node = this.map.get(key);
+            this.map.delete(key);
+            this.remove(node);
+            node = null;
+        }
+    }
+
     flushCache() {
         this.map = new Map();
         this.head = new ListNode(0);
@@ -74,24 +83,3 @@ class LRUCache {
 }
 
 module.exports = LRUCache;
-
-/*var c = new LRUCache(2);
-c.put(1, 2);
-c.put(3, 4);
-console.log(c.get(3));
-c.put(4, 5);
-console.log(c.get(1));
-console.log(c.get(4));
-console.log(c.get(4));
-console.log(c.get(3));
-c.put(3, 6);
-c.put(7, 8);
-console.log(c.get(4));
-console.log(c.get(3));*/
-
-//["LRUCache","put","put","get","put","get","put","get","get","get"]
-//[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]
-
-// Tests
-    // Copy LeetCode LRUCache tests
-    // Does fluschache work

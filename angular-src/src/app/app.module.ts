@@ -51,7 +51,6 @@ import { UnitAutocompleteComponent } from './ingredients-table/unit-autocomplete
 // import { ProductLineAutocompleteComponent } from './product-line-table/product-line-autocomplete/product-line-autocomplete.component';
 import { FormulaAutocompleteComponent } from './formula-table/formula-autocomplete/formula-autocomplete.component';
 import { SalesReportComponent } from './sales-report/sales-report.component';
-import { SalesSummaryComponent } from './sales-report/sales-summary/sales-summary.component';
 import { SalesDrilldownComponent } from './sales-report/sales-drilldown/sales-drilldown.component';
 import { CustomerAutocompleteComponent } from './sales-report/customer-autocomplete/customer-autocomplete.component';
 import { ChartsModule } from 'ng2-charts';
@@ -120,7 +119,6 @@ const routes: Routes = [
     // ProductLineAutocompleteComponent,
     FormulaAutocompleteComponent,
     SalesReportComponent,
-    SalesSummaryComponent,
     SalesDrilldownComponent,
     CustomerAutocompleteComponent,
     LineGraphComponent,

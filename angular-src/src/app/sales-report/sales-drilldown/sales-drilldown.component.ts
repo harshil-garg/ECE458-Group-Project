@@ -56,7 +56,7 @@ export class SalesDrilldownComponent implements OnInit {
         stat: this.summaryLabels[column]
       };
 
-      transposedData[column][`value`] = (column < 2) ? this.stats[this.summaryColumns[column]].toLocaleString() :
+      transposedData[column][`value`] = (column == 1) ? this.stats[this.summaryColumns[column]].toLocaleString() :
                                         ((column >= 8) ? (this.stats[this.summaryColumns[column]].toFixed(2)+"%") :
                                         (this.stats[this.summaryColumns[column]].toLocaleString('en-US', { style: 'currency', currency: 'USD' })));
       ;

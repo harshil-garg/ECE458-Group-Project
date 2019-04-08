@@ -8,13 +8,14 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
  import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SearchSkuComponent } from './search-sku/search-sku.component';
-import { MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatChipsModule, MatButtonToggleModule, MatSlideToggleModule } from '@angular/material';
+import { MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatChipsModule, MatButtonToggleModule, MatSlideToggleModule, MatTableModule } from '@angular/material';
+import { SalesProjectionToolDialogComponent } from './add-manufacturing-goal-dialog/sales-projection-tool-dialog/sales-projection-tool-dialog.component';
 
 @NgModule({
-  imports: [CommonModule, FlexLayoutModule, HttpClientModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatChipsModule, MatButtonToggleModule, MatSlideToggleModule],
-  declarations: [AddManufacturingGoalComponent, AddManufacturingGoalDialogComponent, SearchSkuComponent],
+  imports: [CommonModule, FlexLayoutModule, HttpClientModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, MatButtonModule, MatDialogModule, MatListModule, MatProgressBarModule, MatIconModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatChipsModule, MatButtonToggleModule, MatSlideToggleModule, MatTableModule],
+  declarations: [AddManufacturingGoalComponent, AddManufacturingGoalDialogComponent, SearchSkuComponent, SalesProjectionToolDialogComponent],
   exports: [AddManufacturingGoalComponent],
-  entryComponents: [AddManufacturingGoalDialogComponent], // Add the DialogComponent as entry component
+  entryComponents: [AddManufacturingGoalDialogComponent, SalesProjectionToolDialogComponent], // Add the DialogComponent as entry component
   providers: [
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: MatDialogRef, useValue: {} }]
