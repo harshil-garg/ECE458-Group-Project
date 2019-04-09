@@ -87,58 +87,75 @@ router.post('/report_calculate', async (req, res) => {
 
 router.post('/load',  async (req, res) => {
     let results = await schedule_filter.filter();
-
     res.json({success: true, data: results});
-})
+});
 
 //Add an mapping of an activity to a manufacturing line
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
 
-    let error = await createValidation(activity, manufacturing_line, start_date, duration, duration_override);
-    if(!('sku' in error)){
-        res.json({success: false, message: error});
-        return;
+    let mapping = await createMapping(res, activity, manufacturing_line, start_date, duration, duration_override);
+    if (mapping.hasOwnProperty('success')) {
+        return res.json(mapping);
     }
 
-    let isUnique = await schedule_validator.uniqueActivity(activity);
-    if(!isUnique[0]){
-        res.json({success: false, message: isUnique[1]});
-        return;
-    }
-
-    //calculate duration
-    let sku = await SKU.findOne({_id: error.sku}).exec();
-    let goal = await ManufacturingGoal.findOne({_id: error.manufacturing_goal}).exec();
-    let quantity;
-    for(let tuple of goal.sku_tuples){
-        if(tuple.sku.equals(sku._id)){
-            quantity = tuple.case_quantity;
-        }
-    }
-    calculated_duration = Math.ceil(quantity / sku.manufacturing_rate);
-    if(duration){
-        if(duration != calculated_duration){
-            duration_override = true;
-        }
-    }else{
-        duration = calculated_duration
-    }
-
-    activity.sku = error.sku;
-    activity.manufacturing_goal = error.manufacturing_goal;
-    manufacturing_line = error.manufacturing_line;
-    let mapping = new ManufacturingSchedule({activity, manufacturing_line, start_date, duration, duration_override});
     ManufacturingSchedule.create(mapping, (err) => {
         if (err) {
-            res.json({success: false, message: `Failed to create a new mapping. Error: ${err}`});
-        } else{
-            res.json({success: true, message: "Added successfully."});
+            res.json({
+                success: false, 
+                message: `Failed to create a new mapping. Error: ${err}`
+            });
+        } else {
+            res.json({
+                success: true, 
+                message: "Added successfully."
+            });
         }
     });
 });
 
-//Update a mapping
+async function createMapping(res, activity, manufacturing_line, start_date, duration, duration_override) {
+    let validation = await createValidation(activity, manufacturing_line, start_date, duration, duration_override);
+    if (!('sku' in validation)) {
+        return {
+            success: false, 
+            message: validation
+        };
+    }
+
+    let isUnique = await schedule_validator.uniqueActivity(activity);
+    if (!isUnique[0]) {
+        return {
+            success: false, 
+            message: isUnique[1]
+        };
+    }
+
+    // Calculate duration
+    let sku = await SKU.findOne({_id: validation.sku}).exec();
+    let goal = await ManufacturingGoal.findOne({_id: validation.manufacturing_goal}).exec();
+    let quantity;
+    for (let tuple of goal.sku_tuples) {
+        if (tuple.sku.equals(sku._id)) {
+            quantity = tuple.case_quantity;
+        }
+    }
+    calculated_duration = Math.ceil(quantity / sku.manufacturing_rate);
+    if (duration) {
+        if (duration != calculated_duration) {
+            duration_override = true;
+        }
+    } else {
+        duration = calculated_duration
+    }
+
+    activity.sku = validation.sku;
+    activity.manufacturing_goal = validation.manufacturing_goal;
+    manufacturing_line = validation.manufacturing_line;
+    
+    return new ManufacturingSchedule({activity, manufacturing_line, start_date, duration, duration_override});
+}
+
 router.post('/update', async (req, res) => {
     //can change line, start date, and duration
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;

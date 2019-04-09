@@ -8,7 +8,7 @@
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>
 </div>
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
@@ -31,9 +31,25 @@
 
   <!-- Name Column -->
   <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
       {{element.name}}
+    </td>
+  </ng-container>
+
+  <!-- Author Column -->
+  <ng-container matColumnDef="author">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
+    <td mat-cell *matCellDef="let element">
+      {{element.author}}
+    </td>
+  </ng-container>
+
+  <!-- Last Edit Column -->
+  <ng-container matColumnDef="last_edit">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Edit</th>
+    <td mat-cell *matCellDef="let element">
+      {{element.last_edit}}
     </td>
   </ng-container>
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-
 import { ManufacturingGoal, SkuNameQuantity } from '../../../model/manufacturing-goal';
+import { SalesProjectionToolDialogComponent } from './sales-projection-tool-dialog/sales-projection-tool-dialog.component';
 
 @Component({
   selector: 'app-add-manufacturing-goal-dialog',
@@ -15,7 +15,8 @@ export class AddManufacturingGoalDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<AddManufacturingGoalDialogComponent>,
-      @Inject(MAT_DIALOG_DATA) public manufGoal: ManufacturingGoal){}
+      @Inject(MAT_DIALOG_DATA) public manufGoal: ManufacturingGoal,
+      public salesDialog: MatDialog){}
 
     ngOnInit(){
       this.manufGoal.sku_tuples = [];
@@ -38,6 +39,8 @@ export class AddManufacturingGoalDialogComponent implements OnInit {
     }
 
     addSkuQuantity(event){
+      console.log("in here " + this.quantityInput);
+      console.log(this.quantityInput.length>0);
       if(this.skuInput!=undefined && this.skuInput.name.length>0 && this.quantityInput!=undefined && this.quantityInput.length>0){
         var added_sku_quant = {
           sku: this.skuInput,
@@ -57,6 +60,22 @@ export class AddManufacturingGoalDialogComponent implements OnInit {
       console.log("SKU SET");
       console.log(sku);
       this.skuInput = sku;
+    }
+
+    openSalesProjectionToolDialog() {
+
+      console.log(this.skuInput);
+
+      const salesDialogRef = this.salesDialog.open(SalesProjectionToolDialogComponent, {
+        width: '800px',
+        data: this.skuInput
+      });
+
+      salesDialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.quantityInput = result+"";
+        }
+      })
     }
 
 

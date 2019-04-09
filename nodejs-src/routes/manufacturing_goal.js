@@ -13,7 +13,6 @@ const utils = require('../utils/utils');
 const manufacturing_goal_filter = require('../controllers/manufacturing_goal_filter');
 const jwtDecode = require('jwt-decode');
 
-
 function getUser(req){
     let jwt = req.headers.authorization
     let payload = jwt.split(' ')[1]
@@ -34,7 +33,7 @@ router.post('/calculator', async (req, res) => {
 
     let ingredientMap = {}
 
-    let goal = await ManufacturingGoal.findOne({name: name, user: user}).exec();
+    let goal = await ManufacturingGoal.findOne({name: name}).exec();
 
     for(let sku_tuple of goal.sku_tuples){
         let sku = await SKU.findOne({_id: sku_tuple.sku}).exec();
@@ -96,7 +95,7 @@ router.post('/all', async (req, res) => {
         return;
     }
 
-    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size, user);
+    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size);
     res.json(results);
 });
 
@@ -135,12 +134,14 @@ router.post('/create', async (req, res) => {
         return;
     }
 
-    createManufacturingGoal(name, sku_tuples, user, deadline_date, res);    
+    let last_edit = new Date();   
+
+    createManufacturingGoal(name, sku_tuples, deadline_date, user, last_edit, res);    
 
 });
 
-function createManufacturingGoal(name, sku_tuples, user, deadline, res){
-    let goal = new ManufacturingGoal({name, sku_tuples, user, deadline});
+function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, res){
+    let goal = new ManufacturingGoal({name, sku_tuples, deadline, author, last_edit});
 
     ManufacturingGoal.create(goal, (error) => {
         if (error) {

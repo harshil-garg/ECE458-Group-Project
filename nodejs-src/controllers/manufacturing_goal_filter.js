@@ -1,13 +1,10 @@
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const pagination = require('./paginate');
+const moment = require('moment-timezone');
 
-module.exports.filter = async function(pageNum, sortBy, page_size, user){
+module.exports.filter = async function(pageNum, sortBy, page_size){
     let pipeline = [];
-    if(user){
-        pipeline.push({$match: {user: user}});
-    }else{
-        pipeline.push({$match: {enabled: true}})
-    }
+
     pipeline.push({
         $lookup: {
             from: 'skus',
@@ -57,5 +54,6 @@ function populateSKUs(results){
 
         delete item.skus;
         delete item.manufacturing_lines;
+        item.last_edit = moment.utc(item.last_edit).format('LLL')
     }
 }

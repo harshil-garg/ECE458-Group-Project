@@ -21,6 +21,8 @@
         <input class="form-control" name="quantity" [(ngModel)]="quantityInput" name="quantity" (keydown) = "keyPressed($event)" type="text" placeholder="Quantity"/><br>
         <button mat-raised-button type="button" (click)="addSkuQuantity($event)" color="accent"
           [disabled]="skuInput==undefined || skuInput.name.length==0 || quantityInput==undefined || quantityInput.length==0">Add Sku-Quantity</button>
+        <button mat-raised-button type="button" (click)="openSalesProjectionToolDialog()" color="accent"
+          [disabled]="skuInput==undefined || skuInput.name.length==0">Project Sales</button>
       </mat-card>
 
       <div class="form-group">
