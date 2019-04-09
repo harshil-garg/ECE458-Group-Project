@@ -230,11 +230,6 @@ export class IngredientsTableComponent implements OnInit{
       });
     }
 
-    setSortBy(property: string){
-      this.sortBy = property;
-      this.refresh();
-    }
-
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
       this.paginator.pageSize = 10;

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ManufacturingGoal } from '../model/manufacturing-goal'
 import { AuthenticationService } from '../authentication.service'
 import { ManufacturingGoalService, RefreshResponse } from './manufacturing-goal.service';
-import {MatTableDataSource, MatPaginator, MatSnackBar} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
@@ -13,13 +13,15 @@ import {SelectionModel} from '@angular/cdk/collections';
 export class ManufacturingGoalTableComponent implements OnInit {
 
   manufGoalList: Array<any> = [];
-  displayedColumns: string[] = ['select', 'name', 'skus', 'deadline'];
+  displayedColumns: string[] = ['select', 'name', 'author', 'last_edit', 'skus', 'deadline'];
   selection = new SelectionModel<ManufacturingGoal>(true, []);
   dataSource = new MatTableDataSource<ManufacturingGoal>(this.manufGoalList);
+  sortBy: string = 'name'
   maxPages: number;
   totalDocs: number;
   loadingResults: boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar) { }
 
@@ -30,6 +32,11 @@ export class ManufacturingGoalTableComponent implements OnInit {
       this.selection.clear();
       this.refresh();
     });
+    this.sort.sortChange.subscribe(x => {
+      this.sortBy = x.active;
+      this.refresh();
+      this.paginator.pageIndex = 0; //reset page to 0 when sort by new field
+    });
     this.refresh();
   }
 
@@ -37,12 +44,13 @@ export class ManufacturingGoalTableComponent implements OnInit {
     this.loadingResults = true;
     var pageIndex : number = this.paginator.pageIndex+1;
     this.manufacturingService.refresh({
-        sortBy : "name",
+        sortBy : this.sortBy,
         page_size: this.paginator.pageSize,
         pageNum: pageIndex
       }).subscribe(
       response => {
         if(response.success){
+          console.log(response)
           this.handleRefreshResponse(response);
         }
         else{
@@ -55,6 +63,16 @@ export class ManufacturingGoalTableComponent implements OnInit {
         }
       }
     );
+  }
+
+  handleRefreshResponse(response: RefreshResponse){ 
+    if(response.success){
+      this.manufGoalList = response.data;
+      this.dataSource.data = this.manufGoalList;
+      this.totalDocs = response.total_docs;
+      this.maxPages = response.pages;
+      this.loadingResults = false;
+    }
   }
 
   delete() {
@@ -97,24 +115,6 @@ export class ManufacturingGoalTableComponent implements OnInit {
       });
       var encodedUri = encodeURI(csvContent);
       window.open(encodedUri);
-    }
-  }
-
-  handleRefreshResponse(response: RefreshResponse){
-    console.log(response);
-    if(response.success){
-      this.manufGoalList = [];
-      for(let manufGoal of response.data){
-        this.manufGoalList.push({
-            name: manufGoal.name,
-            sku_tuples: manufGoal.sku_tuples,
-            deadline: manufGoal.deadline,
-        });
-      }
-      this.dataSource.data = this.manufGoalList;
-      this.totalDocs = response.total_docs;
-      this.maxPages = response.pages;
-      this.loadingResults = false;
     }
   }
 

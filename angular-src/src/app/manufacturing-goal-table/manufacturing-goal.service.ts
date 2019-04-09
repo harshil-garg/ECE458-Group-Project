@@ -26,6 +26,8 @@ export class ResponseData {
   name: string;
 	sku_tuples: SkuNameQuantity[];
   deadline: Date;
+  author: string;
+  last_edit: Date;
 }
 
 export class RefreshResponse {

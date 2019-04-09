@@ -22,10 +22,6 @@ const ManufacturingGoalSchema = new Schema({
         type: [SKU_Tuple],
         required: true
     },
-    user: {
-        type: String,
-        required: true,
-    },
     deadline: {
         type: Date,
         required: true
@@ -33,6 +29,14 @@ const ManufacturingGoalSchema = new Schema({
     enabled: {
         type: Boolean,
         default: false
+    },
+    author: {
+        type: String,
+        required: true
+    },
+    last_edit: {
+        type: Date,
+        required: true
     }
 });
 
