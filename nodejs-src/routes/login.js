@@ -15,18 +15,22 @@ router.post('/',
             if(err){
                 res.json({success: false, message: err});
             }else{
+                analyst = user.analyst;
+                product_manager = user.product_manager;
+                business_manager = user.business_manager;
+                plant_manager = user.plant_manager;
                 admin = user.admin;
                 const email = req.body.email;
                 let d = new Date();
                 let exp = d.getTime() + sessionTimeout;
                 opts = {};
                 const secret = 'SECRET_KEY'; //normally stored in process.env.secret
-                const token = jwt.sign({ email, admin, exp }, secret, opts);
+                const token = jwt.sign({ email, admin, business_manager, exp }, secret, opts);
                 res.json({success: true, token});
             }
-            
+
         });
-		
+
     });
 
 router.post('/netid', (req, res) => {

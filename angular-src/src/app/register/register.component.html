@@ -69,7 +69,7 @@
 
         <button mat-raised-button type="button" [matMenuTriggerFor]="menu" *ngIf="selectedOptions.indexOf('Plant Manager')>-1">Select Manufacturing Lines for Plant Manager</button>
         <mat-menu #menu="matMenu">
-          <mat-selection-list (selectionChange)="setManufacturingLines(manufLines.selectedOptions.selected)" #manufLines>
+          <mat-selection-list [(ngModel)]="selectedManufLines" #manufLines>
             <mat-list-option (click)="handleClick($event)" *ngFor="let manufLine of manufacturingLines" [value]='manufLine'>{{manufLine}}</mat-list-option>
           </mat-selection-list>
         </mat-menu>

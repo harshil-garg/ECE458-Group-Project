@@ -9,7 +9,7 @@ import { RegisterResponse } from './model/register-response';
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
-  })  
+  })
 };
 
 class AutocompleteResponse {
@@ -38,10 +38,22 @@ export class AccountsService {
     return this.http.post<AutocompleteResponse>('api/users/autocomplete', body, httpOptions);
   }
 
-  updatePriveleges(email: string, admin: boolean): Observable<RegisterResponse> {
+  getPriveleges(email: string): Observable<any> {
+    let body = {
+      email: email
+    };
+    console.log(body);
+    return this.http.post<any>('api/users/get-priveleges', body, httpOptions);
+  }
+
+  updatePriveleges(email: string, admin: boolean, product_manager: boolean, business_manager: boolean, manufacturing_lines: any[], analyst: boolean): Observable<RegisterResponse> {
     let body = {
       email: email,
-      admin: admin
+      admin: admin,
+      product_manager: product_manager,
+      business_manager: business_manager,
+      manufacturing_lines: manufacturing_lines,
+      analyst: analyst
     };
     return this.http.post<RegisterResponse>('api/users/update-priveleges', body, httpOptions);
   }

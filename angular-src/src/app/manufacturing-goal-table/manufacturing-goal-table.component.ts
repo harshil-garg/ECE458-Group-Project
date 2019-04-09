@@ -65,7 +65,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
     );
   }
 
-  handleRefreshResponse(response: RefreshResponse){ 
+  handleRefreshResponse(response: RefreshResponse){
     if(response.success){
       this.manufGoalList = response.data;
       this.dataSource.data = this.manufGoalList;
@@ -129,6 +129,14 @@ export class ManufacturingGoalTableComponent implements OnInit {
     this.isAllSelected() ?
         this.selection.clear() :
         this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+
+  isAdmin() {
+    return this.authenticationService.isAdmin();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
   }
 
 }
