@@ -1,8 +1,11 @@
 const ManufacturingSchedule = require('../model/manufacturing_schedule_model')
 
-module.exports.filter = async function(manufacturing_line, start, end){
+module.exports.filter = async function(user, manufacturing_line, start, end){
     pipeline = [];
     pipeline.push({
+        $match: {$or: [{committed: true}, {$and: [{committed: false}, {user: user}]}]}
+    },
+    {
         $lookup: {
             from: 'skus',
             localField: 'activity.sku',

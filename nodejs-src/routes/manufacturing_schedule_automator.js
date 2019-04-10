@@ -12,6 +12,7 @@ const ManufacturingLine = require('../model/manufacturing_line_model');
 
 // Utilities
 const PriorityQueue = require('../utils/priority_queue')
+const jwtDecode = require('jwt-decode');
 
 /****************************************************************************************************
  * NAIVE ALGORITHM
@@ -64,6 +65,14 @@ const PriorityQueue = require('../utils/priority_queue')
 router.post('/naive', async(req, res) => {
     return await automate_naive(req, res);
 });
+
+function getUser(req){
+    let jwt = req.headers.authorization
+    let payload = jwt.split(' ')[1]
+    let decoded = jwtDecode(payload)
+
+    return decoded.email;  
+}
 
 async function automate_naive(req, res) {
     let { activities, start_, end_ } = req.body;
@@ -133,7 +142,8 @@ async function automate_naive(req, res) {
                 start_date: moment.utc(earliestStartTime).format(), 
                 duration: task.duration, 
                 duration_override: false,
-                committed: false
+                committed: false,
+                user: getUser(req)
             });
             await ManufacturingSchedule.create(mapping);
         }
@@ -361,7 +371,8 @@ async function transformSchedule(schedule, times) {
             start_date: moment.utc(start).format(), 
             duration: s.end - s.start, 
             duration_override: false,
-            committed: false
+            committed: false,
+            user: getUser(req)
         });
         console.log(mapping);
         mappings.push(mapping);

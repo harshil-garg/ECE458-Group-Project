@@ -38,6 +38,9 @@ const ManufacturingScheduleSchema = new Schema({
     committed: {
         type: Boolean,
         default: true
+    },
+    user: {
+        type: String,
     }
 });
 
