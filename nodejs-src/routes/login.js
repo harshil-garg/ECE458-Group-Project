@@ -25,7 +25,7 @@ router.post('/',
                 let exp = d.getTime() + sessionTimeout;
                 opts = {};
                 const secret = 'SECRET_KEY'; //normally stored in process.env.secret
-                const token = jwt.sign({ email, admin, business_manager, exp }, secret, opts);
+                const token = jwt.sign({ email, analyst, product_manager, business_manager, plant_manager, admin, exp }, secret, opts);
                 res.json({success: true, token});
             }
 
