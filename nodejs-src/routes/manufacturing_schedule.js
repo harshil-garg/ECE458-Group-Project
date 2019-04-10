@@ -34,7 +34,7 @@ router.post('/report', async (req, res) => {
     const { manufacturing_line, start, end } = req.body;
 
 
-    let results = await schedule_filter.filter(manufacturing_line, start, end);
+    let results = await schedule_filter.filter(getUser(req), manufacturing_line, start, end);
 
     res.json({success: true, data: results});
 
@@ -86,7 +86,7 @@ router.post('/report_calculate', async (req, res) => {
 })
 
 router.post('/load',  async (req, res) => {
-    let results = await schedule_filter.filter();
+    let results = await schedule_filter.filter(getUser(req));
     res.json({success: true, data: results});
 });
 
