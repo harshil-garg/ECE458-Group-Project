@@ -13,13 +13,14 @@ import {SelectionModel} from '@angular/cdk/collections';
 export class ManufacturingGoalTableComponent implements OnInit {
 
   manufGoalList: Array<any> = [];
-  displayedColumns: string[] = ['select', 'name', 'author', 'last_edit', 'skus', 'deadline'];
+  displayedColumns: string[] = ['select', 'name', 'author', 'last_edit', 'skus', 'deadline', 'enabled'];
   selection = new SelectionModel<ManufacturingGoal>(true, []);
   dataSource = new MatTableDataSource<ManufacturingGoal>(this.manufGoalList);
   sortBy: string = 'name'
   maxPages: number;
   totalDocs: number;
   loadingResults: boolean = false;
+  enabled = new SelectionModel<ManufacturingGoal>(true, [])
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -72,6 +73,11 @@ export class ManufacturingGoalTableComponent implements OnInit {
       this.totalDocs = response.total_docs;
       this.maxPages = response.pages;
       this.loadingResults = false;
+      for(let goal of response.data){
+        if(goal.enabled){
+          this.enabled.select(goal)
+        }
+      }
     }
   }
 
@@ -129,6 +135,34 @@ export class ManufacturingGoalTableComponent implements OnInit {
     this.isAllSelected() ?
         this.selection.clear() :
         this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+
+  toggleEnabled(event, goal){
+    let question = this.enabled.isSelected(goal) ? "disable" : "enable"
+    event.stopPropagation();
+
+    if(confirm(`Are you sure you would like to ${question} ${goal.name}?`)){
+      this.enabled.toggle(goal);
+  
+      this.manufacturingService.setEnabled({
+        manufacturing_goal: goal,
+        enabled: this.enabled.isSelected(goal)
+      }).subscribe((response) => {
+        if(response.success){
+          this.refresh()
+        }else{
+          this.handleError(response);
+        }
+      },
+      (err) => {
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      })
+    }else{
+      event.preventDefault();
+    }
+    
   }
 
 }

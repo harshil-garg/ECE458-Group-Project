@@ -2,13 +2,13 @@
 <mat-sidenav-container class="example-container">
   <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
     <div class="example-container">
-      <h2>Goals</h2>
-      <app-search-goals (enableGoal)="confirmEnable($event)"></app-search-goals>
+      <h2>Enabled Goals</h2>
+      <!-- <app-search-goals (enableGoal)="confirmEnable($event)"></app-search-goals> -->
       <br>
       <mat-card class="mat-elevation-z2">
-        <mat-card-subtitle [style.color]="'black'">
+        <!-- <mat-card-subtitle [style.color]="'black'">
           Enabled Goals
-        </mat-card-subtitle>
+        </mat-card-subtitle> -->
         <mat-card-content>
           <mat-list>
             <mat-list-item class="right" *ngFor="let item of manufGoalList; let id=index">
