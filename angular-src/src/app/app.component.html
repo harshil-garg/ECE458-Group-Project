@@ -19,8 +19,8 @@
 				<button mat-menu-item (click)="router.navigate(['dashboard/manufacturing-lines'])">Lines</button>
 				<button *ngIf="this.authService.isAdmin()" mat-menu-item (click)="router.navigate(['dashboard/manufacturing-schedule'])">Schedule</button>
 			</mat-menu>
-			<button mat-button (click)="router.navigate(['dashboard/sales-report'])">Sales Report</button>
-			<button mat-button *ngIf="this.authService.isAdmin()" (click)="router.navigate(['dashboard/upload'])">Data Import</button>
+			<button mat-button *ngIf="this.authService.isAdmin() || this.authService.isProductManager() || this.authService.isBusinessManager() || this.authService.isPlantManager() || this.authService.isAnalyst()" (click)="router.navigate(['dashboard/sales-report'])">Sales Report</button>
+			<button mat-button *ngIf="this.authService.isAdmin() || this.authService.isProductManager()" (click)="router.navigate(['dashboard/upload'])">Data Import</button>
 			<button mat-button *ngIf="this.authService.isAdmin()" (click)="router.navigate(['dashboard/accounts'])">Accounts</button>
 			<button mat-button (click)="authService.logout()">Log out</button>
 	 </mat-toolbar-row>

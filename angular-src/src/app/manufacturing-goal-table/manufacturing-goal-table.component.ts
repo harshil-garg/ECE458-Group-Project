@@ -135,6 +135,10 @@ export class ManufacturingGoalTableComponent implements OnInit {
     return this.authenticationService.isAdmin();
   }
 
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
   isBusinessManager() {
     return this.authenticationService.isBusinessManager();
   }

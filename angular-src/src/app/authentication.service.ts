@@ -125,7 +125,9 @@ export class AuthenticationService {
     const token = this.getUserDetails();
 
     if(token) {
-      return token.plant_manager;
+      if(token.plant_manager){
+        return token.plant_manager.length > 0;
+      }
     }
     return false;
   }

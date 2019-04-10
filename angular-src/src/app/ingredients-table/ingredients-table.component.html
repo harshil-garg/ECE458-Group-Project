@@ -3,16 +3,16 @@
     <app-search-ingredient class="search"></app-search-ingredient>
     <br style="clear:both" />
 </div>
-<div *ngIf="isAdmin()" align="center">
+<div *ngIf="canUpdate()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
-<div class="button-div" *ngIf="isAdmin()">
+<div class="button-div" *ngIf="canUpdate()">
   <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <app-add-ingredient class="add"></app-add-ingredient>
   <app-create-dependency-report class="dependency" [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
   <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
 </div>
-<div class="flex-box-center" *ngIf="!isAdmin()">
+<div class="flex-box-center" *ngIf="isAnalyst() && !canUpdate()">
   <div class="flex-item">
     <app-create-dependency-report [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
     <button mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>

@@ -3,12 +3,12 @@
     <!-- <app-search-ingredient class="search"></app-search-ingredient> -->
     <br style="clear:both" />
 </div>
-<div *ngIf="isAdmin()" align="center">
+<div *ngIf="canUpdate()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
 <div id="search-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <app-add-manufacturing-line class="add" *ngIf="isAdmin()"></app-add-manufacturing-line>
+  <button *ngIf="canUpdate()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
+  <app-add-manufacturing-line class="add" *ngIf="canUpdate()"></app-add-manufacturing-line>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>

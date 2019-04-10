@@ -5,6 +5,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { SalesReportService } from './sales-report.service';
 import { CrudProductLineService } from '../product-line-table/crud-product-line.service';
 import { ExportService } from '../export.service';
+import { AuthenticationService } from '../authentication.service'
 
 @Component({
   selector: 'app-sales-report',
@@ -26,7 +27,7 @@ export class SalesReportComponent implements OnInit {
 
   loadingResults: boolean = false;
 
-  constructor(private salesReportService: SalesReportService, public dialog: MatDialog, public productLineService: CrudProductLineService, public exportService: ExportService) {
+  constructor(private authenticationService: AuthenticationService, private salesReportService: SalesReportService, public dialog: MatDialog, public productLineService: CrudProductLineService, public exportService: ExportService) {
   }
 
   ngOnInit() {
@@ -53,7 +54,7 @@ export class SalesReportComponent implements OnInit {
     this.salesReportService.getSummary(request).subscribe(
       response => {
         this.summary_data = response;
-        this.product_line_keys = Object.keys(this.summary_data); 
+        this.product_line_keys = Object.keys(this.summary_data);
         this.formatYearlyData();
         this.formatTenYearData();
         console.log(this.summary_data);
@@ -190,5 +191,29 @@ export class SalesReportComponent implements OnInit {
   exportTotalsToCSV(sku) {
     console.log(sku.sku_ten_year_data_export);
     this.exportService.exportJSON(this.ldisplayedColumns, sku.sku_ten_year_data_export, `${sku.sku_info.number}_ten_year_sales`);
+  }
+
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authenticationService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authenticationService.isPlantManager();
+  }
+
+  isAdmin() {
+    return this.authenticationService.isAdmin();
+  }
+
+  canUpdate() {
+    return this.isAdmin() || this.isProductManager();
   }
 }
