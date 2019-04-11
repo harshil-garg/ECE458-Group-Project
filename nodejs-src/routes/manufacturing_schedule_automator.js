@@ -446,7 +446,7 @@ router.post('/undo', async(req, res) => {
 
 router.post('/commit', async(req, res) => {
     let response = await ManufacturingSchedule.updateMany({
-        commited: false
+        committed: false
     }, {
         committed: true
     });
