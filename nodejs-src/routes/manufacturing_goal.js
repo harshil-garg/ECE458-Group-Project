@@ -153,8 +153,7 @@ function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, 
     });
 }
 
-
-
+//DELETE
 router.post('/delete', async (req, res) => {
     const { name } = req.body;
     let goal = await ManufacturingGoal.findOne({name: name}).exec();

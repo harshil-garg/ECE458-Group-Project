@@ -28,6 +28,7 @@ export class ResponseData {
   deadline: Date;
   author: string;
   last_edit: Date;
+  enabled: boolean;
 }
 
 export class RefreshResponse {

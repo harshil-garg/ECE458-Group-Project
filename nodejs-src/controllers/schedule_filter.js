@@ -1,4 +1,23 @@
 const ManufacturingSchedule = require('../model/manufacturing_schedule_model')
+const User = require('../model/user_model');
+
+module.exports.getUserModel = async function(user){
+    let cursor = await User.aggregate([{$match: {email: user}}, {
+        $lookup: {
+            from: 'manufacturinglines',
+            localField: 'plant_manager',
+            foreignField: '_id',
+            as: 'manufacturinglines'
+        }
+    }]).cursor({}).exec();
+    
+    let user_model;
+    await cursor.eachAsync((res) => {
+        user_model = res;
+    });
+
+    return user_model;
+}
 
 module.exports.filter = async function(user, manufacturing_line, start, end){
     pipeline = [];

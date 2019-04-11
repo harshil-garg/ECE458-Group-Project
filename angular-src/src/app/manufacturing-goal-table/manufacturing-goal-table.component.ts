@@ -20,7 +20,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
   maxPages: number;
   totalDocs: number;
   loadingResults: boolean = false;
-  enabled = new SelectionModel<ManufacturingGoal>(true, [])
+  enabled = new SelectionModel<any>(true, [])
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
