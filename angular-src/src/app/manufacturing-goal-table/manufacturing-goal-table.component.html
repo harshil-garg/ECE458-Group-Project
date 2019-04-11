@@ -1,9 +1,20 @@
 <h1 class="mat-display-3" align="center">Manufacturing Goals</h1>
-<div class="button-div">
+<div class="button-div" *ngIf="isBusinessManager() || isAdmin()">
   <button class="remove" mat-raised-button type="button" (click)="delete()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
   <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
   <app-calculator [disabled]="selection.selected.length!=1" [manufGoal]="selection.selected[0]!=null ? selection.selected[0].name : null"></app-calculator>
   <app-add-manufacturing-goal class="add"></app-add-manufacturing-goal>
+</div>
+<div class="flex-box-center" *ngIf="isAnalyst() && !isBusinessManager() && !isAdmin()">
+  <div class="flex-item">
+    <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
+    <app-calculator [disabled]="selection.selected.length!=1" [manufGoal]="selection.selected[0]!=null ? selection.selected[0].name : null"></app-calculator>
+  </div>
+</div>
+<div class="flex-box-center" *ngIf="!isAnalyst() && !isBusinessManager() && !isAdmin()">
+  <div class="flex-item">
+    <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
+  </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>

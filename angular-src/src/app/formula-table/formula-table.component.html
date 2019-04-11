@@ -3,15 +3,15 @@
     <app-search-formula class="search"></app-search-formula>
     <br style="clear:both" />
 </div>
-<div *ngIf="isAdmin()" align="center">
+<div *ngIf="canUpdate()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
-<div class="button-div" *ngIf="isAdmin()">
+<div class="button-div" *ngIf="canUpdate()">
   <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export Formulas</button>
   <app-add-formula class="add"></app-add-formula>
 </div>
-<div class="flex-box-center" *ngIf="!isAdmin()">
+<div class="flex-box-center" *ngIf="isAnalyst() && !canUpdate()">
   <div class="flex-item">
     <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export Formulas</button>
   </div>

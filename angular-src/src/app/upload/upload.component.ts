@@ -160,7 +160,7 @@ export class UploadComponent {
         this.changeState(UploadState.SUCCESS);
       }
     });
-    
+
     // The OK-button should have the text "Finish" now
     this.primaryButtonText = 'Finish';
   }
@@ -215,7 +215,23 @@ export class UploadComponent {
     return  this.results.skus.createlist.length || this.results.skus.changelist.length || this.results.skus.ignorelist.length;
   }
 
-  isAdmin(): boolean {
+  isAnalyst() {
+    return this.authService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authService.isPlantManager();
+  }
+
+  isAdmin() {
     return this.authService.isAdmin();
   }
 }

@@ -1,136 +1,138 @@
-<mat-sidenav-container id="container" fullscreen>
-  <mat-sidenav mode="side" opened>
-    <div class="flex-box-space">
-      <div class="flex-item">
-        <button mat-raised-button color="accent" class="flush" (click)="flush()">Flush Cache</button>
+<ng-container *ngIf="isAdmin() || isPlantManager() || isBusinessManager() || isProductManager() || isAnalyst()">
+  <mat-sidenav-container id="container" fullscreen>
+    <mat-sidenav mode="side" opened>
+      <div class="flex-box-space">
+        <div class="flex-item">
+          <button mat-raised-button color="accent" class="flush" (click)="flush()">Flush Cache</button>
+        </div>
       </div>
-    </div>
-    <div>
-      <h2>Customers</h2>
-      <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
-      </app-customer-autocomplete>
-    </div>
-    <div>
-      <h2>Product Lines</h2>
-      <mat-card class="mat-elevation-z2">
-        <mat-card-content>
-          <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
-          <app-product-line-autocomplete (messageEvent)="refreshProductLines($event)"></app-product-line-autocomplete>
-        </mat-card-content>
-        <mat-card-content>
-          <button mat-raised-button color="accent" (click)="addAllProductLines()">Add All</button>
-        </mat-card-content>
-      </mat-card>
-      <br>
-      <mat-card class="elevation">
-        <mat-card-subtitle [style.color]="'black'">Selected Product Lines</mat-card-subtitle>
-        <mat-card-content>
-          <mat-list>
-            <mat-list-item class="right" *ngFor="let item of product_lines; let id=index">
-              {{item}} <mat-icon (click)="removeProductLine(id)">clear</mat-icon>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div class="sales-report">
-      <h1>Sales Report</h1>
-      <div class="example-loading-shade" *ngIf="loadingResults">
-        <mat-spinner></mat-spinner>
+      <div>
+        <h2>Customers</h2>
+        <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
+        </app-customer-autocomplete>
       </div>
-      <mat-accordion>
-        <mat-expansion-panel *ngFor="let product_line of product_line_keys" [disabled]="summary_data[product_line].length == 0">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{product_line}}
-            </mat-panel-title>
-            <div *ngIf="summary_data[product_line].length == 0">
-              No SKUs for this product line
+      <div>
+        <h2>Product Lines</h2>
+        <mat-card class="mat-elevation-z2">
+          <mat-card-content>
+            <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
+            <app-product-line-autocomplete (messageEvent)="refreshProductLines($event)"></app-product-line-autocomplete>
+          </mat-card-content>
+          <mat-card-content>
+            <button mat-raised-button color="accent" (click)="addAllProductLines()">Add All</button>
+          </mat-card-content>
+        </mat-card>
+        <br>
+        <mat-card class="elevation">
+          <mat-card-subtitle [style.color]="'black'">Selected Product Lines</mat-card-subtitle>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item class="right" *ngFor="let item of product_lines; let id=index">
+                {{item}} <mat-icon (click)="removeProductLine(id)">clear</mat-icon>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <div class="sales-report">
+        <h1>Sales Report</h1>
+        <div class="example-loading-shade" *ngIf="loadingResults">
+          <mat-spinner></mat-spinner>
+        </div>
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let product_line of product_line_keys" [disabled]="summary_data[product_line].length == 0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{product_line}}
+              </mat-panel-title>
+              <div *ngIf="summary_data[product_line].length == 0">
+                No SKUs for this product line
+              </div>
+            </mat-expansion-panel-header>
+            <div *ngFor="let sku of summary_data[product_line]">
+              <mat-card>
+                <mat-card-title>
+                  {{getSKUDisplayName(sku)}}
+                </mat-card-title>
+                <div *ngIf="!sku.success">
+                  The data is not currently available. Please check back in 10-15 seconds.
+                </div>
+                <div *ngIf="sku.success">
+                  <table mat-table class="summary-table" [dataSource]="sku.sku_yearly_data_display">
+                    <ng-container matColumnDef="year">
+                      <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="sales">
+                      <mat-header-cell *matHeaderCellDef> Sales </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.sales}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="revenue">
+                      <mat-header-cell *matHeaderCellDef> Revenue </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.revenue}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="revenue_per_case">
+                      <mat-header-cell *matHeaderCellDef> Revenue per Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> {{element.revenue_per_case}} </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
+                  </table>
+                  <div class="padding"></div>
+                  <mat-table class="summary-table" [dataSource]="sku.sku_ten_year_data_display">
+                    <ng-container matColumnDef="total_revenue">
+                      <mat-header-cell *matHeaderCellDef> Total Revenue </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> <b>{{element.total_revenue}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="revenue_per_case">
+                      <mat-header-cell *matHeaderCellDef> Revenue / Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"> <b>{{element.revenue_per_case}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="profit_per_case">
+                      <mat-header-cell *matHeaderCellDef> Profit / Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.profit_per_case}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="profit_margin">
+                      <mat-header-cell *matHeaderCellDef> Profit Margin </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.profit_margin}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="manufacturing_setup_cost_per_case">
+                      <mat-header-cell *matHeaderCellDef> Setup Cost / Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.manufacturing_setup_cost_per_case}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="manufacturing_run_size">
+                      <mat-header-cell *matHeaderCellDef> Run Size </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.manufacturing_run_size}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="manufacturing_run_cost_per_case">
+                      <mat-header-cell *matHeaderCellDef> Run Cost / Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.manufacturing_run_cost_per_case}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="ingredient_cost_per_case">
+                      <mat-header-cell *matHeaderCellDef> Ingredient Cost / Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.ingredient_cost_per_case}}</b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="cogs_per_case">
+                      <mat-header-cell *matHeaderCellDef> COGS / Case </mat-header-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.cogs_per_case}}</b></mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="ldisplayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: ldisplayedColumns;"></mat-row>
+                  </mat-table>
+                  <mat-card-actions>
+                    <button mat-raised-button color="accent" (click)="exportYearlyToCSV(sku)">Export Yearly to CSV</button>
+                    <button mat-raised-button color="accent" (click)="exportTotalsToCSV(sku)">Export Totals to CSV</button>
+                    <button mat-raised-button color="accent" (click)="openDrilldown(sku.sku_info)">See Drilldown</button>
+                  </mat-card-actions>
+                </div>
+              </mat-card>
+              <div class="card-padding"></div>
             </div>
-          </mat-expansion-panel-header>
-          <div *ngFor="let sku of summary_data[product_line]">
-            <mat-card>
-              <mat-card-title>
-                {{getSKUDisplayName(sku)}}
-              </mat-card-title>
-              <div *ngIf="!sku.success">
-                The data is not currently available. Please check back in 10-15 seconds.
-              </div>
-              <div *ngIf="sku.success">
-                <table mat-table class="summary-table" [dataSource]="sku.sku_yearly_data_display">
-                  <ng-container matColumnDef="year">
-                    <mat-header-cell *matHeaderCellDef> Year </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.year}} </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="sales">
-                    <mat-header-cell *matHeaderCellDef> Sales </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.sales}} </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="revenue">
-                    <mat-header-cell *matHeaderCellDef> Revenue </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.revenue}} </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="revenue_per_case">
-                    <mat-header-cell *matHeaderCellDef> Revenue per Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{element.revenue_per_case}} </mat-cell>
-                  </ng-container>
-                  <mat-header-row *matHeaderRowDef="sdisplayedColumns"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: sdisplayedColumns;"></mat-row>
-                </table>
-                <div class="padding"></div>
-                <mat-table class="summary-table" [dataSource]="sku.sku_ten_year_data_display">
-                  <ng-container matColumnDef="total_revenue">
-                    <mat-header-cell *matHeaderCellDef> Total Revenue </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> <b>{{element.total_revenue}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="revenue_per_case">
-                    <mat-header-cell *matHeaderCellDef> Revenue / Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> <b>{{element.revenue_per_case}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="profit_per_case">
-                    <mat-header-cell *matHeaderCellDef> Profit / Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.profit_per_case}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="profit_margin">
-                    <mat-header-cell *matHeaderCellDef> Profit Margin </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.profit_margin}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="manufacturing_setup_cost_per_case">
-                    <mat-header-cell *matHeaderCellDef> Setup Cost / Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.manufacturing_setup_cost_per_case}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="manufacturing_run_size">
-                    <mat-header-cell *matHeaderCellDef> Run Size </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.manufacturing_run_size}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="manufacturing_run_cost_per_case">
-                    <mat-header-cell *matHeaderCellDef> Run Cost / Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.manufacturing_run_cost_per_case}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="ingredient_cost_per_case">
-                    <mat-header-cell *matHeaderCellDef> Ingredient Cost / Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.ingredient_cost_per_case}}</b></mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="cogs_per_case">
-                    <mat-header-cell *matHeaderCellDef> COGS / Case </mat-header-cell>
-                    <mat-cell *matCellDef="let element"><b>{{element.cogs_per_case}}</b></mat-cell>
-                  </ng-container>
-                  <mat-header-row *matHeaderRowDef="ldisplayedColumns"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: ldisplayedColumns;"></mat-row>
-                </mat-table>
-                <mat-card-actions>
-                  <button mat-raised-button color="accent" (click)="exportYearlyToCSV(sku)">Export Yearly to CSV</button>
-                  <button mat-raised-button color="accent" (click)="exportTotalsToCSV(sku)">Export Totals to CSV</button>
-                  <button mat-raised-button color="accent" (click)="openDrilldown(sku.sku_info)">See Drilldown</button>
-                </mat-card-actions>
-              </div>
-            </mat-card>
-            <div class="card-padding"></div>
-          </div>
-        </mat-expansion-panel>
-      </mat-accordion>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</ng-container>

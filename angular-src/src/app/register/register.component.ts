@@ -21,6 +21,7 @@ export class RegisterComponent implements OnInit {
 	userInput: string;
   adminPriveleges: string[] = ['Analyst', 'Product Manager', 'Business Manager', 'Plant Manager', 'Administrator'];
   selectedOptions: string[] = ['Analyst'];
+  selectedManufLines: string[];
   manufacturingLines = [];
 
 	constructor(private authenticationService: AuthenticationService, private crudManufacturingLineService: CrudManufacturingLineService, private accountsService: AccountsService, private snackBar: MatSnackBar) { }
@@ -54,7 +55,10 @@ export class RegisterComponent implements OnInit {
 
 	updatePriveleges() {
     var admin = this.selectedOptions.indexOf('Administrator')>-1;
-		this.accountsService.updatePriveleges(this.userInput, admin).subscribe((response) => {
+    var product_manager = this.selectedOptions.indexOf('Product Manager')>-1;
+    var business_manager = this.selectedOptions.indexOf('Business Manager')>-1;
+    var analyst = this.selectedOptions.indexOf('Analyst')>-1;
+		this.accountsService.updatePriveleges(this.userInput, admin, product_manager, business_manager, this.selectedManufLines, analyst).subscribe((response) => {
 				this.snackBar.open(response.message, 'close', {duration:3000});
 		}, (err) => {
 			this.snackBar.open(err, 'close', {duration:3000});
@@ -75,6 +79,35 @@ export class RegisterComponent implements OnInit {
 
   updateUser(ev){
     this.userInput = ev;
+    this.accountsService.getPriveleges(ev).subscribe((response) => {
+      this.selectedOptions = [];
+      this.selectedManufLines = [];
+      console.log("PRIVELEGES");
+      console.log(response);
+      if(response.data[0]!=null){
+        if(response.data[0].analyst){
+          this.selectedOptions.push("Analyst");
+        }
+        if(response.data[0].product_manager){
+          this.selectedOptions.push("Product Manager");
+        }
+        if(response.data[0].business_manager){
+          this.selectedOptions.push("Business Manager");
+        }
+        if(response.data[0].plant_manager!=null && response.data[0].plant_manager.length>0){
+          this.selectedOptions.push("Plant Manager");
+          response.data[0].plant_manager.forEach(line => {
+            console.log(line);
+            this.selectedManufLines.push(line.shortname);
+          });
+        }
+        if(response.data[0].admin){
+          this.selectedOptions.push("Administrator");
+        }
+      }
+    }, (err) => {
+      console.log("BAD");
+    });
   }
 
   handleClick(ev){

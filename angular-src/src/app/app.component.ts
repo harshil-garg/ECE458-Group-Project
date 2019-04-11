@@ -19,6 +19,22 @@ export class AppComponent implements OnInit{
     this.titleService.setTitle(this.title);
   }
 
+  isAnalyst() {
+    return this.authService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authService.isPlantManager();
+  }
+
   isAdmin() {
     return this.authService.isAdmin();
   }
