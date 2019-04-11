@@ -162,7 +162,8 @@ export class ManufacturingGoalTableComponent implements OnInit {
     }else{
       event.preventDefault();
     }
-    
+  }
+  
   isAdmin() {
     return this.authenticationService.isAdmin();
   }
