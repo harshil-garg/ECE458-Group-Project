@@ -94,6 +94,17 @@ export class DeleteResponse {
 	message: string;
 }
 
+export class AutomateMessage {
+	activities: Array<Activity>;
+	start_: Date;
+	end_: Date;
+}
+
+export class AutomateResponse {
+	success: boolean;
+	message: string;
+}
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type':  'application/json',
@@ -121,6 +132,12 @@ export class ManufacturingScheduleService {
 
 	load(): Observable<LoadResponse>{
 		return this.http.post<LoadResponse>('api/manufacturing_schedule/load', httpOptions);
+	}
+
+	automate(automateMessage: AutomateMessage): Observable<AutomateResponse>{
+		console.log("AUTOMATTEEEEE");
+		console.log(automateMessage);
+		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/naive', automateMessage, httpOptions);
 	}
 
 	create(createMessage: CreateMessage): Observable<CreateResponse>{

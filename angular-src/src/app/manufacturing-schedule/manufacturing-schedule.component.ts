@@ -28,6 +28,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   @Input() manufGoals : Array<ManufacturingGoal> = [];
   @Input() remove: EventEmitter<any>;
   @Input() goalsUpdated: EventEmitter<Array<ManufacturingGoal>>;
+  @Input() refreshSchedule: EventEmitter<boolean>;
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
   @Output() activitiesUpdated: EventEmitter<Array<ManufacturingScheduleEvent>> = new EventEmitter();
 
@@ -38,6 +39,9 @@ export class ManufacturingScheduleComponent implements OnInit {
   ngOnInit() {
     this.refresh();
     this.remove.subscribe(index=>this.removeActivity(index));
+    this.refreshSchedule.subscribe(e=>{
+      this.refresh();
+    });
     this.goalsUpdated.subscribe(goals => {
       this.manufGoals = goals;
       this.refresh();
@@ -377,7 +381,7 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.manufacturingScheduleService.create({
       activity: {
         manufacturing_goal: manufacturingScheduleEvent.activity.manufacturing_goal,
-      	sku: manufacturingScheduleEvent.activity.sku["number"]
+      	sku: manufacturingScheduleEvent.activity.sku.number.toString()
       },
       manufacturing_line: manufacturingScheduleEvent.manufacturing_line,
       start_date: manufacturingScheduleEvent.start_date,

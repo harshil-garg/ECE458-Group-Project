@@ -19,12 +19,16 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   suggestedManufacturingLines = [];
   startDate = new FormControl(new Date());
   endDate = new FormControl(new Date());
+  startAutomateDate = new FormControl(new Date());
+  endAutomateDate = new FormControl(new Date());
   manufGoalList : Array<ManufacturingGoal> = [];
   reportingFormControl = new FormControl();
   activityList : Array<Activity> = [];
   palette : Array<Activity> = [];
   addedActivities : Array<Activity> = [];
+  selectedActivityList : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
+  refreshScheduler: EventEmitter<boolean> = new EventEmitter();
   goalsUpdated: EventEmitter<Array<ManufacturingGoal>> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
@@ -219,6 +223,55 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     this.refreshPalette();
   }
 
+  activityClicked(item, event){
+    if(event.ctrlKey){
+      let index = this.selectedActivityList.indexOf(item);
+      if(index == -1){
+        this.selectedActivityList.push(item);
+      } else {
+        this.selectedActivityList.splice(index, 1);
+      }
+    }
+    else {
+      this.selectedActivityList = [];
+    }
+  }
+
+  handleKey(event){
+    if(this.palette.length == this.selectedActivityList.length){
+      this.selectedActivityList = [];
+    }
+    else {
+      this.selectedActivityList = [];
+      for(let activity of this.palette){
+        this.selectedActivityList.push(activity);
+      }
+    }
+    event.preventDefault();
+  }
+
+  automateSchedule(){
+    let activities = [];
+    for(let activity of this.selectedActivityList){
+      console.log(activity);
+      activities.push({
+        manufacturing_goal: activity.manufacturing_goal,
+        sku: activity.sku.number
+      });
+    };
+    this.manufacturingScheduleService.automate({
+        activities: activities,
+        start_: this.startAutomateDate.value.toISOString(),
+        end_: this.endAutomateDate.value.toISOString()
+      }).subscribe(response => {
+        this.refreshScheduler.emit(true);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      });
+  }
+
   public makeReport(value) {
     //console.log("hi"+value+""+this.startDate.value);
     console.log(this.startDate.value + " " + typeof this.startDate.value);
@@ -255,17 +308,17 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
           var formula_id = formula_info.number;
           var formula_name = formula_info.name;
           var formula_ingredient_tuples = formula_info.ingredient_tuples;
-          
+
           activities.push({
               id: manufacturing_task._id,
               start_date: start_date,
               end_date: end_date,
               duration: duration,
-              sku_display_name: sku_display_name, 
+              sku_display_name: sku_display_name,
               sku_id: sku_id,
               sku_case_quantity: sku_case_quantity,
               formula_id: formula_id,
-              formula_name: formula_name, 
+              formula_name: formula_name,
               formula_ingredient_tuples: formula_ingredient_tuples
           });
         }
@@ -279,7 +332,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
       }
     }, err => {
       console.log(err);
-      
+
     });
 
     /*dialogRef.afterClosed().subscribe(result =>{
@@ -287,7 +340,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         this.manufacturingLine = result;
         this.add(this.manufacturingLine);
       }
-    });*/ 
+    });*/
   }
 
 }
