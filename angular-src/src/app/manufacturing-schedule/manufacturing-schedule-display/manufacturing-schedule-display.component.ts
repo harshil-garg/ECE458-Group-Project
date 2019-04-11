@@ -9,6 +9,7 @@ import { Activity } from '../../model/activity';
 import { MatSnackBar } from '@angular/material';
 import {ManufacturingScheduleReportComponent} from '../manufacturing-schedule-report/manufacturing-schedule-report.component';
 import { MatDialog } from '@angular/material';
+import { AuthenticationService } from '../../authentication.service'
 
 @Component({
   selector: 'app-manufacturing-schedule-display',
@@ -32,7 +33,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   goalsUpdated: EventEmitter<Array<ManufacturingGoal>> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
-  constructor(private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar, private crudManufacturingLineService: CrudManufacturingLineService,
+  constructor(private authenticationService: AuthenticationService, private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar, private crudManufacturingLineService: CrudManufacturingLineService,
     public dialog: MatDialog) {}
 
   ngOnInit() {
@@ -274,6 +275,30 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
       });
   }
 
+  commit(){
+    this.manufacturingScheduleService.commit()
+      .subscribe(response => {
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      });
+  }
+
+  undo(){
+    this.manufacturingScheduleService.undo()
+      .subscribe(response => {
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      });
+  }
+
   public makeReport(value) {
     //console.log("hi"+value+""+this.startDate.value);
     console.log(this.startDate.value + " " + typeof this.startDate.value);
@@ -343,6 +368,26 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         this.add(this.manufacturingLine);
       }
     });*/
+  }
+
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authenticationService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authenticationService.isPlantManager();
+  }
+
+  isAdmin() {
+    return this.authenticationService.isAdmin();
   }
 
 }

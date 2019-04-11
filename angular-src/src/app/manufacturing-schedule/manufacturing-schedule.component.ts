@@ -66,6 +66,7 @@ export class ManufacturingScheduleComponent implements OnInit {
             },
             manufacturing_line: data.manufacturing_line.shortname,
             start_date: start_date,
+            committed: data.committed,
             duration: data.duration,
             duration_override: data.duration_override
           })});
@@ -147,7 +148,7 @@ export class ManufacturingScheduleComponent implements OnInit {
           console.log("STARTING ACTIVITY");
           console.log(this.activities[i]);
           console.log(hour);
-          if(this.canEditLine(this.activities[i].manufacturing_line)){
+          if(this.canEditLine(this.activities[i].manufacturing_line) && this.activities[i].committed){
             this.starting_hours[manufIndex][hour-8] = this.activities[i].activity.sku.name;
           }
         }
@@ -265,6 +266,7 @@ export class ManufacturingScheduleComponent implements OnInit {
               manufacturing_line: this.manufLines[+currId],
               start_date: startDate,
               duration: droppedActivity.duration,
+              committed: droppedActivity.committed,
               duration_override: false
           }
           this.createActivity(newManufEvent);
@@ -355,21 +357,23 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   openActivityDialog(id, hour_id){
-    var activity_id = this.hours[id][hour_id];
-    if(activity_id != -1){//there is an activity at this time
-      let dialogRef = this.dialog.open(ActivityDialogComponent, {
-        height: '400px',
-        width: '400px',
-        data: this.activities[activity_id].duration
-      });
+    if(this.canEditLine(this.manufLines[id])){
+      var activity_id = this.hours[id][hour_id];
+      if(activity_id != -1){//there is an activity at this time
+        let dialogRef = this.dialog.open(ActivityDialogComponent, {
+          height: '400px',
+          width: '400px',
+          data: this.activities[activity_id].duration
+        });
 
-      dialogRef.afterClosed().subscribe(result =>{
-        if(result!=null){
-          this.activities[activity_id].duration = +result;
-          this.activities[activity_id].duration_override = true;
-          this.updateActivity(this.activities[activity_id]);
-        }
-      });
+        dialogRef.afterClosed().subscribe(result =>{
+          if(result!=null){
+            this.activities[activity_id].duration = +result;
+            this.activities[activity_id].duration_override = true;
+            this.updateActivity(this.activities[activity_id]);
+          }
+        });
+      }
     }
   }
 
@@ -420,7 +424,8 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(response.success){
           this.refresh();
         } else {
-          this.displayError("Failed to create Activity!");
+          this.displayError(response.message);
+          this.manufacturingScheduleDisplayComponent.refreshPalette();
         }
       },
       err => {
@@ -445,7 +450,8 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(response.success){
           this.refresh();
         } else {
-          this.displayError("Failed to create Activity!");
+          this.displayError(response.message);
+          this.manufacturingScheduleDisplayComponent.refreshPalette();
         }
       },
       err => {
@@ -496,7 +502,9 @@ export class ManufacturingScheduleComponent implements OnInit {
     } else {
       var activity = this.activities[item];
       var prefix : string = "";
-      if(activity.past_deadline){
+      if(!activity.committed){
+        prefix += "uncommitted-"
+      } else if(activity.past_deadline){
         prefix += "past-deadline-";
       } else if(activity.duration_override){
         prefix += "duration-override-";

@@ -40,6 +40,7 @@ export class ResponseData {
 	};
 	manufacturing_line: ManufacturingLine;
 	start_date: Date;
+	committed: boolean;
 	duration: number;
 	duration_override: boolean;
 }
@@ -138,6 +139,14 @@ export class ManufacturingScheduleService {
 		console.log("AUTOMATTEEEEE");
 		console.log(automateMessage);
 		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/naive', automateMessage, httpOptions);
+	}
+
+	commit(): Observable<AutomateResponse>{
+		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/commit', httpOptions);
+	}
+
+	undo(): Observable<AutomateResponse>{
+		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/undo', httpOptions);
 	}
 
 	create(createMessage: CreateMessage): Observable<CreateResponse>{

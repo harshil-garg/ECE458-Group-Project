@@ -2,58 +2,52 @@
   <mat-sidenav-container class="example-container">
     <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
       <div class="example-container">
-        <h2>Enabled Goals</h2>
-        <!-- <app-search-goals (enableGoal)="confirmEnable($event)"></app-search-goals> -->
-        <!-- <br> -->
-        <mat-card class="mat-elevation-z2">
-          <!-- <mat-card-subtitle [style.color]="'black'">
-            Enabled Goals
-          </mat-card-subtitle> -->
-          <mat-card-content>
-            <mat-list>
-              <mat-list-item class="right" *ngFor="let item of manufGoalList; let id=index">
-                {{item.name}}
-                <!-- <mat-icon (click)="remove(id)">clear</mat-icon> -->
-              </mat-list-item>
-            </mat-list>
-          </mat-card-content>
-        </mat-card>
 
-        <h2>Automate Scheduling</h2>
-        <mat-card class="mat-elevation-z2">
-          <mat-card-subtitle>
-            Select Goals with ctrl-click <br>
-            Select All Goals with ctrl-a
-          </mat-card-subtitle>
-          <mat-card-content>
-            <mat-form-field appearance="fill">
-              <input matInput [matDatepicker]="automate_start" [formControl]="startAutomateDate" placeholder="Choose a start date" required>
-              <mat-datepicker-toggle matSuffix [for]="automate_start"></mat-datepicker-toggle>
-              <mat-datepicker #automate_start></mat-datepicker>
-            </mat-form-field>
-            <br>
-            <mat-form-field appearance="fill">
-              <input matInput [matDatepicker]="automate_end" [formControl]="endAutomateDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
-              <mat-datepicker-toggle matSuffix [for]="automate_end"></mat-datepicker-toggle>
-              <mat-datepicker #automate_end></mat-datepicker>
-            </mat-form-field>
-            <br>
-            <br>
-            <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule()" color="primary">Automate Schedule</button>
-          </mat-card-content>
-        </mat-card>
+        <div *ngIf="isAdmin() || isPlantManager()">
+          <h2>Automate Scheduling</h2>
+          <mat-card class="mat-elevation-z2">
+            <mat-card-subtitle>
+              Select Goals with ctrl-click <br>
+              Select All Goals with ctrl-a
+            </mat-card-subtitle>
+            <mat-card-content>
+              <mat-form-field appearance="fill">
+                <input matInput [matDatepicker]="automate_start" [formControl]="startAutomateDate" placeholder="Choose a start date" required>
+                <mat-datepicker-toggle matSuffix [for]="automate_start"></mat-datepicker-toggle>
+                <mat-datepicker #automate_start></mat-datepicker>
+              </mat-form-field>
+              <br>
+              <mat-form-field appearance="fill">
+                <input matInput [matDatepicker]="automate_end" [formControl]="endAutomateDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
+                <mat-datepicker-toggle matSuffix [for]="automate_end"></mat-datepicker-toggle>
+                <mat-datepicker #automate_end></mat-datepicker>
+              </mat-form-field>
+              <br>
+              <br>
+              <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule()" color="accent">Automate Schedule</button>
+              <br>
+              <br>
+              <button type="button" mat-raised-button [disabled]="false" (click)="commit()" color="accent">Commit Automated Suggestions</button>
+              <br>
+              <br>
+              <button type="button" mat-raised-button [disabled]="false" (click)="undo()" color="accent">Undo Automated Suggestions</button>
+            </mat-card-content>
+          </mat-card>
+        </div>
 
-        <h2>Palette</h2>
-        <div
-          cdkDropList
-          #activities="cdkDropList"
-          [cdkDropListData]="palette"
-          [cdkDropListConnectedTo]="getLists()"
-          id="manufacturing-activities"
-          class="example-list"
-          (cdkDropListDropped)="drop($event)">
-          <div [ngClass]="{'box':selectedActivityList.indexOf(item)===-1, 'selected-box':selectedActivityList.indexOf(item)>-1}" *ngFor="let item of palette" cdkDrag (click)="activityClicked(item, $event)" (keyDown)="activityKeyPress(item, $event)">{{item.sku.name}} <br> ({{item.manufacturing_goal}})
-            <mat-icon *cdkDragPreview></mat-icon>
+        <div *ngIf="isAdmin() || isPlantManager()">
+          <h2>Palette</h2>
+          <div
+            cdkDropList
+            #activities="cdkDropList"
+            [cdkDropListData]="palette"
+            [cdkDropListConnectedTo]="getLists()"
+            id="manufacturing-activities"
+            class="example-list"
+            (cdkDropListDropped)="drop($event)">
+            <div [ngClass]="{'box':selectedActivityList.indexOf(item)===-1, 'selected-box':selectedActivityList.indexOf(item)>-1}" *ngFor="let item of palette" cdkDrag (click)="activityClicked(item, $event)" (keyDown)="activityKeyPress(item, $event)">{{item.sku.name}} <br> ({{item.manufacturing_goal}})
+              <mat-icon *cdkDragPreview></mat-icon>
+            </div>
           </div>
         </div>
       </div>
