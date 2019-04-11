@@ -28,6 +28,7 @@ export class ResponseData {
   deadline: Date;
   author: string;
   last_edit: Date;
+  enabled: boolean;
 }
 
 export class RefreshResponse {
@@ -55,6 +56,12 @@ export class DeleteMessage {
 
 export class DeleteResponse {
   success: boolean;
+  message: string;
+}
+
+export class SetEnabledMessage {
+  manufacturing_goal: any;
+  enabled: boolean;
 }
 
 const httpOptions = {
@@ -85,5 +92,9 @@ export class ManufacturingGoalService {
 
   delete(requestedDelete: DeleteMessage): Observable<DeleteResponse>{
     return this.http.post<DeleteResponse>('/api/manufacturing_goals/delete', requestedDelete, httpOptions);
+  }
+
+  setEnabled(requestedEnabled: SetEnabledMessage): Observable<DeleteResponse>{
+    return this.http.post<DeleteResponse>('/api/manufacturing_goals/set_enabled', requestedEnabled, httpOptions);
   }
 }

@@ -411,6 +411,7 @@ export class ManufacturingScheduleComponent implements OnInit {
       }
     }).subscribe(
       response => {
+        console.log(response)
         if(response.success){
           this.refresh();
         } else {

@@ -5,7 +5,7 @@ const SKU = require('../model/sku_model');
 const Formula = require('../model/formula_model.js');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
-const Ingredient = require('../model/ingredient_model')
+const Ingredient = require('../model/ingredient_model');
 const validator = require('../controllers/validator');
 const schedule_validator = require('../controllers/schedule_validator');
 const autocomplete = require('../controllers/autocomplete');
@@ -90,9 +90,27 @@ router.post('/load',  async (req, res) => {
     res.json({success: true, data: results});
 });
 
+async function validatePermission(manufacturing_line, req){
+    let user_model = await schedule_filter.getUserModel(getUser(req));
+
+    let pass = false;
+    for(let line of user_model.manufacturinglines){
+        if(manufacturing_line == line.shortname || user_model.admin){
+            pass = true;
+            break;
+        }
+    }
+    console.log(pass)
+    return pass;
+}
+
 //Add an mapping of an activity to a manufacturing line
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
+
+    if(!validatePermission(manufacturing_line, req)){
+        return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
+    }
 
     let mapping = await createMapping(res, activity, manufacturing_line, start_date, duration, duration_override);
     if (mapping.hasOwnProperty('success')) {
@@ -160,6 +178,10 @@ router.post('/update', async (req, res) => {
     //can change line, start date, and duration
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
 
+    if(!validatePermission(manufacturing_line, req)){
+        return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
+    }
+
     let errors = await createValidation(activity, manufacturing_line, start_date);
     if(!('sku' in errors)){
         res.json({success: false, message: errors});
@@ -215,6 +237,13 @@ router.post('/delete', async (req, res) => {
         res.json({success: false, message: activity_passed[1]})
     }
 
+    let manufacturing_line = await ManufacturingSchedule.findOne({'activity.sku': activity_passed[2],'activity.manufacturing_goal': activity_passed[3]}).exec();
+    manufacturing_line = manufacturing_line.manufacturing_line
+
+    if(!validatePermission(manufacturing_line, req)){
+        return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
+    }
+
     ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2],
         'activity.manufacturing_goal': activity_passed[3]}, (err, result) => {
             if (err) {
@@ -264,5 +293,7 @@ async function createValidation(activity, manufacturing_line, start_date){
         manufacturing_line: line_passed[2]
     };
 }
+
+
 
 module.exports = router;

@@ -2,7 +2,7 @@ const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const pagination = require('./paginate');
 const moment = require('moment-timezone');
 
-module.exports.filter = async function(pageNum, sortBy, page_size){
+module.exports.filter = async function(pageNum, sortBy, page_size, get_enabled){
     let pipeline = [];
 
     pipeline.push({
@@ -21,6 +21,12 @@ module.exports.filter = async function(pageNum, sortBy, page_size){
             as: 'manufacturing_lines'
         }
     })
+
+    if(get_enabled){
+        pipeline.push({
+            $match: {enabled: true}
+        })
+    }
 
     let agg = ManufacturingGoal.aggregate(pipeline);
 

@@ -69,8 +69,9 @@ router.post('/calculator', async (req, res) => {
 });
 
 router.post('/get_enabled', async (req, res) => {
+    let get_enabled = true;
 
-    let results = await manufacturing_goal_filter.filter(-1, 'name', 0);
+    let results = await manufacturing_goal_filter.filter(-1, 'name', 0, get_enabled);
     res.json(results);
 });
 
@@ -152,8 +153,7 @@ function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, 
     });
 }
 
-
-
+//DELETE
 router.post('/delete', async (req, res) => {
     const { name } = req.body;
     let goal = await ManufacturingGoal.findOne({name: name}).exec();
