@@ -237,11 +237,12 @@ router.post('/delete', async (req, res) => {
         res.json({success: false, message: activity_passed[1]})
     }
 
-    let manufacturing_line = await ManufacturingSchedule.findOne({'activity.sku': activity_passed[2],'activity.manufacturing_goal': activity_passed[3]}).exec();
-    manufacturing_line = manufacturing_line.manufacturing_line
+    let schedule = await ManufacturingSchedule.findOne({'activity.sku': activity_passed[2],'activity.manufacturing_goal': activity_passed[3]}).exec();
+    
+    let manufacturing_line = await ManufacturingLine.findOne({_id: schedule.manufacturing_line}).exec()
 
-    if(!(await validatePermission(manufacturing_line, req))){
-        return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
+    if(!(await validatePermission(manufacturing_line.shortname, req))){
+        return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line.shortname}`})
     }
 
     ManufacturingSchedule.findOneAndDelete({'activity.sku': activity_passed[2],
