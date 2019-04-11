@@ -54,14 +54,17 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.manufacturingScheduleService.load().subscribe(
       response => {
         if(response.success){
-          response.data.forEach(data => {this.activities.push({
+          response.data.forEach(data => {
+            let start_date = new Date(data.start_date);
+            start_date.setMinutes(0, 0, 0);
+            this.activities.push({
             activity: {
               sku: data.activity.sku,
               manufacturing_goal: data.activity.manufacturing_goal.name,
               duration: data.duration
             },
             manufacturing_line: data.manufacturing_line.shortname,
-            start_date: new Date(data.start_date),
+            start_date: start_date,
             duration: data.duration,
             duration_override: data.duration_override
           })});
@@ -140,8 +143,13 @@ export class ManufacturingScheduleComponent implements OnInit {
       if(this.sameDay(this.activities[i].start_date, this.currDate)){
         var hour = this.activities[i].start_date.getHours();
         if(hour>=8 && hour<18){
+          console.log("STARTING ACTIVITY");
+          console.log(this.activities[i]);
+          console.log(hour);
           this.starting_hours[manufIndex][hour-8] = this.activities[i].activity.sku.name;
         }
+        console.log("START HOURS");
+        console.log(this.starting_hours);
       }
       var endDate = this.calculateEndTime(this.activities[i].start_date, this.activities[i].duration);
       var endTime = endDate.getTime();

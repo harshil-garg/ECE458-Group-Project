@@ -265,6 +265,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         end_: this.endAutomateDate.value.toISOString()
       }).subscribe(response => {
         this.refreshScheduler.emit(true);
+        this.displayError(response.message);
       }, err=>{
         if (err.status === 401) {
           console.log("401 Error")
