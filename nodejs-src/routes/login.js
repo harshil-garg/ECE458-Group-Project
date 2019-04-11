@@ -9,27 +9,58 @@ const sessionTimeout = 6000000;
 //Login handle
 //request params: email, password
 router.post('/',
-    passport.authenticate('local', {session: false}), (req, res) => {
-        let admin = false;
-        User.findOne({email: req.body.email}, (err, user) => {
-            if(err){
-                res.json({success: false, message: err});
-            }else{
-                analyst = user.analyst;
-                product_manager = user.product_manager;
-                business_manager = user.business_manager;
-                plant_manager = user.plant_manager;
-                admin = user.admin;
-                const email = req.body.email;
-                let d = new Date();
-                let exp = d.getTime() + sessionTimeout;
-                opts = {};
-                const secret = 'SECRET_KEY'; //normally stored in process.env.secret
-                const token = jwt.sign({ email, analyst, product_manager, business_manager, plant_manager, admin, exp }, secret, opts);
-                res.json({success: true, token});
-            }
+    passport.authenticate('local', {session: false}), async (req, res) => {
+        const {email} = req.body;
 
+        let cursor = await User.aggregate([{$match: {email: email}}, {
+            $lookup: {
+                from: 'manufacturinglines',
+                localField: 'plant_manager',
+                foreignField: '_id',
+                as: 'manufacturinglines'
+            }
+        }]).cursor({}).exec();
+    
+        let user;
+        await cursor.eachAsync((res) => {
+            user = res;
         });
+
+        if(user){
+            analyst = user.analyst;
+            product_manager = user.product_manager;
+            business_manager = user.business_manager;
+            plant_manager = user.manufacturinglines;
+            admin = user.admin;
+            let d = new Date();
+            let exp = d.getTime() + sessionTimeout;
+            opts = {};
+            const secret = 'SECRET_KEY'; //normally stored in process.env.secret
+            const token = jwt.sign({ email, analyst, product_manager, business_manager, plant_manager, admin, exp }, secret, opts);
+            res.json({success: true, token});
+        }else{
+            res.json({success: false, message: err});
+        }
+
+        // User.findOne({email: req.body.email}, (err, user) => {
+        //     if(err){
+        //         res.json({success: false, message: err});
+        //     }else{
+        //         analyst = user.analyst;
+        //         product_manager = user.product_manager;
+        //         business_manager = user.business_manager;
+        //         plant_manager = user.plant_manager;
+        //         admin = user.admin;
+        //         const email = req.body.email;
+        //         let d = new Date();
+        //         let exp = d.getTime() + sessionTimeout;
+        //         opts = {};
+        //         const secret = 'SECRET_KEY'; //normally stored in process.env.secret
+        //         const token = jwt.sign({ email, analyst, product_manager, business_manager, plant_manager, admin, exp }, secret, opts);
+        //         res.json({success: true, token});
+        //     }
+
+        // });
 
     });
 
