@@ -264,6 +264,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         start_: this.startAutomateDate.value.toISOString(),
         end_: this.endAutomateDate.value.toISOString()
       }).subscribe(response => {
+        this.selectedActivityList = [];
         this.refreshScheduler.emit(true);
         this.displayError(response.message);
       }, err=>{

@@ -92,6 +92,36 @@
   max-width: 125px;
 }
 
+.editable-header-box {
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
+.uneditable-header-box {
+  padding: 20px 10px;
+  border-right: solid 1px #ccc;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: lightgrey;
+  font-size: 14px;
+  flex-grow: 1;
+  flex-basis: 0;
+  min-width: 125px;
+  max-width: 125px;
+}
+
 .mat-button-toggle-group {
   left: 25%;
 }

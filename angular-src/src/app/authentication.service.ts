@@ -132,6 +132,15 @@ export class AuthenticationService {
     return false;
   }
 
+  public getPlantManagerLines(): Array<any> {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.plant_manager;
+    }
+    return [];
+  }
+
   public logout(): void {
     this.token = '';
     window.localStorage.removeItem('mean-token');

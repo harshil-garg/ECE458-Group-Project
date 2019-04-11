@@ -9,6 +9,7 @@ import { Activity } from '../model/activity';
 import { Sku } from '../model/sku';
 import { ManufacturingGoal } from '../model/manufacturing-goal';
 import { MatSnackBar, MatDialog } from '@angular/material';
+import { AuthenticationService } from '../authentication.service'
 
 @Component({
   selector: 'app-manufacturing-schedule',
@@ -32,7 +33,7 @@ export class ManufacturingScheduleComponent implements OnInit {
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
   @Output() activitiesUpdated: EventEmitter<Array<ManufacturingScheduleEvent>> = new EventEmitter();
 
-  constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
+  constructor(private authenticationService: AuthenticationService, private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog,
     private manufacturingScheduleService: ManufacturingScheduleService) { }
 
@@ -512,6 +513,47 @@ export class ManufacturingScheduleComponent implements OnInit {
         return prefix+"start-box";
       }
     }
+  }
+
+  lineHeaderBoxClass(line){
+    console.log(this.authenticationService.getPlantManagerLines());
+    if(this.isAdmin()){
+      return "editable-header-box";
+    } else if(this.authenticationService.isPlantManager()){
+      let containsLine = false;
+      this.authenticationService.getPlantManagerLines().forEach(l => {
+        if(l.shortname==line){
+          containsLine = true;
+        }
+      });
+      if(containsLine){
+        return "editable-header-box";
+      } else {
+        return "uneditable-header-box";
+      }
+    } else {
+      return "uneditable-header-box";
+    }
+  }
+
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authenticationService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authenticationService.isPlantManager();
+  }
+
+  isAdmin() {
+    return this.authenticationService.isAdmin();
   }
 
 }

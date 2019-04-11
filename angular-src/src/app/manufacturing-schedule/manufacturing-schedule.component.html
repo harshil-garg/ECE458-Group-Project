@@ -28,7 +28,7 @@
     <ng-container *ngFor="let manufLine of manufLines; let id = index">
       <div
         class="example-list">
-        <div class="header-box">{{manufLine}}</div>
+        <div [ngClass]="lineHeaderBoxClass(manufLine)">{{manufLine}}</div>
         <ng-container *ngFor="let item of hours[id]; let hour_id = index">
           <div
             cdkDropList

@@ -37,6 +37,8 @@
               <mat-datepicker-toggle matSuffix [for]="automate_end"></mat-datepicker-toggle>
               <mat-datepicker #automate_end></mat-datepicker>
             </mat-form-field>
+            <br>
+            <br>
             <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule()" color="primary">Automate Schedule</button>
           </mat-card-content>
         </mat-card>
@@ -158,6 +160,8 @@
                 This is <strong>required</strong>
               </mat-error>
             </mat-form-field>
+            <br>
+            <br>
             <button type="button" mat-raised-button [disabled]="endDate.invalid || startDate.invalid ||reportingFormControl.hasError('forbiddenNames') || reportingFormControl.hasError('required') || !reportingFormControl.value" (click)="makeReport(reportingFormControl.value)" color="primary">Make Report</button>
           </form>
         </mat-card-content>
