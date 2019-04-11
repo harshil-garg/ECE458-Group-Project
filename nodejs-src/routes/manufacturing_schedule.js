@@ -108,7 +108,7 @@ async function validatePermission(manufacturing_line, req){
 router.post('/create', async (req, res) => {
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
 
-    if(!validatePermission(manufacturing_line, req)){
+    if(!(await validatePermission(manufacturing_line, req))){
         return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
     }
 
@@ -178,7 +178,7 @@ router.post('/update', async (req, res) => {
     //can change line, start date, and duration
     let { activity, manufacturing_line, start_date, duration, duration_override } = req.body;
 
-    if(!validatePermission(manufacturing_line, req)){
+    if(!(await validatePermission(manufacturing_line, req))){
         return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
     }
 
@@ -240,7 +240,7 @@ router.post('/delete', async (req, res) => {
     let manufacturing_line = await ManufacturingSchedule.findOne({'activity.sku': activity_passed[2],'activity.manufacturing_goal': activity_passed[3]}).exec();
     manufacturing_line = manufacturing_line.manufacturing_line
 
-    if(!validatePermission(manufacturing_line, req)){
+    if(!(await validatePermission(manufacturing_line, req))){
         return res.json({success: false, message: `User does not have access to manufacturing line ${manufacturing_line}`})
     }
 
