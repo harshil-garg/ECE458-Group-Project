@@ -33,7 +33,8 @@ const UserSchema = new Schema({
         default: false
     },
     plant_manager: {
-        type: [Schema.ObjectId]
+        type: [Schema.ObjectId],
+        default: []
     },
     analyst:{
         type: Boolean,

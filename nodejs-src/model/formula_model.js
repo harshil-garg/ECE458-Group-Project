@@ -38,6 +38,7 @@ const FormulaSchema = new Schema({
     },
     ingredient_tuples: {
         type: [Ingredient_Tuple],
+        default: []
     },
     comment: {
         type: String

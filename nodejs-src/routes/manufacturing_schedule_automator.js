@@ -9,6 +9,7 @@ const SKU = require('../model/sku_model');
 const ManufacturingGoal = require('../model/manufacturing_goal_model');
 const ManufacturingSchedule = require('../model/manufacturing_schedule_model');
 const ManufacturingLine = require('../model/manufacturing_line_model');
+const User = require('../model/user_model');
 
 // Utilities
 const PriorityQueue = require('../utils/priority_queue')
@@ -87,46 +88,55 @@ async function automate_naive(req, res) {
         pq.push(t);
     }
     
+    let user_model = await User.find({email: getUser(req)})
+
     while (true) {
         let task = pq.pop();
         if (!task) break;
         let schedulable = false;
         let earliestStartTime = moment(end);
         let bestLine;
-        for (let line of task.sku.manufacturing_lines) {
-            let schedulableOnLine = false;
-            let preExistingActivities = await ManufacturingSchedule.find({
-                manufacturing_line: line
-            });
 
-            let interval = skipToWorkingHours(moment(start), calculateEndTime(moment(start), task.duration), task.duration);
-            while (interval.end <= end) {
-                interval = skipToWorkingHours(interval.start, interval.end, task.duration);
-                let conflict = false;
-                for (let preExistingActivity of preExistingActivities) {
-                    let otherStart = moment(preExistingActivity.start_date).tz("America/New_York");
-                    let otherEnd = calculateEndTime(otherStart, preExistingActivity.duration);
-                    if (interval.start < otherEnd && interval.end > otherStart) {
-                        conflict = true;
-                        break;
+        for(let valid_line of user_model.plant_manager){
+            for (let line of task.sku.manufacturing_lines) {
+                if(line.equals(valid_line)){
+                    let schedulableOnLine = false;
+                    let preExistingActivities = await ManufacturingSchedule.find({
+                        manufacturing_line: line
+                    });
+        
+                    let interval = skipToWorkingHours(moment(start), calculateEndTime(moment(start), task.duration), task.duration);
+                    while (interval.end <= end) {
+                        interval = skipToWorkingHours(interval.start, interval.end, task.duration);
+                        let conflict = false;
+                        for (let preExistingActivity of preExistingActivities) {
+                            let otherStart = moment(preExistingActivity.start_date).tz("America/New_York");
+                            let otherEnd = calculateEndTime(otherStart, preExistingActivity.duration);
+                            if (interval.start < otherEnd && interval.end > otherStart) {
+                                conflict = true;
+                                break;
+                            }
+                        }
+                        if (conflict) {
+                            interval.start = interval.start.add(1, 'hours');
+                            interval.end = calculateEndTime(interval.start, task.duration);
+                        } else {
+                            schedulable = true;
+                            schedulableOnLine = true;
+                            break;
+                        }
+                    }
+                    if (schedulableOnLine) {
+                        if (interval.start < earliestStartTime) {
+                            earliestStartTime = interval.start;
+                            bestLine = line;
+                        }
                     }
                 }
-                if (conflict) {
-                    interval.start = interval.start.add(1, 'hours');
-                    interval.end = calculateEndTime(interval.start, task.duration);
-                } else {
-                    schedulable = true;
-                    schedulableOnLine = true;
-                    break;
-                }
-            }
-            if (schedulableOnLine) {
-                if (interval.start < earliestStartTime) {
-                    earliestStartTime = interval.start;
-                    bestLine = line;
-                }
+                
             }
         }
+        
         if (!schedulable) {
             return res.json({
                 success: false,
