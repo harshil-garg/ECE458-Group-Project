@@ -42,16 +42,48 @@
           <mat-spinner></mat-spinner>
         </div>
         <mat-accordion>
-          <mat-expansion-panel *ngFor="let product_line of product_line_keys" [disabled]="summary_data[product_line].length == 0">
+          <mat-expansion-panel *ngFor="let product_line of product_line_keys"
+            [disabled]="all_data[product_line].data.length == 0">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 {{product_line}}
               </mat-panel-title>
-              <div *ngIf="summary_data[product_line].length == 0">
+              <div *ngIf="all_data[product_line].data.length == 0">
                 No SKUs for this product line
               </div>
             </mat-expansion-panel-header>
-            <div *ngFor="let sku of summary_data[product_line]">
+            <div>
+              <mat-card>
+                <mat-card-title>
+                  {{product_line}} revenue summary
+                </mat-card-title>
+                <div *ngIf="all_data[product_line].summary.length==0">
+                  The data is not currently available. Please check back in 10-15 seconds.
+                </div>
+                <div *ngIf="all_data[product_line].summary.length != 0">
+                  <table mat-table class="summary-table-long" [dataSource]="[all_data[product_line].summary]">
+                    <div *ngFor="let year of pdisplayedColumns">
+                      <div *ngIf="year != 'total'">
+                        <ng-container matColumnDef={{year}}>
+                          <mat-header-cell *matHeaderCellDef> {{year}} </mat-header-cell>
+                          <mat-cell *matCellDef="let element"> {{element[year]}} </mat-cell>
+                        </ng-container>
+                      </div>
+                      <div *ngIf="year == 'total'">
+                          <ng-container matColumnDef={{year}}>
+                            <mat-header-cell *matHeaderCellDef><b>Total</b></mat-header-cell>
+                            <mat-cell *matCellDef="let element"><b>{{element[year]}}</b></mat-cell>
+                          </ng-container>
+                      </div>
+                    </div>
+                    <mat-header-row *matHeaderRowDef="pdisplayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: pdisplayedColumns;"></mat-row>
+                  </table>
+                </div>
+              </mat-card>
+            </div>
+            <div class="padding"></div>
+            <div *ngFor="let sku of all_data[product_line].data">
               <mat-card>
                 <mat-card-title>
                   {{getSKUDisplayName(sku)}}
@@ -100,7 +132,8 @@
                     </ng-container>
                     <ng-container matColumnDef="manufacturing_setup_cost_per_case">
                       <mat-header-cell *matHeaderCellDef> Setup Cost / Case </mat-header-cell>
-                      <mat-cell *matCellDef="let element"><b>{{element.manufacturing_setup_cost_per_case}}</b></mat-cell>
+                      <mat-cell *matCellDef="let element"><b>{{element.manufacturing_setup_cost_per_case}}</b>
+                      </mat-cell>
                     </ng-container>
                     <ng-container matColumnDef="manufacturing_run_size">
                       <mat-header-cell *matHeaderCellDef> Run Size </mat-header-cell>
@@ -122,9 +155,12 @@
                     <mat-row *matRowDef="let row; columns: ldisplayedColumns;"></mat-row>
                   </mat-table>
                   <mat-card-actions>
-                    <button mat-raised-button color="accent" (click)="exportYearlyToCSV(sku)">Export Yearly to CSV</button>
-                    <button mat-raised-button color="accent" (click)="exportTotalsToCSV(sku)">Export Totals to CSV</button>
-                    <button mat-raised-button color="accent" (click)="openDrilldown(sku.sku_info)">See Drilldown</button>
+                    <button mat-raised-button color="accent" (click)="exportYearlyToCSV(sku)">Export Yearly to
+                      CSV</button>
+                    <button mat-raised-button color="accent" (click)="exportTotalsToCSV(sku)">Export Totals to
+                      CSV</button>
+                    <button mat-raised-button color="accent" (click)="openDrilldown(sku.sku_info)">See
+                      Drilldown</button>
                   </mat-card-actions>
                 </div>
               </mat-card>

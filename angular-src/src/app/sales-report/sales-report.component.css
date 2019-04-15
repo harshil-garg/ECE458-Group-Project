@@ -7,6 +7,11 @@ table {
   width: 100%;
 }
 
+.summary-table-long {
+  min-width: 1500px;
+  overflow-x: scroll;
+}
+
 .centre {
     text-align: center;
 }
