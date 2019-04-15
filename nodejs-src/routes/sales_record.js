@@ -196,7 +196,6 @@ router.post('/summary', async function(req, res) {
 
                     if (!product_line_summary_data.hasOwnProperty(year)) {
                         product_line_summary_data[year] = 0;
-                        product_line_summary_data[year] += year_summary_data.revenue;
                     }
                     product_line_summary_data[year] += year_summary_data.revenue;
                 }
