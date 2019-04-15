@@ -11,7 +11,6 @@ const uploadroute = require('./routes/upload');
 const exportroute = require('./routes/export');
 require('./config/passport');
 const mongo_config = require('./config/database');
-const elastic = require('./config/elasticsearch');
 const users = require('./routes/user');
 const ingredients = require('./routes/ingredient');
 const skus = require('./routes/sku');

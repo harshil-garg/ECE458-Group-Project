@@ -166,7 +166,10 @@ router.post('/summary', async function(req, res) {
             product_line: product_line._id
         });
 
-        var product_line_summary_data = [];
+        var product_line_data = [];
+
+        var product_line_summary_data = {};
+        var valid_summary_data = true;
         for (let sku of skus) {
             var sku_summary_data = {
                 sku_info: sku
@@ -188,26 +191,46 @@ router.post('/summary', async function(req, res) {
                             revenue: record.sales*record.price
                         }
                     ));
-                    sku_yearly_data.push(getYearlySummaryData(mappedRecords));
+                    let year_summary_data = getYearlySummaryData(mappedRecords);
+                    sku_yearly_data.push(year_summary_data);
+
+                    if (!product_line_summary_data.hasOwnProperty(year)) {
+                        product_line_summary_data[year] = 0;
+                    }
+                    product_line_summary_data[year] += year_summary_data.revenue;
                 }
             }
             sku_summary_data["sku_yearly_data"] = sku_yearly_data;
 
             if (sku_yearly_data.length < 10) {
+                valid_summary_data = false;
                 sku_summary_data["success"] = false;
                 sku_summary_data["sku_ten_year_data"] = {};
-                product_line_summary_data.push(sku_summary_data);
+                product_line_data.push(sku_summary_data);
                 continue;
             }
             
             let tenYearData = await getTotalSummaryData(sku, sku_yearly_data, new Date(start, 0, 1).toISOString());
             sku_summary_data["sku_ten_year_data"] = tenYearData;
             sku_summary_data["success"] = true;
-            product_line_summary_data.push(sku_summary_data);
+            product_line_data.push(sku_summary_data);
         }
-        data[product_line_name] = product_line_summary_data;
+
+        if (valid_summary_data) {
+            let total = 0;
+            for (let key of Object.keys(product_line_summary_data)) {
+                total += product_line_summary_data[key];
+            }
+            product_line_summary_data["total"] = total;
+        } else {
+            product_line_summary_data = {};
+        }
+
+        data[product_line_name] = {
+            summary: product_line_summary_data,
+            data: product_line_data
+        };
     }
-    console.log(data);
     res.send(data);
 });
 
