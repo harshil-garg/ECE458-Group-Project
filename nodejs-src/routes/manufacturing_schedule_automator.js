@@ -85,10 +85,12 @@ async function automate_naive(req, res) {
     let pq = makePriorityQueue();
     for (let activity of activities) {
         let t = await processActivity(activity);
+        console.log(activity)
         pq.push(t);
     }
     
-    let user_model = await User.find({email: getUser(req)})
+    let user_model = await User.findOne({email: getUser(req)})
+    let skipped = false;
 
     while (true) {
         let task = pq.pop();
@@ -98,8 +100,11 @@ async function automate_naive(req, res) {
         let bestLine;
 
         for(let valid_line of user_model.plant_manager){
+            console.log("user valid: "+valid_line)
             for (let line of task.sku.manufacturing_lines) {
+                console.log("sku valid: "+line)
                 if(line.equals(valid_line)){
+                    console.log(true)
                     let schedulableOnLine = false;
                     let preExistingActivities = await ManufacturingSchedule.find({
                         manufacturing_line: line
@@ -138,10 +143,9 @@ async function automate_naive(req, res) {
         }
         
         if (!schedulable) {
-            return res.json({
-                success: false,
-                message: `Some activities may have been added, but ${task.sku.name + ' (' + task.goal.name + ')'} cannot be scheduled`
-            })
+            skipped = true;
+            continue;
+            
         } else {
             let mapping = new ManufacturingSchedule({
                 activity: {
@@ -159,10 +163,18 @@ async function automate_naive(req, res) {
         }
     }
 
-    res.json({
-        success: true,
-        message: "Automation of all activities successful"
-    });
+    if(skipped){
+        return res.json({
+            success: false,
+            message: `Some activities could not be scheduled`
+        })
+    }else{
+        return res.json({
+            success: true,
+            message: "Automation of all activities successful"
+        });
+    }
+    
 }
 
 /**
