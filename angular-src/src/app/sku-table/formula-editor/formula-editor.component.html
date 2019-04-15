@@ -33,7 +33,7 @@
         <app-ingredient-autocomplete (messageEvent)="setIngredientInput($event)"></app-ingredient-autocomplete>
         <app-unit-autocomplete [initUnit]="" (messageEvent)="updateUnit($event)"></app-unit-autocomplete>
         <br>
-        <button mat-raised-button type="button" (click)="addIngredientQuantity()" color="accent">Add Ingr-Quant</button>
+        <button mat-raised-button type="button" (click)="addIngredientQuantity()" color="accent" [disabled]="unitInput==null || unitInput.length==0 || quantityInput==null || quantityInput.length==0 || ingredientInput==null || ingredientInput.length==0">Add Ingr-Quant</button>
       </mat-card>
       <br>
       <button mat-raised-button type="button" (click)="updateFormula()" color="accent">Update Formula</button>

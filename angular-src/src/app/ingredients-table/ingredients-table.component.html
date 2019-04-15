@@ -6,11 +6,17 @@
 <div *ngIf="isAdmin()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
-<div class="button-div">
-  <button *ngIf="isAdmin()" class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <app-add-ingredient class="add" *ngIf="isAdmin()"></app-add-ingredient>
+<div class="button-div" *ngIf="isAdmin()">
+  <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
+  <app-add-ingredient class="add"></app-add-ingredient>
   <app-create-dependency-report class="dependency" [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
   <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
+</div>
+<div class="flex-box-center" *ngIf="!isAdmin()">
+  <div class="flex-item">
+    <app-create-dependency-report [sortBy]="this.sortBy" [keywords]="this.keywords" [skus]="this.skus"></app-create-dependency-report>
+    <button mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
+  </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
   <mat-spinner></mat-spinner>
@@ -40,8 +46,8 @@
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-			  <input #name matInput placeholder="Name" [readonly]="!isEditable()" [value]="element.name" (blur)="edit(element.name, 'name', name.value)" required>
+      <mat-form-field floatLabel="never" #nameField>
+			  <input #name matInput [readonly]="!isEditable()" [value]="element.name" (focus)="addUnderline(nameField)" (blur)="edit(element.name, 'name', name.value); removeUnderline(nameField)" required>
 			</mat-form-field>
     </td>
   </ng-container>
@@ -50,8 +56,8 @@
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Ingr#</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-        <input #number matInput placeholder="Number" [readonly]="!isEditable()" [value]="element.id" (blur)="edit(element.name, 'id', number.value)" required>
+      <mat-form-field floatLabel="never" #numberField>
+        <input #number matInput [readonly]="!isEditable()" [value]="element.id" (focus)="addUnderline(numberField)" (blur)="edit(element.name, 'id', number.value); removeUnderline(numberField)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -60,8 +66,8 @@
   <ng-container matColumnDef="vendor_info">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Vendor Info</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-        <textarea #vendor_info matInput placeholder="Vendor Info" [readonly]="!isEditable()" [value]="element.vendor_info" (blur)="edit(element.name, 'vendor_info', vendor_info.value)" optional></textarea>
+      <mat-form-field floatLabel="never" #vendorField>
+        <textarea #vendor_info matInput cdkTextareaAutosize [readonly]="!isEditable()" [value]="element.vendor_info" (focus)="addUnderline(vendorField)" (blur)="edit(element.name, 'vendor_info', vendor_info.value); removeUnderline(vendorField)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>
@@ -81,8 +87,8 @@
   <ng-container matColumnDef="cost">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Cost Per Package</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-        <input #cost_per_package matInput placeholder="Cost Per Package" [readonly]="!isEditable()" [value]="element.cost_per_package" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value)" required>
+      <mat-form-field floatLabel="never" #costField>
+        <input #cost_per_package matInput [readonly]="!isEditable()" [value]="element.cost_per_package" (focus)="addUnderline(costField)" (blur)="edit(element.name, 'cost_per_package', cost_per_package.value); removeUnderline(costField)" required>
       </mat-form-field>
     </td>
   </ng-container>
@@ -91,8 +97,8 @@
   <ng-container matColumnDef="comment">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
     <td mat-cell *matCellDef="let element">
-      <mat-form-field floatLabel="never">
-        <textarea #comment matInput placeholder="Comment" [readonly]="!isEditable()" [value]="element.comment" (blur)="edit(element.name, 'comment', comment.value)" optional></textarea>
+      <mat-form-field floatLabel="never" #commentField>
+        <textarea #comment="cdkTextareaAutosize" matInput cdkTextareaAutosize [readonly]="!isEditable()" [value]="element.comment" (focus)="addUnderline(commentField)" (blur)="edit(element.name, 'comment', comment.value); removeUnderline(commentField)" optional></textarea>
       </mat-form-field>
     </td>
   </ng-container>

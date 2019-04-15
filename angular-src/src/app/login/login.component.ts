@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit {
 
 	constructor(private authenticationService: AuthenticationService, private router: Router, private route: ActivatedRoute, private snackBar: MatSnackBar) { }
 
-	ngOnInit() { 
+	ngOnInit() {
 		if (this.authenticationService.isAuthenticated()) {
 			console.log('hellllll')
 			this.router.navigate(['dashboard']);
@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
 		    var value = token.split("=")[1];
 		    params[key] = value;
 		}
-		console.log(params);    
+		console.log(params);
 		this.authenticationService.getNetIDInfo(params["access_token"]).subscribe(
 		    info => {
 		        console.log(info);
@@ -42,14 +42,14 @@ export class LoginComponent implements OnInit {
 				this.handleResponse(response, 'netid_' + info["netid"])
 			    },
 			    err => {
-			        this.snackBar.open("Unable to login with NetID", "Close");
+			        this.snackBar.open("Unable to login with NetID", "Close", {duration:3000});
 				this.loginError = true;
 				this.showSpinner = false;
 			    }
 			);
 		    },
 		    err => {
-		        this.snackBar.open("Cannot communicate with NetID server", "Close");
+		        this.snackBar.open("Cannot communicate with NetID server", "Close", {duration:3000});
 			this.loginError = true;
 			this.showSpinner = false;
 		    }
@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit {
 			response => this.handleResponse(response, email),
 			err => {
 				if (err.status === 401) {
-          this.snackBar.open("Email or password incorrect", "Close");
+          this.snackBar.open("Email or password incorrect", "Close", {duration:3000});
 					this.loginError = true;
           this.showSpinner = false;
 				}

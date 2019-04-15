@@ -1,0 +1,22 @@
+<h1 align="center">Formula</h1>
+<h5>Formula Name</h5>
+{{formula.name}}
+<br>
+<br>
+<h5>Formula Number</h5>
+{{formula.number}}
+<br>
+<br>
+<h5>Ingredient Tuples</h5>
+<div class="tuple-list">
+  <mat-chip-list class="mat-chip-list-stacked">
+    <ng-container *ngFor="let ingredient of formula.ingredient_tuples; let ingr_id=index">
+      <div>
+        <mat-chip>{{ingredient.ingredient}} : {{ingredient.quantity}} {{ingredient.unit}}</mat-chip>
+      </div>
+    </ng-container>
+  </mat-chip-list>
+</div>
+<br>
+<h5>Comment</h5>
+{{formula.comment}}

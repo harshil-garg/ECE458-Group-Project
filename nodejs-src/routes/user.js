@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../model/user_model');
+const ManufacturingLine = require('../model/manufacturing_line_model');
 const autocomplete = require('../controllers/autocomplete');
 const jwt = require("jsonwebtoken");
 const router = express.Router();
@@ -13,26 +14,70 @@ router.post('/autocomplete', async (req, res) => {
 });
 
 router.post('/update-priveleges', async (req, res) => {    
-    User.findOne({email: req.body.email}, (err, result) =>{
+    const {email, admin, product_manager, business_manager, manufacturing_lines, analyst} = req.body;
+
+    User.findOne({email: email}, async (err, result) =>{
         if (!result) {
             res.json({success: false, message: 'User not found'});
         }
         else if (err) {
             res.json({success: false, message: err});
         }
-        else if (result.admin == req.body.admin){
-            res.json({success: false, message: `User is already ${result.admin ? 'admin' : 'not an admin'}`});
-        }
         else {
-            User.findOneAndUpdate({email: req.body.email}, {admin: req.body.admin}, (err, result) => {
-                if (err) {
-                    res.json({success: false, message: err});
+            let line_ids = [];
+            let error;
+
+            for(let line of manufacturing_lines){
+                let line_model = await ManufacturingLine.findOne({shortname: line}).exec();
+                if(!line_model){
+                    error = line;
+                    break;
                 }
-                else res.json({success: true, message: 'Updated user admin permissions succesfully'});
-            });
+                line_ids.push(line_model._id);
+            }
+            if(error){
+                res.json({success: false, message: `Invalid manufacturing line: ${error}`})
+            }else{
+                let json = {
+                    admin: admin,
+                    product_manager: product_manager,
+                    business_manager: business_manager,
+                    plant_manager: line_ids,
+                    analyst: analyst
+                }
+                User.findOneAndUpdate({email: email}, json, (err, result) => {
+                    if (err) {
+                        res.json({success: false, message: err});
+                    }
+                    else res.json({success: true, message: 'Updated user roles succesfully'});
+                });
+            }
+            
         }
     });
 });
+
+router.post('/get-priveleges', async (req, res) => {
+    const {email} = req.body;
+
+    let cursor = await User.aggregate([]).match({email: email}).lookup({
+        from: 'manufacturinglines',
+        localField: 'plant_manager',
+        foreignField: '_id',
+        as: 'plant_manager'
+    }).cursor({}).exec();
+
+    let results = [];
+    await cursor.eachAsync((res) => {
+        results.push(res);
+    });
+
+    if(results.length == 0){
+        res.json({success: false, message: 'No user by that email'})
+    }else{
+        res.json({success: true, data: results})
+    }
+})
 
 router.post('/delete-user', async (req, res) => {    
     User.findOne({email: req.body.email}, (err, result) =>{

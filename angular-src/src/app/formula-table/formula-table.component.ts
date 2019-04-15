@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList} from '@angular/core';
 import { Formula } from '../model/formula'
 import { AuthenticationService } from '../authentication.service'
 import { Sku } from '../model/sku'
 import { MeasurementUnit } from '../model/measurement-unit'
 import { CrudFormulaService, Response } from './crud-formula.service';
 import { FilterFormulaService, FilterResponse } from './filter-formula.service'
-import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { ExportService } from '../export.service';
@@ -34,7 +34,7 @@ export class FormulaTableComponent implements OnInit{
     unitInput: string = "";
     quantityInput: string = "";
 
-    displayedColumns: string[] = ['select', 'name', 'number', 'ingredient_tuples', 'comment'];
+    displayedColumns: string[] = ['select', 'name', 'number', 'ingredient_tuples', 'comment', 'sku_dropdown'];
     selection = new SelectionModel<Formula>(true, []);
     dataSource = new MatTableDataSource<Formula>(this.formulaList);
     maxPages: number;
@@ -43,6 +43,7 @@ export class FormulaTableComponent implements OnInit{
     liveEditing: boolean = false;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
+    @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
     //skuShown: Array<boolean> = [false];
     expandedFormula;
@@ -50,7 +51,10 @@ export class FormulaTableComponent implements OnInit{
     ngOnInit() {
       this.paginator.pageIndex = 0;
       this.paginator.pageSize = 10;
-      this.paginator.page.subscribe(x => this.refresh());
+      this.paginator.page.subscribe(x => {
+        this.selection.clear();
+        this.refresh();
+      });
       this.sort.sortChange.subscribe(x => {
         this.sortBy = x.active;
         this.refresh();
@@ -186,6 +190,11 @@ export class FormulaTableComponent implements OnInit{
         this.maxPages = response.pages;
         this.loadingResults = false;
       }
+      this.formFields.changes.subscribe((change) => {
+        change.forEach(form => {
+          form.underlineRef.nativeElement.className = null;
+        });
+      });
     }
 
     setSortBy(property: string){
@@ -195,6 +204,7 @@ export class FormulaTableComponent implements OnInit{
 
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
+      this.paginator.pageSize = 10;
       this.refresh();
     }
 
@@ -210,7 +220,10 @@ export class FormulaTableComponent implements OnInit{
     }
 
     removeIngrQuant(ingr_id:number, formula_id:number){
-      var ingredient_tuples = this.formulaList[formula_id].ingredient_tuples;
+      var listId = this.formulaList.findIndex(element=>{
+        return element.id == formula_id;
+      });
+      var ingredient_tuples = this.formulaList[listId].ingredient_tuples;
       ingredient_tuples.splice(ingr_id, 1);
       this.edit(formula_id, 'tuple', ingredient_tuples);
     }
@@ -270,6 +283,18 @@ export class FormulaTableComponent implements OnInit{
         }
         this.ingredientInput = '';
         this.quantityInput = '';
+      }
+    }
+
+    addUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = "mat-form-field-underline";
+      }
+    }
+
+    removeUnderline(form){
+      if(this.isEditable()){
+        form.underlineRef.nativeElement.className = null;
       }
     }
 }
