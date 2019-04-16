@@ -45,7 +45,7 @@ def makeSchedule(content):
             resources = resources | MyResources[line_names[i]]
         t += resources
 
-        MyScenario += t > 0, t < deadline
+        MyScenario += t >= 0, t <= deadline
     
     solvers.mip.solve(MyScenario,msg=1)
     plotters.matplotlib.plot(MyScenario,img_filename='household.png')

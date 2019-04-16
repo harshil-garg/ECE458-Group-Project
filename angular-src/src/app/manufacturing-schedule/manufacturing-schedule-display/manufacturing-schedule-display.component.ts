@@ -38,7 +38,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
 
   ngOnInit() {
     this.startAutomateDate.value.setHours(8, 0, 0 ,0 );
-    this.endAutomateDate.value.setHours(17, 0, 0, 0);
+    this.endAutomateDate.value.setHours(18, 0, 0, 0);
     this.manufGoalList = [];
     this.palette = [];
     this.populateManufGoalList();

@@ -91,8 +91,6 @@ async function automate_naive(req, res) {
     }
     
     let user_model = await User.findOne({email: getUser(req)})
-    let skipped = false;
-    let deadline_passed = false;
     let errors = '';
 
     while (true) {
@@ -103,8 +101,10 @@ async function automate_naive(req, res) {
         let bestLine;
 
         for(let valid_line of user_model.plant_manager){
+            console.log(await ManufacturingLine.find({_id: valid_line}));
             for (let line of task.sku.manufacturing_lines) {
                 if(line.equals(valid_line)){
+                    console.log("Am i ever in here lol");
                     let schedulableOnLine = false;
                     let preExistingActivities = await ManufacturingSchedule.find({
                         manufacturing_line: line
@@ -142,13 +142,14 @@ async function automate_naive(req, res) {
             }
         }      
         
-        if(calculateEndTime(earliestStartTime, task.duration) > task.deadline){
-            errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled past deadline\n`
-            continue;
-        } 
         if (!schedulable) {
             errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled on any line\n`
             continue;  
+        } else if( calculateEndTime(earliestStartTime, task.duration) > task.deadline) {
+            console.log(calculateEndTime(earliestStartTime, task.duration).format());
+            console.log(task.deadline.format());
+            errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled past deadline\n`
+            continue;
         } else {
             let mapping = new ManufacturingSchedule({
                 activity: {
@@ -264,11 +265,12 @@ router.post('/complex', async(req, res) => {
     let start = moment(start_).tz("America/New_York")
     let end = moment(end_).tz("America/New_York")
     console.log(`The start date in EST is ${start.format()} and the end date in EST is ${end.format()}.`);
+    console.log(activities);
 
     let periods = mapTime(start, end);
-    let horizon = periods.length;
+    let horizon = periods.length - 1;
     let intervalStart = periods[0];
-    let intervalEnd = periods[horizon - 1];
+    let intervalEnd = periods[horizon];
 
     for (let period of periods) {
         console.log(period.format());
@@ -280,6 +282,7 @@ router.post('/complex', async(req, res) => {
     let user_model = await User.findOne({email: getUser(req)})
     let lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}}); //lines the user has access to
     console.log(lines)
+    console.log("poo")
     for (let line of lines) {
         let tasks = await ManufacturingSchedule.find({
             manufacturing_line: line
@@ -318,6 +321,7 @@ router.post('/complex', async(req, res) => {
     
     for (let activity of activities) {
         let processedActivity = await processActivity(activity);
+        console.log(processedActivity);
         let lineNames = [];
         for(let line of lines){
             for (let lineID of processedActivity.sku.manufacturing_lines) {
@@ -329,15 +333,8 @@ router.post('/complex', async(req, res) => {
             }
         }
         
-        let taskMaxStartTime = moment(processedActivity.deadline).subtract(processedActivity.duration, 'hours');
-        let deadline_index = getIndex(taskMaxStartTime, periods);
-        if (deadline_index == -1) {
-            if (taskMaxStartTime < periods[0]) {
-                deadline_index = 0;
-            } else {
-                deadline_index = horizon;
-            }
-        }
+        console.log(`The processed activity deadline is ${processedActivity.deadline.format()}`);
+        let deadline_index = getDeadlineIndex(processedActivity.deadline, periods);
         console.log("deadline index is" + deadline_index);
         tasks.push({
             sku_number: processedActivity.sku.number,
@@ -347,6 +344,8 @@ router.post('/complex', async(req, res) => {
             deadline: deadline_index
         });
     }
+    console.log('these are the tasks');
+    console.log(tasks);
 
     let axios_error, response;
     [axios_error, response] = await to(
@@ -475,6 +474,17 @@ function getIndex(time, periods) {
         index++;
     }
     return -1;
+}
+
+function getDeadlineIndex(deadline, periods) {
+    let index = 0;
+    for (let period of periods) {
+        if (deadline <= period) {
+            return index;
+        }
+        index++;
+    }
+    return index - 1;
 }
 
 /****************************************************************************************************
