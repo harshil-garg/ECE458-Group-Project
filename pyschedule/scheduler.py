@@ -35,13 +35,17 @@ def makeSchedule(content):
         taskid = str(task["goal_name"] + "_" + str(task["sku_number"]))
         duration = task["duration"]
         line_names = task["line_names"]
-
+        deadline = task["deadline"]
+        print(deadline)
+        print(type(deadline))
         t = MyScenario.Task(taskid, length=duration, delay_cost=1)
 
         resources = MyResources[line_names[0]]
         for i in range(1, len(line_names)):
             resources = resources | MyResources[line_names[i]]
         t += resources
+
+        MyScenario += t > 0, t < deadline
     
     solvers.mip.solve(MyScenario,msg=1)
     plotters.matplotlib.plot(MyScenario,img_filename='household.png')

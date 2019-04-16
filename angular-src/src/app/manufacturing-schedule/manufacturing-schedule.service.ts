@@ -141,6 +141,10 @@ export class ManufacturingScheduleService {
 		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/naive', automateMessage, httpOptions);
 	}
 
+	automate_complex(automateMessage: AutomateMessage): Observable<AutomateResponse>{
+		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/complex', automateMessage, httpOptions);
+	}
+
 	commit(): Observable<AutomateResponse>{
 		return this.http.post<AutomateResponse>('api/manufacturing_schedule_automator/commit', httpOptions);
 	}

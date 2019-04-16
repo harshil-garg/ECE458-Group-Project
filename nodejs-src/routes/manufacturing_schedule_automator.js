@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const moment = require('moment-timezone');
 const axios = require('axios');
+const os = require('os');
 
 // Schemas and models
 const SKU = require('../model/sku_model');
@@ -91,6 +92,8 @@ async function automate_naive(req, res) {
     
     let user_model = await User.findOne({email: getUser(req)})
     let skipped = false;
+    let deadline_passed = false;
+    let errors = '';
 
     while (true) {
         let task = pq.pop();
@@ -100,11 +103,8 @@ async function automate_naive(req, res) {
         let bestLine;
 
         for(let valid_line of user_model.plant_manager){
-            console.log("user valid: "+valid_line)
             for (let line of task.sku.manufacturing_lines) {
-                console.log("sku valid: "+line)
                 if(line.equals(valid_line)){
-                    console.log(true)
                     let schedulableOnLine = false;
                     let preExistingActivities = await ManufacturingSchedule.find({
                         manufacturing_line: line
@@ -140,12 +140,15 @@ async function automate_naive(req, res) {
                 }
                 
             }
-        }
+        }      
         
-        if (!schedulable) {
-            skipped = true;
+        if(calculateEndTime(earliestStartTime, task.duration) > task.deadline){
+            errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled past deadline\n`
             continue;
-            
+        } 
+        if (!schedulable) {
+            errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled on any line\n`
+            continue;  
         } else {
             let mapping = new ManufacturingSchedule({
                 activity: {
@@ -163,11 +166,11 @@ async function automate_naive(req, res) {
         }
     }
 
-    if(skipped){
+    if(errors.length > 0){
         return res.json({
-            success: false,
-            message: `Some activities could not be scheduled`
-        })
+            success: true,
+            message: errors
+        });
     }else{
         return res.json({
             success: true,
@@ -273,7 +276,10 @@ router.post('/complex', async(req, res) => {
     console.log(horizon);
 
     let blocks = [];
-    let lines = await ManufacturingLine.find({});
+
+    let user_model = await User.findOne({email: getUser(req)})
+    let lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}}); //lines the user has access to
+    console.log(lines)
     for (let line of lines) {
         let tasks = await ManufacturingSchedule.find({
             manufacturing_line: line
@@ -309,26 +315,43 @@ router.post('/complex', async(req, res) => {
     }
 
     let tasks = [];
+    
     for (let activity of activities) {
         let processedActivity = await processActivity(activity);
         let lineNames = [];
-        for (let lineID of processedActivity.sku.manufacturing_lines) {
-            let line = await ManufacturingLine.findOne({_id: lineID});
-            lineNames.push(line.name);
+        for(let line of lines){
+            for (let lineID of processedActivity.sku.manufacturing_lines) {
+                if(line.equals(lineID)){
+                    let line_model = await ManufacturingLine.findOne({_id: lineID});
+                    lineNames.push(line_model.name);
+                }
+                
+            }
         }
-    
+        
+        let taskMaxStartTime = moment(processedActivity.deadline).subtract(processedActivity.duration, 'hours');
+        let deadline_index = getIndex(taskMaxStartTime, periods);
+        if (deadline_index == -1) {
+            if (taskMaxStartTime < periods[0]) {
+                deadline_index = 0;
+            } else {
+                deadline_index = horizon;
+            }
+        }
+        console.log("deadline index is" + deadline_index);
         tasks.push({
             sku_number: processedActivity.sku.number,
             goal_name: processedActivity.goal.name,
             duration: processedActivity.duration,
-            line_names: lineNames
+            line_names: lineNames,
+            deadline: deadline_index
         });
     }
 
     let axios_error, response;
     [axios_error, response] = await to(
         axios.post(
-            'http://vcm-8670.vm.duke.edu:5000', 
+            'http://pyschedule:5000', 
             {
                 blocks: blocks,
                 tasks: tasks,
@@ -349,8 +372,10 @@ router.post('/complex', async(req, res) => {
         return await automate_naive(req, res);
     } else {
         console.log(response.data.data);
-        let scheduling_result = await transformSchedule(response.data.data, periods);
+        console.log("hello banan");
+        let scheduling_result = await transformSchedule(response.data.data, periods, req);
         if (scheduling_result.success) {
+            console.log("I am in here");
             return res.json(scheduling_result);
         } else {
             return await automate_naive(req, res);
@@ -358,7 +383,7 @@ router.post('/complex', async(req, res) => {
     }
 });
 
-async function transformSchedule(schedule, times) {
+async function transformSchedule(schedule, times, req) {
     let mappings = [];
     for (let s of schedule) {
         if (s.task == 'MakeSpan') continue;
