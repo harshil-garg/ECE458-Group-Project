@@ -16,6 +16,13 @@ export class CreateResponse {
   message: string;
 }
 
+export class UpdateMessage {
+  name : string;
+  newname : string;
+  sku_tuples : SkuNameQuantity[];
+  deadline: Date;
+}
+
 export class RefreshMessage {
   pageNum: number;
   page_size: number;
@@ -80,6 +87,11 @@ export class ManufacturingGoalService {
   create(requestedManufacturingGoal: CreateMessage): Observable<CreateResponse>{
     console.log(requestedManufacturingGoal);
     return this.http.post<CreateResponse>('/api/manufacturing_goals/create', requestedManufacturingGoal, httpOptions);
+  }
+
+  update(requestedManufacturingGoal: UpdateMessage): Observable<CreateResponse>{
+    console.log(requestedManufacturingGoal);
+    return this.http.post<CreateResponse>('/api/manufacturing_goals/update', requestedManufacturingGoal, httpOptions);
   }
 
   refresh(requestedRefresh: RefreshMessage): Observable<RefreshResponse>{

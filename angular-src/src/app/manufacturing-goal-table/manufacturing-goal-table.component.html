@@ -1,6 +1,9 @@
 <h1 class="mat-display-3" align="center">Manufacturing Goals</h1>
-<div class="button-div" *ngIf="isBusinessManager() || isAdmin()">
-  <button class="remove" mat-raised-button type="button" (click)="delete()" color="accent" [disabled]="selection.selected.length==0">Remove Selected</button>
+<div *ngIf="canUpdate()" align="center">
+  <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
+</div>
+<div class="button-div" *ngIf="canUpdate()">
+  <button class="remove" mat-raised-button type="button" (click)="delete()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
   <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
   <app-calculator [disabled]="selection.selected.length!=1" [manufGoal]="selection.selected[0]!=null ? selection.selected[0].name : null"></app-calculator>
   <app-add-manufacturing-goal class="add"></app-add-manufacturing-goal>
@@ -44,7 +47,9 @@
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      {{element.name}}
+      <mat-form-field floatLabel="never" #nameField>
+			  <input #name matInput [readonly]="!isEditable()" (focus)="addUnderline(nameField)" [value]="element.name" (blur)="edit(element.name, 'name', name.value); removeUnderline(nameField)" required>
+			</mat-form-field>
     </td>
   </ng-container>
 

@@ -153,6 +153,52 @@ function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, 
     });
 }
 
+//UPDATE
+router.post('/update', async (req, res) => {
+    const { name, newname, sku_tuples, deadline } = req.body;
+    let json = {};
+
+    if(newname != undefined && newname != NaN){
+        json["name"] = newname;
+    }
+    if(sku_tuples != undefined && sku_tuples != NaN){
+        // Check that SKUS exist
+        let valid_tuples = [];
+        for(let tuple of sku_tuples){
+            valid_tuples.push(await validator.itemExists(SKU, tuple.sku.number.toString()));
+        }
+
+        let errors = validator.compileErrors(...valid_tuples);
+        // Return errors if any
+        if(errors.length > 0){
+            res.json({success: false, message: errors});
+            return;
+        }
+
+        // Change from sku name to id
+        for(let i = 0; i < valid_tuples.length; i++){
+            sku_tuples[i]['sku'] = valid_tuples[i][2]; //id of sku
+        }
+        json["sku_tuples"] = sku_tuples;
+    }
+    if(deadline != undefined && deadline != NaN){
+        let deadline_date = new Date(deadline);
+        if(isNaN(deadline_date)){
+            res.json({success: false, message: deadline_date}); //message is: invalid date
+            return;
+        }
+        json["deadline"] = deadline_date;
+    }
+    
+    ManufacturingGoal.findOneAndUpdate({name: name}, json, (err) => {
+        if (err) {
+            res.json({success: false, message: `Failed to update manufacturing goal. Error: ${err}`});
+        } else {
+            res.json({success: true, message: "Updated successfully."});
+        }
+    })
+})
+
 //DELETE
 router.post('/delete', async (req, res) => {
     const { name } = req.body;
