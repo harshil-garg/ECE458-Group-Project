@@ -138,14 +138,13 @@ async function automate_naive(req, res) {
                         }
                     }
                 }
-                
             }
         }      
         
         if (!schedulable) {
             errors.push(`Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled on any line`);
             continue;  
-        } else if( calculateEndTime(earliestStartTime, task.duration) > task.deadline) {
+        } else if (calculateEndTime(earliestStartTime, task.duration) > task.deadline) {
             console.log(calculateEndTime(earliestStartTime, task.duration).format());
             console.log(task.deadline.format());
             errors.push(`Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled past deadline`);
@@ -167,12 +166,12 @@ async function automate_naive(req, res) {
         }
     }
 
-    if(errors.length > 0){
+    if (errors.length > 0) {
         return res.json({
             success: true,
             message: errors
         });
-    }else{
+    } else {
         return res.json({
             success: true,
             message: ["Automation of all activities successful"]
@@ -371,10 +370,8 @@ router.post('/complex', async(req, res) => {
         return await automate_naive(req, res);
     } else {
         console.log(response.data.data);
-        console.log("hello banan");
         let scheduling_result = await transformSchedule(response.data.data, periods, req);
         if (scheduling_result.success) {
-            console.log("I am in here");
             return res.json(scheduling_result);
         } else {
             return await automate_naive(req, res);
@@ -384,11 +381,13 @@ router.post('/complex', async(req, res) => {
 
 async function transformSchedule(schedule, times, req) {
     let mappings = [];
+    let blocks = await ManufacturingSchedule.find({
+        committed: true
+    });
     for (let s of schedule) {
         if (s.task == 'MakeSpan') continue;
 
         let goal_name, sku_number, resource, start, end;
-
         goal_name = s.task.split("_")[0];
         sku_number = s.task.split("_")[1];
         resource = s.resource;
@@ -402,8 +401,21 @@ async function transformSchedule(schedule, times, req) {
             }
         }
 
+        // Do not schedule the blocks again (prescheduled activities used as constraints in pyschedule)
+        let is_block = false;
+        for (let block of blocks) {
+            if (goal_name == block.activity.manufacturing_goal.name ||
+                sku_number == block.activity.sku.number) {
+                    is_block = true;
+                    break;
+                }
+        }
+        if (is_block) {
+            continue;
+        }
+
+        // Go ahead and schedule the complex
         let manufacturing_goal, sku, manufacturing_line, duration, duration_override;
-        
         manufacturing_goal = await ManufacturingGoal.findOne({name: goal_name});
         sku = await SKU.findOne({number: sku_number});
         manufacturing_line = await ManufacturingLine.findOne({name: resource});
@@ -420,7 +432,6 @@ async function transformSchedule(schedule, times, req) {
             committed: false,
             user: getUser(req)
         });
-        console.log(mapping);
         mappings.push(mapping);
     }
 

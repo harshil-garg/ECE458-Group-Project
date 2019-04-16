@@ -263,6 +263,9 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
       });
     };
 
+    this.startAutomateDate.value.setHours(8, 0, 0 ,0 );
+    this.endAutomateDate.value.setHours(18, 0, 0, 0);
+
     if(complex){
       this.manufacturingScheduleService.automate_complex({
         activities: activities,
