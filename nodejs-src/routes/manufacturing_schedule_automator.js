@@ -91,7 +91,7 @@ async function automate_naive(req, res) {
     }
     
     let user_model = await User.findOne({email: getUser(req)})
-    let errors = '';
+    let errors = [];
 
     while (true) {
         let task = pq.pop();
@@ -143,12 +143,12 @@ async function automate_naive(req, res) {
         }      
         
         if (!schedulable) {
-            errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled on any line\n`
+            errors.push(`Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled on any line`);
             continue;  
         } else if( calculateEndTime(earliestStartTime, task.duration) > task.deadline) {
             console.log(calculateEndTime(earliestStartTime, task.duration).format());
             console.log(task.deadline.format());
-            errors = errors + `Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled past deadline\n`
+            errors.push(`Activity ${task.sku.name} (${task.goal.name}) cannot be scheduled past deadline`);
             continue;
         } else {
             let mapping = new ManufacturingSchedule({
@@ -175,7 +175,7 @@ async function automate_naive(req, res) {
     }else{
         return res.json({
             success: true,
-            message: "Automation of all activities successful"
+            message: ["Automation of all activities successful"]
         });
     }
     
@@ -398,7 +398,7 @@ async function transformSchedule(schedule, times, req) {
         if (!end) {
             return {
                 success: false,
-                message: "Scheduler could not fit the activities and had overflow, must use naive method"
+                message: ["Scheduler could not fit the activities and had overflow, must use naive method"]
             }
         }
 
@@ -430,7 +430,7 @@ async function transformSchedule(schedule, times, req) {
 
     return {
         success: true,
-        message: "Complex scheduling was successful"
+        message: ["Complex scheduling was successful"]
     }
 }
 
@@ -497,7 +497,7 @@ router.post('/undo', async(req, res) => {
     });
     res.json({
         success: true,
-        message: "Removed autoscheduled activities that were not committed"
+        message: ["Removed autoscheduled activities that were not committed"]
     })
 });
 
@@ -509,7 +509,7 @@ router.post('/commit', async(req, res) => {
     });
     res.json({
         success: true,
-        message: "Committed provisional activities to the manufacturing schedule"
+        message: ["Committed provisional activities to the manufacturing schedule"]
     });
 });
 
