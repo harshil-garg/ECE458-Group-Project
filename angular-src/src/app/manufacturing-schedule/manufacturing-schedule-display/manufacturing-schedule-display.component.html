@@ -1,4 +1,4 @@
-<div (keydown.control.a)="handleKey($event)">
+<div (keydown.shift.a)="handleKey($event)">
   <mat-sidenav-container class="example-container">
     <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
       <div class="example-container">
@@ -7,8 +7,8 @@
           <h2>Automate Scheduling</h2>
           <mat-card class="mat-elevation-z2">
             <mat-card-subtitle>
-              Select Goals with ctrl-click <br>
-              Select All Goals with ctrl-a
+              Select Goals with shift-click <br>
+              Select All Goals with shift-a
             </mat-card-subtitle>
             <mat-card-content>
               <mat-form-field appearance="fill">

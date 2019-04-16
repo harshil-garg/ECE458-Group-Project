@@ -227,7 +227,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   }
 
   activityClicked(item, event){
-    if(event.ctrlKey){
+    if(event.shiftKey){
       let index = this.selectedActivityList.indexOf(item);
       if(index == -1){
         this.selectedActivityList.push(item);

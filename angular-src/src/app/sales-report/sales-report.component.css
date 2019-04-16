@@ -8,8 +8,7 @@ table {
 }
 
 .summary-table-long {
-  min-width: 1500px;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .centre {
@@ -68,4 +67,12 @@ mat-icon:hover{
 
 .card-padding {
   padding-bottom: 10px;
+}
+
+.mat-cell {
+  padding: 8px 8px 8px 0;
+}
+
+.mat-header-cell {
+  padding: 8px 8px 8px 0;
 }
