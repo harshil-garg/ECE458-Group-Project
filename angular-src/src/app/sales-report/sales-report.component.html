@@ -57,29 +57,31 @@
                 <mat-card-title>
                   {{product_line}} revenue summary
                 </mat-card-title>
-                <div *ngIf="all_data[product_line].summary.length==0">
-                  The data is not currently available. Please check back in 10-15 seconds.
-                </div>
-                <div *ngIf="all_data[product_line].summary.length != 0">
-                  <table mat-table class="summary-table-long" [dataSource]="[all_data[product_line].summary]">
-                    <div *ngFor="let year of pdisplayedColumns">
-                      <div *ngIf="year != 'total'">
-                        <ng-container matColumnDef={{year}}>
-                          <mat-header-cell *matHeaderCellDef> {{year}} </mat-header-cell>
-                          <mat-cell *matCellDef="let element"> {{element[year]}} </mat-cell>
-                        </ng-container>
-                      </div>
-                      <div *ngIf="year == 'total'">
+                <mat-card-content class="summary-table-long">
+                  <div *ngIf="all_data[product_line].summary.length==0">
+                    The data is not currently available. Please check back in 10-15 seconds.
+                  </div>
+                  <div *ngIf="all_data[product_line].summary.length != 0">
+                    <table mat-table [dataSource]="[all_data[product_line].summary]">
+                      <div *ngFor="let year of pdisplayedColumns">
+                        <div *ngIf="year != 'total'">
                           <ng-container matColumnDef={{year}}>
-                            <mat-header-cell *matHeaderCellDef><b>Total</b></mat-header-cell>
-                            <mat-cell *matCellDef="let element"><b>{{element[year]}}</b></mat-cell>
+                            <mat-header-cell *matHeaderCellDef> {{year}} </mat-header-cell>
+                            <mat-cell *matCellDef="let element"> {{element[year]}} </mat-cell>
                           </ng-container>
+                        </div>
+                        <div *ngIf="year == 'total'">
+                            <ng-container matColumnDef={{year}}>
+                              <mat-header-cell *matHeaderCellDef><b>Total</b></mat-header-cell>
+                              <mat-cell *matCellDef="let element"><b>{{element[year]}}</b></mat-cell>
+                            </ng-container>
+                        </div>
                       </div>
-                    </div>
-                    <mat-header-row *matHeaderRowDef="pdisplayedColumns"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: pdisplayedColumns;"></mat-row>
-                  </table>
-                </div>
+                      <mat-header-row *matHeaderRowDef="pdisplayedColumns"></mat-header-row>
+                      <mat-row *matRowDef="let row; columns: pdisplayedColumns;"></mat-row>
+                    </table>
+                  </div>
+                </mat-card-content>
               </mat-card>
             </div>
             <div class="padding"></div>
