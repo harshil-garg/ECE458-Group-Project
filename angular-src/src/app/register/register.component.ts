@@ -20,6 +20,7 @@ export class RegisterComponent implements OnInit {
 	adminSelection = false;
 	userInput: string;
   adminPriveleges: string[] = ['Analyst', 'Product Manager', 'Business Manager', 'Plant Manager', 'Administrator'];
+  disabledOptions: string[] = [];
   selectedOptions: string[] = ['Analyst'];
   selectedManufLines: string[];
   manufacturingLines = [];
@@ -104,6 +105,7 @@ export class RegisterComponent implements OnInit {
         if(response.data[0].admin){
           this.selectedOptions.push("Administrator");
         }
+        this.updateDisabled();
       }
     }, (err) => {
       console.log("BAD");
@@ -112,6 +114,35 @@ export class RegisterComponent implements OnInit {
 
   handleClick(ev){
     ev.stopPropagation();
+  }
+
+  updateDisabled(){
+    this.disabledOptions = [];
+    if(this.selectedOptions.indexOf("Administrator") > -1){
+      this.disabledOptions.push("Analyst");
+      this.disabledOptions.push("Product Manager");
+      this.disabledOptions.push("Business Manager");
+      this.disabledOptions.push("Plant Manager");
+      this.selectedOptions = ["Administrator", "Plant Manager", "Business Manager", "Product Manager", "Analyst"];
+    }
+    else if(this.selectedOptions.indexOf("Plant Manager") > -1){
+      this.disabledOptions.push("Analyst");
+      if(this.selectedOptions.indexOf("Analyst") == -1){
+        this.selectedOptions.push("Analyst");
+      }
+    }
+    else if(this.selectedOptions.indexOf("Business Manager") > -1){
+      this.disabledOptions.push("Analyst");
+      if(this.selectedOptions.indexOf("Analyst") == -1){
+        this.selectedOptions.push("Analyst");
+      }
+    }
+    else if(this.selectedOptions.indexOf("Product Manager") > -1){
+      this.disabledOptions.push("Analyst");
+      if(this.selectedOptions.indexOf("Analyst") == -1){
+        this.selectedOptions.push("Analyst");
+      }
+    }
   }
 
 }

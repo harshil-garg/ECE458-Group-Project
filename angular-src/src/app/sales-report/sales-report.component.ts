@@ -19,10 +19,11 @@ export class SalesReportComponent implements OnInit {
   selected_customer: string;
   customers: Array<any> = [];
 
-  summary_data = {};
+  all_data = {};
   product_line_keys = [];
 
-  sdisplayedColumns = ['year', 'sales', 'revenue', 'revenue_per_case']
+  pdisplayedColumns = [];
+  sdisplayedColumns = ['year', 'sales', 'revenue', 'revenue_per_case'];
   ldisplayedColumns = ['total_revenue', 'revenue_per_case', 'profit_per_case', 'profit_margin', 'manufacturing_setup_cost_per_case', 'manufacturing_run_size', 'manufacturing_run_cost_per_case', 'ingredient_cost_per_case', 'cogs_per_case'];
 
   loadingResults: boolean = false;
@@ -31,6 +32,10 @@ export class SalesReportComponent implements OnInit {
   }
 
   ngOnInit() {
+    for (let year = new Date().getFullYear() - 9; year <= new Date().getFullYear(); year++) {
+      this.pdisplayedColumns.push(year.toString());
+    }
+    this.pdisplayedColumns.push('total');
     this.refreshCustomer('all');
   }
 
@@ -45,7 +50,6 @@ export class SalesReportComponent implements OnInit {
   }
 
   refresh() {
-    console.log("Uh lols");
     this.loadingResults = true;
     var request = {
       product_lines: this.product_lines,
@@ -53,11 +57,11 @@ export class SalesReportComponent implements OnInit {
     }
     this.salesReportService.getSummary(request).subscribe(
       response => {
-        this.summary_data = response;
-        this.product_line_keys = Object.keys(this.summary_data);
+        this.all_data = response;
+        this.product_line_keys = Object.keys(this.all_data);
         this.formatYearlyData();
         this.formatTenYearData();
-        console.log(this.summary_data);
+        this.formatProductLineSummaryData();
         this.loadingResults = false;
       },
       error => {
@@ -68,7 +72,7 @@ export class SalesReportComponent implements OnInit {
 
   formatYearlyData() {
     for (let product_line of this.product_line_keys) {
-      let data = this.summary_data[product_line];
+      let data = this.all_data[product_line].data;
       for (let sku of data) {
         let year = new Date().getFullYear() - 9;
         let sku_yearly_data_export = [];
@@ -100,7 +104,7 @@ export class SalesReportComponent implements OnInit {
 
   formatTenYearData() {
     for (let product_line of this.product_line_keys) {
-      let data = this.summary_data[product_line];
+      let data = this.all_data[product_line].data;
       for (let sku of data) {
         let sku_ten_year_data_display = [];
         let sku_ten_year_data_export = [];
@@ -120,6 +124,15 @@ export class SalesReportComponent implements OnInit {
         sku_ten_year_data_export.push(export_obj);
         sku["sku_ten_year_data_display"] = sku_ten_year_data_display;
         sku["sku_ten_year_data_export"] = sku_ten_year_data_export;
+      }
+    }
+  }
+
+  formatProductLineSummaryData() {
+    for (let product_line of this.product_line_keys) {
+      let summary = this.all_data[product_line].summary;
+      for (let key of Object.keys(summary)) {
+        summary[key] = summary[key].toLocaleString('en-US', { style: 'currency', currency: 'USD' });
       }
     }
   }
