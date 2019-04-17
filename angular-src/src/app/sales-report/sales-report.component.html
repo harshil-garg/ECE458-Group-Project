@@ -8,8 +8,13 @@
       </div>
       <div>
         <h2>Customers</h2>
-        <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
-        </app-customer-autocomplete>
+        <mat-card class="mat-elevation-z2">
+          <mat-card-content>
+            <mat-card-subtitle [style.color]="'black'">Filter by customers</mat-card-subtitle>
+            <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
+            </app-customer-autocomplete>
+          </mat-card-content>
+        </mat-card>
       </div>
       <div>
         <h2>Product Lines</h2>
