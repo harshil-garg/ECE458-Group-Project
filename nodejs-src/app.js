@@ -59,12 +59,12 @@ app.use(passport.initialize());
 app.use('/api/login', login);
 app.use('/api/upload', passport.authenticate('jwt', { session: false }), uploadroute);
 app.use('/api/export', passport.authenticate('jwt', { session: false }), exportroute);
-app.use('/api/ingredients', passport.authenticate('jwt', { session: false }), ingredients);
 app.use('/api/skus', passport.authenticate('jwt', { session: false }), skus)
+app.use('/api/formulas', passport.authenticate('jwt', { session: false }), formulas.router);
+app.use('/api/ingredients', passport.authenticate('jwt', { session: false }), ingredients);
 app.use('/api/product_lines', passport.authenticate('jwt', { session: false }), product_lines);
 app.use('/api/users', passport.authenticate('jwt', { session: false }), users);
 app.use('/api/manufacturing_goals', passport.authenticate('jwt', { session: false }), manufacturing_goals);
-app.use('/api/formulas', passport.authenticate('jwt', { session: false }), formulas.router);
 app.use('/api/manufacturing_lines', passport.authenticate('jwt', { session: false }), manufacturing_lines);
 app.use('/api/manufacturing_schedule', passport.authenticate('jwt', { session: false }), manufacturing_schedule);
 app.use('/api/manufacturing_schedule_automator', passport.authenticate('jwt', { session: false }), manufacturing_schedule_automator);

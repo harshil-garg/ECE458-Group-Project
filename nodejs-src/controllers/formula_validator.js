@@ -1,7 +1,6 @@
 const Units = require('../controllers/units');
 const autogen = require('../controllers/autogen');
 const utils = require('../utils/utils');
-const SKU = require('../model/ingredient_model');
 
 module.exports.validIngredientTuple = async function(model, ingredient_id, unit){
     let err_msg;
@@ -153,10 +152,9 @@ module.exports.conflictCheck = async function(model, formulas, formulas_csv, res
     }
 }
 
-module.exports.formulaClear = async function(id) {
+module.exports.formulaClear = async function(id, model) {
     let err_msg = `Formula is in use`;
-    let result = await SKU.findOne({formula: id}).exec()
-    console.log(result)
-    console.log("output: "+!result)
+    let result = await model.findOne({formula: id}).exec()
+
     return [!result, err_msg]; //if clear then there will be no result, thus !result will be true
 };
