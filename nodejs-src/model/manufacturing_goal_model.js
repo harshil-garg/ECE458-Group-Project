@@ -9,7 +9,10 @@ const SKU_Tuple = new Schema({
         required: true,
         ref: 'SKU'
     },
-    case_quantity: Number
+    case_quantity: {
+        type: Number,
+        required: true
+    }
 });
 
 const ManufacturingGoalSchema = new Schema({
@@ -20,7 +23,7 @@ const ManufacturingGoalSchema = new Schema({
     },
     sku_tuples: {
         type: [SKU_Tuple],
-        required: true
+        default: []
     },
     deadline: {
         type: Date,
