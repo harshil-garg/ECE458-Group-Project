@@ -16,4 +16,4 @@ else
 	node js/backup.js $email_address $(hostname) false "Mongodump failed, likely due to failed Docker connection to MongoDB server. Check health of the MongoDB instance"
 	echo "Mongodump failed."
 fi
-#sudo rm -rf $NAME;
+sudo rm -rf $NAME;
