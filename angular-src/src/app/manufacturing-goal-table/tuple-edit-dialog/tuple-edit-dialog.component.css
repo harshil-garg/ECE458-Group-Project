@@ -1,0 +1,8 @@
+mat-icon:hover{
+  cursor: pointer;
+  color: mediumaquamarine;
+}
+
+mat-icon{
+  color: gray;
+}

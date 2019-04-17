@@ -77,6 +77,7 @@
       <ng-container *ngFor="let sku of element.sku_tuples; let sku_id=index">
         <a *ngIf="sku.sku!=undefined">{{sku.sku.name}} ({{sku.sku.number}}) : {{sku.case_quantity}}<br></a>
       </ng-container>
+      <mat-icon (click)="openTupleEditDialog(element.name, element.sku_tuples)" *ngIf="isEditable()">edit</mat-icon>
     </td>
   </ng-container>
 
