@@ -8,12 +8,12 @@
 </div>
 <div class="button-div" *ngIf="canUpdate()">
   <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export Formulas</button>
+  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export</button>
   <app-add-formula class="add"></app-add-formula>
 </div>
 <div class="flex-box-center" *ngIf="isAnalyst() && !canUpdate()">
   <div class="flex-item">
-    <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export Formulas</button>
+    <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export</button>
   </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
