@@ -1,0 +1,19 @@
+<h1>Edit Sku-Quantities</h1>
+<mat-card>
+  <mat-card-subtitle [style.color]="'black'">Sku-Quantity Pairs</mat-card-subtitle>
+  <div class="tuple-list">
+    <mat-chip-list class="mat-chip-list-stacked">
+      <ng-container *ngFor="let tuple of tuples; let sku_id=index">
+        <div>
+          <mat-chip>{{tuple.sku.name}} ({{tuple.sku.number}}) : {{tuple.case_quantity}} <mat-icon (click)="removeIngrQuant(sku_id)">clear</mat-icon></mat-chip>
+        </div>
+      </ng-container>
+    </mat-chip-list>
+  </div>
+  <app-sku-autocomplete (skuSelected)="setSkuInput($event)"></app-sku-autocomplete>
+  <input [(ngModel)]="quantityInput">
+  <br>
+  <br>
+  <button mat-raised-button type="button" (click)="addSkuQuantity()" color="accent" [disabled]="skuInput==null || quantityInput==null || quantityInput.length==0">Add Ingr-Quant</button>
+</mat-card>
+<button mat-raised-button type="button" (click)="updateTuples()" color="accent">Update Tuples</button>

@@ -61,6 +61,8 @@ import { UserAutocompleteComponent } from './register/user-autocomplete/user-aut
 import { FormulaViewDialogComponent } from './sku-table/formula-view-dialog/formula-view-dialog.component';
 import { FormulaEditDialogComponent } from './sku-table/formula-edit-dialog/formula-edit-dialog.component';
 import { SearchFormulaComponent } from './formula-table/search-formula/search-formula.component';
+import { TupleEditDialogComponent } from './manufacturing-goal-table/tuple-edit-dialog/tuple-edit-dialog.component';
+import { SkuAutocompleteComponent } from './manufacturing-goal-table/sku-autocomplete/sku-autocomplete.component';
 
 const routes: Routes = [
   {
@@ -125,7 +127,9 @@ const routes: Routes = [
     UserAutocompleteComponent,
     FormulaViewDialogComponent,
     FormulaEditDialogComponent,
-    SearchFormulaComponent
+    SearchFormulaComponent,
+    TupleEditDialogComponent,
+    SkuAutocompleteComponent
   ],
   imports: [
     BrowserModule,
@@ -183,6 +187,6 @@ const routes: Routes = [
     }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, FormulaEditDialogComponent, FormulaViewDialogComponent]
+  entryComponents: [DependencyReportDialogComponent, ActivityDialogComponent, ManufacturingScheduleReportComponent, BulkSkuEditDialogComponent, AddFormulaDialogComponent, SalesDrilldownComponent, FormulaEditDialogComponent, FormulaViewDialogComponent, TupleEditDialogComponent]
 })
 export class AppModule { }
