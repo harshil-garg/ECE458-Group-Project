@@ -21,9 +21,16 @@ module.exports.getUserModel = async function(user){
 
 module.exports.filter = async function(user, manufacturing_line, start, end){
     pipeline = [];
-    pipeline.push({
-        $match: {$or: [{committed: true}, {$and: [{committed: false}, {user: user}]}]}
-    },
+    if(user){
+        pipeline.push({
+            $match: {$or: [{committed: true}, {$and: [{committed: false}, {user: user}]}]}
+        })
+    }else{
+        pipeline.push({
+            $match: {committed: true}
+        })
+    }
+    pipeline.push(
     {
         $lookup: {
             from: 'skus',
@@ -63,7 +70,17 @@ module.exports.filter = async function(user, manufacturing_line, start, end){
 
     if(manufacturing_line && start && end){
         pipeline.push({$match: {'manufacturing_line.shortname': manufacturing_line}},
-        {$addFields: {end_date: {$add: ['$start_date', {$multiply: ['$duration', 60, 60, 1000]}]}}},
+        {$addFields: {hours_to_six: {$subtract: [22, {$hour: '$start_date'}]}}},
+        {$addFields: {end_date: {$cond: {
+            if: {$gte: ['$hours_to_six', '$duration']}, 
+            then: {$add: ['$start_date', {$multiply: ['$duration', 60, 60, 1000]}]}, 
+            else: {$add: ['$start_date', 
+                    {$multiply: [24, 60, 60, 1000]}, 
+                    {$multiply: [{$floor: {$divide: [{$subtract: ['$duration', '$hours_to_six']}, 10.01]}}, 24, 60, 60, 1000]},
+                    {$multiply: [{$mod: [{$subtract: ['$duration', '$hours_to_six']}, 10]}, 60, 60, 1000]}
+            ]}
+        }}}},
+        // {$addFields: {end_date: {$add: ['$start_date', {$multiply: ['$duration', 60, 60, 1000]}]}}},
         {$match: {$and: [{start_date: {$lte: new Date(end)}}, {end_date: {$gte: new Date(start)}}]}},
         {
             $lookup: {
@@ -101,6 +118,7 @@ module.exports.filter = async function(user, manufacturing_line, start, end){
 
     return results;
 }
+
 
 function populateIngredients(results){
     for(let map of results){        
