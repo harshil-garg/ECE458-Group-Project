@@ -10,14 +10,22 @@ import {UploadState} from './uploadStates';
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.css']
 })
-export class UploadComponent {
+export class UploadComponent implements OnInit{
   @ViewChild('file') file;
 
   public files: Set<File> = new Set();
+  admin: boolean = false;
+  productManager: boolean = false;
+  display: boolean = false;
 
   constructor(public uploadService: UploadService, public authService: AuthenticationService, public snackBar: MatSnackBar) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.admin = this.isAdmin();
+    this.productManager = this.isProductManager();
+    this.display = this.admin || this.productManager;
+    console.log(this.display);
+  }
 
   uploadState = UploadState.SELECTING;
   isUploading = false;
@@ -219,7 +227,7 @@ export class UploadComponent {
     return this.authService.isAnalyst();
   }
 
-  isProductManager() {
+  isProductManager(): boolean {
     return this.authService.isProductManager();
   }
 
@@ -231,7 +239,7 @@ export class UploadComponent {
     return this.authService.isPlantManager();
   }
 
-  isAdmin() {
+  isAdmin(): boolean {
     return this.authService.isAdmin();
   }
 }
