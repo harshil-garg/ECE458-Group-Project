@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Enter backup data in form YYYY-MM-DD";
+echo "Enter backup data in form YYYY-MM-DD_type where type is either daily, weekly, or monthly";
 read date_str;
 DIRNAME="backup_$date_str";
 scp -i ~/.ssh/id_rsa -r vcm@$backup_hostname:/home/vcm/$DIRNAME/ .
