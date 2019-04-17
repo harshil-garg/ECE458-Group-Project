@@ -4,10 +4,11 @@ const Formula = require('../model/formula_model');
 const Ingredient = require('../model/ingredient_model');
 const generator = require('../controllers/autogen');
 const validator = require('../controllers/validator');
-const formula_validator = require('../controllers/formula_validator');
 const formula_filter = require('../controllers/formula_filter');
 const autocomplete = require('../controllers/autocomplete');
 const Units = require('../controllers/units');
+const SKU = require('../model/sku_model');
+const formula_validator = require('../controllers/formula_validator');
 
 //Autocomplete 
 router.post('/autocomplete', async (req, res) => {
@@ -57,8 +58,6 @@ router.post('/create', async (req, res) => {
             res.json({success: false, message: err.toString()});
         })
     }
-
-
 });
 
 //Update
@@ -138,17 +137,17 @@ router.post('/update', async (req, res) => {
 
 //Delete
 router.post('/delete', async (req, res) => {
-    const { number } = req.body;
+    const { name } = req.body;
 
-    let formula = await Formula.findOne({number: number}).exec();
-    let formula_passed = await formula_validator.formulaClear(formula._id);
+    let formula = await Formula.findOne({name: name}).exec();
+    let formula_passed = await formula_validator.formulaClear(formula._id, SKU);
 
     if(!formula_passed[0]){
         res.json({success: false, message: formula_passed[1]});
         return;
     }
 
-    Formula.deleteOne({number: number}, (err, result) => {
+    Formula.deleteOne({name: name}, (err, result) => {
         if(err) {
             res.json({success: false, message: `Failed to delete formula. Error: ${err}`});
         }else if(!result || result.deletedCount == 0){

@@ -15,6 +15,7 @@ const User = require('../model/user_model');
 // Utilities
 const PriorityQueue = require('../utils/priority_queue')
 const jwtDecode = require('jwt-decode');
+const schedule_filter = require('../controllers/schedule_filter');
 
 /****************************************************************************************************
  * NAIVE ALGORITHM
@@ -90,7 +91,7 @@ async function automate_naive(req, res) {
         pq.push(t);
     }
     
-    let user_model = await User.findOne({email: getUser(req)})
+    let valid_lines = await getAccesibleManufacturingLines(req);
     let errors = [];
 
     while (true) {
@@ -99,10 +100,12 @@ async function automate_naive(req, res) {
         let schedulable = false;
         let earliestStartTime = moment(end);
         let bestLine;
-        console.log(user_model.plant_manager);
-        for(let valid_line of user_model.plant_manager){
+
+        for(let valid_line of valid_lines){
+            console.log(await ManufacturingLine.find({_id: valid_line}));
+
             for (let line of task.sku.manufacturing_lines) {
-                if(line.equals(valid_line)){
+                if(line.equals(valid_line._id)){
                     console.log("Am i ever in here lol");
                     let schedulableOnLine = false;
                     // We also compare to committed activities
@@ -111,6 +114,7 @@ async function automate_naive(req, res) {
                     });
         
                     let interval = skipToWorkingHours(moment(start), calculateEndTime(moment(start), task.duration), task.duration);
+
                     while (interval.end <= end) {
                         interval = skipToWorkingHours(interval.start, interval.end, task.duration);
                         let conflict = false;
@@ -378,6 +382,7 @@ router.post('/complex', async(req, res) => {
 
 async function transformSchedule(schedule, blocks, periods, req) {
     let mappings = [];
+
     for (let s of schedule) {
         if (s.task == 'MakeSpan') continue;
 
@@ -570,7 +575,7 @@ function to(promise) {
  */
 async function getAccesibleManufacturingLines(req) {
     let user_model = await User.findOne({email: getUser(req)})
-    let manufacturing_lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}});
+    let manufacturing_lines = user_model.admin ? await ManufacturingLine.find({}) : await ManufacturingLine.find({_id: {$in: user_model.plant_manager}});
     return manufacturing_lines;
 }
 

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddManufacturingGoalDialogComponent } from './add-manufacturing-goal-dialog/add-manufacturing-goal-dialog.component';
 import { ManufacturingGoalService, CreateResponse } from '../manufacturing-goal.service';
 import { ManufacturingGoalTableComponent } from '../manufacturing-goal-table.component';
@@ -17,7 +17,7 @@ export class AddManufacturingGoalComponent {
     @Input() disabled = false;
 
     constructor(public dialog: MatDialog, public manufacturingService: ManufacturingGoalService,
-      public manufacturingComponent: ManufacturingGoalTableComponent) {}
+      public manufacturingComponent: ManufacturingGoalTableComponent, private snackBar: MatSnackBar) {}
 
     public openDialog() {
       let dialogRef = this.dialog.open(AddManufacturingGoalDialogComponent, {
@@ -57,6 +57,7 @@ export class AddManufacturingGoalComponent {
 
     private handleResponse(response: CreateResponse) {
       console.log(response);
+      this.snackBar.open(response.message, "Close", {duration:1000});
       this.manufacturingComponent.refresh();
     }
 

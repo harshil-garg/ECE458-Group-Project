@@ -39,7 +39,7 @@ router.post('/create', (req, res) => {
     let line = new ManufacturingLine({name, shortname, comment});
     ManufacturingLine.create(line, (err) => {
         if (err) {
-            res.json({success: false, message: `Failed to create a new manufacturing line. Error: ${error}`});
+            res.json({success: false, message: `Failed to create a new manufacturing line. Error: ${err}`});
         } else{
             res.json({success: true, message: "Added successfully."});
         }
