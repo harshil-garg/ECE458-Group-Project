@@ -14,7 +14,7 @@
   background: white;
   border-radius: 4px;
   overflow: hidden;
-  float: right;
+  float: left;
   width: 125px;
 }
 
@@ -57,4 +57,9 @@
 mat-icon:hover {
   cursor: pointer;
   color: mediumaquamarine;
+}
+
+.pad-box {
+  padding-left: 10px;
+  padding-right: 10px;
 }

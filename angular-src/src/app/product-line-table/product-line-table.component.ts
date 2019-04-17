@@ -78,9 +78,11 @@ export class ProductLineTableComponent implements OnInit{
           response => {
             if(response.success){
               this.handleResponse(response);
+              console.log("responded");
             }
             else{
               this.handleError(response);
+              console.log("responded bad");
             }
           },
           err => {

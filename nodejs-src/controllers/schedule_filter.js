@@ -1,7 +1,7 @@
 const ManufacturingSchedule = require('../model/manufacturing_schedule_model')
 const User = require('../model/user_model');
 
-module.exports.getUserModel = async function(user){
+module.exports.getUserModel = async function(user) {
     let cursor = await User.aggregate([{$match: {email: user}}, {
         $lookup: {
             from: 'manufacturinglines',
@@ -12,14 +12,14 @@ module.exports.getUserModel = async function(user){
     }]).cursor({}).exec();
     
     let user_model;
-    await cursor.eachAsync((res) => {
+    await cursor.eachAsync(res => {
         user_model = res;
     });
 
     return user_model;
 }
 
-module.exports.filter = async function(user, manufacturing_line, start, end){
+module.exports.filter = async function(user, manufacturing_line, start, end) {
     pipeline = [];
     if(user){
         pipeline.push({
@@ -65,10 +65,9 @@ module.exports.filter = async function(user, manufacturing_line, start, end){
             foreignField: '_id',
             as: 'activity.sku.manufacturing_lines'
         }
-    }
-    );
+    });
 
-    if(manufacturing_line && start && end){
+    if (manufacturing_line && start && end) {
         pipeline.push({$match: {'manufacturing_line.shortname': manufacturing_line}},
         {$addFields: {hours_to_six: {$subtract: [22, {$hour: '$start_date'}]}}},
         {$addFields: {end_date: {$cond: {
@@ -109,39 +108,34 @@ module.exports.filter = async function(user, manufacturing_line, start, end){
         results.push(res);
     });
 
-
-    if(manufacturing_line && start && end){
-        populateIngredients(results)
+    if (manufacturing_line && start && end) {
+        populateIngredients(results);
     }
 
-    convertToShortnames(results)
+    convertToShortnames(results);
 
     return results;
 }
 
-
-function populateIngredients(results){
-    for(let map of results){        
-        for(let ingredient of map.ingredients){
-            for(let tuple of map.activity.sku.formula.ingredient_tuples){
-                if(ingredient._id.equals(tuple.ingredient)){
+function populateIngredients(results) {
+    for (let map of results) {        
+        for (let ingredient of map.ingredients) {
+            for (let tuple of map.activity.sku.formula.ingredient_tuples) {
+                if (ingredient._id.equals(tuple.ingredient)) {
                     tuple.ingredient = ingredient;
                 }
             }
         }
-        delete map.ingredientss
+        delete map.ingredients
     }
 }
 
-
-function convertToShortnames(results){
-    
-    for(let map of results){
+function convertToShortnames(results) {
+    for (let map of results) {
         let shortnames = [];
-        for(let line of map.activity.sku.manufacturing_lines){
+        for (let line of map.activity.sku.manufacturing_lines) {
             shortnames.push(line.shortname);
         }
         map.activity.sku.manufacturing_lines = shortnames;
     }
-    
 }

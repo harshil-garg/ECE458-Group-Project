@@ -33,23 +33,23 @@ const schedule_filter = require('../controllers/schedule_filter');
  * Since this is a complicated NP-complete problem, the complex algorithm attempts to solve some of the
  * flaws in this approach.
  * 
- * Diving more into the specifics of the implementation, we first convert the start and end times to EST
- * because the manufacturing lines operate 8AM - 6PM. A priority queue is leveraged to sort the activities
+ * Diving more into the specifics of the implementation, we first convert the start and end periods to EST
+ * because the manufacturing manufacturing_lines operate 8AM - 6PM. A priority queue is leveraged to sort the activities
  * as mentioned in the algorithm overview, and an activity processing function is used to calculate the
  * duration and retrieve the deadline of the activity (from the ManufacturingGoal collection). Tasks are 
  * popped from the priority queue, and we attempt to schedule the task. We attempt to schedule the task 
- * on a set intersection of the lines available to the plant manager and the lines the SKU can be produced
+ * on a set intersection of the manufacturing_lines available to the plant manager and the manufacturing_lines the SKU can be produced
  * on. For each line, we will (1) check if there is space on the line for the activity, (2) what it the
  * earliest it can be scheduled. Then, choosing the optimal line for production is trivial as it is simply
- * a Math.min() over all the lines. 
+ * a Math.min() over all the manufacturing_lines. 
  * 
  * We first set the start time of our proposed activity as the start time of the timeframe. Then, we retrieve 
  * all of the manufacturing activities currently on the line, and iterate through all of them making sure
  * that we don't have any overlap. If there is overlap and a conflict is detected, we add an hour to the
  * start time and try again. We keep going until we find a start time in which no other existing activity 
- * conflicts. If we do we break out of the loop, and update the earliest start time over all the lines if it 
- * is so (Math.min call that was described above). It may be that all lines are full, and the activity isn't 
- * schedulable at any time over all the lines, in which case we return an error message and stop trying to add 
+ * conflicts. If we do we break out of the loop, and update the earliest start time over all the manufacturing_lines if it 
+ * is so (Math.min call that was described above). It may be that all manufacturing_lines are full, and the activity isn't 
+ * schedulable at any time over all the manufacturing_lines, in which case we return an error message and stop trying to add 
  * any other activities. If the activity is schedulable, we simply add an uncommitted entry to our collection,
  * and move on to the next activity.
  * 
@@ -104,10 +104,12 @@ async function automate_naive(req, res) {
 
         for(let valid_line of valid_lines){
             console.log(await ManufacturingLine.find({_id: valid_line}));
+
             for (let line of task.sku.manufacturing_lines) {
                 if(line.equals(valid_line._id)){
                     console.log("Am i ever in here lol");
                     let schedulableOnLine = false;
+                    // We also compare to committed activities
                     let preExistingActivities = await ManufacturingSchedule.find({
                         manufacturing_line: line
                     });
@@ -170,6 +172,7 @@ async function automate_naive(req, res) {
     }
 
     if (errors.length > 0) {
+        console.log(errors);
         return res.json({
             success: true,
             message: errors
@@ -264,53 +267,49 @@ function calculateEndTime(start, duration) {
 router.post('/complex', async(req, res) => {
     let { activities, start_, end_} = req.body;
 
-    let start = moment(start_).tz("America/New_York")
-    let end = moment(end_).tz("America/New_York")
-    console.log(`The start date in EST is ${start.format()} and the end date in EST is ${end.format()}.`);
-    console.log(activities);
+    // Start and end date for autoscheduling
+    let start = moment(start_).tz("America/New_York");
+    let end = moment(end_).tz("America/New_York");
 
-    let periods = mapTime(start, end);
-    let horizon = periods.length - 1;
-    let intervalStart = periods[0];
-    let intervalEnd = periods[horizon];
+    // Setting up pyschedule periods for mapping activities to indices
+    let periods, horizon, interval_start, interval_end;
+    periods = mapTime(start, end);
+    horizon = periods.length - 1;
+    interval_start = periods[0];
+    interval_end = periods[horizon];
 
-    for (let period of periods) {
-        console.log(period.format());
-    }
-    console.log(horizon);
+    // Manufacturing lines the user has access to
+    let user_manufacturing_lines = await getAccesibleManufacturingLines(req);
 
+    // Console log the request for analysis purposes
+    printAutoscheduleRequest(start, end, activities, periods, interval_start, interval_end, user_manufacturing_lines);
+
+    // Add blocking activities
     let blocks = [];
-
-    let user_model = await User.findOne({email: getUser(req)})
-    let lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}}); //lines the user has access to
-    console.log("poo")
-    for (let line of lines) {
+    for (let user_manufacturing_line of user_manufacturing_lines) {
         let tasks = await ManufacturingSchedule.find({
-            manufacturing_line: line
+            manufacturing_line: user_manufacturing_line,
+            committed: true
         });
         for (let task of tasks) {
-            let taskStart = moment(task.start_date).tz("America/New_York");
-            let taskEnd = calculateEndTime(taskStart, task.duration);
-            if (taskStart < intervalEnd && taskEnd > intervalStart) {
-                console.log(taskStart.format());
-                console.log(taskEnd.format());
-                let s = moment.max(taskStart, intervalStart);
-                let e = moment.min(taskEnd, intervalEnd);
-
-                // From s to e, we must find the position(s) in the periods array
+            let task_start = moment(task.start_date).tz("America/New_York");
+            let task_end = calculateEndTime(task_start, task.duration);
+            if (task_start < interval_end && task_end > interval_start) {
+                let s = moment.max(task_start, interval_start);
+                let e = moment.min(task_end, interval_end);
                 let s_index = getIndex(s, periods);
                 let e_index = getIndex(e, periods);
-                console.log(task);
                 let sku = await SKU.findOne({
                     _id: task.activity.sku
                 });
                 let goal = await ManufacturingGoal.findOne({
                     _id: task.activity.manufacturing_goal
                 });
+                console.log(task);
                 blocks.push({
                     sku_number: sku.number,
                     goal_name: goal.name,
-                    line_name: line.name,
+                    manufacturing_line_name: user_manufacturing_line.name,
                     start: s_index,
                     end: e_index
                 });
@@ -318,34 +317,35 @@ router.post('/complex', async(req, res) => {
         }
     }
 
+    // New activities to attempt to schedule
     let tasks = [];
-    
     for (let activity of activities) {
         let processedActivity = await processActivity(activity);
-        console.log(processedActivity);
-        let lineNames = [];
-        for(let line of lines){
-            for (let lineID of processedActivity.sku.manufacturing_lines) {
-                if(line.equals(lineID)){
-                    let line_model = await ManufacturingLine.findOne({_id: lineID});
-                    lineNames.push(line_model.name);
+
+        // Set intersection of user's controllable manufacturing lines and which lines the SKU can be produced on
+        let usable_manufacturing_lines = [];
+        for (let line of user_manufacturing_lines) {
+            for (let id of processedActivity.sku.manufacturing_lines) {
+                if (line.equals(id)) {
+                    let t = await ManufacturingLine.findOne({_id: id});
+                    usable_manufacturing_lines.push(t.name);
                 }
-                
             }
         }
         
-        console.log(`The processed activity deadline is ${processedActivity.deadline.format()}`);
+        console.log(`The processed activity deadline is ${processedActivity.deadline.format()}`)
+
         let deadline_index = getDeadlineIndex(processedActivity.deadline, periods);
-        console.log("deadline index is" + deadline_index);
         tasks.push({
             sku_number: processedActivity.sku.number,
             goal_name: processedActivity.goal.name,
             duration: processedActivity.duration,
-            line_names: lineNames,
+            manufacturing_line_names: usable_manufacturing_lines,
             deadline: deadline_index
         });
     }
-    console.log('these are the tasks');
+    
+    console.log(`The tasks to schedule are as follows: \n`);
     console.log(tasks);
 
     let axios_error, response;
@@ -356,7 +356,7 @@ router.post('/complex', async(req, res) => {
                 blocks: blocks,
                 tasks: tasks,
                 horizon: horizon,
-                lines: lines.map(line => line.name)
+                manufacturing_lines: user_manufacturing_lines.map(line => line.name)
             }, 
             { 
                 headers: {  
@@ -372,7 +372,7 @@ router.post('/complex', async(req, res) => {
         return await automate_naive(req, res);
     } else {
         console.log(response.data.data);
-        let scheduling_result = await transformSchedule(response.data.data, periods, req);
+        let scheduling_result = await transformSchedule(response.data.data, blocks, periods, req);
         if (scheduling_result.success) {
             return res.json(scheduling_result);
         } else {
@@ -381,10 +381,9 @@ router.post('/complex', async(req, res) => {
     }
 });
 
-async function transformSchedule(schedule, times, req) {
+async function transformSchedule(schedule, blocks, periods, req) {
     let mappings = [];
-    let blocks = await schedule_filter.filter();
-    console.log("BLOCKS: "+blocks)
+
     for (let s of schedule) {
         if (s.task == 'MakeSpan') continue;
 
@@ -392,8 +391,18 @@ async function transformSchedule(schedule, times, req) {
         goal_name = s.task.split("_")[0];
         sku_number = s.task.split("_")[1];
         resource = s.resource;
-        start = times[s.start];
-        end = times[s.end];
+        start = periods[s.start];
+        end = periods[s.end];
+
+        // Do not schedule the blocks again (prescheduled activities used as constraints in pyschedule)
+        let skip = false;
+        for (let block of blocks) {
+            if (goal_name.equals(block.goal_name) || sku_number.equals(block.sku_number)) {
+                    skip = true;
+                    break;
+                }
+        }
+        if (skip) continue;
 
         if (!end) {
             return {
@@ -402,24 +411,10 @@ async function transformSchedule(schedule, times, req) {
             }
         }
 
-        // Do not schedule the blocks again (prescheduled activities used as constraints in pyschedule)
-        let is_block = false;
-        for (let block of blocks) {
-            if (goal_name == block.activity.manufacturing_goal.name ||
-                sku_number == block.activity.sku.number) {
-                    is_block = true;
-                    break;
-                }
-        }
-        if (is_block) {
-            continue;
-        }
-
-        // Go ahead and schedule the complex
-        let manufacturing_goal, sku, manufacturing_line, duration, duration_override;
-        manufacturing_goal = await ManufacturingGoal.findOne({name: goal_name});
-        sku = await SKU.findOne({number: sku_number});
-        manufacturing_line = await ManufacturingLine.findOne({name: resource});
+        // Formally schedule
+        let manufacturing_goal = await ManufacturingGoal.findOne({name: goal_name});
+        let sku = await SKU.findOne({number: sku_number});
+        let manufacturing_line = await ManufacturingLine.findOne({name: resource});
 
         let mapping = new ManufacturingSchedule({
             activity: {
@@ -505,7 +500,8 @@ function getDeadlineIndex(deadline, periods) {
 
 router.post('/undo', async(req, res) => {
     let response = await ManufacturingSchedule.deleteMany({
-        committed: false
+        committed: false,
+        user: getUser(req)
     });
     res.json({
         success: true,
@@ -514,7 +510,57 @@ router.post('/undo', async(req, res) => {
 });
 
 router.post('/commit', async(req, res) => {
-    let response = await ManufacturingSchedule.updateMany({
+    let errors = [];
+
+    let activities = await ManufacturingSchedule.find({
+        committed: false,
+        user: getUser(req)
+    });
+    console.log(activities);
+
+    for (let activity of activities) {
+        let start = moment(activity.start_date).tz('America/New_York');
+        let end = calculateEndTime(start, activity.duration);
+        let committed_activities = await ManufacturingSchedule.find({
+            committed: true,
+            manufacturing_line: activity.manufacturing_line
+        });
+        console.log(committed_activities);
+        let conflict = false;
+        for (let committed_activity of committed_activities) {
+            let committed_start = moment(committed_activity.start_date).tz('America/New_York');
+            let committed_end = calculateEndTime(committed_start, committed_activity.duration);
+            console.log(`The committed start is ${committed_start.format()} and the committed end is ${committed_end.format()}`);
+            console.log(`The start is ${start.format()} and theend is ${end.format()}`);
+            if (start < committed_end && end > committed_start) {
+                console.log("How is this triggered");
+                conflict = true;
+                break;
+            }
+        }
+        if (!conflict) {
+            activity.committed = true;
+            activity.user = undefined;
+            activity.save();
+        } else {
+            errors.push('Some activities could not be scheduled');
+        }
+    }
+
+    if (errors.length == 0) {
+        res.json({
+            success: true,
+            message: ["Committed provisional activities to the manufacturing schedule"]
+        });
+    } else {
+        res.json({
+            success: false,
+            message: errors
+        })
+    }
+
+
+    /*let response = await ManufacturingSchedule.updateMany({
         committed: false
     }, {
         committed: true
@@ -522,7 +568,7 @@ router.post('/commit', async(req, res) => {
     res.json({
         success: true,
         message: ["Committed provisional activities to the manufacturing schedule"]
-    });
+    });*/
 });
 
 /****************************************************************************************************
@@ -534,6 +580,31 @@ function to(promise) {
        return [null, data];
     })
     .catch(err => [err]);
- }
+}
+
+/**
+ * @TODO @Jesse This does not work
+ */
+async function getAccesibleManufacturingLines(req) {
+    let user_model = await User.findOne({email: getUser(req)})
+    let manufacturing_lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}});
+    return manufacturing_lines;
+}
+
+function printAutoscheduleRequest(start, end, activities, periods, interval_start, interval_end, manufacturing_lines) {
+    console.log(`The start date in EST is ${start.format()} and the end date in EST is ${end.format()}. \n`);
+    console.log(`We are requested to schedule the following activities: \n`);
+    console.log(activities);
+    console.log(``);
+    console.log(`The periods we are looking to schedule are as follows: \n`);
+    for (let period of periods) {
+        console.log(period.format());
+    }
+    console.log(``);
+    console.log(`The interval start is ${interval_start.format()} and the interval end is ${interval_end.format()} \n`);
+    console.log(`We have access to the following manufacturing lines: \n`);
+    console.log(manufacturing_lines);
+    console.log(``);
+}
 
 module.exports = router;

@@ -30,7 +30,12 @@ module.exports.uniqueActivity = async function(activity){
     let sku = await SKU.findOne({number: activity.sku}).exec();
     let goal = await ManufacturingGoal.findOne({name: activity.manufacturing_goal}).exec();
 
-    let mapping = await ManufacturingSchedule.findOne({'activity.sku': sku._id, 'activity.manufacturing_goal': goal._id}).exec();
+    // We only consider unique committed activities
+    let mapping = await ManufacturingSchedule.findOne({
+        'activity.sku': sku._id, 
+        'activity.manufacturing_goal': goal._id,
+        'committed': true
+    }).exec();
     return [!mapping, err_msg]
 }
 

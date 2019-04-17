@@ -52,8 +52,8 @@ mat-icon:hover{
 }
 
 .sales-report {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 60px;
+  padding-right: 30px;
 }
 
 .flush {
@@ -75,4 +75,9 @@ mat-icon:hover{
 
 .mat-header-cell {
   padding: 8px 8px 8px 0;
+}
+
+.pad-box {
+  padding-left: 10px;
+  padding-right: 10px;
 }
