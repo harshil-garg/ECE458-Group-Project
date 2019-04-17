@@ -91,8 +91,7 @@ async function automate_naive(req, res) {
         pq.push(t);
     }
     
-    let user_model = await schedule_filter.getUserModel(getUser(req));
-    let valid_lines = user_model.admin ? await ManufacturingLine.find({}).exec() : user_model.manufacturinglines
+    let valid_lines = await getAccesibleManufacturingLines(req);
     let errors = [];
 
     while (true) {
@@ -587,7 +586,7 @@ function to(promise) {
  */
 async function getAccesibleManufacturingLines(req) {
     let user_model = await User.findOne({email: getUser(req)})
-    let manufacturing_lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}});
+    let manufacturing_lines = user_model.admin ? await ManufacturingLine.find({}) : await ManufacturingLine.find({_id: {$in: user_model.plant_manager}});
     return manufacturing_lines;
 }
 
