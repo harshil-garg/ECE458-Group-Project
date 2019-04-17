@@ -5,19 +5,19 @@
 </div>
 <div class="button-div" *ngIf="canUpdate()">
   <button class="remove" mat-raised-button type="button" (click)="delete()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
+  <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export</button>
   <app-calculator [disabled]="selection.selected.length!=1" [manufGoal]="selection.selected[0]!=null ? selection.selected[0].name : null"></app-calculator>
   <app-add-manufacturing-goal [disabled]="!liveEditing" class="add"></app-add-manufacturing-goal>
 </div>
 <div class="flex-box-center" *ngIf="isAnalyst() && !isBusinessManager() && !isAdmin()">
   <div class="flex-item">
-    <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
+    <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export</button>
     <app-calculator [disabled]="selection.selected.length!=1" [manufGoal]="selection.selected[0]!=null ? selection.selected[0].name : null"></app-calculator>
   </div>
 </div>
 <div class="flex-box-center" *ngIf="!isAnalyst() && !isBusinessManager() && !isAdmin()">
   <div class="flex-item">
-    <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export to CSV</button>
+    <button mat-raised-button [disabled]="selection.selected.length==0" color="accent" type="button" (click)="exportcsv()">Export</button>
   </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
@@ -112,46 +112,3 @@
 </table>
 
 <mat-paginator [length]="totalDocs" [pageSize]="10 < totalDocs ? 10 : totalDocs" [pageSizeOptions]="[10, totalDocs]" showFirstLastButtons></mat-paginator>
-
-<!-- code based off https://mdbootstrap.com/docs/angular/tables/editable/#advanced-table-options -->
-<!-- <div class="card">
-  <h3 class="card-header text-center font-weight-bold py-4">Manufacturing Goals</h3>
-<div class="pagination">
-  <a (click) = "prevPage()">&laquo;</a>
-  <li *ngFor="let i of shownPages()" (click)="setPage(i)">
-      <a [ngClass]="{active: i == currentPage}">{{i}}</a>
-  </li>
-  <a (click) = "nextPage()">&raquo;</a>
-</div>
-  <div class="card-body">
-    <div id="table" class="table-editable">
-      <app-add-manufacturing-goal></app-add-manufacturing-goal>
-      <table class="table table-bordered table-responsive-md table-striped text-center">
-        <tr>
-          <th class="text-center">Manufacturing Goal Name</th>
-          <th class="text-center">SKUs</th>
-        </tr>
-
-       <ng-container *ngFor="let manufGoal of manufGoalList; let id=index">
-            <tr>
-              <td contenteditable="false">{{manufGoal.name}}</td>
-              <td>
-                <ng-container *ngFor="let sku of manufGoal.skus; let sku_id=index">
-                  <a *ngIf="sku.sku_name!=null">{{sku.sku_name}} : {{sku.case_quantity}}<br></a>
-                </ng-container>
-              </td>
-              <td>
-                <app-calculator [manufGoal]="manufGoal.name"></app-calculator>
-              </td>
-              <td>
-                <button class="remove" type="button" (click)="exportcsv(id)">Export to CSV</button>
-              </td>
-              <td>
-                <button class="remove" type="button" (click)="delete(manufGoal.name)">Remove</button>
-              </td>
-            </tr>
-        </ng-container>
-      </table>
-    </div>
-  </div>
-</div> -->

@@ -36,8 +36,6 @@ export class BulkSkuEditDialogComponent implements OnInit {
         this.data = response.data;
       }
     });
-
- 
   }
 
   bulkEdit(add: boolean) {

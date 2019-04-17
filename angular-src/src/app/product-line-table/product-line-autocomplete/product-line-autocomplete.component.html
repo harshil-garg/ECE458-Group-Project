@@ -1,5 +1,5 @@
-<mat-form-field style="width: 200px;">
-  <input type="text" placeholder="ProductLine" matInput (click)="stopPropagation($event)" [formControl]="inputField" [matAutocomplete]="auto">
+<mat-form-field style="width: 200px;" #productLineForm>
+  <input type="text" (focus)="addUnderline(productLineForm)" (blur)="removeUnderline(productLineForm)" matInput (click)="stopPropagation($event)" [formControl]="inputField" [matAutocomplete]="auto">
   <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
     <mat-option *ngFor="let line of suggestedProductLines" [value]="line">
       {{line}}

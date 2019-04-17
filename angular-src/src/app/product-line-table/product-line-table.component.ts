@@ -189,7 +189,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     isEditable(){
-      return this.isAdmin() && this.liveEditing;
+      return (this.isAdmin() || this.isProductManager()) && this.liveEditing;
     }
 
     addUnderline(form){
