@@ -224,29 +224,31 @@ export class ManufacturingGoalTableComponent implements OnInit {
   }
 
   toggleEnabled(event, goal){
-    let question = this.enabled.isSelected(goal) ? "disable" : "enable"
-    event.stopPropagation();
+    if(this.isAdmin() || this.isBusinessManager()){
+      let question = this.enabled.isSelected(goal) ? "disable" : "enable"
+      event.stopPropagation();
 
-    if(confirm(`Are you sure you would like to ${question} ${goal.name}?`)){
-      this.enabled.toggle(goal);
+      if(confirm(`Are you sure you would like to ${question} ${goal.name}?`)){
+        this.enabled.toggle(goal);
 
-      this.manufacturingService.setEnabled({
-        manufacturing_goal: goal,
-        enabled: this.enabled.isSelected(goal)
-      }).subscribe((response) => {
-        if(response.success){
-          this.refresh()
-        }else{
-          this.handleError(response);
-        }
-      },
-      (err) => {
-        if (err.status === 401) {
-          console.log("401 Error")
-        }
-      })
-    }else{
-      event.preventDefault();
+        this.manufacturingService.setEnabled({
+          manufacturing_goal: goal,
+          enabled: this.enabled.isSelected(goal)
+        }).subscribe((response) => {
+          if(response.success){
+            this.refresh()
+          }else{
+            this.handleError(response);
+          }
+        },
+        (err) => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        })
+      }else{
+        event.preventDefault();
+      }
     }
   }
 

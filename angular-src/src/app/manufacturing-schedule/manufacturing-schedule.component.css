@@ -274,3 +274,7 @@
   width: 1150px;
   overflow: auto;
 }
+
+.gray-text {
+  color: gray;
+}

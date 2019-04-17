@@ -141,6 +141,15 @@ export class AuthenticationService {
     return [];
   }
 
+  public getEmail(): string {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.email;
+    }
+    return "";
+  }
+
   public logout(): void {
     this.token = '';
     window.localStorage.removeItem('mean-token');

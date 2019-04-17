@@ -9,6 +9,7 @@ import {BulkSkuEditDialogComponent} from './bulk-sku-edit-dialog/bulk-sku-edit-d
 })
 export class BulkSkuEditComponent implements OnInit {
   @Input() selectedSkus: Array<any>;
+  @Input() disabled = false;
 
   constructor(public matDialog: MatDialog) { }
 
