@@ -54,7 +54,6 @@ router.post('/update', (req, res) => {
         if (error) {
             res.json({success: false, message: `Failed to update product line. Error: ${error}`});
         } else {
-            await SKU.update({product_line: name}, {product_line: newname}, {multi: true}).exec();
             res.json({success: true, message: "Updated successfully."});
         }
     });
