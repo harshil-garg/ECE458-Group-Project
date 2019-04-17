@@ -16,6 +16,13 @@ export class CreateResponse {
   message: string;
 }
 
+export class UpdateMessage {
+  name : string;
+  newname : string;
+  sku_tuples : SkuNameQuantity[];
+  deadline: Date;
+}
+
 export class RefreshMessage {
   pageNum: number;
   page_size: number;
@@ -26,6 +33,9 @@ export class ResponseData {
   name: string;
 	sku_tuples: SkuNameQuantity[];
   deadline: Date;
+  author: string;
+  last_edit: Date;
+  enabled: boolean;
 }
 
 export class RefreshResponse {
@@ -53,6 +63,12 @@ export class DeleteMessage {
 
 export class DeleteResponse {
   success: boolean;
+  message: string;
+}
+
+export class SetEnabledMessage {
+  manufacturing_goal: any;
+  enabled: boolean;
 }
 
 const httpOptions = {
@@ -73,6 +89,11 @@ export class ManufacturingGoalService {
     return this.http.post<CreateResponse>('/api/manufacturing_goals/create', requestedManufacturingGoal, httpOptions);
   }
 
+  update(requestedManufacturingGoal: UpdateMessage): Observable<CreateResponse>{
+    console.log(requestedManufacturingGoal);
+    return this.http.post<CreateResponse>('/api/manufacturing_goals/update', requestedManufacturingGoal, httpOptions);
+  }
+
   refresh(requestedRefresh: RefreshMessage): Observable<RefreshResponse>{
     return this.http.post<RefreshResponse>('/api/manufacturing_goals/all', requestedRefresh, httpOptions);
   }
@@ -83,5 +104,9 @@ export class ManufacturingGoalService {
 
   delete(requestedDelete: DeleteMessage): Observable<DeleteResponse>{
     return this.http.post<DeleteResponse>('/api/manufacturing_goals/delete', requestedDelete, httpOptions);
+  }
+
+  setEnabled(requestedEnabled: SetEnabledMessage): Observable<DeleteResponse>{
+    return this.http.post<DeleteResponse>('/api/manufacturing_goals/set_enabled', requestedEnabled, httpOptions);
   }
 }

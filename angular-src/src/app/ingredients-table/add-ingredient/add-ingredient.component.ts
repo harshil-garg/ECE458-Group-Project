@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddIngredientDialogComponent } from './add-ingredient-dialog/add-ingredient-dialog.component';
 import { CrudIngredientsService, Response } from '../crud-ingredients.service';
@@ -15,6 +15,7 @@ import { Ingredient } from '../../model/ingredient';
 export class AddIngredientComponent {
 
     ingredient: Ingredient = new Ingredient();
+    @Input() disabled = false;
 
     constructor(public dialog: MatDialog, public crudIngredientsService: CrudIngredientsService,
       public ingredientsTableComponent: IngredientsTableComponent, public resultDialog: MatDialog, private snackBar: MatSnackBar) {}
@@ -73,7 +74,7 @@ export class AddIngredientComponent {
       // var units = ["oz.", "ounce", "lb", "pound", "ton", "g", "gram", "kg", "kilogram", "floz", "fluidounce", "pt", "pint", "qt", "quart", "gal", "gallon", "ml", "milliliter", "l", "liter", "ct", "count"];
       let regex = /^(\d*\.?\d+)\s*(\D.*|)$/;
       var failure = {
-        success: false, 
+        success: false,
         message: "The package size was not numeric or parseable"
       }
       if (package_size) {
@@ -82,7 +83,7 @@ export class AddIngredientComponent {
         console.log(match)
         let number = (match != null) ? match[1] : false;
         let unit = (match != null) ? match[2] : false;
-        
+
         if(number && unit){
           unit = this.cleanUnit(unit);
           return {
@@ -100,6 +101,7 @@ export class AddIngredientComponent {
       if (!response.success) {
         this.snackBar.open(response.message, "Close", {duration:3000});
       } else {
+        this.ingredientsTableComponent.increasePageSize();
         this.ingredientsTableComponent.refresh();
       }
     }

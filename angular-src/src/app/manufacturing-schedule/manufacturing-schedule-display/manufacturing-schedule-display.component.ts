@@ -9,6 +9,7 @@ import { Activity } from '../../model/activity';
 import { MatSnackBar } from '@angular/material';
 import {ManufacturingScheduleReportComponent} from '../manufacturing-schedule-report/manufacturing-schedule-report.component';
 import { MatDialog } from '@angular/material';
+import { AuthenticationService } from '../../authentication.service'
 
 @Component({
   selector: 'app-manufacturing-schedule-display',
@@ -19,19 +20,27 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   suggestedManufacturingLines = [];
   startDate = new FormControl(new Date());
   endDate = new FormControl(new Date());
+  startAutomateDate = new FormControl(new Date());
+  endAutomateDate = new FormControl(new Date());
   manufGoalList : Array<ManufacturingGoal> = [];
   reportingFormControl = new FormControl();
   activityList : Array<Activity> = [];
   palette : Array<Activity> = [];
   addedActivities : Array<Activity> = [];
+  selectedActivityList : Array<Activity> = [];
   removeEvent: EventEmitter<any> = new EventEmitter();
+  refreshScheduler: EventEmitter<boolean> = new EventEmitter();
   goalsUpdated: EventEmitter<Array<ManufacturingGoal>> = new EventEmitter();
   warnings: Array<Array<string>> = [[],[],[],[]];
 
-  constructor(private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar, private crudManufacturingLineService: CrudManufacturingLineService,
+  constructor(private authenticationService: AuthenticationService, private manufacturingScheduleService: ManufacturingScheduleService, private snackBar: MatSnackBar, private crudManufacturingLineService: CrudManufacturingLineService,
     public dialog: MatDialog) {}
 
   ngOnInit() {
+    this.startAutomateDate.value.setHours(8, 0, 0 , 0);
+    this.endAutomateDate.value.setHours(18, 0, 0, 0);
+    this.startDate.value.setHours(8, 0, 0 , 0);
+    this.endDate.value.setHours(18, 0, 0 , 0);
     this.manufGoalList = [];
     this.palette = [];
     this.populateManufGoalList();
@@ -219,6 +228,104 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     this.refreshPalette();
   }
 
+  activityClicked(item, event){
+    if(event.shiftKey){
+      let index = this.selectedActivityList.indexOf(item);
+      if(index == -1){
+        this.selectedActivityList.push(item);
+      } else {
+        this.selectedActivityList.splice(index, 1);
+      }
+    }
+    else {
+      this.selectedActivityList = [];
+    }
+  }
+
+  handleKey(event){
+    if(this.palette.length == this.selectedActivityList.length){
+      this.selectedActivityList = [];
+    }
+    else {
+      this.selectedActivityList = [];
+      for(let activity of this.palette){
+        this.selectedActivityList.push(activity);
+      }
+    }
+    event.preventDefault();
+  }
+
+  automateSchedule(complex){
+    let activities = [];
+    for(let activity of this.selectedActivityList){
+      console.log(activity);
+      activities.push({
+        manufacturing_goal: activity.manufacturing_goal,
+        sku: activity.sku.number
+      });
+    };
+
+    this.startAutomateDate.value.setHours(8, 0, 0 ,0 );
+    this.endAutomateDate.value.setHours(18, 0, 0, 0);
+
+    if(complex){
+      this.manufacturingScheduleService.automate_complex({
+        activities: activities,
+        start_: this.startAutomateDate.value.toISOString(),
+        end_: this.endAutomateDate.value.toISOString()
+      }).subscribe(response => {
+        this.selectedActivityList = [];
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      })
+    }else{
+      this.manufacturingScheduleService.automate({
+        activities: activities,
+        start_: this.startAutomateDate.value.toISOString(),
+        end_: this.endAutomateDate.value.toISOString()
+      }).subscribe(response => {
+        this.selectedActivityList = [];
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+        console.log(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      });
+    }
+    
+  }
+
+
+  commit(){
+    this.manufacturingScheduleService.commit()
+      .subscribe(response => {
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      });
+  }
+
+  undo(){
+    this.manufacturingScheduleService.undo()
+      .subscribe(response => {
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      });
+  }
+
   public makeReport(value) {
     //console.log("hi"+value+""+this.startDate.value);
     console.log(this.startDate.value + " " + typeof this.startDate.value);
@@ -238,7 +345,8 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         var activities : Array<any> = [];
         for(let manufacturing_task of response.data) {
           var start_date = new Date(manufacturing_task.start_date);
-          var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          // var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          var end_date = new Date(manufacturing_task.end_date);
           var duration = manufacturing_task.duration;
 
           let sku_info = manufacturing_task.activity.sku;
@@ -255,17 +363,17 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
           var formula_id = formula_info.number;
           var formula_name = formula_info.name;
           var formula_ingredient_tuples = formula_info.ingredient_tuples;
-          
+
           activities.push({
               id: manufacturing_task._id,
               start_date: start_date,
               end_date: end_date,
               duration: duration,
-              sku_display_name: sku_display_name, 
+              sku_display_name: sku_display_name,
               sku_id: sku_id,
               sku_case_quantity: sku_case_quantity,
               formula_id: formula_id,
-              formula_name: formula_name, 
+              formula_name: formula_name,
               formula_ingredient_tuples: formula_ingredient_tuples
           });
         }
@@ -279,7 +387,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
       }
     }, err => {
       console.log(err);
-      
+
     });
 
     /*dialogRef.afterClosed().subscribe(result =>{
@@ -287,7 +395,27 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         this.manufacturingLine = result;
         this.add(this.manufacturingLine);
       }
-    });*/ 
+    });*/
+  }
+
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authenticationService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authenticationService.isPlantManager();
+  }
+
+  isAdmin() {
+    return this.authenticationService.isAdmin();
   }
 
 }

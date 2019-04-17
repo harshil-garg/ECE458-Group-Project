@@ -1,0 +1,15 @@
+<div class="flex-row">
+  <mat-form-field floatLabel="never" style="width: 400px;">
+    <input #name matInput [placeholder]="selectedValue==='sku'? 'Search by Sku' : 'Search by Product Line'" [matAutocomplete]="auto" [formControl]="inputField" [(ngModel)]="input" (ngModelChange)="updateValue()">
+  </mat-form-field>
+  <mat-button-toggle-group name="sku" #sku="matButtonToggleGroup" [value]="selectedValue" (change)="changeInputType(sku.value)">
+    <mat-button-toggle class="no-padding" value="sku">Sku</mat-button-toggle>
+    <mat-button-toggle class="no-padding" value="product_line">Product Line</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelectionChanged($event)">
+    <mat-option *ngFor="let sku of suggestedSkus" [value]="sku">{{sku.name}}
+       <font color="lightgray">{{sku.product_line}}</font> </mat-option>
+  </mat-autocomplete>
+
+</div>

@@ -13,8 +13,27 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
   }
 
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authenticationService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authenticationService.isPlantManager();
+  }
+
   isAdmin() {
     return this.authenticationService.isAdmin();
   }
 
+  getUser(){
+    return this.authenticationService.getEmail();
+  }
 }

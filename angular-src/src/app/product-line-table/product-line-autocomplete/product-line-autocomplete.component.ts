@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, QueryList } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { CrudProductLineService } from '../crud-product-line.service';
+import { MatFormField } from '@angular/material';
 
 @Component({
   selector: 'app-product-line-autocomplete',
@@ -13,7 +14,9 @@ export class ProductLineAutocompleteComponent implements OnInit {
   inputField : FormControl = new FormControl();
 
   @Input() initProductLine : string;
+  @Input() disableUnderline : boolean;
   @Output() messageEvent = new EventEmitter<any>();
+  @ViewChild(MatFormField) formField: MatFormField;
 
   constructor(public productLineService: CrudProductLineService) { }
 
@@ -21,7 +24,7 @@ export class ProductLineAutocompleteComponent implements OnInit {
     if(this.initProductLine != null){
       this.inputField.setValue(this.initProductLine);
     }
-    
+
     this.inputField.valueChanges.debounceTime(200)
     .distinctUntilChanged()
     .switchMap((query) =>  this.productLineService.autocomplete({input: query}))
@@ -41,6 +44,18 @@ export class ProductLineAutocompleteComponent implements OnInit {
 
   stopPropagation(ev){
     ev.stopPropagation();
+  }
+
+  addUnderline(form){
+    if(this.disableUnderline){
+      form.underlineRef.nativeElement.className = "mat-form-field-underline";
+    }
+  }
+
+  removeUnderline(form){
+    if(this.disableUnderline){
+      form.underlineRef.nativeElement.className = null;
+    }
   }
 
 }

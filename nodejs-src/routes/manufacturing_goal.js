@@ -13,7 +13,6 @@ const utils = require('../utils/utils');
 const manufacturing_goal_filter = require('../controllers/manufacturing_goal_filter');
 const jwtDecode = require('jwt-decode');
 
-
 function getUser(req){
     let jwt = req.headers.authorization
     let payload = jwt.split(' ')[1]
@@ -34,7 +33,7 @@ router.post('/calculator', async (req, res) => {
 
     let ingredientMap = {}
 
-    let goal = await ManufacturingGoal.findOne({name: name, user: user}).exec();
+    let goal = await ManufacturingGoal.findOne({name: name}).exec();
 
     for(let sku_tuple of goal.sku_tuples){
         let sku = await SKU.findOne({_id: sku_tuple.sku}).exec();
@@ -70,8 +69,9 @@ router.post('/calculator', async (req, res) => {
 });
 
 router.post('/get_enabled', async (req, res) => {
+    let get_enabled = true;
 
-    let results = await manufacturing_goal_filter.filter(-1, 'name', 0);
+    let results = await manufacturing_goal_filter.filter(-1, 'name', 0, get_enabled);
     res.json(results);
 });
 
@@ -96,7 +96,7 @@ router.post('/all', async (req, res) => {
         return;
     }
 
-    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size, user);
+    let results = await manufacturing_goal_filter.filter(pageNum, sortBy, page_size);
     res.json(results);
 });
 
@@ -135,13 +135,15 @@ router.post('/create', async (req, res) => {
         return;
     }
 
-    createManufacturingGoal(name, sku_tuples, user, deadline_date, res);    
+    let last_edit = new Date();   
+
+    createManufacturingGoal(name, sku_tuples, deadline_date, user, last_edit, res);    
 
 });
 
-function createManufacturingGoal(name, sku_tuples, user, deadline, res){
-    let goal = new ManufacturingGoal({name, sku_tuples, user, deadline});
-
+function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, res){
+    let goal = new ManufacturingGoal({name, sku_tuples, deadline, author, last_edit});
+    
     ManufacturingGoal.create(goal, (error) => {
         if (error) {
             res.json({success: false, message: `Failed to create a new manufacturing goal. Error: ${error}`});
@@ -151,8 +153,53 @@ function createManufacturingGoal(name, sku_tuples, user, deadline, res){
     });
 }
 
+//UPDATE
+router.post('/update', async (req, res) => {
+    const { name, newname, sku_tuples, deadline } = req.body;
+    
+    let json = {};
+    if(newname != undefined && newname != NaN){
+        json["name"] = newname;
+    }
+    if(sku_tuples != undefined && sku_tuples != NaN){
+        // Check that SKUS exist
+        let valid_tuples = [];
+        for(let tuple of sku_tuples){
+            valid_tuples.push(await validator.itemExists(SKU, tuple.sku.number.toString()));
+        }
 
+        let errors = validator.compileErrors(...valid_tuples);
+        // Return errors if any
+        if(errors.length > 0){
+            res.json({success: false, message: errors});
+            return;
+        }
+        // Change from sku name to id
+        for(let i = 0; i < valid_tuples.length; i++){
+            sku_tuples[i]['sku'] = valid_tuples[i][2]; //id of sku
+        }
+        json["sku_tuples"] = sku_tuples;
+    }
+    if(deadline != undefined && deadline != NaN){
+        let deadline_date = new Date(deadline);
+        if(isNaN(deadline_date)){
+            res.json({success: false, message: deadline_date}); //message is: invalid date
+            return;
+        }
+        json["deadline"] = deadline_date;
+    }
+    json["last_edit"] = new Date()
+    
+    ManufacturingGoal.findOneAndUpdate({name: name}, json, {new: true}, (err) => {
+        if (err) {
+            res.json({success: false, message: `Failed to update manufacturing goal. Error: ${err}`});
+        } else {
+            res.json({success: true, message: "Updated successfully."});
+        }
+    })
+})
 
+//DELETE
 router.post('/delete', async (req, res) => {
     const { name } = req.body;
     let goal = await ManufacturingGoal.findOne({name: name}).exec();

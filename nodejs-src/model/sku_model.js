@@ -54,6 +54,7 @@ const SKUSchema = new Schema({
     },
     manufacturing_lines: {
         type: [Schema.ObjectId],
+        deafult: [],
         ref: 'ManufacturingLine'
     },
     manufacturing_rate: {

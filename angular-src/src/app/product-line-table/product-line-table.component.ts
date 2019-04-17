@@ -78,9 +78,11 @@ export class ProductLineTableComponent implements OnInit{
           response => {
             if(response.success){
               this.handleResponse(response);
+              console.log("responded");
             }
             else{
               this.handleError(response);
+              console.log("responded bad");
             }
           },
           err => {
@@ -100,10 +102,6 @@ export class ProductLineTableComponent implements OnInit{
       this.snackBar.open(response.message, "Close", {duration:1000});
       //refreshing every time gets rid of active element
       //this.refresh();
-    }
-
-    isAdmin() {
-      return this.authenticationService.isAdmin();
     }
 
     refresh(){
@@ -191,7 +189,7 @@ export class ProductLineTableComponent implements OnInit{
     }
 
     isEditable(){
-      return this.isAdmin() && this.liveEditing;
+      return (this.isAdmin() || this.isProductManager()) && this.liveEditing;
     }
 
     addUnderline(form){
@@ -203,6 +201,36 @@ export class ProductLineTableComponent implements OnInit{
     removeUnderline(form){
       if(this.isEditable()){
         form.underlineRef.nativeElement.className = null;
+      }
+    }
+
+    isAnalyst() {
+      return this.authenticationService.isAnalyst();
+    }
+
+    isProductManager() {
+      return this.authenticationService.isProductManager();
+    }
+
+    isBusinessManager() {
+      return this.authenticationService.isBusinessManager();
+    }
+
+    isPlantManager() {
+      return this.authenticationService.isPlantManager();
+    }
+
+    isAdmin() {
+      return this.authenticationService.isAdmin();
+    }
+
+    canUpdate() {
+      return this.isAdmin() || this.isProductManager();
+    }
+
+    increasePageSize() {
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+        this.paginator.pageSize++;
       }
     }
 }

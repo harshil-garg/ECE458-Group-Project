@@ -94,6 +94,62 @@ export class AuthenticationService {
     return false;
   }
 
+  public isBusinessManager(): boolean {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.business_manager;
+    }
+    return false;
+  }
+
+  public isAnalyst(): boolean {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.analyst;
+    }
+    return false;
+  }
+
+  public isProductManager(): boolean {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.product_manager;
+    }
+    return false;
+  }
+
+  public isPlantManager(): boolean {
+    const token = this.getUserDetails();
+
+    if(token) {
+      if(token.plant_manager){
+        return token.plant_manager.length > 0;
+      }
+    }
+    return false;
+  }
+
+  public getPlantManagerLines(): Array<any> {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.plant_manager;
+    }
+    return [];
+  }
+
+  public getEmail(): string {
+    const token = this.getUserDetails();
+
+    if(token) {
+      return token.email;
+    }
+    return "";
+  }
+
   public logout(): void {
     this.token = '';
     window.localStorage.removeItem('mean-token');

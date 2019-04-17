@@ -3,15 +3,15 @@
 <div class="search-div">
     <br style="clear:both" />
 </div>
-<div *ngIf="isAdmin()" align="center">
+<div *ngIf="canUpdate()" align="center">
   <mat-slide-toggle [(ngModel)]="liveEditing">Live Editing Enabled</mat-slide-toggle>
 </div>
-<div id="search-div" *ngIf="isAdmin()">
+<div id="search-div" *ngIf="canUpdate()">
   <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <app-add-product-line class="add"></app-add-product-line>
+  <app-add-product-line [disabled]="!liveEditing" class="add"></app-add-product-line>
   <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
 </div>
-<div class="flex-box-center" *ngIf="!isAdmin()">
+<div class="flex-box-center" *ngIf="!canUpdate()">
   <div class="flex-item">
     <button mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
   </div>
@@ -29,13 +29,15 @@
     <th mat-header-cell *matHeaderCellDef>
       <mat-checkbox (change)="$event ? masterToggle() : null"
                     [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                    [disabled]="!liveEditing">
       </mat-checkbox>
     </th>
     <td mat-cell *matCellDef="let row">
       <mat-checkbox (click)="$event.stopPropagation()"
                     (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)">
+                    [checked]="selection.isSelected(row)"
+                    [disabled]="!liveEditing">
       </mat-checkbox>
     </td>
   </ng-container>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ManufacturingLineTableComponent } from '../manufacturing-line-table.component';
 import { AddManufacturingLineDialogComponent } from './add-manufacturing-line-dialog/add-manufacturing-line-dialog.component';
@@ -14,6 +14,7 @@ import { ManufacturingLine } from '../../model/manufacturing-line';
 export class AddManufacturingLineComponent {
 
     manufacturingLine: ManufacturingLine = new ManufacturingLine();
+    @Input() disabled = false;
 
     constructor(public dialog: MatDialog, public manufacturingLineTableComponent: ManufacturingLineTableComponent,
       public crudManufacturingLineService: CrudManufacturingLineService) {}
@@ -52,6 +53,7 @@ export class AddManufacturingLineComponent {
       if (!response.success) {
         alert(response.message);
       }
+      this.manufacturingLineTableComponent.increasePageSize();
       this.manufacturingLineTableComponent.refresh();
     }
 

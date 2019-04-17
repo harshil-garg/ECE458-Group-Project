@@ -1,6 +1,7 @@
 #!/bin/sh
 DATE=`date +%Y-%m-%d`;
-NAME="backup_$DATE";
+NAME="backup_$DATE""_$1";
+echo $NAME;
 /usr/bin/docker run --network=ece458-group-project_default --link ece458-group-project_database_1:db --rm -v $(pwd)/$NAME:/backup mongo bash -c "mongodump --out /backup --host db:27017"
 if [ -d "$NAME" -a "$(ls -A $NAME)" ]; then
 	scp -i ~/.ssh/id_rsa -r $NAME/ vcm@$backup_hostname:/home/vcm/

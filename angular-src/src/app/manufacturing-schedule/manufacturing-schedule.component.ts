@@ -9,6 +9,7 @@ import { Activity } from '../model/activity';
 import { Sku } from '../model/sku';
 import { ManufacturingGoal } from '../model/manufacturing-goal';
 import { MatSnackBar, MatDialog } from '@angular/material';
+import { AuthenticationService } from '../authentication.service'
 
 @Component({
   selector: 'app-manufacturing-schedule',
@@ -28,16 +29,20 @@ export class ManufacturingScheduleComponent implements OnInit {
   @Input() manufGoals : Array<ManufacturingGoal> = [];
   @Input() remove: EventEmitter<any>;
   @Input() goalsUpdated: EventEmitter<Array<ManufacturingGoal>>;
+  @Input() refreshSchedule: EventEmitter<boolean>;
   @Output() warnings: EventEmitter<Array<Array<Activity>>> = new EventEmitter();
   @Output() activitiesUpdated: EventEmitter<Array<ManufacturingScheduleEvent>> = new EventEmitter();
 
-  constructor(private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
+  constructor(private authenticationService: AuthenticationService, private crudManufacturingLineService: CrudManufacturingLineService, private snackBar: MatSnackBar,
     public manufacturingScheduleDisplayComponent: ManufacturingScheduleDisplayComponent, public dialog: MatDialog,
     private manufacturingScheduleService: ManufacturingScheduleService) { }
 
   ngOnInit() {
     this.refresh();
     this.remove.subscribe(index=>this.removeActivity(index));
+    this.refreshSchedule.subscribe(e=>{
+      this.refresh();
+    });
     this.goalsUpdated.subscribe(goals => {
       this.manufGoals = goals;
       this.refresh();
@@ -50,14 +55,18 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.manufacturingScheduleService.load().subscribe(
       response => {
         if(response.success){
-          response.data.forEach(data => {this.activities.push({
+          response.data.forEach(data => {
+            let start_date = new Date(data.start_date);
+            start_date.setMinutes(0, 0, 0);
+            this.activities.push({
             activity: {
               sku: data.activity.sku,
               manufacturing_goal: data.activity.manufacturing_goal.name,
               duration: data.duration
             },
             manufacturing_line: data.manufacturing_line.shortname,
-            start_date: new Date(data.start_date),
+            start_date: start_date,
+            committed: data.committed,
             duration: data.duration,
             duration_override: data.duration_override
           })});
@@ -136,8 +145,15 @@ export class ManufacturingScheduleComponent implements OnInit {
       if(this.sameDay(this.activities[i].start_date, this.currDate)){
         var hour = this.activities[i].start_date.getHours();
         if(hour>=8 && hour<18){
-          this.starting_hours[manufIndex][hour-8] = this.activities[i].activity.sku.name;
+          console.log("STARTING ACTIVITY");
+          console.log(this.activities[i]);
+          console.log(hour);
+          if(this.canEditLine(this.activities[i].manufacturing_line) && this.activities[i].committed){
+            this.starting_hours[manufIndex][hour-8] = this.activities[i].activity.sku.name;
+          }
         }
+        console.log("START HOURS");
+        console.log(this.starting_hours);
       }
       var endDate = this.calculateEndTime(this.activities[i].start_date, this.activities[i].duration);
       var endTime = endDate.getTime();
@@ -250,15 +266,9 @@ export class ManufacturingScheduleComponent implements OnInit {
               manufacturing_line: this.manufLines[+currId],
               start_date: startDate,
               duration: droppedActivity.duration,
+              committed: droppedActivity.committed,
               duration_override: false
           }
-          // this.activities.push({
-          //   activity: droppedActivity,
-          //   manufacturing_line: this.manufLines[+currId],
-          //   start_date: startDate,
-          //   duration: droppedActivity.duration,
-          //   duration_override: false
-          // });
           this.createActivity(newManufEvent);
           this.manufacturingScheduleDisplayComponent.removeActivity(event.previousIndex);
         } else{
@@ -347,21 +357,23 @@ export class ManufacturingScheduleComponent implements OnInit {
   }
 
   openActivityDialog(id, hour_id){
-    var activity_id = this.hours[id][hour_id];
-    if(activity_id != -1){//there is an activity at this time
-      let dialogRef = this.dialog.open(ActivityDialogComponent, {
-        height: '400px',
-        width: '400px',
-        data: this.activities[activity_id].duration
-      });
+    if(this.canEditLine(this.manufLines[id])){
+      var activity_id = this.hours[id][hour_id];
+      if(activity_id != -1){//there is an activity at this time
+        let dialogRef = this.dialog.open(ActivityDialogComponent, {
+          height: '400px',
+          width: '400px',
+          data: this.activities[activity_id].duration
+        });
 
-      dialogRef.afterClosed().subscribe(result =>{
-        if(result!=null){
-          this.activities[activity_id].duration = +result;
-          this.activities[activity_id].duration_override = true;
-          this.updateActivity(this.activities[activity_id]);
-        }
-      });
+        dialogRef.afterClosed().subscribe(result =>{
+          if(result!=null){
+            this.activities[activity_id].duration = +result;
+            this.activities[activity_id].duration_override = true;
+            this.updateActivity(this.activities[activity_id]);
+          }
+        });
+      }
     }
   }
 
@@ -377,7 +389,7 @@ export class ManufacturingScheduleComponent implements OnInit {
     this.manufacturingScheduleService.create({
       activity: {
         manufacturing_goal: manufacturingScheduleEvent.activity.manufacturing_goal,
-      	sku: manufacturingScheduleEvent.activity.sku["number"]
+      	sku: manufacturingScheduleEvent.activity.sku.number.toString()
       },
       manufacturing_line: manufacturingScheduleEvent.manufacturing_line,
       start_date: manufacturingScheduleEvent.start_date,
@@ -388,7 +400,8 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(response.success){
           this.refresh();
         } else {
-          this.displayError("Failed to create Activity!");
+          this.displayError(response.message);
+          this.manufacturingScheduleDisplayComponent.refreshPalette();
         }
       },
       err => {
@@ -407,10 +420,12 @@ export class ManufacturingScheduleComponent implements OnInit {
       }
     }).subscribe(
       response => {
+        console.log(response)
         if(response.success){
           this.refresh();
         } else {
-          this.displayError("Failed to create Activity!");
+          this.displayError(response.message);
+          this.manufacturingScheduleDisplayComponent.refreshPalette();
         }
       },
       err => {
@@ -435,7 +450,8 @@ export class ManufacturingScheduleComponent implements OnInit {
         if(response.success){
           this.refresh();
         } else {
-          this.displayError("Failed to create Activity!");
+          this.displayError(response.message);
+          this.manufacturingScheduleDisplayComponent.refreshPalette();
         }
       },
       err => {
@@ -486,7 +502,9 @@ export class ManufacturingScheduleComponent implements OnInit {
     } else {
       var activity = this.activities[item];
       var prefix : string = "";
-      if(activity.past_deadline){
+      if(!activity.committed){
+        prefix += "uncommitted-"
+      } else if(activity.past_deadline){
         prefix += "past-deadline-";
       } else if(activity.duration_override){
         prefix += "duration-override-";
@@ -499,6 +517,54 @@ export class ManufacturingScheduleComponent implements OnInit {
         return prefix+"start-box";
       }
     }
+  }
+
+  lineHeaderBoxClass(line){
+    if(this.isAdmin()){
+      return "editable-header-box";
+    } else if(this.authenticationService.isPlantManager()){
+      if(this.canEditLine(line)){
+        return "editable-header-box";
+      } else {
+        return "uneditable-header-box";
+      }
+    } else {
+      return "uneditable-header-box";
+    }
+  }
+
+  canEdit() {
+    return this.isAdmin() || this.isPlantManager();
+  }
+
+  canEditLine(line) {
+    let containsLine = false;
+    this.authenticationService.getPlantManagerLines().forEach(l => {
+      if(l.shortname==line){
+        containsLine = true;
+      }
+    });
+    return containsLine || this.isAdmin();
+  }
+
+  isAnalyst() {
+    return this.authenticationService.isAnalyst();
+  }
+
+  isProductManager() {
+    return this.authenticationService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authenticationService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authenticationService.isPlantManager();
+  }
+
+  isAdmin() {
+    return this.authenticationService.isAdmin();
   }
 
 }

@@ -10,14 +10,22 @@ import {UploadState} from './uploadStates';
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.css']
 })
-export class UploadComponent {
+export class UploadComponent implements OnInit{
   @ViewChild('file') file;
 
   public files: Set<File> = new Set();
+  admin: boolean = false;
+  productManager: boolean = false;
+  display: boolean = false;
 
   constructor(public uploadService: UploadService, public authService: AuthenticationService, public snackBar: MatSnackBar) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.admin = this.isAdmin();
+    this.productManager = this.isProductManager();
+    this.display = this.admin || this.productManager;
+    console.log(this.display);
+  }
 
   uploadState = UploadState.SELECTING;
   isUploading = false;
@@ -160,7 +168,7 @@ export class UploadComponent {
         this.changeState(UploadState.SUCCESS);
       }
     });
-    
+
     // The OK-button should have the text "Finish" now
     this.primaryButtonText = 'Finish';
   }
@@ -213,6 +221,22 @@ export class UploadComponent {
   }
   skusImported(): boolean {
     return  this.results.skus.createlist.length || this.results.skus.changelist.length || this.results.skus.ignorelist.length;
+  }
+
+  isAnalyst() {
+    return this.authService.isAnalyst();
+  }
+
+  isProductManager(): boolean {
+    return this.authService.isProductManager();
+  }
+
+  isBusinessManager() {
+    return this.authService.isBusinessManager();
+  }
+
+  isPlantManager() {
+    return this.authService.isPlantManager();
   }
 
   isAdmin(): boolean {

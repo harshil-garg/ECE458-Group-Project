@@ -167,10 +167,6 @@ export class IngredientsTableComponent implements OnInit{
       this.editField = event.target.textContent;
     }
 
-    isAdmin() {
-      return this.authenticationService.isAdmin();
-    }
-
     getNumSkus(ingredient: Ingredient){
       return ingredient.skus.length;
     }
@@ -230,11 +226,6 @@ export class IngredientsTableComponent implements OnInit{
       });
     }
 
-    setSortBy(property: string){
-      this.sortBy = property;
-      this.refresh();
-    }
-
     setKeywords(newKeywords : Array<any>){
       this.keywords = newKeywords;
       this.paginator.pageSize = 10;
@@ -281,7 +272,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     isEditable(){
-      return this.isAdmin() && this.liveEditing;
+      return this.canUpdate() && this.liveEditing;
     }
 
     addUnderline(form){
@@ -293,6 +284,36 @@ export class IngredientsTableComponent implements OnInit{
     removeUnderline(form){
       if(this.isEditable()){
         form.underlineRef.nativeElement.className = null;
+      }
+    }
+
+    isAnalyst() {
+      return this.authenticationService.isAnalyst();
+    }
+
+    isProductManager() {
+      return this.authenticationService.isProductManager();
+    }
+
+    isBusinessManager() {
+      return this.authenticationService.isBusinessManager();
+    }
+
+    isPlantManager() {
+      return this.authenticationService.isPlantManager();
+    }
+
+    isAdmin() {
+      return this.authenticationService.isAdmin();
+    }
+
+    canUpdate() {
+      return this.isAdmin() || this.isProductManager();
+    }
+
+    increasePageSize() {
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+        this.paginator.pageSize++;
       }
     }
 

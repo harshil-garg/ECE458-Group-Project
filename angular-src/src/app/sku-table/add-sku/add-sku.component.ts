@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddSkuDialogComponent } from './add-sku-dialog/add-sku-dialog.component';
 import { CrudSkuService, Response } from '../crud-sku.service';
@@ -15,6 +15,7 @@ import { Ingredient } from '../../model/ingredient';
 export class AddSkuComponent {
 
   sku: Sku = new Sku();
+  @Input() disabled = false;
 
   constructor(public dialog: MatDialog, public crudSkuService: CrudSkuService,
     public skuTableComponent: SkuTableComponent, private snackBar: MatSnackBar) {}
@@ -65,10 +66,11 @@ export class AddSkuComponent {
     if (!response.success) {
       this.snackBar.open(response.message, "Close", {duration:3000});
     } else {
+      this.skuTableComponent.increasePageSize();
       this.skuTableComponent.refresh();
     }
     console.log(response);
-    
+
   }
 
 }

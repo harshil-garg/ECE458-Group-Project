@@ -5,6 +5,7 @@ import { ManufacturingLine } from './manufacturing-line'
 export class Sku {
   id: number;
   name: string;
+  number?: number;
   case_upc: number;
   unit_upc: number;
   unit_size: string;

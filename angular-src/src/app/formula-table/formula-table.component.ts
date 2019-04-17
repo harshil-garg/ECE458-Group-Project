@@ -149,10 +149,6 @@ export class FormulaTableComponent implements OnInit{
       //this.refresh();
     }
 
-    isAdmin() {
-      return this.authenticationService.isAdmin();
-    }
-
     refresh(){
       this.loadingResults = true;
       var pageIndex : number = this.paginator.pageIndex+1;
@@ -182,7 +178,8 @@ export class FormulaTableComponent implements OnInit{
               id: formula.number,
               name: formula.name,
               ingredient_tuples: formula.ingredient_tuples,
-              comment: formula.comment
+              comment: formula.comment,
+              skus: formula.skus
           });
         }
         this.dataSource.data = this.formulaList;
@@ -236,7 +233,7 @@ export class FormulaTableComponent implements OnInit{
     }
 
     isEditable(){
-      return this.isAdmin() && this.liveEditing;
+      return this.canUpdate() && this.liveEditing;
     }
 
     export(){
@@ -286,6 +283,10 @@ export class FormulaTableComponent implements OnInit{
       }
     }
 
+    getNumSkus(formula){
+      return formula.skus.length;
+    }
+
     addUnderline(form){
       if(this.isEditable()){
         form.underlineRef.nativeElement.className = "mat-form-field-underline";
@@ -295,6 +296,36 @@ export class FormulaTableComponent implements OnInit{
     removeUnderline(form){
       if(this.isEditable()){
         form.underlineRef.nativeElement.className = null;
+      }
+    }
+
+    isAnalyst() {
+      return this.authenticationService.isAnalyst();
+    }
+
+    isProductManager() {
+      return this.authenticationService.isProductManager();
+    }
+
+    isBusinessManager() {
+      return this.authenticationService.isBusinessManager();
+    }
+
+    isPlantManager() {
+      return this.authenticationService.isPlantManager();
+    }
+
+    isAdmin() {
+      return this.authenticationService.isAdmin();
+    }
+
+    canUpdate() {
+      return this.isAdmin() || this.isProductManager();
+    }
+
+    increasePageSize() {
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+        this.paginator.pageSize++;
       }
     }
 }

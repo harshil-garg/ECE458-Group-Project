@@ -110,10 +110,6 @@ export class ManufacturingLineTableComponent implements OnInit{
       this.snackBar.open(response.message, "Close", {duration:1000});
     }
 
-    isAdmin() {
-      return this.authenticationService.isAdmin();
-    }
-
     refresh(){
       this.loadingResults = true;
       var pageIndex : number = this.paginator.pageIndex+1;
@@ -167,7 +163,7 @@ export class ManufacturingLineTableComponent implements OnInit{
     }
 
     isEditable(){
-      return this.isAdmin() && this.liveEditing;
+      return this.canUpdate() && this.liveEditing;
     }
 
     addUnderline(form){
@@ -179,6 +175,36 @@ export class ManufacturingLineTableComponent implements OnInit{
     removeUnderline(form){
       if(this.isEditable()){
         form.underlineRef.nativeElement.className = null;
+      }
+    }
+
+    isAnalyst() {
+      return this.authenticationService.isAnalyst();
+    }
+
+    isProductManager() {
+      return this.authenticationService.isProductManager();
+    }
+
+    isBusinessManager() {
+      return this.authenticationService.isBusinessManager();
+    }
+
+    isPlantManager() {
+      return this.authenticationService.isPlantManager();
+    }
+
+    isAdmin() {
+      return this.authenticationService.isAdmin();
+    }
+
+    canUpdate() {
+      return this.isAdmin() || this.isProductManager();
+    }
+
+    increasePageSize() {
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+        this.paginator.pageSize++;
       }
     }
 }

@@ -7,6 +7,10 @@ table {
   width: 100%;
 }
 
+.summary-table-long {
+  overflow-x: auto;
+}
+
 .centre {
     text-align: center;
 }
@@ -48,8 +52,8 @@ mat-icon:hover{
 }
 
 .sales-report {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 .flush {
@@ -62,5 +66,24 @@ mat-icon:hover{
 }
 
 .card-padding {
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
+
+.mat-cell {
+  padding: 8px 8px 8px 0;
+}
+
+.mat-header-cell {
+  padding: 8px 8px 8px 0;
+}
+
+.pad-box {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.pad-small-box {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+

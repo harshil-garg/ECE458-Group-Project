@@ -83,6 +83,8 @@ export class LoginComponent implements OnInit {
 	    if (response.success) {
           this.authenticationService.loginState.user = email;
 			this.authenticationService.saveToken(response.token);
+      console.log("LOGIN TOKEN");
+      console.log(response);
 			this.loginError = false;
       		this.showSpinner = false;
 			this.router.navigate(['dashboard']);
