@@ -3,7 +3,7 @@ Read INSTALL.MD. Walk through the script step by step for easy deployment. You n
 
 As of evolution 4, our production server lives at https://vcm-9470.vm.duke.edu:4200 and our backup server lives at https://vcm-8793.vm.duke.edu.
 
-The passwords are seTrogrum5 and 6yTefrigao respectively.
+The passwords are hubut6anGr and 6yTefrigao respectively.
 
 # Backup Guide
 Read BACKUP.MD for an understanding of how the backups and restore are done or can be handled by the system administrator.
