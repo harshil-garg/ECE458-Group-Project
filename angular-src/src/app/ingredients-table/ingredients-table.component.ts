@@ -312,7 +312,7 @@ export class IngredientsTableComponent implements OnInit{
     }
 
     increasePageSize() {
-      if(this.paginator.pageSize < 10){
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
         this.paginator.pageSize++;
       }
     }
