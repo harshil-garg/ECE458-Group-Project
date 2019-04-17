@@ -8,20 +8,24 @@
       </div>
       <div>
         <h2>Customers</h2>
-        <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
-        </app-customer-autocomplete>
+        <div class="pad-box">
+          <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
+          </app-customer-autocomplete>
+        </div>
       </div>
       <div>
         <h2>Product Lines</h2>
-        <mat-card class="mat-elevation-z2">
-          <mat-card-content>
-            <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
-            <app-product-line-autocomplete (messageEvent)="refreshProductLines($event)"></app-product-line-autocomplete>
-          </mat-card-content>
-          <mat-card-content>
-            <button mat-raised-button color="accent" (click)="addAllProductLines()">Add All</button>
-          </mat-card-content>
-        </mat-card>
+        <div class="pad-box">
+          <mat-card class="mat-elevation-z2">
+            <mat-card-content>
+              <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
+              <app-product-line-autocomplete (messageEvent)="refreshProductLines($event)"></app-product-line-autocomplete>
+            </mat-card-content>
+            <mat-card-content>
+              <button mat-raised-button color="accent" (click)="addAllProductLines()">Add All</button>
+            </mat-card-content>
+          </mat-card>
+        </div>
         <br>
         <mat-card class="elevation">
           <mat-card-subtitle [style.color]="'black'">Selected Product Lines</mat-card-subtitle>
@@ -36,7 +40,7 @@
       </div>
     </mat-sidenav>
     <mat-sidenav-content>
-      <div class="sales-report">
+      <div class="sales-report" align="center">
         <h1>Sales Report</h1>
         <div class="example-loading-shade" *ngIf="loadingResults">
           <mat-spinner></mat-spinner>

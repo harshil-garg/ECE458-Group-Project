@@ -268,6 +268,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         this.selectedActivityList = [];
         this.refreshScheduler.emit(true);
         this.displayError(response.message);
+        console.log(response.message);
       }, err=>{
         if (err.status === 401) {
           console.log("401 Error")

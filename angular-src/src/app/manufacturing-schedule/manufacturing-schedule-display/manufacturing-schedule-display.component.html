@@ -5,48 +5,59 @@
 
         <div *ngIf="isAdmin() || isPlantManager()">
           <h2>Automate Scheduling</h2>
-          <mat-card class="mat-elevation-z2">
-            <mat-card-subtitle>
-              Select Goals with shift-click <br>
-              Select All Goals with shift-a
-            </mat-card-subtitle>
-            <mat-card-content>
-              <mat-form-field appearance="fill">
-                <input matInput [matDatepicker]="automate_start" [formControl]="startAutomateDate" placeholder="Choose a start date" required>
-                <mat-datepicker-toggle matSuffix [for]="automate_start"></mat-datepicker-toggle>
-                <mat-datepicker #automate_start></mat-datepicker>
-              </mat-form-field>
-              <br>
-              <mat-form-field appearance="fill">
-                <input matInput [matDatepicker]="automate_end" [formControl]="endAutomateDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
-                <mat-datepicker-toggle matSuffix [for]="automate_end"></mat-datepicker-toggle>
-                <mat-datepicker #automate_end></mat-datepicker>
-              </mat-form-field>
-              <br>
-              <br>
-              <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule()" color="accent">Automate Schedule</button>
-              <br>
-              <br>
-              <button type="button" mat-raised-button [disabled]="false" (click)="commit()" color="accent">Commit Automated Suggestions</button>
-              <br>
-              <br>
-              <button type="button" mat-raised-button [disabled]="false" (click)="undo()" color="accent">Undo Automated Suggestions</button>
-            </mat-card-content>
-          </mat-card>
+          <br>
+          <div class="pad-box">
+            <mat-card class="mat-elevation-z2">
+              <mat-card-subtitle>
+                Select Goals with shift-click <br>
+                Select All Goals with shift-a
+              </mat-card-subtitle>
+              <mat-card-content>
+                <mat-form-field appearance="fill">
+                  <input matInput [matDatepicker]="automate_start" [formControl]="startAutomateDate" placeholder="Choose a start date" required>
+                  <mat-datepicker-toggle matSuffix [for]="automate_start"></mat-datepicker-toggle>
+                  <mat-datepicker #automate_start></mat-datepicker>
+                </mat-form-field>
+                <br>
+                <mat-form-field appearance="fill">
+                  <input matInput [matDatepicker]="automate_end" [formControl]="endAutomateDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="automate_end"></mat-datepicker-toggle>
+                  <mat-datepicker #automate_end></mat-datepicker>
+                </mat-form-field>
+                <br>
+                <br>
+                <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule()" color="accent">Automate Schedule</button>
+                <br>
+                <br>
+                <button type="button" mat-raised-button [disabled]="false" (click)="commit()" color="accent">Commit Automated Suggestions</button>
+                <br>
+                <br>
+                <button type="button" mat-raised-button [disabled]="false" (click)="undo()" color="accent">Undo Automated Suggestions</button>
+              </mat-card-content>
+            </mat-card>
+          </div>
         </div>
 
         <div *ngIf="isAdmin() || isPlantManager()">
+          <br>
           <h2>Palette</h2>
-          <div
-            cdkDropList
-            #activities="cdkDropList"
-            [cdkDropListData]="palette"
-            [cdkDropListConnectedTo]="getLists()"
-            id="manufacturing-activities"
-            class="example-list"
-            (cdkDropListDropped)="drop($event)">
-            <div [ngClass]="{'box':selectedActivityList.indexOf(item)===-1, 'selected-box':selectedActivityList.indexOf(item)>-1}" *ngFor="let item of palette" cdkDrag (click)="activityClicked(item, $event)" (keyDown)="activityKeyPress(item, $event)">{{item.sku.name}} <br> ({{item.manufacturing_goal}})
-              <mat-icon *cdkDragPreview></mat-icon>
+          <br>
+          <div class="pad-box">
+            Drag activities to scheduler
+            <br>
+            Drop activities here to unschedule
+            <br>
+            <div
+              cdkDropList
+              #activities="cdkDropList"
+              [cdkDropListData]="palette"
+              [cdkDropListConnectedTo]="getLists()"
+              id="manufacturing-activities"
+              class="example-list"
+              (cdkDropListDropped)="drop($event)">
+              <div [ngClass]="{'box':selectedActivityList.indexOf(item)===-1, 'selected-box':selectedActivityList.indexOf(item)>-1}" *ngFor="let item of palette" cdkDrag (click)="activityClicked(item, $event)" (keyDown)="activityKeyPress(item, $event)">{{item.sku.name}} <br> ({{item.manufacturing_goal}})
+                <mat-icon *cdkDragPreview></mat-icon>
+              </div>
             </div>
           </div>
         </div>
@@ -55,118 +66,125 @@
 
     <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" position="end" opened>
       <h2>Warnings</h2>
-      <mat-card class="mat-elevation-z2">
-        <mat-card-subtitle [style.color]="'black'">
-          Warning Conditions
-        </mat-card-subtitle>
-        <mat-card-content>
-          <mat-accordion>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title [style.color]="warnings[0].length>0? 'red' : 'black'">
-                  Activities Enabled but Not Scheduled
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <mat-panel-description>
-                <ul>
-                  <li *ngFor="let warning of warnings[0]">
-                    {{warning}}
-                  </li>
-                </ul>
-              </mat-panel-description>
-            </mat-expansion-panel>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title [style.color]="warnings[1].length>0? 'red' : 'black'">
-                  Activities Scheduled After Deadline
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <mat-panel-description>
-                <ul>
-                  <li *ngFor="let warning of warnings[1]">
-                    {{warning}}
-                  </li>
-                </ul>
-              </mat-panel-description>
-            </mat-expansion-panel>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title [style.color]="warnings[2].length>0? 'red' : 'black'">
-                  Orphaned Manufacturing Activities
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <mat-panel-description>
-                <ul>
-                  <li *ngFor="let warning of warnings[2]">
-                    {{warning}}
-                  </li>
-                </ul>
-              </mat-panel-description>
-            </mat-expansion-panel>
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title [style.color]="warnings[3].length>0? 'red' : 'black'">
-                  Overridden Durations
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <mat-panel-description>
-                <ul>
-                  <li *ngFor="let warning of warnings[3]">
-                    {{warning}}
-                  </li>
-                </ul>
-              </mat-panel-description>
-            </mat-expansion-panel>
-          </mat-accordion>
-        </mat-card-content>
-      </mat-card>
+      <br>
+      <div class="pad-box">
+        <mat-card class="mat-elevation-z2">
+          <mat-card-subtitle [style.color]="'black'">
+            Warning Conditions
+          </mat-card-subtitle>
+          <mat-card-content>
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title [style.color]="warnings[0].length>0? 'red' : 'black'">
+                    Activities Enabled but Not Scheduled
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-panel-description>
+                  <ul>
+                    <li *ngFor="let warning of warnings[0]">
+                      {{warning}}
+                    </li>
+                  </ul>
+                </mat-panel-description>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title [style.color]="warnings[1].length>0? 'red' : 'black'">
+                    Activities Scheduled After Deadline
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-panel-description>
+                  <ul>
+                    <li *ngFor="let warning of warnings[1]">
+                      {{warning}}
+                    </li>
+                  </ul>
+                </mat-panel-description>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title [style.color]="warnings[2].length>0? 'red' : 'black'">
+                    Orphaned Manufacturing Activities
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-panel-description>
+                  <ul>
+                    <li *ngFor="let warning of warnings[2]">
+                      {{warning}}
+                    </li>
+                  </ul>
+                </mat-panel-description>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title [style.color]="warnings[3].length>0? 'red' : 'black'">
+                    Overridden Durations
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-panel-description>
+                  <ul>
+                    <li *ngFor="let warning of warnings[3]">
+                      {{warning}}
+                    </li>
+                  </ul>
+                </mat-panel-description>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </mat-card-content>
+        </mat-card>
+      </div>
 
+      <br>
       <h2>Reports</h2>
-      <mat-card class="mat-elevation-z2">
-        <mat-card-subtitle [style.color]="'black'">
-          Warning Conditions
-        </mat-card-subtitle>
-        <mat-card-content>
-          <form>
-            <mat-form-field appearance="fill">
-              <input matInput [matDatepicker]="picker_start" [formControl]="startDate" placeholder="Choose a start date" required>
-              <mat-datepicker-toggle matSuffix [for]="picker_start"></mat-datepicker-toggle>
-              <mat-datepicker #picker_start></mat-datepicker>
-            </mat-form-field>
-            <br>
-            <mat-form-field appearance="fill">
-              <input matInput [matDatepicker]="picker_end" [formControl]="endDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
-              <mat-datepicker-toggle matSuffix [for]="picker_end"></mat-datepicker-toggle>
-              <mat-datepicker #picker_end></mat-datepicker>
-            </mat-form-field>
-            <br>
-            <mat-form-field>
-              <input type="text" placeholder="Manufacturing Line" aria-label="Manufacturing Line" matInput [formControl]="reportingFormControl" id="autx" name="autx" [matAutocomplete]="auto">
-              <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let option of suggestedManufacturingLines" [value]="option.shortname">
-                  {{option.shortname}}
-                </mat-option>
-              </mat-autocomplete>
-              <mat-error *ngIf="reportingFormControl.hasError('forbiddenNames')">
-                You should enter value from suggested one only. <strong>'{{reportingFormControl.errors.forbiddenNames.value}}'</strong> is not allowed.
-              </mat-error>
-              <mat-error *ngIf="reportingFormControl.hasError('required')">
-                This is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <br>
-            <br>
-            <button type="button" mat-raised-button [disabled]="endDate.invalid || startDate.invalid ||reportingFormControl.hasError('forbiddenNames') || reportingFormControl.hasError('required') || !reportingFormControl.value" (click)="makeReport(reportingFormControl.value)" color="primary">Make Report</button>
-          </form>
-        </mat-card-content>
-      </mat-card>
+      <br>
+      <div class="pad-box">
+        <mat-card class="mat-elevation-z2">
+          <mat-card-subtitle [style.color]="'black'">
+            Warning Conditions
+          </mat-card-subtitle>
+          <mat-card-content>
+            <form>
+              <mat-form-field appearance="fill">
+                <input matInput [matDatepicker]="picker_start" [formControl]="startDate" placeholder="Choose a start date" required>
+                <mat-datepicker-toggle matSuffix [for]="picker_start"></mat-datepicker-toggle>
+                <mat-datepicker #picker_start></mat-datepicker>
+              </mat-form-field>
+              <br>
+              <mat-form-field appearance="fill">
+                <input matInput [matDatepicker]="picker_end" [formControl]="endDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
+                <mat-datepicker-toggle matSuffix [for]="picker_end"></mat-datepicker-toggle>
+                <mat-datepicker #picker_end></mat-datepicker>
+              </mat-form-field>
+              <br>
+              <mat-form-field>
+                <input type="text" placeholder="Manufacturing Line" aria-label="Manufacturing Line" matInput [formControl]="reportingFormControl" id="autx" name="autx" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let option of suggestedManufacturingLines" [value]="option.shortname">
+                    {{option.shortname}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="reportingFormControl.hasError('forbiddenNames')">
+                  You should enter value from suggested one only. <strong>'{{reportingFormControl.errors.forbiddenNames.value}}'</strong> is not allowed.
+                </mat-error>
+                <mat-error *ngIf="reportingFormControl.hasError('required')">
+                  This is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+              <br>
+              <br>
+              <button type="button" mat-raised-button [disabled]="endDate.invalid || startDate.invalid ||reportingFormControl.hasError('forbiddenNames') || reportingFormControl.hasError('required') || !reportingFormControl.value" (click)="makeReport(reportingFormControl.value)" color="primary">Make Report</button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
 
     </mat-sidenav>
 
     <mat-sidenav-content>
       <div class="fixed-container">
-        <h2>Manufacturing Schedule</h2>
-        <div class="content">
+        <div class="pad-box">
+          <h2>Manufacturing Schedule</h2>
           <app-manufacturing-schedule [remove]="removeEvent" [manufGoals]="manufGoalList" [goalsUpdated]="goalsUpdated" [refreshSchedule]="refreshScheduler" (warnings)="updateWarnings($event)" (activitiesUpdated)="updateActivities($event)"></app-manufacturing-schedule>
         </div>
       </div>
