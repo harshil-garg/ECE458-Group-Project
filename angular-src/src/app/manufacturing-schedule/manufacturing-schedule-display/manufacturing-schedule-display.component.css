@@ -63,3 +63,8 @@ mat-icon:hover {
   padding-left: 10px;
   padding-right: 10px;
 }
+
+.pad-small-box {
+  padding-left: 5px;
+  padding-right: 5px;
+}

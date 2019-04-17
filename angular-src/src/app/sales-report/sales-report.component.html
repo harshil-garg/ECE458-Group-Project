@@ -1,9 +1,9 @@
 <ng-container *ngIf="isAdmin() || isPlantManager() || isBusinessManager() || isProductManager() || isAnalyst()">
   <mat-sidenav-container id="container" fullscreen autosize>
     <mat-sidenav mode="side" opened>
-      <div>
+      <div class="pad-box">
         <h2>Customers</h2>
-        <div class="pad-box">
+        <div class="pad-small-box">
           <app-customer-autocomplete [initCustomer]="initCustomer()" (messageEvent)="refreshCustomer($event)">
           </app-customer-autocomplete>
         </div>
@@ -13,9 +13,9 @@
           <button mat-raised-button color="accent" class="flush" (click)="flush()">Flush Cache</button>
         </div>
       </div>
-      <div>
+      <div class="pad-box">
         <h2>Product Lines</h2>
-        <div class="pad-box">
+        <div class="pad-small-box">
           <mat-card class="mat-elevation-z2">
             <mat-card-content>
               <mat-card-subtitle [style.color]="'black'">Add Product Line</mat-card-subtitle>
