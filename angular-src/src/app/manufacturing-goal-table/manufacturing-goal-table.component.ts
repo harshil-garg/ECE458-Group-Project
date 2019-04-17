@@ -272,6 +272,10 @@ export class ManufacturingGoalTableComponent implements OnInit {
     this.edit(name, 'sku_tuples', result);
   }
 
+  dateChanged(ev){
+    console.log(ev);
+  }
+
   // updateFormula(id:number, updated_value:Formula) {
   //   var editedFormula : Formula = updated_value;
   //   this.crudFormulaService.edit({
