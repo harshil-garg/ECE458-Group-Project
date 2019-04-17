@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { AddManufacturingGoalDialogComponent } from './add-manufacturing-goal-dialog/add-manufacturing-goal-dialog.component';
 import { ManufacturingGoalService, CreateResponse } from '../manufacturing-goal.service';
@@ -14,6 +14,7 @@ import { ManufacturingGoal } from '../../model/manufacturing-goal';
 export class AddManufacturingGoalComponent {
 
     manufGoal: ManufacturingGoal = new ManufacturingGoal();
+    @Input() disabled = false;
 
     constructor(public dialog: MatDialog, public manufacturingService: ManufacturingGoalService,
       public manufacturingComponent: ManufacturingGoalTableComponent) {}
@@ -39,7 +40,7 @@ export class AddManufacturingGoalComponent {
       manufGoal.deadline.setMinutes(0);
       manufGoal.deadline.setSeconds(0);
       manufGoal.deadline.setUTCMilliseconds(0);
-      
+
       this.manufacturingService.create({
           name : manufGoal.name,
           sku_tuples : manufGoal.sku_tuples,

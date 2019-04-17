@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { ManufacturingGoal } from '../model/manufacturing-goal'
 import { AuthenticationService } from '../authentication.service'
 import { ManufacturingGoalService, RefreshResponse } from './manufacturing-goal.service';
-import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
@@ -21,8 +21,10 @@ export class ManufacturingGoalTableComponent implements OnInit {
   totalDocs: number;
   loadingResults: boolean = false;
   enabled = new SelectionModel<any>(true, [])
+  liveEditing: boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
   constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar) { }
 
@@ -79,6 +81,52 @@ export class ManufacturingGoalTableComponent implements OnInit {
         }
       }
     }
+    this.formFields.changes.subscribe((change) => {
+      change.forEach(form => {
+        form.underlineRef.nativeElement.className = null;
+      });
+    });
+  }
+
+  edit(name:any, property:string, updated_value:any) {
+    if(this.isEditable()){
+      var editedGoal : ManufacturingGoal = new ManufacturingGoal();
+      var newname : string;
+      editedGoal.name = name;
+      switch(property){
+        case 'name':{
+          newname = updated_value; //new name
+          break;
+        }
+        case 'sku_tuples':{
+          editedGoal.sku_tuples = updated_value;
+          break;
+        }
+        case 'deadline':{
+          editedGoal.deadline = updated_value;
+          break;
+        }
+      }
+      this.manufacturingService.update({
+          name : editedGoal.name,
+          newname: newname,
+          sku_tuples: editedGoal.sku_tuples,
+          deadline : editedGoal.deadline
+        }).subscribe(
+        response => {
+          if(response.success){
+            this.handleResponse(response);
+          }
+          else{
+            this.handleError(response);
+          }
+        },
+        err => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        });
+      }
   }
 
   delete() {
@@ -107,6 +155,12 @@ export class ManufacturingGoalTableComponent implements OnInit {
   private handleError(response){
     this.snackBar.open(response.message, "Close", {duration:3000});
     this.refresh();//refresh changes back to old value
+  }
+
+  private handleResponse(response) {
+    this.snackBar.open(response.message, "Close", {duration:1000});
+    //don't refresh for edits
+    //this.refresh();
   }
 
   exportcsv() {
@@ -149,30 +203,52 @@ export class ManufacturingGoalTableComponent implements OnInit {
     return this.authenticationService.isBusinessManager();
   }
 
+  canUpdate() {
+    return this.isAdmin() || this.isBusinessManager();
+  }
+
+  isEditable(){
+    return this.canUpdate() && this.liveEditing;
+  }
+
+  addUnderline(form){
+    if(this.isEditable()){
+      form.underlineRef.nativeElement.className = "mat-form-field-underline";
+    }
+  }
+
+  removeUnderline(form){
+    if(this.isEditable()){
+      form.underlineRef.nativeElement.className = null;
+    }
+  }
+
   toggleEnabled(event, goal){
-    let question = this.enabled.isSelected(goal) ? "disable" : "enable"
-    event.stopPropagation();
+    if(this.isAdmin() || this.isBusinessManager()){
+      let question = this.enabled.isSelected(goal) ? "disable" : "enable"
+      event.stopPropagation();
 
-    if(confirm(`Are you sure you would like to ${question} ${goal.name}?`)){
-      this.enabled.toggle(goal);
+      if(confirm(`Are you sure you would like to ${question} ${goal.name}?`)){
+        this.enabled.toggle(goal);
 
-      this.manufacturingService.setEnabled({
-        manufacturing_goal: goal,
-        enabled: this.enabled.isSelected(goal)
-      }).subscribe((response) => {
-        if(response.success){
-          this.refresh()
-        }else{
-          this.handleError(response);
-        }
-      },
-      (err) => {
-        if (err.status === 401) {
-          console.log("401 Error")
-        }
-      })
-    }else{
-      event.preventDefault();
+        this.manufacturingService.setEnabled({
+          manufacturing_goal: goal,
+          enabled: this.enabled.isSelected(goal)
+        }).subscribe((response) => {
+          if(response.success){
+            this.refresh()
+          }else{
+            this.handleError(response);
+          }
+        },
+        (err) => {
+          if (err.status === 401) {
+            console.log("401 Error")
+          }
+        })
+      }else{
+        event.preventDefault();
+      }
     }
   }
 

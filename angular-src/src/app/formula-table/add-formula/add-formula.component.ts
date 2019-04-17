@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddFormulaDialogComponent } from './add-formula-dialog/add-formula-dialog.component';
 import { CrudFormulaService, Response } from '../crud-formula.service';
@@ -13,6 +13,7 @@ import { Formula } from '../../model/formula';
 })
 export class AddFormulaComponent {
 
+  @Input() disabled = false;
   formula: Formula = new Formula();
 
   constructor(public dialog: MatDialog, public crudFormulaService: CrudFormulaService,

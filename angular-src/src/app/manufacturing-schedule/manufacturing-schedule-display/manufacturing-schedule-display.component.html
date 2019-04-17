@@ -9,8 +9,8 @@
           <div class="pad-box">
             <mat-card class="mat-elevation-z2">
               <mat-card-subtitle>
-                Select Goals with shift-click <br>
-                Select All Goals with shift-a
+                Select Activities with shift-click <br>
+                Select All Activities with shift-a
               </mat-card-subtitle>
               <mat-card-content>
                 <mat-form-field appearance="fill">
@@ -27,7 +27,9 @@
                 <br>
                 <br>
                 <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule(false)" color="accent">Automate Naive</button>
-                <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule(true)" color="accent">Automate Complex</button>                <br>
+                <br>
+                <br>
+                <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule(true)" color="accent">Automate Complex</button>
                 <br>
                 <br>
                 <button type="button" mat-raised-button [disabled]="false" (click)="commit()" color="accent">Commit Automated Suggestions</button>

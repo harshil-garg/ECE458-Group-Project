@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ProductLineTableComponent } from '../product-line-table.component';
 import { AddProductLineDialogComponent } from './add-product-line-dialog/add-product-line-dialog.component';
@@ -14,6 +14,7 @@ import { ProductLine } from '../../model/product-line';
 export class AddProductLineComponent {
 
     productLine: ProductLine = new ProductLine();
+    @Input() disabled = false;
 
     constructor(public dialog: MatDialog, public productLineTableComponent: ProductLineTableComponent,
       public crudProductLineService: CrudProductLineService, private snackBar: MatSnackBar) {}
