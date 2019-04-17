@@ -161,7 +161,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
   private handleResponse(response) {
     this.snackBar.open(response.message, "Close", {duration:1000});
     //don't refresh for edits
-    //this.refresh();
+    // this.refresh();
   }
 
   exportcsv() {
@@ -268,7 +268,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
     });
   }
 
-  updateTuples(id: string, result) {
+  updateTuples(name: string, result) {
     this.edit(name, 'sku_tuples', result);
   }
 

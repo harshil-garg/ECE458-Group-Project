@@ -125,7 +125,7 @@ router.post('/update', async (req, res) => {
     if(comment != undefined && comment != NaN){
         json["comment"] = comment;
     }
-
+    
     Formula.findOneAndUpdate({number: number}, json, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update formula. Error: ${err}`});

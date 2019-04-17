@@ -11,9 +11,12 @@
     </mat-chip-list>
   </div>
   <app-sku-autocomplete (skuSelected)="setSkuInput($event)"></app-sku-autocomplete>
+  <label>Case Quantity</label>
+  <br> 
   <input [(ngModel)]="quantityInput">
   <br>
   <br>
-  <button mat-raised-button type="button" (click)="addSkuQuantity()" color="accent" [disabled]="skuInput==null || quantityInput==null || quantityInput.length==0">Add Ingr-Quant</button>
+  <button mat-raised-button type="button" (click)="addSkuQuantity()" color="accent" [disabled]="skuInput==null || quantityInput==null || quantityInput.length==0">Add SKU-Tuple</button>
 </mat-card>
+<br>
 <button mat-raised-button type="button" (click)="updateTuples()" color="accent">Update Tuples</button>
