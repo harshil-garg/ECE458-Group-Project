@@ -34,6 +34,12 @@ export class AddManufacturingGoalComponent {
     }
 
     add(manufGoal: ManufacturingGoal) {
+      // Set the deadline to 6PM
+      manufGoal.deadline.setHours(18);
+      manufGoal.deadline.setMinutes(0);
+      manufGoal.deadline.setSeconds(0);
+      manufGoal.deadline.setUTCMilliseconds(0);
+      
       this.manufacturingService.create({
           name : manufGoal.name,
           sku_tuples : manufGoal.sku_tuples,
