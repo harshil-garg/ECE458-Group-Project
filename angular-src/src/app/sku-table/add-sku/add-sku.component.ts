@@ -66,6 +66,7 @@ export class AddSkuComponent {
     if (!response.success) {
       this.snackBar.open(response.message, "Close", {duration:3000});
     } else {
+      this.skuTableComponent.increasePageSize();
       this.skuTableComponent.refresh();
     }
     console.log(response);

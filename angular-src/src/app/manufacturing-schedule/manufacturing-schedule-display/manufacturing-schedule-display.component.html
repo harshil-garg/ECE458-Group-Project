@@ -1,23 +1,27 @@
 <div (keydown.shift.a)="handleKey($event)">
-  <mat-sidenav-container class="example-container">
-    <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened>
+  <mat-sidenav-container class="example-container" autosize>
+    <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" opened class="pad-box">
       <div class="example-container">
 
         <div *ngIf="isAdmin() || isPlantManager()">
           <h2>Automate Scheduling</h2>
           <br>
-          <div class="pad-box">
+          <div class="pad-small-box">
             <mat-card class="mat-elevation-z2">
               <mat-card-subtitle>
                 Select Activities with shift-click <br>
                 Select All Activities with shift-a
               </mat-card-subtitle>
               <mat-card-content>
+                <label>Start Date</label>
+                <br>
                 <mat-form-field appearance="fill">
                   <input matInput [matDatepicker]="automate_start" [formControl]="startAutomateDate" placeholder="Choose a start date" required>
                   <mat-datepicker-toggle matSuffix [for]="automate_start"></mat-datepicker-toggle>
                   <mat-datepicker #automate_start></mat-datepicker>
                 </mat-form-field>
+                <br>
+                <label>End Date</label>
                 <br>
                 <mat-form-field appearance="fill">
                   <input matInput [matDatepicker]="automate_end" [formControl]="endAutomateDate" placeholder="Choose a end date" id="endDate" name="endDate" required>
@@ -45,7 +49,7 @@
           <br>
           <h2>Palette</h2>
           <br>
-          <div class="pad-box">
+          <div class="pad-small-box">
             Drag activities to scheduler
             <br>
             Drop activities here to unschedule
@@ -67,10 +71,10 @@
       </div>
     </mat-sidenav>
 
-    <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" position="end" opened>
+    <mat-sidenav [fixedInViewport]="true" [fixedTopGap]="65" mode="side" position="end" opened autosize class="pad-box">
       <h2>Warnings</h2>
       <br>
-      <div class="pad-box">
+      <div class="pad-small-box">
         <mat-card class="mat-elevation-z2">
           <mat-card-subtitle [style.color]="'black'">
             Warning Conditions
@@ -141,18 +145,19 @@
       <br>
       <h2>Reports</h2>
       <br>
-      <div class="pad-box">
+      <div class="pad-small-box">
         <mat-card class="mat-elevation-z2">
-          <mat-card-subtitle [style.color]="'black'">
-            Warning Conditions
-          </mat-card-subtitle>
           <mat-card-content>
             <form>
+              <label>Start Date</label>
+              <br>
               <mat-form-field appearance="fill">
                 <input matInput [matDatepicker]="picker_start" [formControl]="startDate" placeholder="Choose a start date" required>
                 <mat-datepicker-toggle matSuffix [for]="picker_start"></mat-datepicker-toggle>
                 <mat-datepicker #picker_start></mat-datepicker>
               </mat-form-field>
+              <br>
+              <label>End Date</label>
               <br>
               <mat-form-field appearance="fill">
                 <input matInput [matDatepicker]="picker_end" [formControl]="endDate" placeholder="Choose a end date" id="endDate" name="endDate" required>

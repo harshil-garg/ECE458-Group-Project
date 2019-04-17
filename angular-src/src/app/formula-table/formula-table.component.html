@@ -13,7 +13,7 @@
 </div>
 <div class="flex-box-center" *ngIf="!canUpdate()">
   <div class="flex-item">
-    <button mat-raised-button="export_formulas" type="button" (click)="export()" color="accent">Export</button>
+    <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export</button>
   </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">

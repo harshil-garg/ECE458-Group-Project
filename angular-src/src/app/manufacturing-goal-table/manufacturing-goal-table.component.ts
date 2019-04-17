@@ -2,9 +2,10 @@ import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/
 import { ManufacturingGoal } from '../model/manufacturing-goal'
 import { AuthenticationService } from '../authentication.service'
 import { ManufacturingGoalService, RefreshResponse } from './manufacturing-goal.service';
-import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
+import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField, MatDialog} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
 import { ExportService } from '../export.service';
+import { TupleEditDialogComponent } from './tuple-edit-dialog/tuple-edit-dialog.component';
 
 @Component({
   selector: 'app-manufacturing',
@@ -27,7 +28,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
-  constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar, private exportService: ExportService) { }
+  constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar, private exportService: ExportService, public dialog: MatDialog) { }
 
   ngOnInit() {
     this.paginator.pageIndex = 0;
@@ -161,7 +162,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
   private handleResponse(response) {
     this.snackBar.open(response.message, "Close", {duration:1000});
     //don't refresh for edits
-    //this.refresh();
+    // this.refresh();
   }
 
   exportcsv() {
@@ -257,5 +258,56 @@ export class ManufacturingGoalTableComponent implements OnInit {
       }
     }
   }
+
+  openTupleEditDialog(name: string, tuples){
+    let dialogRef = this.dialog.open(TupleEditDialogComponent, {
+      height: '600px',
+      width: '400px',
+      data: {
+        tuples: tuples
+      }
+    });
+    dialogRef.afterClosed().subscribe(result =>{
+      if(result!=null){
+        this.updateTuples(name, result);
+      }
+    });
+  }
+
+  updateTuples(name: string, result) {
+    this.edit(name, 'sku_tuples', result);
+  }
+
+  increasePageSize() {
+    if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+      this.paginator.pageSize++;
+    }
+  }
+
+  // updateFormula(id:number, updated_value:Formula) {
+  //   var editedFormula : Formula = updated_value;
+  //   this.crudFormulaService.edit({
+  //       name : editedFormula.name,
+  //       number : editedFormula.number.toString(),
+  //       newnumber: editedFormula.number.toString(),
+  //       ingredient_tuples: editedFormula.ingredient_tuples,
+  //       comment : editedFormula.comment
+  //     }).subscribe(
+  //     response => {
+  //       if(response.success){
+  //         console.log("FORMULA SUCCESS");
+  //         this.handleResponse(response);
+  //       }
+  //       else{
+  //         this.handleError(response);
+  //       }
+  //     },
+  //     err => {
+  //       if (err.status === 401) {
+  //         console.log("401 Error")
+  //       }
+  //     });
+  //   this.edit(id, 'formula', updated_value);
+  // }
 
 }

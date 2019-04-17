@@ -52,7 +52,7 @@ mat-icon:hover{
 }
 
 .sales-report {
-  padding-left: 60px;
+  padding-left: 30px;
   padding-right: 30px;
 }
 
@@ -81,3 +81,9 @@ mat-icon:hover{
   padding-left: 10px;
   padding-right: 10px;
 }
+
+.pad-small-box {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+

@@ -143,7 +143,7 @@ router.post('/create', async (req, res) => {
 
 function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, res){
     let goal = new ManufacturingGoal({name, sku_tuples, deadline, author, last_edit});
-
+    
     ManufacturingGoal.create(goal, (error) => {
         if (error) {
             res.json({success: false, message: `Failed to create a new manufacturing goal. Error: ${error}`});
@@ -156,8 +156,8 @@ function createManufacturingGoal(name, sku_tuples, deadline, author, last_edit, 
 //UPDATE
 router.post('/update', async (req, res) => {
     const { name, newname, sku_tuples, deadline } = req.body;
+    
     let json = {};
-
     if(newname != undefined && newname != NaN){
         json["name"] = newname;
     }
@@ -174,7 +174,6 @@ router.post('/update', async (req, res) => {
             res.json({success: false, message: errors});
             return;
         }
-
         // Change from sku name to id
         for(let i = 0; i < valid_tuples.length; i++){
             sku_tuples[i]['sku'] = valid_tuples[i][2]; //id of sku
@@ -189,8 +188,9 @@ router.post('/update', async (req, res) => {
         }
         json["deadline"] = deadline_date;
     }
+    json["last_edit"] = new Date()
     
-    ManufacturingGoal.findOneAndUpdate({name: name}, json, (err) => {
+    ManufacturingGoal.findOneAndUpdate({name: name}, json, {new: true}, (err) => {
         if (err) {
             res.json({success: false, message: `Failed to update manufacturing goal. Error: ${err}`});
         } else {

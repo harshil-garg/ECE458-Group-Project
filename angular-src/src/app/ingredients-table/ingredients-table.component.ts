@@ -311,6 +311,12 @@ export class IngredientsTableComponent implements OnInit{
       return this.isAdmin() || this.isProductManager();
     }
 
+    increasePageSize() {
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+        this.paginator.pageSize++;
+      }
+    }
+
 }
 //
 // function skuList(ingredient: Ingredient)

@@ -107,7 +107,7 @@
   <ng-container matColumnDef="product_line">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Line</th>
     <td mat-cell *matCellDef="let element">
-      <app-product-line-autocomplete *ngIf="isEditable()" [initProductLine]="element.product_line" (messageEvent)="edit(element.id, 'product_line', $event)"></app-product-line-autocomplete>
+      <app-product-line-autocomplete *ngIf="isEditable()" [disableUnderline]="true" [initProductLine]="element.product_line" (messageEvent)="edit(element.id, 'product_line', $event)"></app-product-line-autocomplete>
       <ng-container *ngIf="!isEditable()">{{element.product_line}}</ng-container>
     </td>
   </ng-container>

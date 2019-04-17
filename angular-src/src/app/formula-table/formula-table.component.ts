@@ -322,4 +322,10 @@ export class FormulaTableComponent implements OnInit{
     canUpdate() {
       return this.isAdmin() || this.isProductManager();
     }
+
+    increasePageSize() {
+      if(this.paginator.pageSize < 10 || this.paginator.pageSize == this.totalDocs){
+        this.paginator.pageSize++;
+      }
+    }
 }

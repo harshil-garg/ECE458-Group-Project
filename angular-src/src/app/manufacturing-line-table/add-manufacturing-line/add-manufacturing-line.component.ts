@@ -53,6 +53,7 @@ export class AddManufacturingLineComponent {
       if (!response.success) {
         alert(response.message);
       }
+      this.manufacturingLineTableComponent.increasePageSize();
       this.manufacturingLineTableComponent.refresh();
     }
 
