@@ -342,7 +342,8 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         var activities : Array<any> = [];
         for(let manufacturing_task of response.data) {
           var start_date = new Date(manufacturing_task.start_date);
-          var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          // var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          var end_date = new Date(manufacturing_task.end_date);
           var duration = manufacturing_task.duration;
 
           let sku_info = manufacturing_task.activity.sku;

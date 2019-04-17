@@ -15,6 +15,7 @@ const User = require('../model/user_model');
 // Utilities
 const PriorityQueue = require('../utils/priority_queue')
 const jwtDecode = require('jwt-decode');
+const schedule_filter = require('../controllers/schedule_filter');
 
 /****************************************************************************************************
  * NAIVE ALGORITHM
@@ -90,7 +91,8 @@ async function automate_naive(req, res) {
         pq.push(t);
     }
     
-    let user_model = await User.findOne({email: getUser(req)})
+    let user_model = await schedule_filter.getUserModel(getUser(req));
+    let valid_lines = user_model.admin ? await ManufacturingLine.find({}).exec() : user_model.manufacturinglines
     let errors = [];
 
     while (true) {
@@ -100,10 +102,10 @@ async function automate_naive(req, res) {
         let earliestStartTime = moment(end);
         let bestLine;
 
-        for(let valid_line of user_model.plant_manager){
+        for(let valid_line of valid_lines){
             console.log(await ManufacturingLine.find({_id: valid_line}));
             for (let line of task.sku.manufacturing_lines) {
-                if(line.equals(valid_line)){
+                if(line.equals(valid_line._id)){
                     console.log("Am i ever in here lol");
                     let schedulableOnLine = false;
                     let preExistingActivities = await ManufacturingSchedule.find({
@@ -111,6 +113,7 @@ async function automate_naive(req, res) {
                     });
         
                     let interval = skipToWorkingHours(moment(start), calculateEndTime(moment(start), task.duration), task.duration);
+
                     while (interval.end <= end) {
                         interval = skipToWorkingHours(interval.start, interval.end, task.duration);
                         let conflict = false;
@@ -280,7 +283,6 @@ router.post('/complex', async(req, res) => {
 
     let user_model = await User.findOne({email: getUser(req)})
     let lines = await ManufacturingLine.find({_id: {$in: user_model.plant_manager}}); //lines the user has access to
-    console.log(lines)
     console.log("poo")
     for (let line of lines) {
         let tasks = await ManufacturingSchedule.find({
@@ -381,9 +383,8 @@ router.post('/complex', async(req, res) => {
 
 async function transformSchedule(schedule, times, req) {
     let mappings = [];
-    let blocks = await ManufacturingSchedule.find({
-        committed: true
-    });
+    let blocks = await schedule_filter.filter();
+    console.log("BLOCKS: "+blocks)
     for (let s of schedule) {
         if (s.task == 'MakeSpan') continue;
 
