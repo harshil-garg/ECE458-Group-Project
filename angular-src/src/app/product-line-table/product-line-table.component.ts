@@ -227,4 +227,10 @@ export class ProductLineTableComponent implements OnInit{
     canUpdate() {
       return this.isAdmin() || this.isProductManager();
     }
+
+    increasePageSize() {
+      if(this.paginator.pageSize < 10){
+        this.paginator.pageSize++;
+      }
+    }
 }

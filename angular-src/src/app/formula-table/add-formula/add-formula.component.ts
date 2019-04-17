@@ -56,6 +56,7 @@ export class AddFormulaComponent {
     if (!response.success) {
       this.snackBar.open(response.message, "Close", {duration:3000});
     } else {
+      this.formulaTableComponent.increasePageSize();
       this.formulaTableComponent.refresh();
     }
     console.log(response);

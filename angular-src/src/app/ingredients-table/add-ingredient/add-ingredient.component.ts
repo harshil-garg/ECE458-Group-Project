@@ -101,6 +101,7 @@ export class AddIngredientComponent {
       if (!response.success) {
         this.snackBar.open(response.message, "Close", {duration:3000});
       } else {
+        this.ingredientsTableComponent.increasePageSize();
         this.ingredientsTableComponent.refresh();
       }
     }

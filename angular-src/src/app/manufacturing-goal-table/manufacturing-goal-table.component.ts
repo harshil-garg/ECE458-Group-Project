@@ -272,8 +272,10 @@ export class ManufacturingGoalTableComponent implements OnInit {
     this.edit(name, 'sku_tuples', result);
   }
 
-  dateChanged(ev){
-    console.log(ev);
+  increasePageSize() {
+    if(this.paginator.pageSize < 10){
+      this.paginator.pageSize++;
+    }
   }
 
   // updateFormula(id:number, updated_value:Formula) {

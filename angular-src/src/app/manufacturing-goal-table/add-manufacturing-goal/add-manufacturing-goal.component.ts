@@ -58,6 +58,7 @@ export class AddManufacturingGoalComponent {
     private handleResponse(response: CreateResponse) {
       console.log(response);
       this.snackBar.open(response.message, "Close", {duration:1000});
+      this.manufacturingComponent.increasePageSize();
       this.manufacturingComponent.refresh();
     }
 

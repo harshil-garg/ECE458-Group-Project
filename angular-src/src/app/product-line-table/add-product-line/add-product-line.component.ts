@@ -51,6 +51,7 @@ export class AddProductLineComponent {
       if (!response.success) {
         this.snackBar.open(response.message, "Close", {duration:3000});
       }
+      this.productLineTableComponent.increasePageSize();
       this.productLineTableComponent.refresh();
     }
 
