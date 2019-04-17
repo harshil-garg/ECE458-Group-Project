@@ -33,4 +33,7 @@ export class DashboardComponent implements OnInit {
     return this.authenticationService.isAdmin();
   }
 
+  getUser(){
+    return this.authenticationService.getEmail();
+  }
 }

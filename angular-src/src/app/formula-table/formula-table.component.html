@@ -8,12 +8,12 @@
 </div>
 <div class="button-div" *ngIf="canUpdate()">
   <button class="remove" mat-raised-button="remove" type="button" (click)="remove()" color="accent" [disabled]="selection.selected.length==0 || !isEditable()">Remove Selected</button>
-  <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export</button>
-  <app-add-formula class="add"></app-add-formula>
+  <button mat-raised-button="export_formulas" class="export" type="button" (click)="export()" color="accent">Export</button>
+  <app-add-formula class="add" [disabled]="!liveEditing"></app-add-formula>
 </div>
 <div class="flex-box-center" *ngIf="isAnalyst() && !canUpdate()">
   <div class="flex-item">
-    <button mat-raised-button="export_formulas" class="export_formulas" type="button" (click)="export()" color="accent">Export</button>
+    <button mat-raised-button="export_formulas" type="button" (click)="export()" color="accent">Export</button>
   </div>
 </div>
 <div class="example-loading-shade" *ngIf="loadingResults">
@@ -29,13 +29,15 @@
     <th mat-header-cell *matHeaderCellDef>
       <mat-checkbox (change)="$event ? masterToggle() : null"
                     [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                    [disabled]="!liveEditing">
       </mat-checkbox>
     </th>
     <td mat-cell *matCellDef="let row">
       <mat-checkbox (click)="$event.stopPropagation()"
                     (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)">
+                    [checked]="selection.isSelected(row)"
+                    [disabled]="!liveEditing">
       </mat-checkbox>
     </td>
   </ng-container>
@@ -64,7 +66,12 @@
   <ng-container matColumnDef="ingredient_tuples">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Ingredient Tuples</th>
     <td mat-cell *matCellDef="let element">
-      <div class="ingr-tuples">
+      <ng-container *ngIf="!isEditable()">
+        <ng-container *ngFor="let tuple of element.ingredient_tuples; let ingr_id=index">
+          <a>{{tuple.ingredient}} : {{tuple.quantity}} {{tuple.unit}}<br></a>
+        </ng-container>
+      </ng-container>
+      <div class="ingr-tuples" *ngIf="isEditable()">
         <mat-chip-list class="mat-chip-list-stacked">
           <ng-container *ngFor="let tuple of element.ingredient_tuples; let ingr_id=index">
             <div>

@@ -10,6 +10,7 @@ import { SkuTableComponent } from '../sku-table.component';
 })
 export class BulkSkuEditComponent implements OnInit {
   @Input() selectedSkus: Array<any>;
+  @Input() disabled = false;
 
   constructor(public matDialog: MatDialog, private skuTableComponent: SkuTableComponent) { }
 

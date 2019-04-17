@@ -557,17 +557,6 @@ router.post('/commit', async(req, res) => {
             message: errors
         })
     }
-
-
-    /*let response = await ManufacturingSchedule.updateMany({
-        committed: false
-    }, {
-        committed: true
-    });
-    res.json({
-        success: true,
-        message: ["Committed provisional activities to the manufacturing schedule"]
-    });*/
 });
 
 /****************************************************************************************************
