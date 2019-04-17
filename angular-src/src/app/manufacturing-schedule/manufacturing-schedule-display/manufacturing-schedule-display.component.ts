@@ -37,6 +37,8 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     public dialog: MatDialog) {}
 
   ngOnInit() {
+    this.startAutomateDate.value.setHours(8, 0, 0 ,0 );
+    this.endAutomateDate.value.setHours(18, 0, 0, 0);
     this.manufGoalList = [];
     this.palette = [];
     this.populateManufGoalList();
@@ -251,7 +253,7 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
     event.preventDefault();
   }
 
-  automateSchedule(){
+  automateSchedule(complex){
     let activities = [];
     for(let activity of this.selectedActivityList){
       console.log(activity);
@@ -260,7 +262,26 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         sku: activity.sku.number
       });
     };
-    this.manufacturingScheduleService.automate({
+
+    this.startAutomateDate.value.setHours(8, 0, 0 ,0 );
+    this.endAutomateDate.value.setHours(18, 0, 0, 0);
+
+    if(complex){
+      this.manufacturingScheduleService.automate_complex({
+        activities: activities,
+        start_: this.startAutomateDate.value.toISOString(),
+        end_: this.endAutomateDate.value.toISOString()
+      }).subscribe(response => {
+        this.selectedActivityList = [];
+        this.refreshScheduler.emit(true);
+        this.displayError(response.message);
+      }, err=>{
+        if (err.status === 401) {
+          console.log("401 Error")
+        }
+      })
+    }else{
+      this.manufacturingScheduleService.automate({
         activities: activities,
         start_: this.startAutomateDate.value.toISOString(),
         end_: this.endAutomateDate.value.toISOString()
@@ -274,7 +295,10 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
           console.log("401 Error")
         }
       });
+    }
+    
   }
+
 
   commit(){
     this.manufacturingScheduleService.commit()

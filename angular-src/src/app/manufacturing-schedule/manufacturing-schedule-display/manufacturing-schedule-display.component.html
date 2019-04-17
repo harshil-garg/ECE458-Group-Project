@@ -26,7 +26,8 @@
                 </mat-form-field>
                 <br>
                 <br>
-                <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule()" color="accent">Automate Schedule</button>
+                <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule(false)" color="accent">Automate Naive</button>
+                <button type="button" mat-raised-button [disabled]="selectedActivityList.length==0 || automate_start.invalid || automate_end.invalid" (click)="automateSchedule(true)" color="accent">Automate Complex</button>                <br>
                 <br>
                 <br>
                 <button type="button" mat-raised-button [disabled]="false" (click)="commit()" color="accent">Commit Automated Suggestions</button>
