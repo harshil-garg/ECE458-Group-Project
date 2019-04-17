@@ -77,7 +77,11 @@ router.post('/netid', (req, res) => {
                     name: name,
                     email: netid_email,
                     password: "hello",
-                    admin : false
+                    admin : false,
+                    analyst : false,
+                    product_manager : false,
+                    business_manager : false,
+                    plant_manager : []
                 });
 
                 bcrypt.genSalt(10, (err, salt) => {
@@ -91,21 +95,30 @@ router.post('/netid', (req, res) => {
                             res.json({success: false, message: `Failed to create a new user. Error: ${err}`});
                     } else {
                         admin = user.admin;
+                        analyst = user.analyst;
+                        product_manager = user.product_manager;
+                        business_manager = user.business_manager;
+                        plant_manager = user.manufacturinglines;
+
                         let d = new Date();
                         let exp = d.getTime() + sessionTimeout;
                         opts = {};
                         const secret = 'SECRET_KEY'; //normally stored in process.env.secret
-                        const token = jwt.sign({ email: netid_email, admin, exp }, secret, opts);
+                        const token = jwt.sign({ email: netid_email, analyst, product_manager, business_manager, plant_manager, admin, exp }, secret, opts);
                         res.json({success: true, token})
                     }
                 });
         } else {
             admin = user.admin;
+            analyst = user.analyst;
+            product_manager = user.product_manager;
+            business_manager = user.business_manager;
+            plant_manager = user.manufacturinglines;
             let d = new Date();
             let exp = d.getTime() + sessionTimeout;
             opts = {};
             const secret = 'SECRET_KEY'; //normally stored in process.env.secret
-            const token = jwt.sign({ email: netid_email, admin, exp }, secret, opts);
+            const token = jwt.sign({ email: netid_email, analyst, product_manager, business_manager, plant_manager, admin, exp }, secret, opts);
             res.json({success: true, token})
         }
         ;

@@ -4,6 +4,7 @@ import { AuthenticationService } from '../authentication.service'
 import { ManufacturingGoalService, RefreshResponse } from './manufacturing-goal.service';
 import {MatTableDataSource, MatPaginator, MatSnackBar, MatSort, MatFormField} from '@angular/material';
 import {SelectionModel} from '@angular/cdk/collections';
+import { ExportService } from '../export.service';
 
 @Component({
   selector: 'app-manufacturing',
@@ -26,7 +27,7 @@ export class ManufacturingGoalTableComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChildren(MatFormField) formFields: QueryList<MatFormField>;
 
-  constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar) { }
+  constructor(private authenticationService: AuthenticationService, public manufacturingService: ManufacturingGoalService, private snackBar: MatSnackBar, private exportService: ExportService) { }
 
   ngOnInit() {
     this.paginator.pageIndex = 0;
@@ -164,18 +165,23 @@ export class ManufacturingGoalTableComponent implements OnInit {
   }
 
   exportcsv() {
-    for(let selected of this.selection.selected){
-      var csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += ["sku_name", "case_quantity"].join(",") + "\r\n";
-      selected.sku_tuples.forEach(function(item) {
-        //let row = item.number+","+item.name+","+item.package_size+","+item.cost+","+item.calculated_quantity;
-        //csvContent += row + "\r\n";
-        console.log(item);
-        csvContent += item.sku+","+item.case_quantity+"\r\n";
+    let headers = ['Name', 'Author', 'Last Edit', 'SKUs', 'Deadline'];
+    let data = [];
+    for(let selected of this.selection.selected) {
+      let row = {};
+      row['Name'] = selected['name'];
+      row['Author'] = selected['author'];
+      row['Last Edit'] = `"${selected['last_edit']}"`;
+      let skus = `"`;
+      selected.sku_tuples.forEach((item, index) => {
+        skus += `${item.sku.name} (${item.sku.number}) : ${item.case_quantity}${index == selected.sku_tuples.length - 1 ? '' : ','}`;
       });
-      var encodedUri = encodeURI(csvContent);
-      window.open(encodedUri);
+      skus += `"`;
+      row['SKUs'] = skus;
+      row['Deadline'] = selected.deadline;
+      data.push(row);
     }
+    this.exportService.exportJSON(headers, data, 'manufacturing_goals');
   }
 
   isAllSelected() {

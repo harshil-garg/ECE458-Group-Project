@@ -16,6 +16,10 @@ router.post('/autocomplete', async (req, res) => {
 router.post('/update-priveleges', async (req, res) => {    
     const {email, admin, product_manager, business_manager, manufacturing_lines, analyst} = req.body;
 
+    if (email == req.user.email) {
+        res.json({success: false, message: "A user can't update their own priveleges"})
+        return
+    }
     User.findOne({email: email}, async (err, result) =>{
         if (!result) {
             res.json({success: false, message: 'User not found'});

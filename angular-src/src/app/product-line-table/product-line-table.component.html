@@ -11,7 +11,7 @@
   <app-add-product-line [disabled]="!liveEditing" class="add"></app-add-product-line>
   <button class="export" mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
 </div>
-<div class="flex-box-center" *ngIf="isAnalyst() && !canUpdate()">
+<div class="flex-box-center" *ngIf="!canUpdate()">
   <div class="flex-item">
     <button mat-raised-button="export" type="button" (click)="export()" color="accent">Export</button>
   </div>

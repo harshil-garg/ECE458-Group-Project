@@ -47,7 +47,7 @@ passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
     User.findOne({email: jwt_payload.email}).exec()
         .then((user, err) => {
             if (user) {
-                return done(null, true);
+                return done(null, user);
             }
             else {
                 console.log('no one found');
