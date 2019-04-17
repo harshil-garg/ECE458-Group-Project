@@ -39,6 +39,8 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
   ngOnInit() {
     this.startAutomateDate.value.setHours(8, 0, 0 , 0);
     this.endAutomateDate.value.setHours(18, 0, 0, 0);
+    this.startDate.value.setHours(8, 0, 0 , 0);
+    this.endDate.value.setHours(18, 0, 0 , 0);
     this.manufGoalList = [];
     this.palette = [];
     this.populateManufGoalList();
@@ -343,7 +345,8 @@ export class ManufacturingScheduleDisplayComponent implements OnInit{
         var activities : Array<any> = [];
         for(let manufacturing_task of response.data) {
           var start_date = new Date(manufacturing_task.start_date);
-          var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          // var end_date = new Date(start_date.getTime() + manufacturing_task.duration*60*60*1000);
+          var end_date = new Date(manufacturing_task.end_date);
           var duration = manufacturing_task.duration;
 
           let sku_info = manufacturing_task.activity.sku;
